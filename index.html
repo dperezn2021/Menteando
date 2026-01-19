@@ -7,83 +7,72 @@
     <link rel="icon" type="image/png" sizes="32x32" href="assests/img/logo.png">    
     <link rel="stylesheet" href="css/style.css"/>
 </head>
+
 <body>
-
-    <!--- Header -->
-    <header>
-        <div class="header-content">
-
-            <!-- TÍTULO + LOGO + ESLOGAN -->
-            <div class="title-block">
-                <img class="logo" src="assests/img/logo.png" alt="logo"/>
-                <div class="title-row">
-                    <h1>Menteando</h1>
-                    <small>Entrena tu mente jugando</small>
-                </div>
+    <!--- HEADER -->
+    <header class="cabecera">
+        <!-- TÍTULO + LOGO + ESLOGAN -->
+        <div class="cabecera-titulo">
+            <img class="cabecera-titulo-logo" src="assests/img/logo.png" alt="logo" style="height: 100px; padding: 1rem;" />
+            <div class="cabecera-titulo-texto">
+                <h1>Menteando</h1>
+                <small>Entrena tu mente, pero jugando</small>
             </div>
-
-            <!-- NAV -->
-            <nav class="main-nav">
-                <a href="index.html">Inicio</a>
-                <a href="perfil.html">Perfil</a>
-                <a href="games.html">Juegos</a>
-                <a href="about.html">Acerca de</a>
-            </nav>
-
         </div>
+
+        <!-- NAVEGACION -->
+        <nav class="cabecera-nav">
+            <a class="navegacion-elemento" href="index.html">Inicio</a>
+            <a class="navegacion-elemento" href="perfil.html">Perfil</a>
+            <a class="navegacion-elemento" href="games.html">Juegos</a>
+            <a class="navegacion-elemento" href="about.html">Acerca de</a>
+        </nav>
     </header>
 
 
     <!--- Cuerpo Main -->
-    <main class="layout">
-        <section id="welcome" class="full-width">
+    <main class="cuerpo">
+        <!-- Columna izquierda CONTAINER para scroll -->
+        <div class="columna-izquierda-contenedor">
+            <div class="columna-izquierda-contenido">
+                <div class="cuerpo-izquierda-bienvenida">
                     <h2>¡Bienvenido a Menteando!</h2>
                     <p>Tu plataforma de minijuegos cognitivos para entrenar memoria, atención y reflejos</p>
+                </div>
 
-        </section>
-        <div class="columns">
-            <!-- COLUMNA 1: PERFIL -->
-            <section id="perfil" class="column">
-                <h2>Perfil</h2>
-                <p>Aquí podrás ver tu progreso</p>
-                <!-- Aquí meterás tus estadísticas -->
-            </section>
-            <!-- COLUMNA 1: PERFIL -->
-            <section id="mascota" class="column">
-                <h2>Mascota</h2>
-                <p>Ponle nombre a tu mascota</p>
-                <!-- Aquí meterás tus estadísticas -->
-            </section>
-            
-           
-
-        </div>
-         <!-- COLUMNA 2: INTRO -->
-        <section id="intro" class="full-width">
-            <h2>Entrena tu mente jugando</h2>
-            <p>¿Sigues pensando que eres demasiado mayor para jugar?</p>
-            
-            
-        </section>
-        <!-- CARDS --> 
-        <section id="games" class="full-width">
-            <h2>Juegos destacados</h2>
-            <div class="cards">
-                <!-- Ejemplo de cards para el futuro -->
-                <div class="card">1</div>
-                <div class="card">2</div>
+                <div class="cuerpo-izquierda-columnas">
+                    <!-- COLUMNA 1: PERFIL -->
+                    <section id="perfil" class="column">
+                        <h2>Estadísticas</h2>
+                        <p>Aquí podrás ver tu progreso</p>
+                    </section>
+                </div>
             </div>
-          
-        </section>
+        </div>
+    
+        <!-- Columna derecha CONTAINER para scroll -->
+        <div class="columna-derecha-contenedor">
+            <div class="columna-derecha-contenido">
+                <!-- CARDS --> 
+                <div class="cuerpo-derecha-juegos">
+                    <h2>Juegos destacados</h2>
+                    <div class="card">1</div>
+                    <div class="card">2</div>
+                </div>
 
+                <!-- FOOTER -->
+                <footer>
+                    <p>&copy; 2025 Daniel Pérez Navarro | Universidad Rey Juan Carlos</p>
+                </footer>
+            </div>
+        </div>
+        
+        
+      
     </main>
 
 
-    <!-- FOOTER -->
-    <footer>
-        <p>&copy; 2025 Daniel Pérez Navarro | Universidad Rey Juan Carlos</p>
-    </footer>
-
+    <!--- Archivo JavaScript principal -->
     <script src="js/main.js"></script>
 
 </body>
