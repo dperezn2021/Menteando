@@ -1,0 +1,169 @@
+/* ================== RESET BÁSICO ================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #1a0808;
+    color: #f0f4f9;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ================== HEADER ================== */
+header {
+    padding: 1rem 2rem;
+    background-color: #443434;
+}
+
+
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.main-nav {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+
+.title-block {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.title-row {
+    display: flex;
+    flex-direction: column; /* h1 arriba, small abajo */
+}
+
+.title-row h1 {
+    font-size: 2rem;
+    margin-bottom: 0.2rem;
+}
+
+.title-row small {
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.logo {
+    height: 80px;
+}
+
+.main-nav a {
+    color: #f0f4f9;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.main-nav a:hover {
+    color: #ffcc00;
+}
+
+/* ================== MAIN ================== */
+main{
+    padding: 2rem;
+}
+
+.columns  {
+    display: grid;
+    grid-template-columns: 3fr 2fr; /* perfil más estrecho que intro */
+    gap: 2rem;
+    padding-bottom: 2rem;}
+
+.full-width {
+    grid-column: span 2; /* ocupa ambas columnas */
+    margin-bottom: 2rem;
+}
+
+section {
+    background-color: #2a1f1f;
+    padding: 1.5rem;
+    border-radius: 10px;
+}
+
+section h2 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* ================== PERFIL ================== */
+#perfil {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Aquí puedes añadir estadísticas con barras, números, etc. */
+
+/* ================== INTRO ================== */
+#intro {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#intro small {
+    font-size: 0.85rem;
+    color: #ccc;
+}
+
+/* ================== CARDS DE JUEGOS ================== */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.card {
+    background-color: #3b2b2b;
+    padding: 1rem;
+    border-radius: 8px;
+    flex: 1 1 150px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* ================== FOOTER ================== */
+footer {
+    padding: 1rem 2rem;
+    background-color: #443434;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #ccc;
+    margin-top: 2rem;
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 900px) {
+    main {
+        grid-template-columns: 1fr; /* columnas apiladas */
+    }
+
+    .title-block {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .main-nav {
+        margin-top: 1rem;
+    }
+}
