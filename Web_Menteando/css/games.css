@@ -1,0 +1,139 @@
+/* ===== Página de juego: layout general ===== */
+
+.game-page {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenido principal centrado y con buen ancho de lectura */
+.game-main {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 3rem;
+    box-sizing: border-box;
+    flex: 1;
+}
+
+/* ===== Header del juego ===== */
+
+.game-header {
+    display: block;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem 1.5rem;
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.game-header-title {
+    display: inline-block;
+    text-align: center;
+}
+
+.game-subtitle {
+    margin: 0.3rem 0 0;
+    color: var(--secondary);
+    font-size: 0.95rem;
+}
+
+.back-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s;
+    text-align: left;
+    padding: 1rem 1.5rem;
+}
+
+.back-link:hover {
+    color: var(--secondary);
+}
+
+/* ===== Bloque de información del juego ===== */
+
+.game-info {
+    margin-top: 2rem;
+    background: var(--card-bg);
+    padding: 1.8rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.game-info h2,
+.game-info h3 {
+    margin-bottom: 0.8rem;
+}
+
+.game-info ul {
+    margin: 0.5rem 0 1.2rem;
+    padding-left: 1.2rem;
+}
+
+/* ===== Zona de juego (iframe Unity) ===== */
+
+.game-area {
+    margin-top: 2.5rem;
+}
+
+.game-area h2 {
+    margin-bottom: 1rem;
+}
+
+.game-container {
+    margin-top: 1rem;
+    background: #000;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    max-width: 80%;
+    margin: auto auto;
+}
+
+/* Iframe del juego: responsive, sin bordes feos */
+.game-iframe {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: none;
+    background: #000;
+}
+
+/* ===== Footer ===== */
+
+.game-footer {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    font-size: 0.9rem;
+    color: var(--secondary);
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 900px) {
+    .game-main {
+        padding: 1.5rem 1rem 2.5rem;
+    }
+
+    .game-info {
+        padding: 1.4rem;
+    }
+
+    .game-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .back-link {
+        align-self: flex-end;
+    }
+}

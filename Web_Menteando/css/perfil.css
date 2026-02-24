@@ -1,0 +1,161 @@
+/* ===== Página de perfil ===== */
+
+.perfil-page {
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* ===== Header ===== */
+
+.perfil-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+}
+
+.perfil-logo {
+    width: 5rem;
+    
+}
+.perfil-apodo-header {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+/* ===== Layout principal ===== */
+
+.perfil-main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    display: grid;
+    grid-template-columns: 280px 1fr; /* ASIDE | CONTENIDO */
+    gap: 2rem;
+    align-items: start;
+}
+
+/* ===== Panel lateral ===== */
+
+.perfil-side {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    height: fit-content;
+}
+
+.perfil-side h2 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.perfil-side ul li {
+    margin-bottom: 0.6rem;
+    font-size: 0.95rem;
+}
+
+.btn-editar {
+    width: 100%;
+    padding: 0.7rem;
+    background: var(--primary);
+    border: none;
+    border-radius: var(--radius);
+    color: #050824;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+/* ===== Formulario ===== */
+
+.perfil-form-section {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+#perfil-form label {
+    display: block;
+    margin-bottom: 1rem;
+}
+
+#perfil-form input {
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 0.3rem;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+#perfil-form button {
+    width: 100%;
+    padding: 0.7rem;
+    background: var(--primary);
+    border: none;
+    border-radius: 8px;
+    color: #050824;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+/* ===== Estadísticas ===== */
+
+.perfil-stats {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.stat-label {
+    margin-bottom: 0.3rem;
+    font-weight: bold;
+}
+
+.stat-bar {
+    width: 100%;
+    height: 14px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.stat-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), aquamarine);
+    transition: width 0.8s ease;
+}
+
+/* ===== Secciones extra ===== */
+
+.perfil-extra {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.perfil-extra h2 {
+    color: var(--primary);
+    margin-bottom: 0.8rem;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 900px) {
+    .perfil-main {
+        grid-template-columns: 1fr;
+    }
+}

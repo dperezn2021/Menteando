@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menteando | Perfil</title>
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/perfil.css" />
+
+    <!-- Scripts -->
+    <script src="js/storage.js" defer></script>
+    <script src="js/perfil.js" defer></script>
+    <script src="js/datosPerfil.js" defer></script>
+</head>
+
+<body class="perfil-page">
+
+   <!-- HEADER -->
+    <header class="header-content">
+        <div class="header-box">
+            <img src="assets/img/logo.png" alt="Logo Menteando" class="logo">
+            <div class="header-title">
+                <h1>Menteando</h1>
+                <small>Entrena tu mente, pero jugando</small>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <ul>
+                <li><a class="nav-link" href="index.html">Inicio</a></li>
+                <li><a class="nav-link" href="games.html">Juegos</a></li>
+                <li><a class="nav-link" href="about.html">Acerca de</a></li>
+
+                <li>
+                    <a class="nav-link active" href="perfil.html"><img src="assets/icon/usuario.webp"
+                            alt="Icono Usuario" class="icon"><span id="perfil-apodo-header"></span></a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- MAIN -->
+    <main class="perfil-main">
+
+        <!-- PANEL LATERAL -->
+        <aside class="perfil-side">
+            <h2>Resumen del perfil</h2>
+            <ul>
+                <li>Nombre: <span id="perfil-nombre"></span></li>
+                <li>Edad: <span id="perfil-edad"></span></li>
+                <li>Correo: <span id="perfil-correo"></span></li>
+                <li>Nivel cognitivo general: <span id="perfil-nivel"></span></li>
+                <li>Sesiones completadas: <span id="perfil-sesiones"></span></li>
+            </ul>
+
+            <button id="btn-editar" class="btn-editar">Editar perfil</button>
+
+        </aside>
+
+        <!-- FORMULARIO EDITABLE -->
+        <section class="perfil-form-section" id="perfil-form-section" style="display:none;">
+            <h2>Editar perfil</h2>
+
+            <form id="perfil-form">
+                <label>Nombre
+                    <input type="text" id="name">
+                </label>
+
+                <label>Apodo
+                    <input type="text" id="nickname">
+                </label>
+
+                <label>Edad
+                    <input type="number" id="age">
+                </label>
+
+                <label>Correo electrónico
+                    <input type="email" id="email">
+                </label>
+
+                <button type="submit">Guardar</button>
+            </form>
+
+
+        </section>
+
+        <!-- ESTADÍSTICAS -->
+        <section id="stats" class="perfil-stats">
+            <h2>Estadísticas cognitivas</h2>
+
+            <div class="stat-label">Atención: <span id="stat-attention-text"></span></div>
+            <div class="stat-bar">
+                <div id="stat-attention" class="stat-fill"></div>
+            </div>
+
+            <div class="stat-label">Memoria: <span id="stat-memory-text"></span></div>
+            <div class="stat-bar">
+                <div id="stat-memory" class="stat-fill"></div>
+            </div>
+
+            <div class="stat-label">Control inhibitorio: <span id="stat-control-text"></span></div>
+            <div class="stat-bar">
+                <div id="stat-control" class="stat-fill"></div>
+            </div>
+
+            <div class="stat-label">Reflejos: <span id="stat-reflejos-text"></span></div>
+            <div class="stat-bar">
+                <div id="stat-reflejos" class="stat-fill"></div>
+            </div>
+        </section>
+
+
+
+            <!-- NUEVA SECCIÓN: JUEGO MÁS JUGADO -->
+            <section class="perfil-extra">
+                <h2>Juego más jugado</h2>
+                <p id="perfil-juego-mas-jugado">Cargando...</p>
+            </section>
+
+            <!-- NUEVA SECCIÓN: TESTS RECOMENDADOS -->
+            <section class="perfil-extra">
+                <h2>Tests recomendados</h2>
+                <ul id="perfil-tests"></ul>
+            </section>
+        <!-- NUEVA SECCIÓN: CONSEJOS PERSONALIZADOS -->
+        <section class="perfil-extra">
+            <h2>Consejos personalizados</h2>
+            <p id="perfil-consejos">Cargando...</p>
+        </section>
+
+
+          <section class="section">
+            <h2>TAXONOMIA DE HABILIDADES</h2>
+                <ul>
+                    <li><strong>1. Atención sostenida</strong></li>
+                    <p>Mantener el foco durante un periodo prolongado.</p>
+                    <small>.</small>
+
+                    <li><strong>2. Atención selectiva</strong></li>
+                    <p>Ignorar distractores y centrarse en lo relevante.</p>
+                    <small>.</small>
+
+                    <li><strong>3. Atención dividida</strong></li>
+                    <p>Gestionar dos estímulos o tareas simultáneamente.</p>
+                    <small>.</small>
+
+                    <li><strong>4. Velocidad cognitiva</strong></li>
+                    <p>Procesar información rápidamente.</p>
+                    <small>.</small>
+
+                    <li><strong>5. Memoria de trabajo</strong></li>
+                    <p>Retener y manipular información a corto plazo.</p>
+                    <small>.</small>
+
+                    <li><strong>6. Memoria espacial / visual</strong></li>
+                    <p>Recordar posiciones, patrones o ubicaciones.</p>
+                    <small>.</small>
+
+                    <li><strong>7. Control inhibitorio</strong></li>
+                    <p>Frenar impulsos automáticos y evitar errores.</p>
+                    <small>.</small>
+
+                    <li><strong>8. Flexibilidad cognitiva</strong></li>
+                    <p>Cambiar reglas, adaptarse a nuevas condiciones.</p>
+                    <small>.</small>
+
+                    <li><strong>9. Planificación</strong></li>
+                    <p>Organizar pasos y anticipar consecuencias.</p>
+                    <small>.</small>
+
+                    <li><strong>10. Coordinación visomotora / reflejos</strong></li>
+                    <p>Responder rápido a estímulos visuales con precisión.</p>
+                </ul>
+        </section>
+
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="perfil-footer">
+        <p>&copy; 2025 Daniel Pérez Navarro | Universidad Rey Juan Carlos</p>
+    </footer>
+
+</body>
+
+</html>

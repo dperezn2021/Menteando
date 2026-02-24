@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Mates Express | Menteando</title>
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="../../css/unity-clean.css">
+
+    <!--JS -->
+    <script src="../../js/perfil.js"></script>
+    <script src="../../js/storage.js"></script>
+</head>
+
+<body>
+    <div id="unity-container">
+        <canvas id="unity-canvas" tabindex="-1"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.querySelector("#unity-canvas");
+
+        const buildUrl = "Build";
+        const loaderUrl = buildUrl + "/mates-express.loader.js";
+
+        const config = {
+            dataUrl: buildUrl + "/mates-express.data",
+            frameworkUrl: buildUrl + "/mates-express.framework.js",
+            codeUrl: buildUrl + "/mates-express.wasm",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "Menteando",
+            productName: "Mates Express",
+            productVersion: "1.0",
+            showBanner: () => {},
+            // CLAVE: evita tamaños absurdos de render
+            matchWebGLToCanvasSize: false
+        };
+
+        // Tamaño razonable de render interno
+        canvas.width  = 1280;
+        canvas.height = 720;
+
+        const script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+            createUnityInstance(canvas, config).then(unityInstance => {
+                // Pantalla completa con tecla F
+                document.addEventListener("keydown", e => {
+                    if (e.key === "f") canvas.requestFullscreen();
+                });
+            }).catch(alert);
+        };
+
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>

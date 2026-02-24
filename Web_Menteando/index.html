@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <!--Metadatos-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Menteando - Plataforma de minijuegos cognitivos para entrenar memoria, atención y reflejos">
+    <meta name="keywords"
+        content="Menteando, juegos cognitivos, memoria, atención, reflejos, minijuegos, entrenamiento mental">
+    <meta name="author" content="Daniel Pérez Navarro">
+
+    <!--Valores de la web-->
+    <title>Menteando</title>
+    <link rel="icon" href="assets/img/logo.png" type="image/png" sizes="32x32">
+
+    <!--Estilos CSS-->
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/pages.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+
+    <!--Scripts-->
+    <script src="js/perfil.js" defer></script>
+    <script src="js/datosPerfil.js" defer></script>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header-content">
+        <div class="header-box">
+            <img src="assets/img/logo.png" alt="Logo Menteando" class="logo">
+            <div class="header-title">
+                <h1>Menteando</h1>
+                <small>Entrena tu mente, pero jugando</small>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <ul>
+                <li><a class="nav-link" href="index.html">Inicio</a></li>
+                <li><a class="nav-link" href="games.html">Juegos</a></li>
+                <li><a class="nav-link" href="about.html">Acerca de</a></li>
+
+                <li>
+                    <a class="nav-link active" href="perfil.html"><img src="assets/icon/usuario.webp"
+                            alt="Icono Usuario" class="icon"><span id="perfil-apodo-header"></span></a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+
+        <!-- HERO -->
+        <section class="hero">
+            <img src="assets/img/ilustracion-cognitiva.png" alt="Ilustración cognitiva">
+            <div class="hero-text">
+                <h2>¡Bienvenido a Menteando!</h2>
+                <p>Tu plataforma de minijuegos cognitivos para entrenar memoria, atención y reflejos.</p>
+                <button class="btn-primary" onclick="window.location.href='games.html'">Ver juegos</button>
+            </div>
+        </section>
+
+        <!-- ¿QUÉ ES MENTEANDO? -->
+        <section class="section">
+            <h2>¿Qué es Menteando?</h2>
+            <p>Menteando es una plataforma de entrenamiento cognitivo basada en minijuegos breves y métricas precisas.
+            </p>
+        </section>
+
+        <!-- HABILIDADES -->
+        <section class="skills-grid">
+            <div class="skill-card">
+                <img src="assets/icon/atencion.png">
+                <h3>Atención</h3>
+                <p>Mejora tu capacidad de concentración sostenida.</p>
+            </div>
+
+            <div class="skill-card">
+                <img src="assets/icon/memoria.png">
+                <h3>Memoria</h3>
+                <p>Retén patrones, secuencias y estímulos visuales.</p>
+            </div>
+
+            <div class="skill-card">
+                <img src="assets/icon/reflejos.png">
+                <h3>Reflejos</h3>
+                <p>Reacciona rápido ante estímulos cambiantes.</p>
+            </div>
+
+            <div class="skill-card">
+                <img src="assets/icon/control.png">
+                <h3>Control inhibitorio</h3>
+                <p>Frena impulsos automáticos y toma decisiones correctas.</p>
+            </div>
+        </section>
+
+      
+        <!-- CÓMO FUNCIONA -->
+        <section class="section">
+            <h2>¿Cómo funciona?</h2>
+        </section>
+
+        <section class="steps">
+            <div class="step">
+                <span>1</span>
+                <h3>Juega</h3>
+                <p>Elige un minijuego y completa una sesión.</p>
+            </div>
+
+            <div class="step">
+                <span>2</span>
+                <h3>Genera métricas</h3>
+                <p>Tu rendimiento se analiza automáticamente.</p>
+            </div>
+
+            <div class="step">
+                <span>3</span>
+                <h3>Mejora</h3>
+                <p>Consulta tu perfil y observa tu progreso real.</p>
+            </div>
+        </section>
+
+        <!-- JUEGOS -->
+        <section class="section">
+            <h2>Juegos destacados</h2>
+
+            <div class="games-grid">
+                <button class="game-card" onclick="window.location.href='juegos/eco-visual/index.html'">
+                    <h4>Eco Visual</h4>
+                    <p>Entrena tu atención sostenida mediante estímulos visuales.</p>
+                </button>
+
+                <button class="game-card" onclick="window.location.href='juegos/cambio-de-reglas/index.html'">
+                    <h4>Cambio de Reglas</h4>
+                    <p>Mejora tu flexibilidad cognitiva adaptándote a normas cambiantes.</p>
+                </button>
+            </div>
+        </section>
+
+        <!-- PERFIL -->
+        <section class="hero">
+
+            <div class="hero-text">
+                <h2>Resumen del perfil</h2>
+                <ul>
+                    <li>Nombre: <span id="perfil-nombre"></span></li>
+                    <li>Edad: <span id="perfil-edad"></span></li>
+                    <li>Nivel cognitivo general: <span id="perfil-nivel"></span></li>
+                    <li>Sesiones completadas: <span id="perfil-sesiones"></span></li>
+                </ul>
+                <button class="btn-primary" onclick="window.location.href='perfil.html'">Ver perfil</button>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>&copy; 2025 Daniel Pérez Navarro | Universidad Rey Juan Carlos</p>
+            <a href="https://github.com/dperezn2021/Menteando" target="_blank">GitHub del proyecto</a>
+        </footer>
+    </main>
+
+
+</body>
+
+</html>
