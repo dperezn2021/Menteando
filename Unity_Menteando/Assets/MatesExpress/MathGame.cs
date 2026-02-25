@@ -10,10 +10,6 @@ public class MathGame : BaseGame
     public TMP_InputField resultado;
     public TextMeshProUGUI textoRacha;
     public TextMeshProUGUI textoNivelActual;
-    
-
-
-
 
     private int respuestaCorrecta;
     private int rachaActual = 0;

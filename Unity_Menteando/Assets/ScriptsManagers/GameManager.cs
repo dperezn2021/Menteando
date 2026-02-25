@@ -23,12 +23,13 @@ public class GameManager : MonoBehaviour
 
     public TMP_InputField inputDuracion;
 
-    public BaseGame prefabJuego;
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+
+        if (txtPrecision == null || txtVelocidad == null || inputDuracion == null) return;
 
         panelFinPartida.SetActive(false);
 
@@ -58,7 +59,7 @@ public class GameManager : MonoBehaviour
         tiempoRestante = duracionPartida;
         estaJugando = true;
 
-        ((MathGame)juegoActual).ResetGame();
+        juegoActual.GetType().GetMethod("ResetGame")?.Invoke(juegoActual, null);
 
         panelFinPartida.SetActive(false);
     }
@@ -81,12 +82,15 @@ public class GameManager : MonoBehaviour
     }
     private void MostrarPanelFinal(CognitiveMetrics m)
     {
-        // Estadísticas básicas
+        if (txtPrecision != null && txtVelocidad != null && inputDuracion != null)
+        {
         txtPrecision.text = "Precisión: " + (m.atencionSostenida * 100f).ToString("F0") + "%";
         txtVelocidad.text = "Velocidad cognitiva: " + (m.velocidadCognitiva * 100f).ToString("F0") + "%";
-
         // Duración predeterminada
         inputDuracion.text = duracionPartida.ToString();
+
+        }// Estadísticas básicas
+
 
         panelFinPartida.SetActive(true);
     }

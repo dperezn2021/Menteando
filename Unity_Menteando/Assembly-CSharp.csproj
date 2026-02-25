@@ -73,6 +73,7 @@
     <Compile Include="Assets\ScriptsManagers\Base\WebExporter.cs" />
     <Compile Include="Assets\ScriptsManagers\Base\BaseGame.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\Intruso\IntruderGame.cs" />
     <Compile Include="Assets\Juegos\ScriptsGenerales\Metricas.cs" />
     <Compile Include="Assets\Juegos\ScriptsGenerales\SesionJuego.cs" />
   </ItemGroup>
