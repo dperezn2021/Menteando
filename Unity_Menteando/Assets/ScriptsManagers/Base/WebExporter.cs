@@ -13,7 +13,7 @@ public static class WebExporter
     }
 #endif
 
-    public static void EnviarSesion(string nombreJuego, GameMetrics metricas)
+    public static void EnviarSesion(string nombreJuego, CognitiveMetrics metricas)
     {
         GameSessionData data = new GameSessionData
         {
@@ -25,6 +25,5 @@ public static class WebExporter
         string json = JsonUtility.ToJson(data);
         Debug.Log("LLAMANDO A SaveGameData DESDE UNITY: " + json);
         SaveGameData(json);
-
     }
 }

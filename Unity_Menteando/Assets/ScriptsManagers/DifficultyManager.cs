@@ -1,15 +1,19 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 public class DifficultyManager : MonoBehaviour
 {
     public static DifficultyManager Instance;
 
-    public float rating = 1000f; // rating inicial
     public int nivelActual = 1;
 
-    private List<float> historial = new List<float>();
-    private const int ventana = 10;
+    private List<float> ventanaRendimiento = new List<float>();
+    private List<bool> ventanaAciertos = new List<bool>();
+    private List<float> ventanaTiempos = new List<float>();
+
+    private const int VENTANA = 5;
+    private const int NIVEL_MIN = 1;
+    private const int NIVEL_MAX = 10;
 
     private void Awake()
     {
@@ -17,30 +21,58 @@ public class DifficultyManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    public void ActualizarDificultad(float precision, float velocidad, float consistencia, float control)
+    // rendimiento = 0–1
+    public void ActualizarDificultad(float rendimiento, bool acierto, float tiempo)
     {
-        float rendimiento =
-            (0.4f * precision) +
-            (0.3f * velocidad) +
-            (0.2f * consistencia) +
-            (0.1f * control);
+        ventanaRendimiento.Add(rendimiento);
+        ventanaAciertos.Add(acierto);
+        ventanaTiempos.Add(tiempo);
 
-        historial.Add(rendimiento);
-        if (historial.Count > ventana)
-            historial.RemoveAt(0);
+        if (ventanaRendimiento.Count < VENTANA)
+            return;
 
-        float media = 0f;
-        foreach (float r in historial) media += r;
-        media /= historial.Count;
+        // --- Calcular métricas ---
+        float precision = 0f;
+        foreach (bool ok in ventanaAciertos)
+            if (ok) precision++;
 
-        // Ajuste suave tipo ELO
-        float delta = (media - 0.5f) * 25f; // m�s suave a�n
-        rating += delta;
-        rating = Mathf.Clamp(rating, 800f, 5000f);
+        precision /= ventanaAciertos.Count;
 
-        // Convertir rating a nivel (procedimental)
-        nivelActual = Mathf.FloorToInt((rating - 800f) / 150f) + 1;
+        float sumaTiempos = 0f;
+        foreach (float t in ventanaTiempos)
+            sumaTiempos += t;
 
-        Debug.Log($"[DIFICULTAD] Media: {media} | Rating: {rating} | Nivel: {nivelActual}");
+        float tiempoMedio = sumaTiempos / ventanaTiempos.Count;
+
+        int fallosSeguidos = 0;
+        for (int i = ventanaAciertos.Count - 1; i >= 0; i--)
+        {
+            if (!ventanaAciertos[i]) fallosSeguidos++;
+            else break;
+        }
+
+        // --- Decisiones de dificultad ---
+
+        // BAJAR NIVEL
+        if (precision < 0.5f || fallosSeguidos >= 2 || tiempoMedio > 4f)
+        {
+            nivelActual = Mathf.Max(NIVEL_MIN, nivelActual - 1);
+            Debug.Log("BAJA NIVEL → " + nivelActual);
+        }
+        // SUBIR NIVEL
+        else if (precision > 0.8f && tiempoMedio < 2.5f)
+        {
+            nivelActual = Mathf.Min(NIVEL_MAX, nivelActual + 1);
+            Debug.Log("SUBE NIVEL → " + nivelActual);
+        }
+        else
+        {
+            Debug.Log("Nivel estable → " + nivelActual);
+        }
+
+        // Reset ventana
+        ventanaRendimiento.Clear();
+        ventanaAciertos.Clear();
+        ventanaTiempos.Clear();
     }
 }

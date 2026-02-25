@@ -9,11 +9,20 @@ public class MathGame : BaseGame
     public TextMeshProUGUI textoOperacion;
     public TMP_InputField resultado;
     public TextMeshProUGUI textoRacha;
+    public TextMeshProUGUI textoNivelActual;
     
+
+
+
+
     private int respuestaCorrecta;
     private int rachaActual = 0;
-    private int rachaMaxima = 0;
     private int operacionesTotales = 0;
+
+    // Datos brutos para métricas
+    private int aciertos = 0;
+    private int errores = 0;
+    private List<float> tiemposReaccion = new List<float>();
 
     private void Awake()
     {
@@ -26,216 +35,172 @@ public class MathGame : BaseGame
         GenerarEstimulos();
     }
 
-    public override void EvaluarRespuestas(bool correcta)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    /*public override void GenerarEstimulos()
-    {
-        int nivel = DifficultyManager.Instance.nivelActual;
-
-        int a = 0;
-        int b = 0;
-        int c = 0;
-
-        string operacion = "";
-        string operacion2 = "";
-
-        if (nivel == 1)
-        {
-            a = Random.Range(1, 10);
-            b = Random.Range(1, 10);
-            operacion = Random.value > 0.5f ? "+" : "-";
-            respuestaCorrecta = (operacion == "+") ? a + b : a - b;
-            textoOperacion.text = a + " " + operacion + " " + b;
-        }
-        else if (nivel == 2)
-        {
-            a = Random.Range(5, 20);
-            b = Random.Range(1, 20);
-            operacion = Random.value > 0.5f ? "+" : "-";
-            respuestaCorrecta = (operacion == "+") ? a + b : a - b;
-            textoOperacion.text = a + " " + operacion + " " + b;
-        }
-        else if (nivel == 3)
-        {
-            a = Random.Range(2, 12);
-            b = Random.Range(2, 12);
-            operacion = "*";
-            respuestaCorrecta = a * b;
-            textoOperacion.text = a + " * " + b;
-        }
-        else
-        {
-            a = Random.Range(2, 15);
-            b = Random.Range(2, 15);
-            c = Random.Range(1, 10);
-
-            operacion = Random.value > 0.5f ? "+" : "*";
-            operacion2 = Random.value > 0.5f ? "+" : "-";
-
-            int temp = (operacion == "+") ? a + b : a * b;
-            respuestaCorrecta = (operacion2 == "+") ? temp + c : temp - c;
-
-            textoOperacion.text = "(" + a + " " + operacion + " " + b + ") " + operacion2 + " " + c;
-        }
-
-        resultado.text = "";
-        EmpezarIntento();
-    }*/
-
     public override void GenerarEstimulos()
     {
         int nivel = DifficultyManager.Instance.nivelActual;
+        textoNivelActual.text = nivel.ToString();
 
-        // 1. Rango de números según nivel
-        int max = 5 + nivel * 4;
+        int tipo = Mathf.Clamp(nivel, 1, 5);
 
-        // 2. Número de operaciones según nivel
-        int numOps = Mathf.Clamp(1 + nivel / 4, 1, 5);
+        int a = 0, b = 0, c = 0;
+        string op1 = "", op2 = "";
+        string operacionTexto = "";
 
-        string[] ops = { "+", "-", "*", "/" };
-
-        List<int> nums = new List<int>();
-        List<string> operadores = new List<string>();
-
-        // Generar números
-        for (int i = 0; i < numOps + 1; i++)
-            nums.Add(Random.Range(1, max));
-
-        // Generar operadores aleatorios
-        for (int i = 0; i < numOps; i++)
-            operadores.Add(ops[Random.Range(0, ops.Length)]);
-
-        // Ajustar divisiones para que sean exactas
-        for (int i = 0; i < operadores.Count; i++)
+        switch (tipo)
         {
-            if (operadores[i] == "/")
-            {
-                int divisor = nums[i + 1];
-                int resultado = Random.Range(1, max);
-                nums[i] = divisor * resultado;
-            }
+            case 1: // sumas/restas 1 cifra
+                a = Random.Range(1, 10);
+                b = Random.Range(1, 10);
+                op1 = Random.value > 0.5f ? "+" : "-";
+                respuestaCorrecta = (op1 == "+") ? a + b : a - b;
+                operacionTexto = $"{a} {op1} {b}";
+                break;
+
+            case 2: // multiplicaciones 1 cifra
+                a = Random.Range(2, 10);
+                b = Random.Range(2, 10);
+                respuestaCorrecta = a * b;
+                operacionTexto = $"{a} * {b}";
+                break;
+
+            case 3: // sumas/restas 2 cifras
+                a = Random.Range(10, 50);
+                b = Random.Range(10, 50);
+                op1 = Random.value > 0.5f ? "+" : "-";
+                respuestaCorrecta = (op1 == "+") ? a + b : a - b;
+                operacionTexto = $"{a} {op1} {b}";
+                break;
+
+            case 4: // multiplicaciones/divisiones 2 y 1 cifra
+                if (Random.value > 0.5f)
+                {
+                    a = Random.Range(10, 50);
+                    b = Random.Range(2, 10);
+                    respuestaCorrecta = a * b;
+                    operacionTexto = $"{a} * {b}";
+                }
+                else
+                {
+                    b = Random.Range(2, 10);
+                    int res = Random.Range(2, 20);
+                    a = b * res;
+                    respuestaCorrecta = res;
+                    operacionTexto = $"{a} / {b}";
+                }
+                break;
+
+            default: // combinadas
+                a = Random.Range(5, 30);
+                b = Random.Range(2, 15);
+                c = Random.Range(1, 10);
+
+                op1 = Random.value > 0.5f ? "+" : "*";
+                op2 = Random.value > 0.5f ? "+" : "-";
+
+                int temp = (op1 == "+") ? a + b : a * b;
+                respuestaCorrecta = (op2 == "+") ? temp + c : temp - c;
+
+                operacionTexto = $"({a} {op1} {b}) {op2} {c}";
+                break;
         }
 
-        // Construir operación en texto
-        string operacion = nums[0].ToString();
-        for (int i = 0; i < operadores.Count; i++)
-            operacion += " " + operadores[i] + " " + nums[i + 1];
-
-        textoOperacion.text = operacion;
-
-        // Calcular respuesta correcta
-        respuestaCorrecta = EvaluarOperacion(nums, operadores);
-
+        textoOperacion.text = operacionTexto;
         resultado.text = "";
         EmpezarIntento();
     }
-
-
-    private int EvaluarOperacion(List<int> nums, List<string> ops)
-    {
-        int resultado = nums[0];
-
-        for (int i = 0; i < ops.Count; i++)
-        {
-            switch (ops[i])
-            {
-                case "+": resultado += nums[i + 1]; break;
-                case "-": resultado -= nums[i + 1]; break;
-                case "*": resultado *= nums[i + 1]; break;
-                case "/": resultado /= nums[i + 1]; break;
-            }
-        }
-
-        return resultado;
-    }
-
-
 
     public void CorregirRespuesta()
     {
         if (!int.TryParse(resultado.text, out int respuesta)) return;
 
+        float tiempoReaccion = Time.time - tiempoInicio;
+        tiemposReaccion.Add(tiempoReaccion);
+
         bool esCorrecta = respuesta == respuestaCorrecta;
-
-        RegistrarRespuesta(esCorrecta);
-
         operacionesTotales++;
 
         if (esCorrecta)
         {
+            aciertos++;
             rachaActual++;
-            if(rachaActual > rachaMaxima)
-            {
-                rachaMaxima = rachaActual;
-            }
         }
         else
         {
+            errores++;
             rachaActual = 0;
         }
 
-        textoRacha.text = "Racha:" + rachaActual;
+        textoRacha.text = "Racha: " + rachaActual;
 
-        AdaptarDificultad();
+        // Calcular rendimiento [0–1] para dificultad
+        float precision = operacionesTotales > 0 ? (float)aciertos / operacionesTotales : 0f;
 
+        float suma = 0f;
+        foreach (float t in tiemposReaccion) suma += t;
+        float tiempoMedio = suma / tiemposReaccion.Count;
+
+        float velocidad = 1f - Mathf.Clamp(tiempoMedio / 5f, 0f, 1f);
+
+        float rendimiento = 0.6f * precision + 0.4f * velocidad;
+
+        DifficultyManager.Instance.ActualizarDificultad(rendimiento, esCorrecta, tiempoReaccion);
         GenerarEstimulos();
 
         resultado.ActivateInputField();
-        resultado.Select(); 
+        resultado.Select();
     }
 
-    private void AdaptarDificultad()
+    public override CognitiveMetrics CalcularCognicion()
     {
-        if (tiemposReaccion.Count < 5) return;
+        CognitiveMetrics c = new CognitiveMetrics();
 
-        //--- 1. PRECISIÓN ---
-        float precision = (float)respuestasCorrectas / (respuestasCorrectas + respuestasIncorrectas);
-        
-        // --- 2. VELOCIDAD ---
-        float suma = 0f; 
-        foreach (float t in tiemposReaccion) 
-            suma += t; 
-        float tiempoMedio = suma / tiemposReaccion.Count; 
-        float velocidad = 1f - Mathf.Clamp(tiempoMedio / 5f, 0f, 1f);
-        
-        // --- 3. CONSISTENCIA ---
-        float varianza = 0f; 
-        foreach (float t in tiemposReaccion) 
-            varianza += Mathf.Pow(t - tiempoMedio, 2); 
-        float desviacion = Mathf.Sqrt(varianza / tiemposReaccion.Count); 
-        float consistencia = 1f - Mathf.Clamp(desviacion / tiempoMedio, 0f, 1f);
-        
-        // --- 4. CONTROL INHIBITORIO ---
-        int impulsivas = 0; 
-        foreach (float t in tiemposReaccion) 
-            if (t < 0.3f) 
-                impulsivas++; 
-        float controlInhibitorio = 1f - ((float)impulsivas / tiemposReaccion.Count);
+        float precision = operacionesTotales > 0 ? (float)aciertos / operacionesTotales : 0f;
 
-        Debug.Log($"PRECISION: {precision}");
-        Debug.Log($"VELOCIDAD: {velocidad}");
-        Debug.Log($"CONSISTENCIA: {consistencia}");
-        Debug.Log($"CONTROL: {controlInhibitorio}");
-        Debug.Log("TIEMPOS: " + string.Join(", ", tiemposReaccion));
+        float tiempoMedio = 0f;
+        if (tiemposReaccion.Count > 0)
+        {
+            float suma = 0f;
+            foreach (float t in tiemposReaccion) suma += t;
+            tiempoMedio = suma / tiemposReaccion.Count;
+        }
 
+        float velocidad = tiempoMedio > 0 ? 1f / tiempoMedio : 0f;
 
-        // --- ACTUALIZAR DIFICULTAD ---
-        DifficultyManager.Instance.ActualizarDificultad( precision, velocidad, consistencia, controlInhibitorio);
-     
+        int impulsivas = 0;
+        foreach (float t in tiemposReaccion)
+            if (t < 0.3f) impulsivas++;
+
+        float controlInhibitorio = tiemposReaccion.Count > 0
+            ? 1f - ((float)impulsivas / tiemposReaccion.Count)
+            : 0f;
+
+        // Mapeo a taxonomía
+        c.atencionSostenida = precision;
+        c.velocidadCognitiva = Mathf.Clamp01(velocidad / 5f);
+        c.memoriaTrabajo = Mathf.Clamp01(DifficultyManager.Instance.nivelActual / 10f);
+        c.controlInhibitorio = controlInhibitorio;
+        c.coordinacionVisomotora = Mathf.Clamp01(velocidad / 5f);
+
+        c.atencionSelectiva = 0f;
+        c.atencionDividida = 0f;
+        c.memoriaEspacial = 0f;
+        c.flexibilidadCognitiva = 0f;
+        c.planificacion = 0f;
+
+        return c;
     }
 
-    public override GameMetrics GetMetricas()
+    public void ResetGame()
     {
-        return MetricsManager.CalcularMetricas(
-            respuestasCorrectas,
-            respuestasIncorrectas,
-            0, // omisiones si no las usas
-            tiemposReaccion
-        );
-    }
+        rachaActual = 0;
+        operacionesTotales = 0;
+        aciertos = 0;
+        errores = 0;
+        tiemposReaccion.Clear();
 
+        DifficultyManager.Instance.nivelActual = 1;
+
+        GenerarEstimulos();
+    }
 
 }

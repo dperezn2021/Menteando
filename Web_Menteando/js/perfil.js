@@ -1,67 +1,141 @@
-const perfil_KEY = 'menteando_perfil';
+// === CLAVE DEL PERFIL ===
+const perfil_KEY = "perfil_usuario";
 
-/* ===== Inicializar perfil ===== */
-function initperfil() {
-    if (!getperfil()) {
-        saveperfil({
-            nombre: 'Jugador 1',
-            apodo: 'Invitado',
-            edad: 0,
-            correo: '',
-            memoria: 0,
-            atencion: 0,
-            control: 0,
-            reflejos: 0,
-            sesiones: 0,
-            ultimaSesion: null,
-            juegos: {}
-        });
+// === PERFIL BASE COMPLETO ===
+const perfilBase = {
+    nombre: "Jugador 1",
+    apodo: "Invitado",
+    edad: 0,
+    correo: "",
+    sesiones: 0,
+    ultimaSesion: null,
+    juegos: {},
+    juegoMasJugado: "Cargando...",
+
+    atencion: 0,
+    memoria: 0,
+    control: 0,
+    reflejos: 0,
+
+    detalle: {
+        atencionSostenida: 0,
+        atencionSelectiva: 0,
+        atencionDividida: 0,
+        velocidadCognitiva: 0,
+        memoriaTrabajo: 0,
+        memoriaEspacial: 0,
+        controlInhibitorio: 0,
+        flexibilidadCognitiva: 0,
+        planificacion: 0,
+        coordinacionVisomotora: 0
     }
-}
+};
 
+const juegoSkills = {
+    "orden caotico": ["atencionSostenida"],
+    "detector de intrusos": ["atencionSelectiva", "controlInhibitorio"],
+    "tres bolas": ["atencionDividida"],
+    "flash tiktok": ["velocidadCognitiva", "atencionSostenida"],
+    "eco visual": ["memoriaEspacial"],
+    "simon dice": ["memoriaTrabajo", "memoriaEspacial"],
+    "asociacion rapida": ["velocidadCognitiva", "memoriaTrabajo"],
+    "secuencia inversa": ["memoriaTrabajo"],
+    "silencio mental": ["controlInhibitorio"],
+    "stroop": ["controlInhibitorio", "flexibilidadCognitiva"],
+    "doble regla": ["flexibilidadCognitiva", "controlInhibitorio"],
+    "trayectorias mentales": ["planificacion"],
+    "tiempo de reaccion": ["velocidadCognitiva"],
+    "objeto movil": ["reflejos", "flexibilidadCognitiva"],
+    "wisconsin": ["flexibilidadCognitiva"],
+    "memory cronometrado": ["memoriaEspacial", "velocidadCognitiva"],
+    "contador mental": ["memoriaTrabajo", "velocidadCognitiva"],
+    "anticipacion patron": ["planificacion"],
+    "multitarea": ["atencionDividida", "controlInhibitorio"],
+    "math": ["memoriaTrabajo", "velocidadCognitiva"]
+};
+
+// === OBTENER PERFIL (SIEMPRE COMPLETO) ===
 function getperfil() {
-    const data = localStorage.getItem(perfil_KEY);
-    return data ? JSON.parse(data) : null;
+    let data = localStorage.getItem(perfil_KEY);
+
+    if (!data) {
+        saveperfil(perfilBase);
+        return JSON.parse(JSON.stringify(perfilBase));
+    }
+
+    let perfil = JSON.parse(data);
+
+    // Rellenar campos faltantes
+    perfil = Object.assign({}, perfilBase, perfil);
+    perfil.detalle = Object.assign({}, perfilBase.detalle, perfil.detalle);
+
+    return perfil;
 }
 
+// === GUARDAR PERFIL ===
 function saveperfil(perfil) {
     localStorage.setItem(perfil_KEY, JSON.stringify(perfil));
 }
 
-/* ===== Registrar sesión desde Unity ===== */
-function mapSessionToSkills(session) {
-    const m = session.metrics || {};
+// === REINICIAR PERFIL ===
+function resetperfil() {
+    // Vuelve al perfil base
+    saveperfil(perfilBase);
+}
 
-    if (session.gameId === "math") {
-        return {
-            memoria: 0,
-            atencion: m.precision || 0,
-            control: m.controlInhibitorio || 0,
-            reflejos: (m.indiceVelocidad || 0) / 100
-        };
+
+// === RECALCULAR PERFIL GLOBAL ===
+function recalcularPerfilGlobal(perfil, metrics, gameId) {
+
+    const skills = juegoSkills[gameId.toLowerCase()];
+    if (!skills) return;
+
+    // 1. MEDIA HISTÓRICA (85% viejo + 15% nuevo)
+    skills.forEach(skill => {
+        perfil.detalle[skill] =
+            perfil.detalle[skill] * 0.85 +
+            metrics[skill] * 0.15;
+    });
+
+    // 2. PROGRESO ACUMULADO (+1% por sesión)
+    skills.forEach(skill => {
+        perfil.detalle[skill] = Math.min(1, perfil.detalle[skill] + 0.01);
+    });
+
+    // 3. BARRAS PRINCIPALES
+    perfil.atencion =
+        (perfil.detalle.atencionSostenida * 0.6 +
+         perfil.detalle.atencionSelectiva * 0.2 +
+         perfil.detalle.atencionDividida * 0.2);
+
+    perfil.memoria =
+        (perfil.detalle.memoriaTrabajo * 0.7 +
+         perfil.detalle.memoriaEspacial * 0.3);
+
+    perfil.control = perfil.detalle.controlInhibitorio;
+
+    perfil.reflejos =
+        (perfil.detalle.velocidadCognitiva * 0.6 +
+         perfil.detalle.coordinacionVisomotora * 0.4);
+
+
+    // 4. JUEGO MÁS JUGADO
+    perfil.juegoMasJugado = getJuegoMasJugado(perfil);
+
+}
+
+
+function getJuegoMasJugado(perfil) {
+    let maxSesiones = 0;
+    let juegoMasJugado = "Ninguno";
+    
+    for (const juego in perfil.juegos) {
+        const sesiones = perfil.juegos[juego].length;
+        if (sesiones > maxSesiones) {
+            maxSesiones = sesiones;
+            juegoMasJugado = juego;
+        }
     }
 
-    return {};
+    return juegoMasJugado;
 }
-
-function updateGlobalProfile(session) {
-    const perfil = getperfil();
-    const skills = mapSessionToSkills(session);
-
-    perfil.atencion = Math.min((perfil.atencion || 0) + (skills.atencion || 0) * 0.2, 1);
-    perfil.control  = Math.min((perfil.control  || 0) + (skills.control  || 0) * 0.2, 1);
-    perfil.memoria  = Math.min((perfil.memoria  || 0) + (skills.memoria  || 0) * 0.2, 1);
-    perfil.reflejos = Math.min((perfil.reflejos || 0) + (skills.reflejos || 0) * 0.2, 1);
-
-    perfil.sesiones = (perfil.sesiones || 0) + 1;
-
-    if (!perfil.juegos) perfil.juegos = {};
-    perfil.juegos[session.gameId] = (perfil.juegos[session.gameId] || 0) + 1;
-
-    perfil.ultimaSesion = new Date().toISOString();
-
-    saveperfil(perfil);
-    return perfil;
-}
-
-initperfil();

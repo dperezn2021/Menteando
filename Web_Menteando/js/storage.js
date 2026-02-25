@@ -1,11 +1,21 @@
-window.SaveGameData = function(data) {
-    console.log("JSON recibido desde Unity:", data);
+window.SaveGameData = function(jsonString) {
+    const data = JSON.parse(jsonString);
+    const perfil = getperfil();
 
-    const session = JSON.parse(data);
+    // Guardar sesión
+    perfil.sesiones++;
+    perfil.ultimaSesion = data.timestamp;
 
-    let results = JSON.parse(localStorage.getItem("gameResults") || "[]");
-    results.push(session);
-    localStorage.setItem("gameResults", JSON.stringify(results));   
+    // Guardar juego
+    if (!perfil.juegos[data.gameId]) perfil.juegos[data.gameId] = [];
+    perfil.juegos[data.gameId].push(data.metrics);
 
-    updateGlobalProfile(session);
+    // Recalcular perfil
+    recalcularPerfilGlobal(perfil, data.metrics, data.gameId);
+
+    // Actualizar juego más jugado
+    perfil.juegoMasJugado = getJuegoMasJugado(perfil);
+
+    // Guardar
+    saveperfil(perfil);
 };

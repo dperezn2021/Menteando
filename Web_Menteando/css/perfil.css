@@ -5,27 +5,6 @@
     color: var(--text);
 }
 
-/* ===== Header ===== */
-
-.perfil-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    background: var(--card-bg);
-    box-shadow: var(--shadow);
-}
-
-.perfil-logo {
-    width: 5rem;
-    
-}
-.perfil-apodo-header {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: var(--primary);
-}
-
 /* ===== Layout principal ===== */
 
 .perfil-main {
@@ -37,7 +16,7 @@
     align-items: start;
 }
 
-/* ===== Panel lateral ===== */
+/* ===== ASIDE FIJO ===== */
 
 .perfil-side {
     background: var(--card-bg);
@@ -45,6 +24,8 @@
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     height: fit-content;
+    position: sticky;
+    top: 8rem;
 }
 
 .perfil-side h2 {
@@ -63,47 +44,86 @@
     background: var(--primary);
     border: none;
     border-radius: var(--radius);
-    color: #050824;
     font-weight: bold;
     cursor: pointer;
     margin-top: 1rem;
 }
-
-/* ===== Formulario ===== */
-
-.perfil-form-section {
-    background: var(--card-bg);
-    padding: 1.5rem;
+.btn-reset {
+    width: 100%;
+    padding: 0.7rem;
+    background: var(--secondary);
+    border: none;
     border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin-bottom: 2rem;
+    cursor: pointer;
+    margin-top: 1rem;
 }
 
-#perfil-form label {
+/* ===== CONTENIDO DERECHA ===== */
+
+.perfil-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* ===== Modal ===== */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--radius);
+    width: 350px;
+    box-shadow: var(--shadow);
+}
+
+.modal-content h2 {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.modal-content label {
     display: block;
     margin-bottom: 1rem;
 }
 
-#perfil-form input {
+.modal-content input {
     width: 100%;
     padding: 0.6rem;
-    margin-top: 0.3rem;
     border-radius: 8px;
     border: none;
     background: rgba(255,255,255,0.1);
     color: white;
 }
 
-#perfil-form button {
+.btn-guardar, .btn-cerrar {
     width: 100%;
     padding: 0.7rem;
-    background: var(--primary);
+    margin-top: 1rem;
     border: none;
     border-radius: 8px;
-    color: #050824;
-    font-weight: bold;
     cursor: pointer;
-    margin-top: 1rem;
+    font-weight: bold;
+}
+
+.btn-guardar {
+    background: var(--primary);
+    color: #050824;
+}
+
+.btn-cerrar {
+    background: #444;
+    color: white;
 }
 
 /* ===== Estadísticas ===== */
@@ -113,7 +133,6 @@
     padding: 1.5rem;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    margin-bottom: 2rem;
 }
 
 .stat-label {
@@ -137,6 +156,45 @@
     transition: width 0.8s ease;
 }
 
+/* === SECCIONES DETALLADAS === */
+.detalle-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    transition: transform .15s ease;
+}
+
+.detalle-card:hover {
+    transform: translateY(-2px);
+}
+
+.detalle-icon {
+    font-size: 24px;
+}
+
+.detalle-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.detalle-nombre {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+
+}
+
+.detalle-valor {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--secondary);
+}
+
+
 /* ===== Secciones extra ===== */
 
 .perfil-extra {
@@ -144,7 +202,6 @@
     padding: 1.5rem;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    margin-bottom: 2rem;
 }
 
 .perfil-extra h2 {
@@ -157,5 +214,9 @@
 @media (max-width: 900px) {
     .perfil-main {
         grid-template-columns: 1fr;
+    }
+
+    .perfil-side {
+        position: static;
     }
 }
