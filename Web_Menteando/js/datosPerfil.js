@@ -14,13 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
     set("perfil-sesiones", perfil.sesiones);
     set("perfil-apodo-header", perfil.apodo);
     set("perfil-juego-mas-jugado", perfil.juegoMasJugado);
+    set("perfil-nivel", perfil.nivel);
 
-
-    const nivel =
-        ((perfil.atencion + perfil.memoria + perfil.control + perfil.reflejos) /
-            4) *
-        100;
-    set("perfil-nivel", nivel.toFixed(0) + "%");
+    
 
     // Animación de barras principales
     function animateBar(idFill, idText, value) {
@@ -28,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const text = document.getElementById(idText);
         if (!fill || !text) return;
 
-        const percent = (value * 100).toFixed(0);
+        const percent = (value * 100).toFixed(2);
         text.textContent = percent + "%";
 
         setTimeout(() => {
@@ -79,15 +75,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 const percent = (valor * 100).toFixed(0);
 
                 html += `
-    <div class="detalle-card">
-        <div class="detalle-icon">⚡</div>
-        <div class="detalle-info">
-            <div class="detalle-nombre">${nombre}</div>
-            <div class="detalle-valor">${percent}%</div>
-        </div>
-    </div>
-`;
-
+                <div class="detalle-card">
+                    <div class="detalle-icon">⚡</div>
+                    <div class="detalle-info">
+                        <div class="detalle-nombre">${nombre}</div>
+                        <div class="detalle-valor">${percent}%</div>
+                    </div>
+                </div>
+                `;
             });
 
             bloque.innerHTML = html;
@@ -128,55 +123,70 @@ document.addEventListener("DOMContentLoaded", () => {
         if (tests.innerHTML === "")
             tests.innerHTML = "<li>No necesitas tests adicionales por ahora.</li>";
     }
-});
 
-// === MODAL ===
-const modal = document.getElementById("modal-editar");
-const btnEditar = document.getElementById("btn-editar");
-const btnCerrar = document.getElementById("btn-cerrar-modal");
-const formModal = document.getElementById("perfil-form");
+    // === MODAL ===
+    const modal = document.getElementById("modal-editar");
+    const btnEditar = document.getElementById("btn-editar");
+    const btnCerrar = document.getElementById("btn-cerrar-modal");
+    const formModal = document.getElementById("perfil-form");
 
-// Abrir modal
-btnEditar.addEventListener("click", () => {
-    const perfil = getperfil();
+    const tituloCoach = document.getElementById("titulo-activar-coach");
+    const btnActivarCoach = document.getElementById("btn-activar-coach");
+    
+    btnActivarCoach.style.display = isCoachDisabled() ? "flex" : "none";
+    tituloCoach.style.display = isCoachDisabled() ? "flex" : "none";
 
-    document.getElementById("name").value = perfil.nombre;
-    document.getElementById("nickname").value = perfil.apodo;
-    document.getElementById("age").value = perfil.edad;
-    document.getElementById("email").value = perfil.correo;
+    btnActivarCoach.addEventListener("click", () => {
+        localStorage.removeItem("coach_disabled");
+        location.reload();
+        btnActivarCoach.style.display = "none";
+        tituloCoach.style.display = "none";
+    });  
 
-    modal.style.display = "flex";
-});
+    // Abrir modal
+    btnEditar.addEventListener("click", () => {
+        const perfil = getperfil();
 
-// Cerrar modal
-btnCerrar.addEventListener("click", () => {
-    modal.style.display = "none";
-});
+        document.getElementById("name").value = perfil.nombre;
+        document.getElementById("nickname").value = perfil.apodo;
+        document.getElementById("age").value = perfil.edad;
+        document.getElementById("email").value = perfil.correo;
 
-// Guardar cambios
-formModal.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const perfil = getperfil();
-
-    perfil.nombre = document.getElementById("name").value;
-    perfil.apodo = document.getElementById("nickname").value;
-    perfil.edad = parseInt(document.getElementById("age").value);
-    perfil.correo = document.getElementById("email").value;
-
-    saveperfil(perfil);
-
-    modal.style.display = "none";
-    location.reload();
-});
-
-const btnReset = document.getElementById("btn-reset-perfil");
-
-if (btnReset) {
-    btnReset.addEventListener("click", () => {
-        if (confirm("¿Seguro que quieres reiniciar todo tu progreso cognitivo?")) {
-            resetperfil();
-            location.reload();
-        }
+        modal.style.display = "flex";
     });
-}
+
+    // Cerrar modal
+    btnCerrar.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    // Guardar cambios
+    formModal.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const perfil = getperfil();
+
+        perfil.nombre = document.getElementById("name").value;
+        perfil.apodo = document.getElementById("nickname").value;
+        perfil.edad = parseInt(document.getElementById("age").value);
+        perfil.correo = document.getElementById("email").value;
+
+        saveperfil(perfil);
+
+        modal.style.display = "none";
+        location.reload();
+    });
+
+    const btnReset = document.getElementById("btn-reset-perfil");
+
+    if (btnReset) {
+        btnReset.addEventListener("click", () => {
+            if (
+                confirm("¿Seguro que quieres reiniciar todo tu progreso cognitivo?")
+            ) {
+                resetperfil();
+                location.reload();
+            }
+        });
+    }
+});

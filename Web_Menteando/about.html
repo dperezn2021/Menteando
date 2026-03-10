@@ -19,13 +19,17 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/pages.css" />
     <link rel="stylesheet" href="css/layout.css" />
-    <!--Scripts-->
-    <script src="js/perfil.js" defer></script>
-    <script src="js/datosPerfil.js" defer></script>
+    <link rel="stylesheet" href="coach/animacionesCoach.css">
+
+    <!-- Scripts -->
+    <script src="js/perfil.js"></script>
+    <script src="js/datosPerfil.js"></script>
 </head>
 
 <body>
-
+    <div id="coach" class="coach">
+        <div id="coach-bubble" class="coach-bubble"></div>
+    </div>
     <!-- HEADER -->
     <header class="header-content">
         <div class="header-box">
@@ -41,10 +45,11 @@
                 <li><a class="nav-link" href="index.html">Inicio</a></li>
                 <li><a class="nav-link" href="games.html">Juegos</a></li>
                 <li><a class="nav-link" href="about.html">Acerca de</a></li>
-
                 <li>
-                    <a class="nav-link active" href="perfil.html"><img src="assets/icon/usuario.webp"
-                            alt="Icono Usuario" class="icon"><span id="perfil-apodo-header"></span></a>
+                    <a class="nav-link active" href="perfil.html">
+                        <img src="assets/icon/usuario.webp" alt="Icono Usuario" class="icon">
+                        <span id="perfil-apodo-header"></span>
+                    </a>
                 </li>
             </ul>
         </nav>
@@ -53,60 +58,142 @@
 
     <!--- Cuerpo Main -->
     <main>
-        <section id="team" class="section">
-            <h2>Sobre el equipo</h2>
-            <p>Este proyecto ha sido desarrollado por Daniel Pérez Navarro, estudiante de Diseño y Desarrollo de
-                Videojuegos en la Universidad Rey Juan Carlos.</p>
-            <div class="game-card">
-                <img src="assets/img/dani-orla.jpeg" alt="Foto de Daniel Pérez Navarro" class="image">
-                <h3>Daniel Pérez Navarro</h3>
-                <p>Desarrollador principal, diseñador de juegos y responsable del proyecto.</p>
-                <a href="https://figma.fun/Fu5Ecs" target="_blank">Portfolio</a>
-                <a href="https://www.linkedin.com/in/dpereznavarro/">Linkedin</a>
-            </div>
-            <div class="game-card">
-                <img src="assets/icon/urjc.webp" alt="Foto de URJC">
-                <h3>Universidad Rey Juan Carlos</h3>
-                <p>Centro de estudios adjunto al proyecto.</p>
+        <section class="section hero-about">
+            <h2>Plataforma Web de Videojuegos Cognitivos Adaptativos</h2>
+            <p>
+                Este Trabajo de Fin de Grado consiste en el diseño e implementación de una
+                plataforma web interactiva desarrollada con tecnologías web (HTML, CSS y JavaScript)
+                e integración de videojuegos en Unity WebGL, orientada a la estimulación cognitiva en adultos.
+            </p>
+        </section>
+
+        <section class="section about-team">
+            <h2>Autor del proyecto</h2>
+
+            <div class="about-grid">
+                <div class="about-photo">
+                    <img src="assets/img/dani-orla.jpeg" alt="Daniel Pérez Navarro">
+                </div>
+
+                <div class="about-info">
+                    <h3>Daniel Pérez Navarro</h3>
+                    <p>
+                        Estudiante del Grado en Diseño y Desarrollo de Videojuegos en la Universidad Rey Juan Carlos.
+                        Responsable del diseño conceptual, implementación técnica y arquitectura de la plataforma.
+                    </p>
+
+                    <div class="about-links">
+                        <a href="https://figma.fun/Fu5Ecs" target="_blank">Portfolio</a>
+                        <a href="https://www.linkedin.com/in/dpereznavarro/" target="_blank">LinkedIn</a>
+                    </div>
+                    <div class="about-links about-grid">
+                        <img src="assets/icon/urjc_blanco.png" alt="Logo URJC" style="width: 200px;">
+                    </div>
+                </div>
+
             </div>
         </section>
 
+
         <section id="intro" class="section">
             <h2>Sobre el proyecto</h2>
-            <p>Se trata de un Trabajo de Fin de Grado, bla bla bla...</p>
-            <p>Titulo del TFG: Desarrollo de una plataforma web interactiva para fomentar la estimulación mental en adultos</p>
+            <p>Titulo del TFG: Desarrollo de una plataforma web interactiva para fomentar la estimulación mental en
+            <p>
+                El objetivo principal del proyecto es analizar cómo los videojuegos
+                pueden utilizarse como herramienta de estimulación cognitiva,
+                evaluando métricas como tiempo de reacción, precisión y progresión
+                de dificultad adaptativa.
+            </p>
+
+            <p>
+                La plataforma registra datos de interacción del usuario con el fin
+                de permitir un análisis posterior del rendimiento y evolución en
+                diferentes dominios cognitivos.
+            </p>
+            adultos</p>
             <div class="game-card">
-                <img src="assets/img/ilustracion-cognitiva.png" alt="Ilustración cognitiva">
+                <img src="assets/img/nabri-entrenando.png" alt="Ilustración cognitiva">
                 <h3>Objetivo</h3>
                 <p>Crear una plataforma de minijuegos cognitivos para entrenar memoria, atención y reflejos.</p>
                 <a href="https://github.com/dperezn2021/Menteando" target="_blank">GitHub del proyecto</a>
 
             </div>
         </section>
-        
-            <!-- TAXONOMÍA -->
-            <section class="section">
-                <h2>Taxonomía de habilidades</h2>
-                <ul>
-                    <li><strong>1. Atención sostenida</strong> — Mantener el foco durante un periodo prolongado.</li>
-                    <li><strong>2. Atención selectiva</strong> — Ignorar distractores y centrarse en lo relevante.</li>
-                    <li><strong>3. Atención dividida</strong> — Gestionar dos estímulos simultáneamente.</li>
-                    <li><strong>4. Velocidad cognitiva</strong> — Procesar información rápidamente.</li>
-                    <li><strong>5. Memoria de trabajo</strong> — Retener y manipular información.</li>
-                    <li><strong>6. Memoria espacial</strong> — Recordar posiciones o patrones.</li>
-                    <li><strong>7. Control inhibitorio</strong> — Frenar impulsos automáticos.</li>
-                    <li><strong>8. Flexibilidad cognitiva</strong> — Cambiar reglas y adaptarse.</li>
-                    <li><strong>9. Planificación</strong> — Organizar pasos y anticipar consecuencias.</li>
-                    <li><strong>10. Coordinación visomotora</strong> — Responder rápido con precisión.</li>
-                </ul>
-            </section>
-    </main>
 
+        <section class="section">
+            <h2>Arquitectura Técnica</h2>
+            <ul>
+                <li><strong>Frontend:</strong> HTML5, CSS3 y JavaScript.</li>
+                <li><strong>Motor de videojuegos:</strong> Unity (WebGL).</li>
+                <li><strong>Persistencia de datos:</strong> Almacenamiento local mediante LocalStorage (fase actual).
+                </li>
+                <li><strong>Modelo de datos:</strong> Estructura JSON para el perfil del usuario y estadísticas de
+                    juego.</li>
+            </ul>
+        </section>
+
+        <!-- TAXONOMÍA -->
+        <section class="section taxonomy">
+            <h2>Dominios Cognitivos Evaluados</h2>
+            <p>
+                La plataforma estructura las habilidades cognitivas en diferentes dominios
+                basados en funciones ejecutivas y modelos de psicología cognitiva.
+            </p>
+
+            <div class="taxonomy-grid">
+
+                <div class="taxonomy-card">
+                    <h3>Atención</h3>
+                    <ul>
+                        <li>Atención Sostenida</li>
+                        <li>Atención Selectiva</li>
+                        <li>Atención Dividida</li>
+                    </ul>
+                </div>
+
+                <div class="taxonomy-card">
+                    <h3>Memoria</h3>
+                    <ul>
+                        <li>Memoria de trabajo</li>
+                        <li>Memoria espacial</li>
+                    </ul>
+                </div>
+
+                <div class="taxonomy-card">
+                    <h3>Funciones Ejecutivas</h3>
+                    <ul>
+                        <li>Control inhibitorio</li>
+                        <li>Flexibilidad cognitiva</li>
+                        <li>Planificación</li>
+                    </ul>
+                </div>
+
+                <div class="taxonomy-card">
+                    <h3>Procesamiento</h3>
+                    <ul>
+                        <li>Velocidad cognitiva</li>
+                        <li>Coordinación visomotora</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Aplicación y futuro desarrollo</h2>
+            <p>
+                La plataforma está diseñada como base para futuros estudios experimentales
+                donde se pueda analizar la evolución cognitiva del usuario mediante
+                recopilación estructurada de datos.
+            </p>
+        </section>
+
+    </main>
     <!-- FOOTER -->
-    <footer>
+    <footer class="perfil-footer">
         <p>&copy; 2025 Daniel Pérez Navarro | Universidad Rey Juan Carlos</p>
-        <a href="https://github.com/dperezn2021/Menteando" target="_blank">GitHub del proyecto</a>
     </footer>
+
 </body>
 
 </html>

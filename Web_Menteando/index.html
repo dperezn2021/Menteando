@@ -13,25 +13,32 @@
 
     <!--Valores de la web-->
     <title>Menteando</title>
-    <link rel="icon" href="assets/img/logo.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="assets/img/logo2.png" type="image/png" sizes="32x32">
 
     <!--Estilos CSS-->
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/pages.css" />
     <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="coach/animacionesCoach.css">
 
-    <!--Scripts-->
-    <script src="js/perfil.js" defer></script>
-    <script src="js/storage.js" defer></script>
-    <script src="js/datosPerfil.js" defer></script>
+   <!-- Scripts -->
+    <script src="js/perfil.js"></script>
+    <script src="js/datosPerfil.js"></script>
+    <script src="coach/mensajesCoach.js"></script>
+    <script src="coach/cerebroCoach.js"></script>
+    <script src="coach/entidadCoach.js"></script>
+    <script src="js/controladorCoach.js"></script>
 </head>
 
 <body>
+    <div id="coach" class="coach">
+        <div id="coach-bubble" class="coach-bubble"></div>
+    </div>
 
     <!-- HEADER -->
     <header class="header-content">
         <div class="header-box">
-            <img src="assets/img/logo.png" alt="Logo Menteando" class="logo">
+            <img src="assets/img/logo2.png" alt="Logo Menteando" class="logo">
             <div class="header-title">
                 <h1>Menteando</h1>
                 <small>Entrena tu mente, pero jugando</small>
@@ -43,10 +50,11 @@
                 <li><a class="nav-link" href="index.html">Inicio</a></li>
                 <li><a class="nav-link" href="games.html">Juegos</a></li>
                 <li><a class="nav-link" href="about.html">Acerca de</a></li>
-
                 <li>
-                    <a class="nav-link active" href="perfil.html"><img src="assets/icon/usuario.webp"
-                            alt="Icono Usuario" class="icon"><span id="perfil-apodo-header"></span></a>
+                    <a class="nav-link active" href="perfil.html">
+                        <img src="assets/icon/usuario.webp" alt="Icono Usuario" class="icon">
+                        <span id="perfil-apodo-header"></span>
+                    </a>
                 </li>
             </ul>
         </nav>
@@ -55,7 +63,7 @@
 
         <!-- HERO -->
         <section class="hero">
-            <img src="assets/img/ilustracion-cognitiva.png" alt="Ilustración cognitiva">
+            <img src="assets/img/nabri-tareas.png" alt="Ilustración cognitiva">
             <div class="hero-text">
                 <h2>¡Bienvenido a Menteando!</h2>
                 <p>Tu plataforma de minijuegos cognitivos para entrenar memoria, atención y reflejos.</p>
@@ -97,7 +105,7 @@
             </div>
         </section>
 
-      
+
         <!-- CÓMO FUNCIONA -->
         <section class="section">
             <h2>¿Cómo funciona?</h2>
@@ -125,19 +133,8 @@
 
         <!-- JUEGOS -->
         <section class="section">
-            <h2>Juegos destacados</h2>
-
-            <div class="games-grid">
-                <button class="game-card" onclick="window.location.href='juegos/eco-visual/index.html'">
-                    <h4>Eco Visual</h4>
-                    <p>Entrena tu atención sostenida mediante estímulos visuales.</p>
-                </button>
-
-                <button class="game-card" onclick="window.location.href='juegos/cambio-de-reglas/index.html'">
-                    <h4>Cambio de Reglas</h4>
-                    <p>Mejora tu flexibilidad cognitiva adaptándote a normas cambiantes.</p>
-                </button>
-            </div>
+            <h2>Juegos destacados del día</h2>
+            <div id="juegos-dia" class="games-grid"></div>
         </section>
 
         <!-- PERFIL -->
@@ -155,13 +152,20 @@
             </div>
         </section>
 
-        <!-- FOOTER -->
-        <footer>
-            <p>&copy; 2025 Daniel Pérez Navarro | Universidad Rey Juan Carlos</p>
-            <a href="https://github.com/dperezn2021/Menteando" target="_blank">GitHub del proyecto</a>
-        </footer>
     </main>
 
+    <!-- FOOTER -->
+    <footer class="perfil-footer">
+        <p>&copy; 2025 Daniel Pérez Navarro | Universidad Rey Juan Carlos</p>
+    </footer>
+
+    <script src="js/juegosDia.js"></script>
+    <script>
+        const perfil = getperfil();
+        const coachController = new CoachController(perfil);
+        coachController.onMenuPrincipal(); 
+            
+    </script>
 
 </body>
 

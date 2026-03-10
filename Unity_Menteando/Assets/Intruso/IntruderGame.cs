@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class IntruderGame : BaseGame
@@ -7,7 +8,17 @@ public class IntruderGame : BaseGame
     public Transform grid;
     public GameObject prefabIcono;
 
-    private int filas;
+    [Header("Parámetros base")]
+    public int cantidadIconosBase = 6;
+    public float tiempoMaximoBase = 4f;
+    public TextMeshProUGUI textoNivelActual;
+
+    // Variables internas
+    private int cantidadIconos;
+    private float tiempoMaximo;
+    private float diferenciaIntruso;
+
+    private int filas; 
     private int columnas;
 
     private int intrusoIndex;
@@ -23,19 +34,25 @@ public class IntruderGame : BaseGame
         nombre = "detector de intrusos";
     }
 
+    private void Start()
+    {
+        GameManager.Instance.EmpezarJuego(this);
+        GenerarEstimulos();
+    }
     // ---------------------------------------------------------
     // GRID SEGÚN NIVEL
     // ---------------------------------------------------------
     private void ObtenerGridPorNivel(int nivel, out int f, out int c)
     {
-        if (nivel <= 2) { f = 2; c = 3; }      // 2x3
-        else if (nivel <= 3) { f = 3; c = 3; } // 3x3
-        else if (nivel <= 4) { f = 4; c = 3; } // 4x3
-        else if (nivel <= 5) { f = 4; c = 4; } // 4x4
-        else if (nivel <= 6) { f = 5; c = 4; } // 5x4
-        else if (nivel <= 7) { f = 5; c = 4; } // 5x4
-        else if (nivel <= 8) { f = 5; c = 4; } // 5x4
-        else { f = 5; c = 5; }                 // 5x5
+        if (nivel <= 2) { f = 3; c = 1; }
+        else if (nivel <= 3) { f = 3; c = 2; }
+        else if (nivel <= 4) { f = 3; c = 3; }
+        else if (nivel <= 5) { f = 4; c = 4; }
+        else if (nivel <= 6) { f = 4; c = 5; }
+        else if (nivel <= 7) { f = 4; c = 6; }
+        else if (nivel <= 8) { f = 4; c = 7; }
+        else if (nivel <= 9) { f = 4; c = 8; }
+        else { f = 5; c = 9; }
     }
 
     // ---------------------------------------------------------
@@ -58,6 +75,7 @@ public class IntruderGame : BaseGame
     public override void GenerarEstimulos()
     {
         int nivel = DifficultyManager.Instance.nivelActual;
+        textoNivelActual.text = nivel.ToString();
 
         ObtenerGridPorNivel(nivel, out filas, out columnas);
         int cantidadIconos = filas * columnas;

@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     private BaseGame juegoActual;
 
     public float duracionPartida = 120.0f;
-    private float tiempoRestante;
+    public float tiempoRestante;
     private bool estaJugando;
 
     public TextMeshProUGUI textoTiempoRestante;

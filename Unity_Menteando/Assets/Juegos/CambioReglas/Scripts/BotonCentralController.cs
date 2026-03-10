@@ -1,63 +1,58 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 public class BotonCentralController : MonoBehaviour
 {
-    public ControladorCambioReglas controlador;
+    [Header("Parte móvil del botón")]
+    public Transform parteMovil;
+    public float distancia = 0.2f;
+    public float velocidad = 10f;
 
-    [Header("Animaci�n f�sica")]
-    public Transform pulsador;              // Parte que baja
-    public float distanciaBajada = 500.0f;
-    public float velocidad = 5.0f;
+    private bool animando = false;
+    private Vector3 posInicial;
 
-    private Vector3 posicionInicial;
-    private bool estaAnimando = false;
+    private RoscoGame juego; // ← ahora es privado
 
     void Start()
     {
-        posicionInicial = pulsador.localPosition;
+        posInicial = parteMovil.localPosition;
+    }
+
+    public void SetJuego(RoscoGame g)
+    {
+        juego = g;
     }
 
     void OnMouseDown()
     {
-        if (!estaAnimando)
-        {
-            StartCoroutine(AnimarBoton());
-            controlador.RegistrarPulsacion();
-        }
+        if (animando) return;
+        if (juego == null) return; // seguridad
+
+        juego.PulsarBoton();
+        StartCoroutine(Animar());
     }
 
-    IEnumerator AnimarBoton()
+    IEnumerator Animar()
     {
-        estaAnimando = true;
+        animando = true;
 
-        Vector3 posicionObjetivo = posicionInicial - new Vector3(distanciaBajada, 0, 0);
+        Vector3 abajo = posInicial - new Vector3(0, distancia, 0);
 
-        // Baja
-        while (Vector3.Distance(pulsador.localPosition, posicionObjetivo) > 0.001f)
+        while (Vector3.Distance(parteMovil.localPosition, abajo) > 0.01f)
         {
-            pulsador.localPosition = Vector3.Lerp(
-                pulsador.localPosition,
-                posicionObjetivo,
-                Time.deltaTime * velocidad
-            );
+            parteMovil.localPosition = Vector3.Lerp(parteMovil.localPosition, abajo, Time.deltaTime * velocidad);
             yield return null;
         }
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.05f);
 
-        // Sube
-        while (Vector3.Distance(pulsador.localPosition, posicionInicial) > 0.001f)
+        while (Vector3.Distance(parteMovil.localPosition, posInicial) > 0.01f)
         {
-            pulsador.localPosition = Vector3.Lerp(
-                pulsador.localPosition,
-                posicionInicial,
-                Time.deltaTime * velocidad
-            );
+            parteMovil.localPosition = Vector3.Lerp(parteMovil.localPosition, posInicial, Time.deltaTime * velocidad);
             yield return null;
         }
 
-        pulsador.localPosition = posicionInicial;
-        estaAnimando = false;
+        parteMovil.localPosition = posInicial;
+        animando = false;
     }
 }

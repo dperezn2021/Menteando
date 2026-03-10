@@ -19,15 +19,22 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/pages.css" />
     <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="coach/animacionesCoach.css">
 
-    <!--Scripts JS-->
-    <script src="js/games.js" defer></script>
-    <script src="js/perfil.js" defer></script>
-    <script src="js/datosPerfil.js" defer></script>
+    <!-- Scripts -->
+    <script src="js/perfil.js"></script>
+    <script src="js/datosPerfil.js"></script>
+    <script src="js/controladorCoach.js"></script>
+    <script src="coach/mensajesCoach.js"></script>
+    <script src="coach/cerebroCoach.js"></script>
+    <script src="coach/entidadCoach.js"></script>
 
 </head>
 
 <body>
+    <div id="coach" class="coach">
+        <div id="coach-bubble" class="coach-bubble"></div>
+    </div>
     <!-- HEADER -->
     <header class="header-content">
         <div class="header-box">
@@ -43,10 +50,11 @@
                 <li><a class="nav-link" href="index.html">Inicio</a></li>
                 <li><a class="nav-link" href="games.html">Juegos</a></li>
                 <li><a class="nav-link" href="about.html">Acerca de</a></li>
-
                 <li>
-                    <a class="nav-link active" href="perfil.html"><img src="assets/icon/usuario.webp"
-                            alt="Icono Usuario" class="icon"><span id="perfil-apodo-header"></span></a>
+                    <a class="nav-link active" href="perfil.html">
+                        <img src="assets/icon/usuario.webp" alt="Icono Usuario" class="icon">
+                        <span id="perfil-apodo-header"></span>
+                    </a>
                 </li>
             </ul>
         </nav>
@@ -81,7 +89,7 @@
                         <option value="control_inhibitorio">Control inhibitorio</option>
                         <option value="flexibilidad_cognitiva">Flexibilidad cognitiva</option>
                         <option value="planificacion">Planificación</option>
-                        <option value="reflejos">Reflejos / visomotor</option>
+                        <option value="coordinacion_visomotora">Reflejos y coordinacion visiomotora</option>
                     </select>
                 </div>
 
@@ -95,116 +103,135 @@
             <div class="games-grid">
 
                 <button class="game-card" data-name="orden caotico" data-skill1="atencion_sostenida" data-skill2=""
+                    data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/orden-caotico/orden-caotico-page.html'">
                     <h4>Orden Caótico</h4>
                     <p>Encuentra números en orden entre distractores.</p>
                 </button>
 
+                <button class="game-card" data-name="rosco" data-skill1="atencion_selectiva"
+                    data-skill2="velocidad_cognitiva" data-skill3="control_inhibitorio"
+                    data-skill4="coordinacion_visomotora" data-skill5=""
+                    onclick="window.location.href='games/rosco/rosco-page.html'">
+                    <h4>Rosco</h4>
+                    <p>Encuentra letras en orden entre distractores.</p>
+                </button>
+
                 <button class="game-card" data-name="detector de intrusos" data-skill1="atencion_selectiva"
-                    data-skill2="control_inhibitorio"
-                    onclick="window.location.href='games/detector-intrusos/detector-intrusos-page.html'">
-                    <h4>Detector de Intrusos</h4>
+                    data-skill2="control_inhibitorio" data-skill3="velocidad_cognitiva"
+                    data-skill4="coordinacion_visomotora" data-skill5=""
+                    onclick="window.location.href='games/detectar-intruso/detectar-intruso-page.html'">
+                    <h4>Detectar Intruso</h4>
                     <p>Identifica el elemento incorrecto entre distractores.</p>
                 </button>
 
                 <button class="game-card" data-name="tres bolas" data-skill1="atencion_dividida" data-skill2=""
+                    data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/tres-bolas/tres-bolas-page.html'">
                     <h4>3 Bolas</h4>
                     <p>Sigue varios objetos en movimiento a la vez.</p>
                 </button>
 
                 <button class="game-card" data-name="flash tiktok" data-skill1="velocidad_cognitiva"
-                    data-skill2="atencion_sostenida"
+                    data-skill2="atencion_sostenida" data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/flash-tiktok/flash-tiktok-page.html'">
                     <h4>Flash TikTok</h4>
                     <p>Detecta números que aparecen durante milisegundos.</p>
                 </button>
 
                 <button class="game-card" data-name="eco visual" data-skill1="memoria_espacial" data-skill2=""
+                    data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/eco-visual/eco-visual-page.html'">
                     <h4>Eco Visual</h4>
                     <p>Recuerda la posición de varios objetos.</p>
                 </button>
 
                 <button class="game-card" data-name="simon dice" data-skill1="memoria_trabajo"
-                    data-skill2="memoria_espacial"
+                    data-skill2="memoria_espacial" data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/simon-dice/simon-dice-page.html'">
                     <h4>Simón Dice</h4>
                     <p>Repite secuencias cada vez más largas.</p>
                 </button>
 
                 <button class="game-card" data-name="asociacion rapida" data-skill1="velocidad_cognitiva"
-                    data-skill2="memoria_trabajo"
+                    data-skill2="memoria_trabajo" data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/asociacion-rapida/asociacion-rapida-page.html'">
                     <h4>Asociación Rápida</h4>
                     <p>Relaciona símbolos y palabras en poco tiempo.</p>
                 </button>
 
                 <button class="game-card" data-name="secuencia inversa" data-skill1="memoria_trabajo" data-skill2=""
+                    data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/secuencia-inversa/secuencia-inversa-page.html'">
                     <h4>Secuencia Inversa</h4>
                     <p>Repite la secuencia pero al revés.</p>
                 </button>
 
                 <button class="game-card" data-name="silencio mental" data-skill1="control_inhibitorio" data-skill2=""
+                    data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/silencio-mental/silencio-mental-page.html'">
                     <h4>Silencio Mental</h4>
                     <p>Go/No-Go: pulsa solo cuando corresponde.</p>
                 </button>
 
                 <button class="game-card" data-name="stroop" data-skill1="control_inhibitorio"
-                    data-skill2="flexibilidad_cognitiva" onclick="window.location.href='games/stroop/stroop-page.html'">
+                    data-skill2="flexibilidad_cognitiva" data-skill3="" data-skill4="" data-skill5=""
+                    onclick="window.location.href='games/stroop/stroop-page.html'">
                     <h4>Stroop</h4>
                     <p>Di el color, no la palabra.</p>
                 </button>
 
                 <button class="game-card" data-name="doble regla" data-skill1="flexibilidad_cognitiva"
-                    data-skill2="control_inhibitorio"
+                    data-skill2="control_inhibitorio" data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/doble-regla/doble-regla-page.html'">
                     <h4>Doble Regla</h4>
                     <p>Cambia de norma según el estímulo.</p>
                 </button>
 
                 <button class="game-card" data-name="trayectorias mentales" data-skill1="planificacion" data-skill2=""
+                    data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/trayectorias-mentales/trayectorias-mentales-page.html'">
                     <h4>Trayectorias Mentales</h4>
                     <p>Planifica el recorrido antes de ejecutarlo.</p>
                 </button>
 
                 <button class="game-card" data-name="tiempo de reaccion" data-skill1="reflejos" data-skill2=""
+                    data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/tiempo-reaccion/tiempo-reaccion-page.html'">
                     <h4>Tiempo de Reacción</h4>
                     <p>Pulsa cuando cambie el color.</p>
                 </button>
 
                 <button class="game-card" data-name="objeto movil" data-skill1="reflejos"
-                    data-skill2="flexibilidad_cognitiva"
+                    data-skill2="flexibilidad_cognitiva" data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/objeto-movil/objeto-movil-page.html'">
                     <h4>Objeto Móvil</h4>
                     <p>Haz clic en el objeto que se mueve.</p>
                 </button>
 
                 <button class="game-card" data-name="wisconsin" data-skill1="flexibilidad_cognitiva" data-skill2=""
+                    data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/wisconsin/wisconsin-page.html'">
                     <h4>Tarjetas Wisconsin</h4>
                     <p>Cambia la regla de clasificación.</p>
                 </button>
 
                 <button class="game-card" data-name="memory cronometrado" data-skill1="memoria_espacial"
-                    data-skill2="velocidad_cognitiva"
+                    data-skill2="velocidad_cognitiva" data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/memory-cronometrado/memory-cronometrado-page.html'">
                     <h4>Memory Cronometrado</h4>
                     <p>Encuentra parejas antes de que acabe el tiempo.</p>
                 </button>
 
                 <button class="game-card" data-name="contador mental" data-skill1="memoria_trabajo"
-                    data-skill2="velocidad_cognitiva"
+                    data-skill2="velocidad_cognitiva" data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/contador-mental/contador-mental-page.html'">
                     <h4>Contador Mental</h4>
                     <p>Resuelve operaciones rápidas mentalmente.</p>
                 </button>
 
                 <button class="game-card" data-name="anticipacion patron" data-skill1="planificacion" data-skill2=""
+                    data-skill3="" data-skill4="" data-skill5=""
                     onclick="window.location.href='games/anticipacion-patron/anticipacion-patron-page.html'">
                     <h4>Anticipación de Patrón</h4>
                     <p>Predice el siguiente elemento.</p>
@@ -217,8 +244,9 @@
                     <p>Gestiona dos tareas a la vez.</p>
                 </button>
 
-                <button class="game-card" data-name="mates express" data-skill1="memoria_trabajo"
-                    data-skill2="velocidad_cognitiva"
+                <button class="game-card" data-name="mates express" data-skill1="atencion_sostenida"
+                    data-skill2="velocidad_cognitiva" data-skill3="memoria_trabajo" data-skill4="control_inhibitorio"
+                    data-skill5="coordinacion_visomotora"
                     onclick="window.location.href='games/mates-express/mates-express-page.html'">
                     <h4>Mates Express</h4>
                     <p>Arrastra el símbolo correcto para completar la operación.</p>
@@ -230,12 +258,16 @@
         </section>
 
     </main>
-
-    <footer>
+    <!-- FOOTER -->
+    <footer class="perfil-footer">
         <p>&copy; 2025 Daniel Pérez Navarro | Universidad Rey Juan Carlos</p>
-        <!-- Enlace a nueva pestaña con target -->
-        <a href="https://github.com/dperezn2021/Menteando" target="_blank">Enlace a GitHub</a>
     </footer>
+    <script>
+        const perfil = getperfil();
+        const coachController = new CoachController(perfil);
+        coachController.onSeleccionJuego(); 
+    </script>
+
 </body>
 
 </html>

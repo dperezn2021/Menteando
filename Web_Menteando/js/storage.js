@@ -16,6 +16,9 @@ window.SaveGameData = function(jsonString) {
     // Actualizar juego más jugado
     perfil.juegoMasJugado = getJuegoMasJugado(perfil);
 
+    //Actualizar nivel
+    perfil.nivel = getNivel(perfil);
+
     // Guardar
     saveperfil(perfil);
 };

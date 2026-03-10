@@ -17,14 +17,25 @@
     <!-- Estilos -->
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/perfil.css" />
+    <link rel="stylesheet" href="coach/animacionesCoach.css">
 
     <!-- Scripts -->
-    <script src="js/storage.js" defer></script>
-    <script src="js/perfil.js" defer></script>
-    <script src="js/datosPerfil.js" defer></script>
+    <script src="js/perfil.js"></script>
+    <script src="js/datosPerfil.js"></script>
+    <script src="coach/mensajesCoach.js"></script>
+    <script src="coach/cerebroCoach.js"></script>
+    <script src="coach/entidadCoach.js"></script>
+    <script src="js/controladorCoach.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+
 </head>
 
 <body class="perfil-page">
+
+    <div id="coach" class="coach">
+        <div id="coach-bubble" class="coach-bubble"></div>
+    </div>
 
     <!-- HEADER -->
     <header class="header-content">
@@ -42,7 +53,7 @@
                 <li><a class="nav-link" href="games.html">Juegos</a></li>
                 <li><a class="nav-link" href="about.html">Acerca de</a></li>
                 <li>
-                    <a class="nav-link active" href="perfil.html">
+                    <a class="nav-link active" href="perfil.html" style="margin-left: 1rem;">
                         <img src="assets/icon/usuario.webp" alt="Icono Usuario" class="icon">
                         <span id="perfil-apodo-header"></span>
                     </a>
@@ -59,18 +70,30 @@
 
             <h2>Resumen del perfil</h2>
             <ul>
-                <li>Nombre: <span id="perfil-nombre"></span></li>
-                <li>Edad: <span id="perfil-edad"></span></li>
-                <li>Correo: <span id="perfil-correo"></span></li>
-                <li>Nivel cognitivo general: <span id="perfil-nivel"></span></li>
-                <li>Sesiones completadas: <span id="perfil-sesiones"></span></li>
+                <li><strong>Nombre: </strong><span id="perfil-nombre"></span></li>
+                <li><strong>Edad: </strong><span id="perfil-edad"></span></li>
+                <li><strong>Correo: </strong><span id="perfil-correo"></span></li>
+                <li><strong>Nivel cognitivo general: </strong><span id="perfil-nivel"></span>%</li>
+                <li><strong>Sesiones completadas: </strong><span id="perfil-sesiones"></span></li>
             </ul>
 
             <button id="btn-editar" class="btn-editar">Editar perfil</button>
             <button id="btn-reset-perfil" class="btn-reset">Reiniciar progreso cognitivo</button>
-            <p>------------------------------------</p>
             <h2>Juego más jugado</h2>
             <p><span id="perfil-juego-mas-jugado">Cargando...</span></p>
+
+
+            <h2>Recibe las métricas</h2>
+            <button id="btn-correo" class="btn-editar">Enviar
+                Correo</button>
+
+            <h2 id="titulo-activar-coach">Coach</h2>
+            <button id="btn-activar-coach" class="btn-editar"
+                onclick="localStorage.removeItem('coach_disabled'); location.reload();">
+                Activar coach
+            </button>
+
+
         </aside>
 
         <!-- CONTENIDO A LA DERECHA (scroll natural de la página) -->
@@ -116,7 +139,7 @@
                 <ul id="perfil-tests"></ul>
             </section>
 
-            
+
         </section>
 
     </main>
@@ -141,6 +164,28 @@
     <footer class="perfil-footer">
         <p>&copy; 2025 Daniel Pérez Navarro | Universidad Rey Juan Carlos</p>
     </footer>
+    <script>
+        const perfil = getperfil();
+        const coachController = new CoachController(perfil);
+        coachController.onPantallaPerfil(); 
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            emailjs.init("lUupELiv1r8lHB85U"); // tu PUBLIC KEY
+
+            const perfil = getperfil();
+            const botonEmail = document.getElementById("btn-correo");
+
+            botonEmail.addEventListener("click", () => {
+
+                enviarMetricasPorCorreo(perfil);
+
+                alert("Correo enviado (si EmailJS está configurado correctamente)");
+            });
+        });
+    </script>
+
 
 </body>
 

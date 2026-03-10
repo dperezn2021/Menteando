@@ -247,6 +247,7 @@ MonoBehaviour:
   prefabIcono: {fileID: 156986887215220525, guid: c00d591ace6324149892fb85bf651d11, type: 3}
   cantidadIconosBase: 6
   tiempoMaximoBase: 4
+  textoNivelActual: {fileID: 558816130}
 --- !u!1 &450599653
 GameObject:
   m_ObjectHideFlags: 0

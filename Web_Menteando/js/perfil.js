@@ -8,6 +8,7 @@ const perfilBase = {
     edad: 0,
     correo: "",
     sesiones: 0,
+    nivel: 0,
     ultimaSesion: null,
     juegos: {},
     juegoMasJugado: "Cargando...",
@@ -33,7 +34,7 @@ const perfilBase = {
 
 const juegoSkills = {
     "orden caotico": ["atencionSostenida"],
-    "detector de intrusos": ["atencionSelectiva", "controlInhibitorio"],
+    "detector de intrusos": ["atencionSelectiva", "controlInhibitorio", "velocidadCognitiva", "coordinacionVisomotora"],
     "tres bolas": ["atencionDividida"],
     "flash tiktok": ["velocidadCognitiva", "atencionSostenida"],
     "eco visual": ["memoriaEspacial"],
@@ -45,16 +46,17 @@ const juegoSkills = {
     "doble regla": ["flexibilidadCognitiva", "controlInhibitorio"],
     "trayectorias mentales": ["planificacion"],
     "tiempo de reaccion": ["velocidadCognitiva"],
-    "objeto movil": ["reflejos", "flexibilidadCognitiva"],
+    "objeto movil": ["coordinacionVisomotora", "flexibilidadCognitiva"],
     "wisconsin": ["flexibilidadCognitiva"],
     "memory cronometrado": ["memoriaEspacial", "velocidadCognitiva"],
     "contador mental": ["memoriaTrabajo", "velocidadCognitiva"],
     "anticipacion patron": ["planificacion"],
     "multitarea": ["atencionDividida", "controlInhibitorio"],
-    "math": ["memoriaTrabajo", "velocidadCognitiva"]
+    "math": ["memoriaTrabajo", "velocidadCognitiva", "controlInhibitorio", "coordinacionVisomotora"],
+    "rosco": ["atencionSelectiva", "velocidadCognitiva", "controlInhibitorio", "coordinacionVisomotora"]
 };
 
-// === OBTENER PERFIL (SIEMPRE COMPLETO) ===
+// === OBTENER PERFIL ===
 function getperfil() {
     let data = localStorage.getItem(perfil_KEY);
 
@@ -65,7 +67,6 @@ function getperfil() {
 
     let perfil = JSON.parse(data);
 
-    // Rellenar campos faltantes
     perfil = Object.assign({}, perfilBase, perfil);
     perfil.detalle = Object.assign({}, perfilBase.detalle, perfil.detalle);
 
@@ -79,10 +80,8 @@ function saveperfil(perfil) {
 
 // === REINICIAR PERFIL ===
 function resetperfil() {
-    // Vuelve al perfil base
     saveperfil(perfilBase);
 }
-
 
 // === RECALCULAR PERFIL GLOBAL ===
 function recalcularPerfilGlobal(perfil, metrics, gameId) {
@@ -90,45 +89,41 @@ function recalcularPerfilGlobal(perfil, metrics, gameId) {
     const skills = juegoSkills[gameId.toLowerCase()];
     if (!skills) return;
 
-    // 1. MEDIA HISTÓRICA (85% viejo + 15% nuevo)
     skills.forEach(skill => {
         perfil.detalle[skill] =
-            perfil.detalle[skill] * 0.85 +
-            metrics[skill] * 0.15;
+            perfil.detalle[skill] * 0.9 +
+            metrics[skill] * 0.1;
     });
 
-    // 2. PROGRESO ACUMULADO (+1% por sesión)
-    skills.forEach(skill => {
-        perfil.detalle[skill] = Math.min(1, perfil.detalle[skill] + 0.01);
-    });
-
-    // 3. BARRAS PRINCIPALES
     perfil.atencion =
-        (perfil.detalle.atencionSostenida * 0.6 +
-         perfil.detalle.atencionSelectiva * 0.2 +
-         perfil.detalle.atencionDividida * 0.2);
+        0.6 * perfil.detalle.atencionSostenida +
+        0.2 * perfil.detalle.atencionSelectiva +
+        0.2 * perfil.detalle.atencionDividida;
 
     perfil.memoria =
-        (perfil.detalle.memoriaTrabajo * 0.7 +
-         perfil.detalle.memoriaEspacial * 0.3);
+        0.7 * perfil.detalle.memoriaTrabajo +
+        0.3 * perfil.detalle.memoriaEspacial;
 
-    perfil.control = perfil.detalle.controlInhibitorio;
+    perfil.control =
+        0.5 * perfil.detalle.controlInhibitorio +
+        0.3 * perfil.detalle.flexibilidadCognitiva +
+        0.2 * perfil.detalle.planificacion;
 
     perfil.reflejos =
-        (perfil.detalle.velocidadCognitiva * 0.6 +
-         perfil.detalle.coordinacionVisomotora * 0.4);
+        0.5 * perfil.detalle.velocidadCognitiva +
+        0.4 * perfil.detalle.coordinacionVisomotora - 
+        0.1 * perfil.detalle.controlInhibitorio;
 
-
-    // 4. JUEGO MÁS JUGADO
     perfil.juegoMasJugado = getJuegoMasJugado(perfil);
 
+    perfil.nivel = getNivel(perfil);
+    console.log(perfil.nivel)
 }
-
 
 function getJuegoMasJugado(perfil) {
     let maxSesiones = 0;
     let juegoMasJugado = "Ninguno";
-    
+
     for (const juego in perfil.juegos) {
         const sesiones = perfil.juegos[juego].length;
         if (sesiones > maxSesiones) {
@@ -139,3 +134,62 @@ function getJuegoMasJugado(perfil) {
 
     return juegoMasJugado;
 }
+
+function getNivel(perfil){
+    let nivel;
+    nivel = ((perfil.atencion + perfil.control + perfil.reflejos + perfil.memoria)/4*100).toFixed(0);
+
+    return nivel;
+}
+
+//-------------------------- ENVIAR METRICAS POR CORREO ---------------------------
+
+function enviarMetricasPorCorreo(perfil) {
+    if (!perfil.correo) {
+        console.warn("El usuario no tiene correo, no se envía nada.");
+        return;
+    }
+
+    const data = {
+        name:"Menteando",
+        email:"no-reply@menteando.com",
+        time: new Date(),
+        seasons: perfil.sesiones,
+        user_name: perfil.nombre,
+        user_email: perfil.correo,
+        metrics_json: JSON.stringify(perfil.detalle, null, 2),
+        memoria: (perfil.memoria * 100).toFixed(0),
+        control: (perfil.control * 100).toFixed(0),
+        atencion: (perfil.atencion * 100).toFixed(0),
+        reflejos: (perfil.reflejos * 100).toFixed(0),
+        nivel: perfil.nivel
+    };
+
+    emailjs.send("service_uzpz3sb", "template_n0n5tvp", data)
+        .then(() => console.log("Correo enviado correctamente"))
+        .catch(err => console.error("Error enviando correo:", err));
+}
+
+
+
+//------------------------- COACH ---------------------------
+
+function disableCoachForever() {
+    localStorage.setItem("coach_disabled", "true");
+}
+
+function isCoachDisabled() {
+    return localStorage.getItem("coach_disabled") === "true";
+}
+
+
+
+
+// === HACER TODO GLOBAL PARA UNITY ===
+window.getperfil = getperfil;
+window.saveperfil = saveperfil;
+window.resetperfil = resetperfil;
+window.recalcularPerfilGlobal = recalcularPerfilGlobal;
+window.getJuegoMasJugado = getJuegoMasJugado;
+window.disableCoachForever = disableCoachForever;
+window.isCoachDisabled = isCoachDisabled;

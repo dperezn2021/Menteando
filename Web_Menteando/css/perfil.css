@@ -55,7 +55,8 @@
     border: none;
     border-radius: var(--radius);
     cursor: pointer;
-    margin-top: 1rem;
+    margin: 1rem 0;
+
 }
 
 /* ===== CONTENIDO DERECHA ===== */
