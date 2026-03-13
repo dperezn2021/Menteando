@@ -3,8 +3,8 @@ const perfil_KEY = "perfil_usuario";
 
 // === PERFIL BASE COMPLETO ===
 const perfilBase = {
-    nombre: "Jugador 1",
-    apodo: "Invitado",
+    nombre: "Jugador Uno",
+    apodo: "Invitado_01",
     edad: 0,
     correo: "",
     sesiones: 0,
@@ -183,6 +183,53 @@ function isCoachDisabled() {
 }
 
 
+function activarCoach() {
+    const btnActivarCoach = document.getElementById("btn-activar-coach");
+    const badge = document.getElementById("titulo-activar-coach");
+    const dot = document.getElementById("coach-status-dot");
+
+    if (!badge || !dot) {
+        console.warn("activarCoach(): elementos no encontrados");
+        return;
+    }
+
+    badge.textContent = "Coach Cognitivo Activo";
+
+    if (btnActivarCoach) btnActivarCoach.style.display = "none";
+
+    badge.classList.remove("text-red-500");
+    badge.classList.add("text-blue-500");
+
+    dot.classList.remove("bg-blue-500");
+    dot.classList.add("bg-green-500");
+
+    localStorage.setItem("coach_disabled", "false");
+}
+
+function desactivarCoach() {
+    const btnActivarCoach = document.getElementById("btn-activar-coach");
+    const badge = document.getElementById("titulo-activar-coach");
+    const dot = document.getElementById("coach-status-dot");
+
+    if (!badge || !dot) {
+        console.warn("desactivarCoach(): elementos no encontrados");
+        return;
+    }
+
+    badge.textContent = "Coach Cognitivo Desactivado";
+
+    if (btnActivarCoach) btnActivarCoach.style.display = "block";
+
+    badge.classList.remove("text-blue-500");
+    badge.classList.add("text-red-500");
+
+    dot.classList.remove("bg-green-500");
+    dot.classList.add("bg-red-500");
+
+    localStorage.setItem("coach_disabled", "true");
+}
+
+
 
 
 // === HACER TODO GLOBAL PARA UNITY ===
@@ -193,3 +240,22 @@ window.recalcularPerfilGlobal = recalcularPerfilGlobal;
 window.getJuegoMasJugado = getJuegoMasJugado;
 window.disableCoachForever = disableCoachForever;
 window.isCoachDisabled = isCoachDisabled;
+window.activarCoach = activarCoach;
+window.desactivarCoach = desactivarCoach;
+
+window.addEventListener("DOMContentLoaded", () => {
+    const badge = document.getElementById("titulo-activar-coach");
+    const dot = document.getElementById("coach-status-dot");
+    const btn = document.getElementById("btn-activar-coach");
+
+    // Si la página NO tiene elementos del coach, no hacemos nada
+    if (!badge || !dot) return;
+
+    if (isCoachDisabled()) {
+        desactivarCoach();
+        const coach = document.getElementById("coach");
+        if (coach) coach.remove();
+    } else {
+        activarCoach();
+    }
+});

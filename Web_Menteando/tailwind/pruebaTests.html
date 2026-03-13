@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+
+
+<head>
+    <!--Metadatos-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Menteando - Plataforma de minijuegos cognitivos para entrenar memoria, atención y reflejos">
+    <meta name="keywords"
+        content="Menteando, juegos cognitivos, memoria, atención, reflejos, minijuegos, entrenamiento mental">
+    <meta name="author" content="Daniel Pérez Navarro">
+
+    <!--Valores de la web-->
+    <title>Menteando | Perfil</title>
+    <link rel="icon" href="assets/img/logo.png" type="image/png" sizes="32x32">
+
+
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../js/perfil.js"></script>
+    <script src="../js/datosPerfil.js"></script>
+    <script src="../coach/mensajesCoach.js"></script>
+    <script src="../coach/cerebroCoach.js"></script>
+    <script src="../coach/entidadCoach.js"></script>
+    <script src="../js/controladorCoach.js"></script>
+    <!-- Tailwind CSS with plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#3b82f6',
+                            secondary: '#6366f1',
+                            accent: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Estilos -->
+
+    <link rel="stylesheet" href="../coach/animacionesCoach.css">
+
+</head>
+
+<body class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased">
+
+
+
+    <!-- Header con logo, navegación y perfil -->
+    <header class="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-8 flex flex-wrap items-center justify-between">
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <img src="../assets/img/logo2.png" alt="Logo Menteando" class="w-16 h-16" />
+                <div class="flex flex-col">
+                    <h1 class="text-4xl font-bold text-slate-900 dark:text-white leading-tight">Menteando</h1>
+                    <p class="text-base font-normal text-slate-500 dark:text-slate-300 leading-tight">Entrena tu mente,
+                        pero jugando</p>
+                </div>
+            </div>
+            <nav class="flex flex-wrap items-center gap-6">
+                <a href="index.html"
+                    class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Inicio</a>
+                <a href="pruebaTests.html"
+                    class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Tests</a>
+                <a href="pruebaGames.html"
+                    class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Juegos</a>
+                <a href="about.html"
+                    class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Acerca
+                    De</a>
+
+
+            </nav>
+            <div class="flex items-center gap-4">
+                <a href="pruebaPerfil.html" class="flex items-center gap-2">
+                    <span id="perfil-apodo-header"
+                        class="text-base font-normal text-slate-500 dark:text-slate-300"></span>
+                    <div
+                        class="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500 bg-blue-500/10 flex items-center justify-center">
+                        <img id="perfil-avatar-header" src="../assets/icon/usuario.webp" alt="Avatar de usuario"
+                            class="w-full h-full object-cover" />
+                    </div>
+                </a>
+                <button id="theme-toggle-btn"
+                    class="text-2xl text-slate-900 dark:text-white hover:text-blue-500 transition-colors"
+                    onclick="document.documentElement.classList.toggle('dark')">🌓</button>
+            </div>
+        </div>
+    </header>
+    <main class="w-full">
+        <!-- HERO -->
+        <section class="bg-white py-20">
+            <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+
+                <div class="flex flex-col gap-6">
+
+                    <span class="px-4 py-1 bg-blue-500/10 text-blue-500 font-bold text-sm rounded-full w-fit">
+                        ACTÍVATE
+                    </span>
+
+                    <h1 class="text-5xl lg:text-6xl font-black leading-tight">
+                        Tu mente es tu mayor activo,
+                        <span class="text-blue-500">actívala y mantenla en forma</span>
+                    </h1>
+
+                    <p class="text-xl text-slate-600 max-w-xl">
+                        Las evaluaciones cognitivas periódicas permiten detectar cambios tempranos
+                        y diseñar estrategias personalizadas para fortalecer tu memoria,
+                        atención y agilidad mental.
+                    </p>
+
+                    <div class="flex gap-4">
+
+                        <button class="px-6 py-3 bg-slate-100 rounded-xl font-bold">
+                            Más información
+                        </button>
+
+                        <button class="px-6 py-3 bg-blue-500 text-white rounded-xl font-bold">
+                            Explorar evaluaciones
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="rounded-3xl overflow-hidden shadow-2xl">
+                    <img src="https://placehold.co/900x500" class="w-full">
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- TESTS -->
+        <section class="py-20 bg-blue-500/5">
+
+            <div class="max-w-7xl mx-auto px-6">
+
+                <div class="flex justify-between items-end mb-12">
+
+                    <div>
+                        <h2 class="text-4xl font-bold mb-2">
+                            Explorar Batería de Tests
+                        </h2>
+
+                        <p class="text-slate-600 text-lg">
+                            Selecciona una categoría para comenzar tu evaluación diaria.
+                        </p>
+                    </div>
+
+                    <div class="flex gap-3">
+
+                        <button class="px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-bold">
+                            Todos
+                        </button>
+
+                        <button class="px-4 py-2 bg-slate-100 rounded-full text-sm font-bold">
+                            Memoria
+                        </button>
+
+                        <button class="px-4 py-2 bg-slate-100 rounded-full text-sm font-bold">
+                            Atención
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CARDS -->
+
+                <div class="space-y-6">
+
+                    <!-- CARD 1 -->
+                    <div class="bg-white rounded-2xl shadow border flex overflow-hidden">
+
+                        <img src="https://placehold.co/220x220" class="w-56 object-cover">
+
+                        <div class="p-6 flex flex-col justify-between flex-1">
+
+                            <div>
+
+                                <h3 class="text-2xl font-bold mb-2">
+                                    Test de Memoria Episódica
+                                </h3>
+
+                                <p class="text-slate-600 mb-3">
+                                    Evalúa tu capacidad para recordar eventos específicos,
+                                    caras y detalles de situaciones.
+                                </p>
+
+                                <span class="text-sm font-bold text-slate-500 uppercase">
+                                    Habilidad: Memoria a corto plazo
+                                </span>
+
+                            </div>
+
+                            <div class="flex justify-between items-center mt-6">
+
+                                <span class="text-slate-500">
+                                    Duración: 5 min
+                                </span>
+
+                                <button class="px-4 py-2 bg-blue-500 text-white rounded-lg font-bold">
+                                    Realizar test
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CARD 2 -->
+                    <div class="bg-white rounded-2xl shadow border flex overflow-hidden">
+
+                        <img src="https://placehold.co/220x220" class="w-56 object-cover">
+
+                        <div class="p-6 flex flex-col justify-between flex-1">
+
+                            <div>
+
+                                <h3 class="text-2xl font-bold mb-2">
+                                    Atención Selectiva
+                                </h3>
+
+                                <p class="text-slate-600 mb-3">
+                                    Mide tu capacidad para concentrarte en un estímulo específico
+                                    mientras ignoras distracciones.
+                                </p>
+
+                                <span class="text-sm font-bold text-slate-500 uppercase">
+                                    Habilidad: Concentración
+                                </span>
+
+                            </div>
+
+                            <div class="flex justify-between items-center mt-6">
+
+                                <span class="text-slate-500">
+                                    Duración: 8 min
+                                </span>
+
+                                <button class="px-4 py-2 bg-blue-500 text-white rounded-lg font-bold">
+                                    Realizar test
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-center mt-10">
+
+                    <button class="text-blue-500 text-lg font-bold">
+                        Ver todas las evaluaciones disponibles
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+      <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+        <div class="max-w-screen-xl mx-auto px-6 pt-8">
+            <div class="flex flex-wrap justify-center gap-12 mb-6">
+                <div class="w-full md:w-96">
+                    <div class="flex items-center gap-3 mb-6">
+                        <img src="../assets/img/logo2.png" alt="Logo Menteando" class="w-16 h-16" />
+                        <h3 class="text-3xl font-black text-blue-500">Menteando</h3>
+                    </div>
+                    <p class="text-base font-normal text-slate-500 dark:text-slate-400">Dedicados a mejorar la calidad
+                        de vida de las personas mayores a través de la tecnología y la ciencia cognitiva.</p>
+                </div>
+                <div class="w-full md:w-64">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-6">Enlaces</h4>
+                    <ul class="space-y-4 text-slate-500 dark:text-slate-400">
+                        <li><a href="index.html" class="hover:text-blue-500 transition-colors">Inicio</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Blog de Salud</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Ejercicios</a></li>
+                    </ul>
+                </div>
+                <div class="w-full md:w-64">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-6">Legal</h4>
+                    <ul class="space-y-4 text-slate-500 dark:text-slate-400">
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Privacidad</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Términos</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Contacto</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-16 border-t border-slate-100 dark:border-slate-800 text-center">
+                <p class="text-sm font-normal text-slate-400">© 2025 Menteando Corp. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+
+</body>
+
+</html>

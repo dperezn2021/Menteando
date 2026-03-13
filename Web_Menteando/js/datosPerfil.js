@@ -14,9 +14,46 @@ document.addEventListener("DOMContentLoaded", () => {
     set("perfil-sesiones", perfil.sesiones);
     set("perfil-apodo-header", perfil.apodo);
     set("perfil-juego-mas-jugado", perfil.juegoMasJugado);
-    set("perfil-nivel", perfil.nivel);
+    actualizarNivelCognitivo(perfil.nivel);
 
-    
+    function actualizarNivelCognitivo(valor) {
+        const span = document.getElementById("perfil-nivel");
+        if (!span) return;
+
+        // Si está vacío o no es número → Nulo
+        if (!valor || valor !== 0) {
+            span.textContent = "Nulo";
+            span.className = "px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded font-medium";
+            return;
+        }
+
+        let texto = "";
+        let clases = "";
+
+
+        if (valor < 20) {
+            texto = "Básico";
+            clases = "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200";
+        } else if (valor < 40) {
+            texto = "Bajo";
+            clases = "bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-200";
+        } else if (valor < 60) {
+            texto = "Medio";
+            clases = "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200";
+        } else if (valor < 75) {
+            texto = "Alto";
+            clases = "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200";
+        } else if (valor < 90) {
+            texto = "Muy alto";
+            clases = "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200";
+        } else {
+            texto = "Maestría";
+            clases = "bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-200";
+        }
+
+        span.textContent = texto;
+        span.className = `px-2 py-1 rounded font-medium ${clases}`;
+    }
 
     // Animación de barras principales
     function animateBar(idFill, idText, value) {
@@ -130,18 +167,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnCerrar = document.getElementById("btn-cerrar-modal");
     const formModal = document.getElementById("perfil-form");
 
-    const tituloCoach = document.getElementById("titulo-activar-coach");
     const btnActivarCoach = document.getElementById("btn-activar-coach");
-    
-    btnActivarCoach.style.display = isCoachDisabled() ? "flex" : "none";
-    tituloCoach.style.display = isCoachDisabled() ? "flex" : "none";
+
+    btnActivarCoach.style.display = isCoachDisabled() ? "block" : "none";
 
     btnActivarCoach.addEventListener("click", () => {
         localStorage.removeItem("coach_disabled");
         location.reload();
         btnActivarCoach.style.display = "none";
         tituloCoach.style.display = "none";
-    });  
+        activarCoach();
+    });
 
     // Abrir modal
     btnEditar.addEventListener("click", () => {

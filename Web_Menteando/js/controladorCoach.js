@@ -17,28 +17,22 @@ function CoachController(perfil) {
 }
 
 
-CoachController.prototype.setupUserInteractionListeners = function() {
+CoachController.prototype.setupUserInteractionListeners = function () {
     document.addEventListener("click", this.onUserInteraction.bind(this));
     document.addEventListener("keydown", this.onUserInteraction.bind(this));
-   document.addEventListener("keydown", function(e) {
-    // Cambia "H" por la tecla que quieras
-    if (e.key.toLowerCase() === "h") {
-        disableCoachForever();
-        const btnActivarCoach = document.getElementById("btn-activar-coach");
-        const tituloCoach = document.getElementById("titulo-activar-coach");
-        if (btnActivarCoach) btnActivarCoach.style.display = "block";
-        if (tituloCoach) tituloCoach.style.display = "block";
+    document.addEventListener("keydown", function (e) {
+        if (e.key.toLowerCase() === "h") {
+            desactivarCoach();
 
-        const coach = document.getElementById("coach");
-        if (coach) coach.remove();
-        console.warn("Coach desactivado permanentemente por el usuario.");
-    }
-});
+            const coach = document.getElementById("coach");
+            if (coach) coach.remove();
+
+            console.warn("Coach desactivado permanentemente por el usuario.");
+        }
+    });
 };
 
-
-
-CoachController.prototype.onUserInteraction = function() {
+CoachController.prototype.onUserInteraction = function () {
     this.entity.hide();
     clearTimeout(this.inactivityTimer);
 
@@ -47,32 +41,33 @@ CoachController.prototype.onUserInteraction = function() {
     }, 5000);
 };
 
-CoachController.prototype.showContext = function(contexto, ultimoJuego, tendencia) {
+CoachController.prototype.showContext = function (contexto, ultimoJuego, tendencia) {
     if (isCoachDisabled()) return;
     const msg = getCoachMessage(this.perfil, contexto, ultimoJuego, tendencia);
     if (msg) this.entity.show(msg);
 };
 
 // === EVENTOS ===
-CoachController.prototype.onPantallaPerfil = function() {
+CoachController.prototype.onPantallaPerfil = function () {
     this.showContext("perfil");
 };
 
-CoachController.prototype.onMenuPrincipal = function() {
+CoachController.prototype.onMenuPrincipal = function () {
     this.showContext("inicio");
 };
 
-CoachController.prototype.onSeleccionJuego = function() {
+CoachController.prototype.onSeleccionJuego = function () {
     this.showContext("juegos");
 };
 
-CoachController.prototype.onResultados = function(ultimoJuego, tendencia) {
+CoachController.prototype.onResultados = function (ultimoJuego, tendencia) {
     this.showContext("resultados", ultimoJuego, tendencia);
 };
 
-CoachController.prototype.onResultados = function() {
+CoachController.prototype.onResultados = function () {
     this.showContext("standby");
 };
+
 
 
 window.CoachController = CoachController;
