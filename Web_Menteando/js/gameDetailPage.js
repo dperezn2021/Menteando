@@ -175,8 +175,10 @@ window.initGameDetailPage = function initGameDetailPage(gameId) {
     const themeToggleBtn = document.getElementById("theme-toggle-btn");
     const root = document.documentElement;
     const headerAvatar = document.getElementById("perfil-avatar-header");
+    const headerApodo = document.getElementById("perfil-apodo-header");
 
     if (perfil?.avatar && headerAvatar) headerAvatar.src = perfil.avatar.replace("../", "../../../");
+    if (perfil?.apodo && headerApodo) headerApodo.textContent = perfil.apodo;
 
     const syncThemeButton = () => {
         const isDark = root.classList.contains("dark");

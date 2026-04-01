@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="light" lang="es">
 
 <head>
@@ -402,25 +402,40 @@
                         <!-- SECCIÓN: EVOLUCIÓN SEMANAL -->
                         <div
                             class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-700">
+
                             <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
-                                <div class="w-5 h-3 bg-blue-500 rounded"></div>
+                                <div class="w-5 h-5 bg-blue-500 rounded"></div>
                                 Evolución Semanal
                             </h3>
-                            <div class="flex items-end justify-between gap-2 h-40">
-                                <div class="flex-1 bg-blue-500/20 dark:bg-blue-900/40 rounded-t hover:bg-blue-500/30 transition-colors"
-                                    style="height: 30%;"></div>
-                                <div class="flex-1 bg-blue-500/40 dark:bg-blue-900/60 rounded-t hover:bg-blue-500/50 transition-colors"
-                                    style="height: 50%;"></div>
-                                <div class="flex-1 bg-blue-500/60 dark:bg-blue-900/80 rounded-t hover:bg-blue-500/70 transition-colors"
-                                    style="height: 40%;"></div>
-                                <div class="flex-1 bg-blue-500 dark:bg-blue-600 rounded-t hover:bg-blue-600 transition-colors"
-                                    style="height: 100%;"></div>
-                                <div class="flex-1 bg-blue-500/50 dark:bg-blue-900/70 rounded-t hover:bg-blue-500/60 transition-colors"
-                                    style="height: 35%;"></div>
+
+                            <!-- CONTENEDOR DEL GRÁFICO -->
+                            <div class="flex items-end gap-3 h-48 px-4">
+
+                                <!-- EJE Y -->
+                                <div
+                                    class="flex flex-col justify-between h-full text-xs text-slate-500 dark:text-slate-400">
+                                    <span id="maxima-racha"></span>
+                                    <span id="media-racha"></span>
+                                    <span id="minima-racha"></span>
+                                </div>
+
+                                <!-- BARRAS -->
+                                <div id="grafico-semanal" class="flex items-end gap-2 w-full h-full">
+                                    <!-- Las barras se generan por JS -->
+                                </div>
                             </div>
-                            <p class="text-center text-xs text-slate-500 dark:text-slate-400 mt-4">Puntuación de
-                                rendimiento
-                                agregada</p>
+
+                            <!-- DÍAS -->
+                            <div class="flex justify-between mt-4 px-8 text-xs text-slate-500 dark:text-slate-400">
+                                <span id="hace-6-dias"></span>
+                                <span id="hace-5-dias"></span>
+                                <span id="hace-4-dias"></span>
+                                <span id="hace-3-dias"></span>
+                                <span id="hace-2-dias"></span>
+                                <span id="hace-1-dia"></span>
+                                <span id="hoy"></span>
+                            </div>
+
                         </div>
                     </div>
 
@@ -442,9 +457,14 @@
 
                             </tbody>
                         </table>
-                        <button class="w-full mt-4 py-2 text-blue-500 font-bold hover:text-blue-600 transition-colors"
+                        <button id="ver-historial-completo" class="w-full mt-4 py-2 text-blue-500 font-bold hover:text-blue-600 transition-colors"
                             onclick="mostrarHistorialCompleto()">
                             Ver historial completo
+                        </button>
+
+                        <button id="ver-historial-comprimido" class="hidden w-full mt-4 py-2 text-blue-500 font-bold hover:text-blue-600 transition-colors"
+                            onclick="mostrarHistorialComprimido()">
+                            Comprimir historial
                         </button>
                     </div>
                 </div>

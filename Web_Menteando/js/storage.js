@@ -1,4 +1,4 @@
-window.SaveGameData = function (jsonString) {
+﻿window.SaveGameData = function (jsonString) {
     try {
         // 1. Reemplazar valores inválidos ANTES de parsear
         jsonString = jsonString
@@ -14,6 +14,10 @@ window.SaveGameData = function (jsonString) {
         // Guardar sesión
         perfil.sesiones++;
         perfil.ultimaSesion = data.timestamp;
+        // Actualizar semana
+        actualizarSesionesDiarias(perfil);
+
+      
 
         // Guardar juego
         if (!perfil.juegos[data.gameId]) perfil.juegos[data.gameId] = [];
@@ -23,10 +27,7 @@ window.SaveGameData = function (jsonString) {
         // Recalcular perfil
         recalcularPerfilGlobal(perfil, data.metrics, data.gameId);
 
-        // Actualizar juego más jugado
-        perfil.juegoMasJugado = getJuegoMasJugado(perfil);
-
-        //Actualizar puntos y tiempo
+  //Actualizar puntos y tiempo
         perfil.nivel = getNivel(perfil);
         perfil.puntos = getPuntos(perfil);
         perfil.tiempo = getTiempo(perfil);

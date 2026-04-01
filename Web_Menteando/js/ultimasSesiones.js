@@ -26,8 +26,10 @@ function renderTablaSesiones() {
 
 function mostrarHistorialCompleto() {
     const perfil = getperfil();
+    document.getElementById("ver-historial-comprimido").classList.remove("hidden");
+    document.getElementById("ver-historial-completo").classList.add("hidden");
     let numJuegos = 0;
-    
+
     for (const gameId in perfil.juegos) {
         numJuegos += perfil.juegos[gameId].length;
     }
@@ -36,8 +38,8 @@ function mostrarHistorialCompleto() {
     console.log(numJuegos);
 
     const sesiones = getUltimasSesiones(perfil, numJuegos); // Obtener muchas para mostrar todo
-    const tbody = document.getElementById("tabla-sesiones");    
-    
+    const tbody = document.getElementById("tabla-sesiones");
+
     tbody.innerHTML = ""; // limpiar
 
     sesiones.forEach(s => {
@@ -56,5 +58,43 @@ function mostrarHistorialCompleto() {
         `;
 
         tbody.appendChild(tr);
+    });
+}
+
+function mostrarHistorialComprimido() {
+    const perfil = getperfil();
+    document.getElementById("ver-historial-comprimido").classList.add("hidden");
+    document.getElementById("ver-historial-completo").classList.remove("hidden");
+
+    const sesiones = getUltimasSesiones(perfil, 3);
+    const tbody = document.getElementById("tabla-sesiones");
+
+    tbody.innerHTML = ""; // limpiar
+    sesiones.forEach(s => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td class="py-3 px-2 text-slate-900 dark:text-white font-medium capitalize">
+                ${s.juego}
+            </td>
+            <td class="py-3 px-2 text-slate-500">
+                ${formatearFecha(s.fecha)}
+            </td>
+            <td class="py-3 px-2 text-right text-blue-500 font-bold">
+                ${s.puntuacion.toLocaleString()}
+            </td>
+        `;
+        tbody.appendChild(tr);
+
+    });
+    onclick = () => { window.location.href = `#` };
+}
+
+function formatearFecha(fechaISO) {
+    const fecha = new Date(fechaISO);
+    return fecha.toLocaleString("es-ES", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit"
     });
 }

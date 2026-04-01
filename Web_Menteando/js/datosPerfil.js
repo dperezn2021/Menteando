@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+﻿document.addEventListener("DOMContentLoaded", () => {
     const perfil = getperfil();
     if (!perfil) return;
 
@@ -20,34 +20,33 @@ document.addEventListener("DOMContentLoaded", () => {
     set("perfil-juego-mas-jugado", perfil.juegoMasJugado);
 
     actualizarNivelCognitivo(perfil.nivel);
-
     function actualizarNivelCognitivo(valor) {
         const span = document.getElementById("perfil-nivel");
-        let texto = "";
-        let clases = "";
-
         if (!span) return;
 
-        // Si está vacío o no es número → Nulo
-        if (!valor || valor === 0) {
-            texto = "Nulo";
-            clases = "px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded font-medium";
+        // Si está vacío, null, undefined o NaN → Nulo
+        if (valor === null || valor === undefined || isNaN(valor)) {
+            span.textContent = "Nulo";
+            span.className = "px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded font-medium";
             return;
         }
 
-        if (valor > 1) {
+        let texto = "";
+        let clases = "";
+
+        if (valor < 20) {
             texto = "Básico";
             clases = "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200";
-        } else if (valor > 19) {
+        } else if (valor < 40) {
             texto = "Bajo";
             clases = "bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-200";
-        } else if (valor > 39) {
+        } else if (valor < 60) {
             texto = "Medio";
             clases = "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200";
-        } else if (valor > 59) {
+        } else if (valor < 75) {
             texto = "Alto";
             clases = "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200";
-        } else if (valor > 79) {
+        } else if (valor < 90) {
             texto = "Muy alto";
             clases = "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200";
         } else {
@@ -57,7 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         span.textContent = texto;
         span.className = `px-2 py-1 rounded font-medium ${clases}`;
-        return;
     }
 
     // Animación de barras principales
@@ -164,6 +162,70 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (tests.innerHTML === "")
             tests.innerHTML = "<li>No necesitas tests adicionales por ahora.</li>";
+    }
+
+    // === Pintar etiquetas de días ===
+    set("hoy", formatDay(0));
+    set("hace-1-dia", formatDay(1));
+    set("hace-2-dias", formatDay(2));
+    set("hace-3-dias", formatDay(3));
+    set("hace-4-dias", formatDay(4));
+    set("hace-5-dias", formatDay(5));
+    set("hace-6-dias", formatDay(6));
+
+    set("maxima-racha", calcularRachaMaxima(perfil.sesionesDiarias));
+    set("media-racha", calcularRachaMedia(perfil.sesionesDiarias));
+    set("minima-racha", calcularRachaMinima(perfil.sesionesDiarias));
+
+    // === Pintar gráfica ===
+    const diasJugados = getDiasJugadosSemana(perfil);
+    renderGraficoSemanal(diasJugados);
+
+    // Devuelve fecha restando X días
+    function formatDay(resta) {
+        return new Date(Date.now() - resta * 86400000)
+            .toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
+    }
+
+    // Pinta barras
+    function renderGraficoSemanal(datos) {
+        const contenedor = document.getElementById("grafico-semanal");
+        if (!contenedor) return;
+
+        const max = Math.max(...datos, 1);
+
+        contenedor.innerHTML = datos.map(valor => {
+            const altura = (valor / max) * 100;
+
+            return `
+            <div class="flex-1 bg-blue-500/40 dark:bg-blue-900/60 rounded-t 
+                        hover:bg-blue-500 transition-all duration-300"
+                 style="height: ${altura}%;">
+            </div>
+        `;
+        }).join("");
+    }
+
+    function calcularRachaMaxima(sesionesDiarias) {
+        return Math.max(...sesionesDiarias);
+    }
+
+    function calcularRachaMedia(sesionesDiarias) {
+        const max = Math.max(...sesionesDiarias);
+        const min = Math.min(...sesionesDiarias);
+        const sum = max + min;
+        let media = (sum / 2);
+
+        if (media === max || media === min) {
+            return "";
+        } else {
+            return media;
+        }
+
+    }
+
+    function calcularRachaMinima(sesionesDiarias) {
+        return Math.min(...sesionesDiarias);
     }
 
     // === MODAL DEL PERFIL ===

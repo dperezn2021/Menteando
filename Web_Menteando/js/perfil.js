@@ -1,4 +1,4 @@
-// === CLAVE DEL PERFIL ===
+﻿// === CLAVE DEL PERFIL ===
 const perfil_KEY = "perfil_usuario";
 
 // === PERFIL BASE COMPLETO ===
@@ -9,12 +9,14 @@ const perfilBase = {
     desde: new Date().toISOString(),
     racha: 0,
     tiempo: 0,
-    puntos:0, 
+    puntos: 0,
     correo: "",
     sesiones: 0,
     nivel: 0,
     avatar: "../assets/icon/usuario.webp",
     ultimaSesion: null,
+    ultimaSesionDia: null,
+    sesionesDiarias: [0,0,0,0,0,0,0], // Lunes a Domingo
     juegos: {},
     juegoMasJugado: "Cargando...",
 
@@ -66,38 +68,49 @@ function resetperfil() {
 
 // === RECALCULAR PERFIL GLOBAL ===
 function recalcularPerfilGlobal(perfil, metrics, gameId) {
-
     const skills = typeof window.getJuegoSkillsById === "function"
         ? window.getJuegoSkillsById(gameId)
         : [];
-    if (!skills) return;
+    if (!skills.length) return;
 
     skills.forEach(skill => {
+        const previousValue = Number(perfil.detalle[skill]) || 0;
+        const incomingValue = Number(metrics?.[skill]) || 0;
+
         perfil.detalle[skill] =
-            perfil.detalle[skill] * 0.9 +
-            metrics[skill] * 0.1;
+            previousValue * 0.9 +
+            incomingValue * 0.1;
     });
 
     perfil.atencion =
-        0.6 * perfil.detalle.atencionSostenida +
-        0.2 * perfil.detalle.atencionSelectiva +
-        0.2 * perfil.detalle.atencionDividida;
+        0.6 * (Number(perfil.detalle.atencionSostenida) || 0) +
+        0.2 * (Number(perfil.detalle.atencionSelectiva) || 0) +
+        0.2 * (Number(perfil.detalle.atencionDividida) || 0);
+    perfil.atencion = Math.max(0, Math.min(1, perfil.atencion));
 
     perfil.memoria =
-        0.7 * perfil.detalle.memoriaTrabajo +
-        0.3 * perfil.detalle.memoriaEspacial;
+        0.7 * (Number(perfil.detalle.memoriaTrabajo) || 0) +
+        0.3 * (Number(perfil.detalle.memoriaEspacial) || 0);
+
+    perfil.memoria = Math.max(0, Math.min(1, perfil.memoria));
+
 
     perfil.control =
-        0.5 * perfil.detalle.controlInhibitorio +
-        0.3 * perfil.detalle.flexibilidadCognitiva +
-        0.2 * perfil.detalle.planificacion;
+        0.5 * (Number(perfil.detalle.controlInhibitorio) || 0) +
+        0.3 * (Number(perfil.detalle.flexibilidadCognitiva) || 0) +
+        0.2 * (Number(perfil.detalle.planificacion) || 0);
+
+    perfil.control = Math.max(0, Math.min(1, perfil.control));
 
     perfil.reflejos =
-        0.5 * perfil.detalle.velocidadCognitiva +
-        0.4 * perfil.detalle.coordinacionVisomotora - 
-        0.1 * perfil.detalle.controlInhibitorio;
+        0.5 * (Number(perfil.detalle.velocidadCognitiva) || 0) +
+        0.4 * (Number(perfil.detalle.coordinacionVisomotora) || 0) -
+        0.1 * (Number(perfil.detalle.controlInhibitorio) || 0);
+
+    perfil.reflejos = Math.max(0, Math.min(1, perfil.reflejos));
 
     perfil.juegoMasJugado = getJuegoMasJugado(perfil);
+    
 
 }
 
@@ -124,17 +137,26 @@ function getNivel(perfil){
 }
 
 
-function getPuntos(perfil){
-    let puntos;
-    puntos = (perfil.atencion * 0.25 + perfil.control * 0.25 + perfil.reflejos * 0.25 + perfil.memoria * 0.25)*10000*perfil.sesiones;
+
+function getPuntos(perfil) {
+    const atencion = Number(perfil.atencion) || 0;
+    const control = Number(perfil.control) || 0;
+    const reflejos = Number(perfil.reflejos) || 0;
+    const memoria = Number(perfil.memoria) || 0;
+    const sesiones = Number(perfil.sesiones) || 0;
+    const puntos = (atencion * 0.25 + control * 0.25 + reflejos * 0.25 + memoria * 0.25) * 10000 * sesiones;
 
     return puntos;
 }
 
 
-function getTiempo(perfil){
-    let tiempo;
-    tiempo = (perfil.atencion * 0.25 + perfil.control * 0.25 + perfil.reflejos * 0.25 + perfil.memoria * 0.25)*10000*perfil.sesiones;
+function getTiempo(perfil) {
+    const atencion = Number(perfil.atencion) || 0;
+    const control = Number(perfil.control) || 0;
+    const reflejos = Number(perfil.reflejos) || 0;
+    const memoria = Number(perfil.memoria) || 0;
+    const sesiones = Number(perfil.sesiones) || 0;
+    const tiempo = (atencion * 0.25 + control * 0.25 + reflejos * 0.25 + memoria * 0.25) * 10000 * sesiones;
 
     return tiempo;
 }
@@ -195,15 +217,56 @@ function getUltimasSesiones(perfil, limite = 3) {
     return sesiones.slice(0, limite);
 }
 
-function formatearFecha(fechaISO) {
-    const fecha = new Date(fechaISO);
-    return fecha.toLocaleString("es-ES", {
-        day: "2-digit",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit"
-    });
+
+
+
+// Devuelve array de 7 días (ordenado)
+function getDiasJugadosSemana(perfil) {
+    return [...perfil.sesionesDiarias];
 }
+
+// Calcula días entre dos fechas dd/mm
+function calcularDiasPasados(fechaAnteriorStr, fechaActualStr) {
+    const [d1, m1] = fechaAnteriorStr.split("/").map(Number);
+    const [d2, m2] = fechaActualStr.split("/").map(Number);
+
+    const f1 = new Date(new Date().getFullYear(), m1 - 1, d1);
+    const f2 = new Date(new Date().getFullYear(), m2 - 1, d2);
+
+    return Math.floor((f2 - f1) / 86400000);
+}
+
+// Actualiza sesiones semanales
+function actualizarSesionesDiarias(perfil) {
+    const hoyStr = new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
+
+    if (!perfil.ultimaSesionDia) {
+        perfil.ultimaSesionDia = hoyStr;
+    }
+
+    // Mismo día → sumar
+    if (perfil.ultimaSesionDia === hoyStr) {
+        perfil.sesionesDiarias[6] += 1;
+        return perfil;
+    }
+
+    // Día distinto → desplazar
+    const diasPasados = calcularDiasPasados(perfil.ultimaSesionDia, hoyStr);
+
+    if (diasPasados >= 7) {
+        perfil.sesionesDiarias = [0,0,0,0,0,0,1];
+    } else {
+        for (let i = 0; i < diasPasados; i++) {
+            perfil.sesionesDiarias.shift();
+            perfil.sesionesDiarias.push(0);
+        }
+        perfil.sesionesDiarias[6] = 1;
+    }
+
+    perfil.ultimaSesionDia = hoyStr;
+    return perfil;
+}
+
 
 //-------------------------- ENVIAR METRICAS POR CORREO ---------------------------
 
@@ -214,8 +277,8 @@ function enviarMetricasPorCorreo(perfil) {
     }
 
     const data = {
-        name:"Menteando",
-        email:"no-reply@menteando.com",
+        name: "Menteando",
+        email: "no-reply@menteando.com",
         time: new Date(),
         seasons: perfil.sesiones,
         user_name: perfil.nombre,
@@ -305,6 +368,9 @@ window.disableCoachForever = disableCoachForever;
 window.isCoachDisabled = isCoachDisabled;
 window.activarCoach = activarCoach;
 window.desactivarCoach = desactivarCoach;
+window.getDiasJugadosSemana = getDiasJugadosSemana;
+window.actualizarSesionesDiarias = actualizarSesionesDiarias;
+
 
 window.addEventListener("DOMContentLoaded", () => {
     const badge = document.getElementById("titulo-activar-coach");
