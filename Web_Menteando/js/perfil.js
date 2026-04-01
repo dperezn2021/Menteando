@@ -6,9 +6,14 @@ const perfilBase = {
     nombre: "Jugador Uno",
     apodo: "Invitado_01",
     edad: 0,
+    desde: new Date().toISOString(),
+    racha: 0,
+    tiempo: 0,
+    puntos:0, 
     correo: "",
     sesiones: 0,
     nivel: 0,
+    avatar: "../assets/icon/usuario.webp",
     ultimaSesion: null,
     juegos: {},
     juegoMasJugado: "Cargando...",
@@ -30,30 +35,6 @@ const perfilBase = {
         planificacion: 0,
         coordinacionVisomotora: 0
     }
-};
-
-const juegoSkills = {
-    "orden caotico": ["atencionSostenida"],
-    "detector de intrusos": ["atencionSelectiva", "controlInhibitorio", "velocidadCognitiva", "coordinacionVisomotora"],
-    "tres bolas": ["atencionDividida"],
-    "flash tiktok": ["velocidadCognitiva", "atencionSostenida"],
-    "eco visual": ["memoriaEspacial"],
-    "simon dice": ["memoriaTrabajo", "memoriaEspacial"],
-    "asociacion rapida": ["velocidadCognitiva", "memoriaTrabajo"],
-    "secuencia inversa": ["memoriaTrabajo"],
-    "silencio mental": ["controlInhibitorio"],
-    "stroop": ["controlInhibitorio", "flexibilidadCognitiva"],
-    "doble regla": ["flexibilidadCognitiva", "controlInhibitorio"],
-    "trayectorias mentales": ["planificacion"],
-    "tiempo de reaccion": ["velocidadCognitiva"],
-    "objeto movil": ["coordinacionVisomotora", "flexibilidadCognitiva"],
-    "wisconsin": ["flexibilidadCognitiva"],
-    "memory cronometrado": ["memoriaEspacial", "velocidadCognitiva"],
-    "contador mental": ["memoriaTrabajo", "velocidadCognitiva"],
-    "anticipacion patron": ["planificacion"],
-    "multitarea": ["atencionDividida", "controlInhibitorio"],
-    "math": ["memoriaTrabajo", "velocidadCognitiva", "controlInhibitorio", "coordinacionVisomotora"],
-    "rosco": ["atencionSelectiva", "velocidadCognitiva", "controlInhibitorio", "coordinacionVisomotora"]
 };
 
 // === OBTENER PERFIL ===
@@ -86,7 +67,9 @@ function resetperfil() {
 // === RECALCULAR PERFIL GLOBAL ===
 function recalcularPerfilGlobal(perfil, metrics, gameId) {
 
-    const skills = juegoSkills[gameId.toLowerCase()];
+    const skills = typeof window.getJuegoSkillsById === "function"
+        ? window.getJuegoSkillsById(gameId)
+        : [];
     if (!skills) return;
 
     skills.forEach(skill => {
@@ -116,8 +99,6 @@ function recalcularPerfilGlobal(perfil, metrics, gameId) {
 
     perfil.juegoMasJugado = getJuegoMasJugado(perfil);
 
-    perfil.nivel = getNivel(perfil);
-    console.log(perfil.nivel)
 }
 
 function getJuegoMasJugado(perfil) {
@@ -140,6 +121,88 @@ function getNivel(perfil){
     nivel = ((perfil.atencion + perfil.control + perfil.reflejos + perfil.memoria)/4*100).toFixed(0);
 
     return nivel;
+}
+
+
+function getPuntos(perfil){
+    let puntos;
+    puntos = (perfil.atencion * 0.25 + perfil.control * 0.25 + perfil.reflejos * 0.25 + perfil.memoria * 0.25)*10000*perfil.sesiones;
+
+    return puntos;
+}
+
+
+function getTiempo(perfil){
+    let tiempo;
+    tiempo = (perfil.atencion * 0.25 + perfil.control * 0.25 + perfil.reflejos * 0.25 + perfil.memoria * 0.25)*10000*perfil.sesiones;
+
+    return tiempo;
+}
+function actualizarRacha() {
+    const perfil = getperfil();
+
+    const hoy = new Date().toDateString(); // Fecha sin horas
+    const ultimaFecha = perfil.ultimaRacha || null;
+
+    // Si es la primera vez
+    if (!ultimaFecha) {
+        perfil.racha = 1;
+        perfil.ultimaRacha = hoy;
+        saveperfil(perfil);
+        return perfil.racha;
+    }
+
+    // Si ya entró hoy → no aumentar
+    if (ultimaFecha === hoy) {
+        return perfil.racha;
+    }
+
+    // Calcular diferencia de días
+    const diffDias = Math.floor(
+        (new Date(hoy) - new Date(ultimaFecha)) / (1000 * 60 * 60 * 24)
+    );
+
+    if (diffDias === 1) {
+        // Día consecutivo → aumentar racha
+        perfil.racha += 1;
+    } else {
+        // Se rompió la racha
+        perfil.racha = 1;
+    }
+
+    perfil.ultimaRacha = hoy;
+    saveperfil(perfil);
+
+    return perfil.racha;
+}
+
+function getUltimasSesiones(perfil, limite = 3) {
+    const sesiones = [];
+
+    for (const gameId in perfil.juegos) {
+        perfil.juegos[gameId].forEach(s => {
+            sesiones.push({
+                juego: gameId,
+                fecha: s.timestamp,
+                puntuacion: s.score ?? s.puntos ?? 0
+            });
+        });
+    }
+
+    // Ordenar por fecha descendente
+    sesiones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+    return sesiones.slice(0, limite);
+}
+
+function formatearFecha(fechaISO) {
+    const fecha = new Date(fechaISO);
+    return fecha.toLocaleString("es-ES", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
 }
 
 //-------------------------- ENVIAR METRICAS POR CORREO ---------------------------

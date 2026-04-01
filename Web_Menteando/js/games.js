@@ -1,31 +1,325 @@
-//--------------------------------------------------------------------------------------------------------
-//------------------------ FILTRADO DE JUEGOS POR NOMBRE Y HABILIDAD (GAMES.HTML) ------------------------
-//--------------------------------------------------------------------------------------------------------
-document.addEventListener('DOMContentLoaded', function() {
-    const barraBusqueda = document.getElementById('barra-busqueda');
-    const habilidadSeleccionada = document.getElementById('habilidad');
+const PAGE_SIZE = 5;
+let randomizedGamesCatalog = null;
 
-    const juegos = document.querySelectorAll('.game-card');
-
-    function filterGames() {
-        const searchValue = barraBusqueda.value.toLowerCase();
-        const skillValue = habilidadSeleccionada.value;
-
-        juegos.forEach(juego => {
-            const nombre = juego.dataset.name;
-            const habilidad1 = juego.dataset.skill1;
-            const habilidad2 = juego.dataset.skill2;
-            const habilidad3 = juego.dataset.skill3;
-            const habilidad4 = juego.dataset.skill4;
-            const habilidad5 = juego.dataset.skill5;
-
-            const equivaleNombre = nombre.includes(searchValue);
-            const equivaleHabilidad = skillValue === '' || habilidad1 === skillValue || habilidad2 === skillValue || habilidad3 === skillValue || habilidad4 === skillValue || habilidad5 === skillValue;
-
-            juego.style.display = (equivaleNombre && equivaleHabilidad) ? 'block' : 'none';
-        });
+function getGamesCatalog() {
+    if (randomizedGamesCatalog) {
+        return randomizedGamesCatalog;
     }
 
-    barraBusqueda.addEventListener('input', filterGames);
-    habilidadSeleccionada.addEventListener('change', filterGames);
-});
+    const catalog = typeof window.getCatalogoJuegos === "function"
+        ? window.getCatalogoJuegos()
+        : [];
+
+    randomizedGamesCatalog = shuffleGames(catalog);
+    return randomizedGamesCatalog;
+}
+
+function shuffleGames(games) {
+    const shuffled = [...games];
+
+    for (let index = shuffled.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+    }
+
+    return shuffled;
+}
+
+function getBadgeClasses(skillSlug) {
+    const accent = window.getSkillDefinition?.(skillSlug)?.accent || "blue";
+    const badgeMap = {
+        blue: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+        sky: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+        cyan: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
+        green: "bg-green-500/10 text-green-600 dark:text-green-400",
+        indigo: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
+        violet: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+        fuchsia: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400",
+        amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+        emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+    };
+
+    return badgeMap[accent] || badgeMap.blue;
+}
+
+function getSkillLabel(skillSlug) {
+    return window.getSkillDefinition?.(skillSlug)?.label || "Entrenamiento cognitivo";
+}
+
+function createLargeCard(juego) {
+    return `
+        <article class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col lg:col-span-2 ${juego.fullWidth ? "lg:col-span-3" : ""}">
+            <div class="flex justify-between items-center p-6 border-b border-slate-200 dark:border-slate-700 gap-4">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-blue-500 mb-2">${juego.heroEyebrow || "Destacado"}</p>
+                    <h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">${juego.nombre}</h3>
+                    <p class="text-slate-500 dark:text-slate-300 text-base mt-2">${juego.descripcion}</p>
+                </div>
+            </div>
+
+            <a href="${juego.buildUrl || juego.url}" class="relative block bg-slate-950 h-[22rem] md:h-[28rem]">
+                <img src="${juego.imagen}" alt="${juego.nombre}" class="w-full h-full object-cover opacity-20">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/35 to-transparent"></div>
+                <div class="group absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
+                    <p class="text-white text-xl md:text-2xl font-bold">Juega ya a ${juego.nombre}</p>
+                    <div class="group-hover:bg-blue-500 w-36 h-16 rounded-2xl bg-white/10 border border-white/20 backdrop-blur  flex items-center justify-center text-white text-sm font-black">JUGAR</div>
+                </div>
+            </a>
+
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-900/30 border-t border-slate-200 dark:border-slate-700">
+                <div class="flex flex-wrap gap-2">
+                    ${juego.skills.slice(0, 3).map((skill) => `<span class="px-3 py-1 text-xs font-bold uppercase rounded-full ${getBadgeClasses(skill)}">${getSkillLabel(skill)}</span>`).join("")}
+                </div>
+
+                <div class="flex gap-3">
+                    <a href="${juego.url}" class="px-5 py-3 rounded-xl bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Ver ficha técnica</a>                </div>
+            </div>
+        </article>
+    `;
+}
+
+function createCompactCard(juego) {
+    const skillSlug = juego.skills[0];
+
+    return `
+        <article class="bg-white dark:bg-slate-800 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col group">
+            <a href="${juego.url}" class="h-48 overflow-hidden bg-slate-200 dark:bg-slate-700 block">
+                <img src="${juego.imagen}" alt="${juego.nombre}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
+            </a>
+
+            <div class="p-6 flex flex-col gap-3 grow">
+                <span class="px-3 py-1 text-sm font-bold uppercase rounded-full w-fit ${getBadgeClasses(skillSlug)}">
+                    ${getSkillLabel(skillSlug)}
+                </span>
+
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white">${juego.nombre}</h3>
+                <p class="text-slate-600 dark:text-slate-300 text-base">${juego.descripcion}</p>
+
+                <a href="${juego.url}" class="mt-auto w-full py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white font-bold text-center hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors">
+                    Entrenar
+                </a>
+            </div>
+        </article>
+    `;
+}
+
+function renderFeaturedGames(destacados) {
+    if (!destacados.length) return "";
+
+    // CASOS ESPECIALES
+    if (destacados.length === 1) {
+        return `
+            <div class="grid grid-cols-1 gap-8 items-stretch">
+                ${createLargeCard({ ...destacados[0], fullWidth: true })}
+            </div>
+        `;
+    }
+
+    if (destacados.length === 2) {
+        return `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+                ${destacados.map(createCompactCard).join("")}
+            </div>
+        `;
+    }
+
+    if (destacados.length === 3) {
+        return `
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+                ${destacados.map(createCompactCard).join("")}
+            </div>
+        `;
+    }
+
+    // MÁS DE 3 DESTACADOS
+    let [principal, lateral, ...inferiores] = destacados;
+
+    // Elegir un modo aleatorio
+    const modo = Math.floor(Math.random() * 4);
+
+    // MODO A — Grandes primero
+    if (modo === 0) {
+        return `
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch my-8">
+                ${createLargeCard(principal)}
+                ${createCompactCard(lateral)}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                ${inferiores.map(createCompactCard).join("")}
+            </div>
+        `;
+    }
+
+    // MODO A — Grandes primero
+    if (modo === 1) {
+        return `
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch my-8">
+                ${createCompactCard(lateral)}
+                ${createLargeCard(principal)}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                ${inferiores.map(createCompactCard).join("")}
+            </div>
+        `;
+    }
+
+    // MODO A — Grandes primero
+    if (modo === 2) {
+         return `
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 my-8">
+            ${inferiores.map(createCompactCard).join("")}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+            ${createCompactCard(lateral)}
+            ${createLargeCard(principal)}
+        </div>
+    `;
+    }
+
+    // MODO C — Todas pequeñas → grandes al final
+    return `
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 my-8">
+            ${inferiores.map(createCompactCard).join("")}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+            ${createLargeCard(principal)}
+            ${createCompactCard(lateral)}
+        </div>
+    `;
+}
+
+function createEmptyState() {
+    return `
+        <div class="rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 p-10 text-center">
+            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-3">No hemos encontrado juegos</h3>
+            <p class="text-slate-600 dark:text-slate-300">Prueba con otro nombre o cambia el filtro de habilidad.</p>
+        </div>
+    `;
+}
+
+function renderGamesPage(options = {}) {
+    const {
+        search = "",
+        skill = "",
+        generalSkill = "",
+        expanded = false
+    } = options;
+
+    const contenedor = document.getElementById("games-grid");
+    if (!contenedor) return;
+
+    const normalizedSearch = search.trim().toLowerCase();
+    const juegosFiltrados = getGamesCatalog().filter((juego) => {
+        const matchesSearch = !normalizedSearch
+            || juego.nombre.toLowerCase().includes(normalizedSearch)
+            || juego.descripcion.toLowerCase().includes(normalizedSearch);
+        const matchesSkill = !skill || juego.skills.includes(skill);
+        const matchesCategory = !generalSkill || juego.categoria === generalSkill;
+
+        return matchesSearch && matchesSkill && matchesCategory;
+    });
+
+    if (!juegosFiltrados.length) {
+        contenedor.innerHTML = createEmptyState();
+        return;
+    }
+
+    const destacados = juegosFiltrados.slice(0, PAGE_SIZE);
+    const resto = juegosFiltrados.slice(PAGE_SIZE);
+
+    const restoGrid = resto.length
+        ? `
+            <div class="${expanded ? "block" : "hidden"}" id="games-resto-grid">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-8">
+                    ${resto.map(createCompactCard).join("")}
+                </div>
+            </div>
+        `
+        : "";
+
+    const toggleButton = resto.length
+        ? `
+            <div class="pt-8">
+                <button id="games-toggle-btn" type="button" class="w-full py-3 text-blue-500 font-bold hover:text-blue-600 transition-colors">
+                    ${expanded ? "Mostrar menos juegos" : "Ver todo el catalogo de juegos"}
+                </button>
+            </div>
+        `
+        : "";
+
+    contenedor.innerHTML = `
+        ${renderFeaturedGames(destacados)}
+        ${restoGrid}
+        ${toggleButton}
+    `;
+}
+
+window.setFiltro = function setFiltro(skill) {
+    const buttons = document.querySelectorAll("[data-game-category]");
+
+    buttons.forEach((button) => {
+        const isActive = button.dataset.gameCategory === skill;
+        button.classList.toggle("bg-blue-500", isActive);
+        button.classList.toggle("text-white", isActive);
+        button.classList.toggle("bg-slate-100", !isActive);
+        button.classList.toggle("dark:bg-slate-800", !isActive);
+        button.classList.toggle("border-slate-200", !isActive);
+        button.classList.toggle("dark:border-slate-700", !isActive);
+        button.classList.toggle("text-slate-700", !isActive);
+        button.classList.toggle("dark:text-slate-200", !isActive);
+    });
+
+
+    const select = document.getElementById("habilidad-general");
+    if (!select) return;
+
+
+    select.value = skill;
+    select.dispatchEvent(new Event("change"));
+};
+
+window.initGamesPage = function initGamesPage() {
+    const barraBusqueda = document.getElementById("barra-busqueda");
+    const habilidadSeleccionada = document.getElementById("habilidad");
+    const categoriaSeleccionada = document.getElementById("habilidad-general");
+
+    let expanded = false;
+
+    const sync = () => {
+        renderGamesPage({
+            search: barraBusqueda?.value || "",
+            skill: habilidadSeleccionada?.value || "",
+            generalSkill: categoriaSeleccionada?.value || "",
+            expanded
+        });
+
+        const toggleBtn = document.getElementById("games-toggle-btn");
+        if (toggleBtn) {
+            toggleBtn.addEventListener("click", () => {
+                expanded = !expanded;
+                sync();
+            }, { once: true });
+        }
+    };
+
+    barraBusqueda?.addEventListener("input", () => {
+        expanded = false;
+        sync();
+    });
+
+    habilidadSeleccionada?.addEventListener("change", () => {
+        expanded = false;
+        sync();
+    });
+
+    categoriaSeleccionada?.addEventListener("change", () => {
+        expanded = false;
+        sync();
+    });
+
+    sync();
+};

@@ -1,198 +1,723 @@
 <!DOCTYPE html>
-<html lang="es">
+<html class="light" lang="es">
 
 <head>
-    <!--Metadatos-->
+    <!-- METADATOS -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Menteando - Plataforma de minijuegos cognitivos para entrenar memoria, atención y reflejos">
-    <meta name="keywords"
-        content="Menteando, juegos cognitivos, memoria, atención, reflejos, minijuegos, entrenamiento mental">
+    <meta name="description" content="Perfil de usuario en Menteando – revisa tus estadísticas cognitivas">
+    <meta name="keywords" content="perfil Menteando, estadísticas, cognitivo, usuario">
     <meta name="author" content="Daniel Pérez Navarro">
 
     <!--Valores de la web-->
-    <title>Menteando | Acerca de</title>
+    <title>Menteando</title>
     <link rel="icon" href="assets/img/logo.png" type="image/png" sizes="32x32">
 
-    <!--Estilos CSS-->
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/pages.css" />
-    <link rel="stylesheet" href="css/layout.css" />
-    <link rel="stylesheet" href="coach/animacionesCoach.css">
+    <script>
+        (() => {
+            const storedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const useDark = storedTheme ? storedTheme === 'dark' : prefersDark;
 
-    <!-- Scripts -->
-    <script src="js/perfil.js"></script>
-    <script src="js/datosPerfil.js"></script>
+            document.documentElement.classList.toggle('dark', useDark);
+            document.documentElement.classList.toggle('light', !useDark);
+        })();
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/correoSoporte.js"></script>
+
+
+
+    <!-- Tailwind CSS with plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#3b82f6',
+                            secondary: '#6366f1',
+                            accent: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="/coach/animacionesCoach.css">
+    <link rel="stylesheet" href="css/style.css">
+
 </head>
 
-<body>
-    <div id="coach" class="coach">
-        <div id="coach-bubble" class="coach-bubble"></div>
-    </div>
-    <!-- HEADER -->
-    <header class="header-content">
-        <div class="header-box">
-            <img src="assets/img/logo.png" alt="Logo Menteando" class="logo">
-            <div class="header-title">
-                <h1>Menteando</h1>
-                <small>Entrena tu mente, pero jugando</small>
-            </div>
-        </div>
+<body class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased">
 
-        <nav class="nav-menu">
-            <ul>
-                <li><a class="nav-link" href="index.html">Inicio</a></li>
-                <li><a class="nav-link" href="games.html">Juegos</a></li>
-                <li><a class="nav-link" href="about.html">Acerca de</a></li>
-                <li>
-                    <a class="nav-link active" href="perfil.html">
-                        <img src="assets/icon/usuario.webp" alt="Icono Usuario" class="icon">
-                        <span id="perfil-apodo-header"></span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+    <!-------------------------------------HEADER----------------------------------->
+    <header class="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
+
+            <!-- TÍTULO Y LOGO -->
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <img src="../assets/img/logo2.png" alt="Logo Menteando" class="w-10 h-10 md:w-12 md:h-12" />
+                <div class="flex flex-col leading-tight text-left">
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
+                        Menteando
+                    </h1>
+                    <p class="text-xs md:text-sm font-normal text-slate-500 dark:text-slate-300">
+                        Entrena tu mente, pero jugando
+                    </p>
+                </div>
+            </div>
+
+            <!-- NAVEGACIÓN -->
+            <nav class="flex flex-direction-row md:flex-row items-center justify-center gap-1 md:gap-3">
+                <a href="index.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">
+                    Inicio
+                </a>
+                <a href="tests.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">
+                    Tests
+                </a>
+                <a href="games.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">
+                    Juegos
+                </a>
+                <a href="about.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">
+                    Acerca De
+                </a>
+            </nav>
+
+            <!-- PERFIL Y MODO OSCURO -->
+            <div class="flex items-center gap-3">
+                <a href="perfil.html" class="flex items-center gap-2">
+                    <span id="perfil-apodo-header"
+                        class="text-md md:text-xl font-normal text-slate-500 dark:text-slate-300"></span>
+                    <div
+                        class="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-blue-500 bg-blue-500/10 flex items-center justify-center">
+                        <img id="perfil-avatar-header" src="/assets/icon/usuario.webp" alt="Avatar de usuario"
+                            class="w-full h-full object-cover" />
+                    </div>
+                </a>
+                <button id="theme-toggle-btn"
+                    class="text-lg md:text-2xl text-slate-900 dark:text-white hover:text-blue-500 transition-colors"
+                    onclick="document.documentElement.classList.toggle('dark')">
+                </button>
+            </div>
+
+        </div>
     </header>
 
 
-    <!--- Cuerpo Main -->
-    <main>
-        <section class="section hero-about">
-            <h2>Plataforma Web de Videojuegos Cognitivos Adaptativos</h2>
-            <p>
-                Este Trabajo de Fin de Grado consiste en el diseño e implementación de una
-                plataforma web interactiva desarrollada con tecnologías web (HTML, CSS y JavaScript)
-                e integración de videojuegos en Unity WebGL, orientada a la estimulación cognitiva en adultos.
-            </p>
+    <!--------------------------------MAIN-------------------------------->
+    <main class="w-full text-lg">
+
+        <!-- CARGAR COACH ANIMADO -->
+        <div id="coach" class="coach">
+            <div id="coach-bubble" class="coach-bubble"></div>
+        </div>
+
+
+        <!-- Hero Section -->
+        <section class="py-16 mx-auto max-w-7xl px-6 lg:px-12 bg-white dark:bg-slate-900 relative overflow-hidden">
+            <div class="mx-auto max-w-7xl px-6 lg:px-12">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                    <div class="relative z-10 flex flex-col gap-8">
+                        <div>
+                            <span
+                                class="inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary">Sobre
+                                Nosotros</span>
+
+                            <h1
+                                class="mt-6 text-5xl font-black tracking-tight text-slate-900 dark:text-white sm:text-7xl leading-[1.1]">
+                                Potenciando la <span class="text-primary">Salud Cognitiva</span> para Todos.
+                            </h1>
+                        </div>
+                        <p class="text-lg leading-relaxed text-slate-600 dark:text-slate-400 max-w-xl">
+                            Menteando es una iniciativa digital nacida de la intersección entre la neuropsicología y
+                            la tecnología moderna. Proporcionamos herramientas accesibles diseñadas para mantener y
+                            mejorar las funciones cognitivas.
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <button
+                                class="px-8 py-4 bg-slate-800 text-white rounded-2xl font-bold text-xl transition-all transform hover:scale-105 shadow-xl shadow-blue-600/20"
+                                onclick="window.location.href='tests.html'">
+                                Empezar a entrenar
+                            </button>
+
+                            <a href="#contexto-academico"
+                                class="px-8 py-4 bg-blue-500 text-white rounded-2xl font-bold text-xl transition-all transform hover:scale-105 shadow-xl shadow-blue-600/20">
+                                Nuestra historia
+                            </a>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div
+                            class="relative md:aspect-[2.5/3] aspect-[6/3] overflow-hidden rounded-2xl bg-slate-200 dark:bg-slate-800 shadow-2xl ring-1 ring-slate-900/10 dark:ring-white/10">
+                            <img alt="Digital illustration of a human brain with technological neural connections"
+                                class="h-full w-full object-cover"
+                                data-alt="Modern digital representation of human brain connectivity"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5jeLUrkwZBTmgOrpxNJV0Y9wIuX4q7IGxIQmrWdRoTsytmUXuvyxH5mjomtvT8VJxU_Vj-ympkTsGi_Ty7Qni9e-MQk6hW_pz2yWESb86BXqgh_HbGmQ9EEhlC2H7xxqUiGNJnhHY2RpZBL1RxA_mEDrVCuQhmQj0Q0qDVRMU53LKkW1Q6EDWeVtrjb6on0EYqdZ14KhUgEFhldy-9eZGIqe9D2JSFgOH_uNjAekAE_P8Gccxat5cb--SuZJiSzvzQImamcp3bAjF" />
+                        </div>
+                        <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <section class="section about-team">
-            <h2>Autor del proyecto</h2>
+        <!-- Mission & Vision Section -->
+        <section class="py-16 mx-auto max-w-4xl px-6">
+            <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
+                <!-- Mission Card -->
+                <div class="group relative p-1">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent rounded-3xl blur transition group-hover:blur-md">
+                    </div>
 
-            <div class="about-grid">
-                <div class="about-photo">
-                    <img src="assets/img/dani-orla.jpeg" alt="Daniel Pérez Navarro">
+                    <div
+                        class="relative flex flex-col gap-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 shadow-sm transition-transform hover:-translate-y-1">
+
+                        <div
+                            class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
+                            <div class="size-6 bg-blue-500 rounded"></div>
+                        </div>
+
+                        <h3 class="text-3xl font-black text-slate-900 dark:text-white">Nuestra Misión</h3>
+
+                        <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+                            Hacer accesible el entrenamiento cognitivo con herramientas digitales simples, eficaces y
+                            basadas en evidencia científica.
+                        </p>
+                    </div>
                 </div>
+                <!-- Vision Card -->
+                <div class="group relative p-1">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent rounded-3xl blur transition group-hover:blur-md">
+                    </div>
 
-                <div class="about-info">
-                    <h3>Daniel Pérez Navarro</h3>
-                    <p>
-                        Estudiante del Grado en Diseño y Desarrollo de Videojuegos en la Universidad Rey Juan Carlos.
-                        Responsable del diseño conceptual, implementación técnica y arquitectura de la plataforma.
+                    <div
+                        class="relative h-full flex flex-col gap-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 shadow-sm transition-transform hover:-translate-y-1">
+                        <div
+                            class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
+                            <div class="size-6 bg-blue-500 rounded"></div>
+                        </div>
+
+                        <h3 class="text-3xl font-black text-slate-900 dark:text-white">Nuestra Visión</h3>
+                        <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+                            Convertirnos en una referencia en entrenamiento cognitivo digital, conectando investigación
+                            científica con herramientas que la gente use en su día a día.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Academic Context & Team -->
+        <div id="contexto-academico"></div>
+        <section class=" py-16 mx-auto max-w-4xl px-6">
+            <div class=" grid gap-16">
+
+                <!-- CONTEXTO ACADÉMICO -->
+                <div class="flex flex-col gap-12">
+
+                    <h2 class="text-center text-4xl font-black text-slate-900 dark:text-white">
+                        Contexto Académico
+                    </h2>
+
+                    <div class="grid mx-20 px-6 lg:grid-cols-2 gap-16 items-center">
+                        <!-- TEXTO -->
+                        <p class="text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                            Menteando es un proyecto desarrollado por <span class="font-bold">Daniel Pérez
+                                Navarro</span>,
+                            un estudiante del Grado de Diseño y Desarrollo de Videojuegos en la
+                            <span class="font-bold">Universidad Rey Juan Carlos (URJC)</span>.
+                            <br><br>
+                            El desarrollo de esta plataforma representa la exposición de un año de trabajo académico,
+                            investigación y desarrollo de un Trabajo de Fin de Grado que se enmarca dentro del ámbito de
+                            la
+                            neuropsicología y la estimulación cognitiva, intentando entender cómo los entornos digitales
+                            pueden
+                            mejorar funciones cognitivas como la atención, la memoria o la toma de decisiones.
+                        </p>
+
+
+                        <!-- PERFIL -->
+                        <div
+                            class="flex items-center gap-6 p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+
+                            <!-- FOTO -->
+                            <div class="w-24 h-24 rounded-2xl overflow-hidden shadow-md border-2 border-blue-500">
+                                <img src="assets/img/dani-orla.jpeg" class="w-full h-full object-cover">
+                            </div>
+
+                            <!-- INFO -->
+                            <div class="flex flex-col">
+                                <h4 class="text-2xl font-bold text-slate-900 dark:text-white">
+                                    Daniel Pérez Navarro
+                                </h4>
+                                <p class="text-blue-500 text-lg font-medium">
+                                    Director & Desarrollador del Proyecto
+                                </p>
+                                <p class="text-slate-500 dark:text-slate-400 text-base">
+                                    Técnico en Desarrollo de Aplicaciones Multiplataforma y estudiante de Grado en
+                                    Diseño y
+                                    Desarrollo de Videojuegos.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <!-- ENFOQUE EDUCATIVO -->
+                <div class="mx-20 flex flex-col gap-8">
+
+                    <h3 class=" justify-center text-center text-3xl font-bold text-slate-900 dark:text-white px-2">
+                        Enfoque Educativo y Profesional
+                    </h3>
+
+                    <!-- ITEM 1 -->
+                    <div class="p-6 bg-blue-500/5 border border-blue-500/10 rounded-2xl flex gap-4">
+                        <div class="pt-1">
+                            <div class="w-5 h-5 bg-blue-500 rounded"></div>
+                        </div>
+                        <div>
+                            <h5 class="text-xl font-bold text-slate-900 dark:text-white">
+                                Entiende lo que entrenas
+                            </h5>
+                            <p class="text-slate-600 dark:text-slate-400">
+                                No solo juegas: entiendes qué habilidad estás mejorando y por qué.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- ITEM 2 -->
+                    <div
+                        class="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex gap-4">
+                        <div class="pt-1">
+                            <div class="w-5 h-5 bg-blue-500 rounded"></div>
+                        </div>
+                        <div>
+                            <h5 class="text-xl font-bold text-slate-900 dark:text-white">
+                                Alfabetización Cognitiva
+                            </h5>
+                            <p class="text-slate-600 dark:text-slate-400">
+                                Ayudamos a entender cómo funciona el cerebro y cómo mantenerlo ágil.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- ITEM 3 -->
+                    <div
+                        class="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex gap-4">
+                        <div class="pt-1">
+                            <div class="w-5 h-5 bg-blue-500 rounded"></div>
+                        </div>
+                        <div>
+                            <h5 class="text-xl font-bold text-slate-900 dark:text-white">
+                                Uso realista y responsable
+                            </h5>
+                            <p class="text-slate-600 dark:text-slate-400">
+                                Puede utilizarse como entrenamiento personal o como complemento en contextos
+                                educativos
+                                y clínicos.
+
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            </div>
+        </section>
+
+        <!-- TAXONOMÍA DE HABILIDADES -->
+        <section class="py-16 mx-auto max-w-5xl px-6">
+
+            <!-- TÍTULO -->
+            <h2 class="justify-center text-center text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+                Qué entrenas exactamente
+            </h2>
+            <p class="text-center justify-center mx-auto mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
+                Cada juego está diseñado para mejorar habilidades cognitivas concretas. Aquí tienes cómo se organizan.
+            </p>
+
+            <div class="mt-16 mx-20 grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+                <!-- ATENCIÓN -->
+                <div
+                    class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+
+                    <div class="flex items-center gap-4 mb-4">
+                        <img class="w-10 h-10" src="assets/icon/atencion.png" alt="">
+                        <h3 class="text-2xl font-bold text-blue-600">Atención</h3>
+                    </div>
+
+                    <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">
+                        La base de casi todo: mantener el foco, ignorar distracciones y gestionar varias tareas.
                     </p>
 
-                    <div class="about-links">
-                        <a href="https://figma.fun/Fu5Ecs" target="_blank">Portfolio</a>
-                        <a href="https://www.linkedin.com/in/dpereznavarro/" target="_blank">LinkedIn</a>
+                    <div class="space-y-5 text-base text-slate-700 dark:text-slate-300">
+                        <div>
+                            <strong class="text-slate-900 dark:text-white text-base">Sostenida</strong>
+                            <p class="text-slate-900 dark:text-white">Mantener la concentración durante periodos largos.</p>
+                        </div>
+                        <div>
+                            <strong class="text-slate-900 dark:text-white text-base">Selectiva</strong>
+                            <p class="text-slate-900 dark:text-white">Centrarte en lo importante ignorando distracciones.</p>
+                        </div>
+                        <div>
+                            <strong class="text-slate-900 dark:text-white text-base">Dividida</strong>
+                            <p class="text-slate-900 dark:text-white">Gestionar varias tareas al mismo tiempo.</p>
+                        </div>
                     </div>
-                    <div class="about-links about-grid">
-                        <img src="assets/icon/urjc_blanco.png" alt="Logo URJC" style="width: 200px;">
+
+                </div>
+
+                <!-- MEMORIA -->
+                <div
+                    class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+
+                    <div class="flex items-center gap-4 mb-4">
+                        <img class="w-10 h-10" src="assets/icon/memoria.png" alt="">
+                        <h3 class="text-2xl font-bold text-emerald-600">Memoria</h3>
+                    </div>
+
+                    <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">
+                        Te permite guardar, usar y recuperar información cuando la necesitas.
+                    </p>
+
+                    <div class="space-y-5 text-base text-slate-700 dark:text-slate-300">
+                        <div>
+                            <strong class="text-slate-900 dark:text-white">Memoria de trabajo</strong>
+                            <p class="text-slate-900 dark:text-white">Usar información en tiempo real para pensar y decidir.</p>
+                        </div>
+                        <div>
+                            <strong class="text-slate-900 dark:text-white">Memoria espacial</strong>
+                            <p class="text-slate-900 dark:text-white">Recordar posiciones, patrones y ubicaciones.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- VELOCIDAD -->
+                <div
+                    class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+
+                    <div class="flex items-center gap-4 mb-4">
+                        <img class="w-10 h-10" src="assets/icon/reflejos.png" alt="">
+                        <h3 class="text-2xl font-bold text-rose-600">Velocidad y Reflejos</h3>
+                    </div>
+
+                    <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">
+                        Qué tan rápido percibes, procesas y reaccionas ante estímulos.
+                    </p>
+
+                    <div class="space-y-5 text-base text-slate-700 dark:text-slate-300">
+                        <div>
+                            <strong class="text-slate-900 dark:text-white">Velocidad cognitiva</strong>
+                            <p class="text-slate-900 dark:text-white">Procesar información rápidamente y responder sin retraso.</p>
+                        </div>
+                        <div>
+                            <strong class="text-slate-900 dark:text-white">Coordinación visomotora</strong>
+                            <p class="text-slate-900 dark:text-white">Coordinar lo que ves con lo que haces.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- CONTROL -->
+                <div
+                    class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+
+                    <div class="flex items-center gap-4 mb-4">
+                        <img class="w-10 h-10" src="assets/icon/control.png" alt="">
+                        <h3 class="text-2xl font-bold text-amber-600">Control Ejecutivo</h3>
+                    </div>
+
+                    <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">
+                        Regula decisiones, adaptación y control del comportamiento.
+                    </p>
+
+                    <div class="space-y-5 text-base text-slate-700 dark:text-slate-300">
+                        <div>
+                            <strong class="text-slate-900 dark:text-white">Control inhibitorio</strong>
+                            <p class="text-slate-900 dark:text-white">Evitar respuestas impulsivas o automáticas.</p>
+                        </div>
+                        <div>
+                            <strong class="text-slate-900 dark:text-white">Flexibilidad cognitiva</strong>
+                            <p class="text-slate-900 dark:text-white">Cambiar de estrategia cuando algo deja de funcionar.</p>
+                        </div>
+                        <div>
+                            <strong class="text-slate-900 dark:text-white">Planificación</strong>
+                            <p class="text-slate-900 dark:text-white">Organizar pasos y anticipar resultados.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+        <!-- FAQ Section -->
+        <section class="py-16 mx-auto max-w-4xl px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-black tracking-tight text-slate-900 dark:text-white">Preguntas
+                    Frecuentes</h2>
+                <p class="mt-4 text-slate-600 dark:text-slate-400">Resolvemos tus dudas sobre el uso de la
+                    plataforma.</p>
+            </div>
+            <div class="space-y-8">
+                <details
+                    class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6 transition-all shadow-sm overflow-hidden"
+                    open="">
+                    <summary
+                        class="flex cursor-pointer items-center justify-between font-bold text-lg text-slate-900 dark:text-white list-none">
+                        <span>¿Tengo que pagar para usar Menteando?</span>
+                        <span
+                            class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180 text-primary">
+                            <img src="assets/icon/flechaFAQ.png" alt="" style="width: 24px; height: 24px;">
+                        </span>
+                    </summary>
+                    <div
+                        class="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                        No, Menteando es actualmente parte de un proyecto de investigación educativa y es
+                        accesible de forma gratuita para todos los usuarios que buscan herramientas de
+                        estimulación cognitiva.
+                    </div>
+                </details>
+                <details
+                    class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6 transition-all shadow-sm overflow-hidden">
+                    <summary
+                        class="flex cursor-pointer items-center justify-between font-bold text-lg text-slate-900 dark:text-white list-none">
+                        <span>¿Sirve como herramienta clínica?</span>
+                        <span
+                            class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180 text-primary">
+                            <img src="assets/icon/flechaFAQ.png" alt="" style="width: 24px; height: 24px;">
+                        </span>
+                    </summary>
+                    <div
+                        class="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                        Aunque Menteando se diseña bajo principios neuropsicológicos, debe utilizarse como una
+                        herramienta complementaria y no como sustituto de un asesoramiento o tratamiento clínico
+                        profesional.
+                    </div>
+                </details>
+                <details
+                    class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6 transition-all shadow-sm overflow-hidden">
+                    <summary
+                        class="flex cursor-pointer items-center justify-between font-bold text-lg text-slate-900 dark:text-white list-none">
+                        <span>¿Cómo contacto con el equipo?</span>
+                        <span
+                            class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180 text-primary">
+                            <img src="assets/icon/flechaFAQ.png" alt="" style="width: 24px; height: 24px;">
+                        </span>
+                    </summary>
+                    <div
+                        class="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                        Puede contactar con nosotros a través de nuestro formulario de contacto.
+                        <br><br>
+                        <button
+                            class="rounded-xl bg-primary-dark/20 borde backdrop-blur px-8 py-4 text-base font-bold bg-slate-800 text-white hover:bg-slate-700 transition-all"
+                            onclick="window.location.href='#contacto'">
+                            Formulario de Contacto</button>
+                    </div>
+                </details>
+            </div>
+            </div>
+        </section>
+        <!-- Call to Action -->
+        <section class="py-16 mx-auto max-w-4xl px-6">
+            <div
+                class="relative overflow-hidden rounded-[2.5rem] bg-primary dark:bg-slate-5 px-8 py-16 text-center text-white shadow-2xl shadow-primary/40">
+                <div
+                    class="absolute inset-0 bg-indigo-100 border border-slate-200 dark:bg-slate-700 dark:border-slate-800">
+                </div>
+                <div class="relative z-10 mx-auto max-w-2xl">
+                    <h2 class="text-4xl text-slate-900 dark:text-white font-black">¿Listo para empezar a entrenar tu
+                        mente?</h2>
+                    <p class="mt-6 text-lg text-slate-600 dark:text-slate-200">Únete a miles de usuarios que ya están
+                        mejorando su
+                        calidad de vida a través de ejercicios diseñados por expertos.</p>
+                    <div class="mt-10 flex text-slate-600 dark:text-slate-200 flex-wrap justify-center gap-4">
+                        <button
+                            class="rounded-xl bg-slate-500 px-8 py-4 text-base text-slate-200 font-bold text-primary shadow-xl hover:bg-blue-500 hover:text-white transition-all"
+                            onclick="window.location.href='juegos.html'">Juega
+                            Ahora</button>
+                        <button
+                            class="rounded-xl bg-primary-dark/20 borde backdrop-blur px-8 py-4 text-base font-bold bg-slate-800 text-white hover:bg-slate-700 transition-all"
+                            onclick="window.location.href='#tests.html'">Conoce qué puedes empezar a mejorar</button>
                     </div>
                 </div>
-
             </div>
         </section>
 
+        <!-- Contacto -->
+        <section id="contacto" class="max-w-4xl mx-auto px-6 py-16">
 
-        <section id="intro" class="section">
-            <h2>Sobre el proyecto</h2>
-            <p>Titulo del TFG: Desarrollo de una plataforma web interactiva para fomentar la estimulación mental en
-            <p>
-                El objetivo principal del proyecto es analizar cómo los videojuegos
-                pueden utilizarse como herramienta de estimulación cognitiva,
-                evaluando métricas como tiempo de reacción, precisión y progresión
-                de dificultad adaptativa.
-            </p>
-
-            <p>
-                La plataforma registra datos de interacción del usuario con el fin
-                de permitir un análisis posterior del rendimiento y evolución en
-                diferentes dominios cognitivos.
-            </p>
-            adultos</p>
-            <div class="game-card">
-                <img src="assets/img/nabri-entrenando.png" alt="Ilustración cognitiva">
-                <h3>Objetivo</h3>
-                <p>Crear una plataforma de minijuegos cognitivos para entrenar memoria, atención y reflejos.</p>
-                <a href="https://github.com/dperezn2021/Menteando" target="_blank">GitHub del proyecto</a>
-
+            <!-- TÍTULO -->
+            <div class="text-center mb-12">
+                <h2 class="text-5xl font-black text-slate-900 dark:text-white">
+                    Contacto
+                </h2>
+                <p class="text-xl text-slate-600 dark:text-slate-400 mt-4">
+                    ¿Tienes dudas, sugerencias o quieres colaborar con el proyecto? Escríbenos.
+                </p>
             </div>
-        </section>
 
-        <section class="section">
-            <h2>Arquitectura Técnica</h2>
-            <ul>
-                <li><strong>Frontend:</strong> HTML5, CSS3 y JavaScript.</li>
-                <li><strong>Motor de videojuegos:</strong> Unity (WebGL).</li>
-                <li><strong>Persistencia de datos:</strong> Almacenamiento local mediante LocalStorage (fase actual).
-                </li>
-                <li><strong>Modelo de datos:</strong> Estructura JSON para el perfil del usuario y estadísticas de
-                    juego.</li>
-            </ul>
-        </section>
+            <!-- FORMULARIO -->
+            <form
+                class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-10 shadow-sm space-y-6">
 
-        <!-- TAXONOMÍA -->
-        <section class="section taxonomy">
-            <h2>Dominios Cognitivos Evaluados</h2>
-            <p>
-                La plataforma estructura las habilidades cognitivas en diferentes dominios
-                basados en funciones ejecutivas y modelos de psicología cognitiva.
-            </p>
-
-            <div class="taxonomy-grid">
-
-                <div class="taxonomy-card">
-                    <h3>Atención</h3>
-                    <ul>
-                        <li>Atención Sostenida</li>
-                        <li>Atención Selectiva</li>
-                        <li>Atención Dividida</li>
-                    </ul>
+                <!-- Nombre -->
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-2">
+                        Nombre
+                    </label>
+                    <input type="text"
+                        class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Tu nombre" required>
                 </div>
 
-                <div class="taxonomy-card">
-                    <h3>Memoria</h3>
-                    <ul>
-                        <li>Memoria de trabajo</li>
-                        <li>Memoria espacial</li>
-                    </ul>
+                <!-- Email -->
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-2">
+                        Correo electrónico
+                    </label>
+                    <input type="email"
+                        class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="tucorreo@ejemplo.com" required>
                 </div>
 
-                <div class="taxonomy-card">
-                    <h3>Funciones Ejecutivas</h3>
-                    <ul>
-                        <li>Control inhibitorio</li>
-                        <li>Flexibilidad cognitiva</li>
-                        <li>Planificación</li>
-                    </ul>
+                <!-- Mensaje -->
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-2">
+                        Mensaje
+                    </label>
+                    <textarea rows="5"
+                        class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Cuéntanos en qué podemos ayudarte" required></textarea>
                 </div>
 
-                <div class="taxonomy-card">
-                    <h3>Procesamiento</h3>
-                    <ul>
-                        <li>Velocidad cognitiva</li>
-                        <li>Coordinación visomotora</li>
-                    </ul>
-                </div>
+                <!-- Botón -->
+                <button type="submit"
+                    class="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl transition"
+                    onclick="enviarCorreoSoporte()">
+                    Enviar mensaje
+                </button>
 
-            </div>
+            </form>
+
         </section>
-
-        <section class="section">
-            <h2>Aplicación y futuro desarrollo</h2>
-            <p>
-                La plataforma está diseñada como base para futuros estudios experimentales
-                donde se pueda analizar la evolución cognitiva del usuario mediante
-                recopilación estructurada de datos.
-            </p>
-        </section>
-
     </main>
-    <!-- FOOTER -->
-    <footer class="perfil-footer">
-        <p>&copy; 2025 Daniel Pérez Navarro | Universidad Rey Juan Carlos</p>
+    <!------------------------------- FOOTER ------------------------>
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+        <div class="max-w-screen-xl mx-auto px-6 pt-8">
+            <div class="flex flex-col md:flex-row items-center md:items-start justify-center gap-12 mb-6">
+
+                <!-- 3 columnas: logo+descripción, enlaces, legal-->
+                <div class="w-full md:w-96 text-center md:text-left">
+                    <div
+                        class="flex flex-col md:flex-row items-center md:items-start gap-3 mb-6 justify-center md:justify-start">
+                        <img src="../assets/img/logo2.png" alt="Logo Menteando" class="w-12 h-12 md:w-16 md:h-16" />
+                        <h3 class="text-2xl md:text-3xl font-black text-blue-500">Menteando</h3>
+                    </div>
+                    <p class="text-sm md:text-base font-normal text-slate-500 dark:text-slate-400">Dedicados a mejorar
+                        la calidad
+                        de vida de las personas mayores a través de la tecnología y la ciencia cognitiva.</p>
+                </div>
+                <div class="w-full md:w-64 text-center md:text-left">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-6">Enlaces de interés</h4>
+                    <ul class="space-y-4 text-slate-500 dark:text-slate-400">
+                        <li><a href="index.html" class="hover:text-blue-500 transition-colors">Inicio</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Entrenamiento</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">GitHub del proyecto</a></li>
+                    </ul>
+                </div>
+                <div class="w-full md:w-64 text-center md:text-left">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-6">Más información</h4>
+                    <ul class="space-y-4 text-slate-500 dark:text-slate-400">
+                        <li><a href="about.html" class="hover:text-blue-500 transition-colors">Acerca de</a></li>
+                        <li><a href="about.html#contacto" class="hover:text-blue-500 transition-colors">Contacto</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-16 border-t border-slate-100 dark:border-slate-800 text-center">
+                <p class="text-sm font-normal text-slate-400">© 2026 Menteando. Todos los derechos reservados.</p>
+            </div>
+        </div>
     </footer>
+
+
+
+    <!-- Scripts -->
+    <script src="/js/perfil.js"></script>
+    <script src="/js/datosPerfil.js"></script>
+    <script src="/coach/mensajesCoach.js"></script>
+    <script src="/coach/cerebroCoach.js"></script>
+    <script src="/coach/entidadCoach.js"></script>
+    <script src="/js/controladorCoach.js"></script>
+    <script src="/js/editarAvatar.js"></script>
+
+
+    <!-- SCRIPTS QUE LLEVAN LA LÓGICA DE LA INTERFAZ -->
+    <!-- Cargar perfil-->
+    <script data-purpose="perfil-logic" src="../js/perfil.js"></script>
+    <script>
+        const perfil = getperfil();
+        const coachController = new CoachController(perfil);
+        coachController.onPantallaAbout();
+    </script>
+
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const root = document.documentElement;
+
+        const syncThemeButton = () => {
+            const isDark = root.classList.contains('dark');
+            themeToggleBtn.textContent = isDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            themeToggleBtn.setAttribute(
+                'aria-label',
+                isDark ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'
+            );
+        };
+
+        if (themeToggleBtn) {
+            themeToggleBtn.onclick = null;
+            themeToggleBtn.type = 'button';
+            themeToggleBtn.addEventListener('click', () => {
+                const willUseDark = !root.classList.contains('dark');
+                root.classList.toggle('dark', willUseDark);
+                root.classList.toggle('light', !willUseDark);
+                localStorage.setItem('theme', willUseDark ? 'dark' : 'light');
+                syncThemeButton();
+            });
+
+            syncThemeButton();
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const perfil = getperfil();
+            if (perfil.avatar) {
+                const headerAvatar = document.getElementById("perfil-avatar-header");
+                if (headerAvatar) headerAvatar.src = perfil.avatar;
+            }
+        });
+    </script>
+
+
 
 </body>
 

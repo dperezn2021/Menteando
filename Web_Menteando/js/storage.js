@@ -1,24 +1,40 @@
-window.SaveGameData = function(jsonString) {
-    const data = JSON.parse(jsonString);
-    const perfil = getperfil();
+window.SaveGameData = function (jsonString) {
+    try {
+        // 1. Reemplazar valores inválidos ANTES de parsear
+        jsonString = jsonString
+            .replace(/Infinity/g, "0")
+            .replace(/-Infinity/g, "0")
+            .replace(/NaN/g, "0");
 
-    // Guardar sesión
-    perfil.sesiones++;
-    perfil.ultimaSesion = data.timestamp;
+        // 2. Parsear con seguridad
+        const data = JSON.parse(jsonString);
 
-    // Guardar juego
-    if (!perfil.juegos[data.gameId]) perfil.juegos[data.gameId] = [];
-    perfil.juegos[data.gameId].push(data.metrics);
+        const perfil = getperfil();
 
-    // Recalcular perfil
-    recalcularPerfilGlobal(perfil, data.metrics, data.gameId);
+        // Guardar sesión
+        perfil.sesiones++;
+        perfil.ultimaSesion = data.timestamp;
 
-    // Actualizar juego más jugado
-    perfil.juegoMasJugado = getJuegoMasJugado(perfil);
+        // Guardar juego
+        if (!perfil.juegos[data.gameId]) perfil.juegos[data.gameId] = [];
+        perfil.juegos[data.gameId].push(data.metrics);
+        perfil.juegos[data.gameId][perfil.juegos[data.gameId].length - 1].timestamp = data.timestamp;
 
-    //Actualizar nivel
-    perfil.nivel = getNivel(perfil);
+        // Recalcular perfil
+        recalcularPerfilGlobal(perfil, data.metrics, data.gameId);
 
-    // Guardar
-    saveperfil(perfil);
+        // Actualizar juego más jugado
+        perfil.juegoMasJugado = getJuegoMasJugado(perfil);
+
+        //Actualizar puntos y tiempo
+        perfil.nivel = getNivel(perfil);
+        perfil.puntos = getPuntos(perfil);
+        perfil.tiempo = getTiempo(perfil);
+
+        // Guardar
+        saveperfil(perfil);
+
+    } catch (e) {
+        console.error("Error al guardar datos del juego:", e, jsonString);
+    }
 };

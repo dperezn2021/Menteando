@@ -60,6 +60,14 @@ CoachController.prototype.onSeleccionJuego = function () {
     this.showContext("juegos");
 };
 
+CoachController.prototype.onPantallaAbout = function () {
+    this.showContext("about");
+};
+
+CoachController.prototype.onPantallaTests = function () {
+    this.showContext("tests");
+};
+
 CoachController.prototype.onResultados = function (ultimoJuego, tendencia) {
     this.showContext("resultados", ultimoJuego, tendencia);
 };

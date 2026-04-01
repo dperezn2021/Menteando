@@ -10,40 +10,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
     set("perfil-nombre", perfil.nombre);
     set("perfil-edad", perfil.edad);
+    set("perfil-desde", new Date(perfil.desde).toLocaleDateString("es-ES", { year: "numeric", month: "long" }));
     set("perfil-correo", perfil.correo);
+    set("perfil-racha", perfil.racha);
+    set("perfil-puntos", perfil.puntos);
+    set("perfil-tiempo", perfil.tiempo);
     set("perfil-sesiones", perfil.sesiones);
     set("perfil-apodo-header", perfil.apodo);
     set("perfil-juego-mas-jugado", perfil.juegoMasJugado);
+
     actualizarNivelCognitivo(perfil.nivel);
 
     function actualizarNivelCognitivo(valor) {
         const span = document.getElementById("perfil-nivel");
-        if (!span) return;
-
-        // Si está vacío o no es número → Nulo
-        if (!valor || valor !== 0) {
-            span.textContent = "Nulo";
-            span.className = "px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded font-medium";
-            return;
-        }
-
         let texto = "";
         let clases = "";
 
+        if (!span) return;
 
-        if (valor < 20) {
+        // Si está vacío o no es número → Nulo
+        if (!valor || valor === 0) {
+            texto = "Nulo";
+            clases = "px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded font-medium";
+            return;
+        }
+
+        if (valor > 1) {
             texto = "Básico";
             clases = "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200";
-        } else if (valor < 40) {
+        } else if (valor > 19) {
             texto = "Bajo";
             clases = "bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-200";
-        } else if (valor < 60) {
+        } else if (valor > 39) {
             texto = "Medio";
             clases = "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200";
-        } else if (valor < 75) {
+        } else if (valor > 59) {
             texto = "Alto";
             clases = "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200";
-        } else if (valor < 90) {
+        } else if (valor > 79) {
             texto = "Muy alto";
             clases = "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200";
         } else {
@@ -53,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         span.textContent = texto;
         span.className = `px-2 py-1 rounded font-medium ${clases}`;
+        return;
     }
 
     // Animación de barras principales
@@ -114,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 html += `
                 <div class="detalle-card">
                     <div class="detalle-icon">⚡</div>
-                    <div class="detalle-info">
+                    <div class="detalle-info mt-6">
                         <div class="detalle-nombre">${nombre}</div>
                         <div class="detalle-valor">${percent}%</div>
                     </div>
@@ -161,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
             tests.innerHTML = "<li>No necesitas tests adicionales por ahora.</li>";
     }
 
-    // === MODAL ===
+    // === MODAL DEL PERFIL ===
     const modal = document.getElementById("modal-editar");
     const btnEditar = document.getElementById("btn-editar");
     const btnCerrar = document.getElementById("btn-cerrar-modal");
@@ -225,4 +230,27 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+
+    // === MODAL DEL AVATAR ===
+    const modalAvatar = document.getElementById("modal-avatar");
+    const btnCambiarAvatar = document.getElementById("btn-cambiar-avatar");
+    const btnCerrarModal = document.getElementById("cerrar-modal-avatar");
+
+    btnCambiarAvatar.addEventListener("click", () => {
+        modalAvatar.classList.remove("hidden");
+    });
+
+    btnCerrarModal.addEventListener("click", () => {
+        modalAvatar.classList.add("hidden");
+    });
+
+    // Cerrar si clicas fuera del modal
+    modalAvatar.addEventListener("click", (e) => {
+        if (e.target === modalAvatar) {
+            modalAvatar.classList.add("hidden");
+        }
+    });
+
+
 });

@@ -1,204 +1,120 @@
-//--------------------------------------------------------------------------------------------------------
-//--------------------------- LISTADO DE JUEGOS PARA ALEATORIEDAD SEGUN EL DIA ---------------------------
-//--------------------------------------------------------------------------------------------------------
-
-// lista de juegos global
-const listaJuegos = [
-    {
-        nombre: "Orden Caótico",
-        descripcion: "Encuentra números en orden entre distractores.",
-        url: "games/orden-caotico/orden-caotico-page.html",
-        skills: ["atencion sostenida"],
-    },
-    {
-        nombre: "Rosco",
-        descripcion: "Encuentra letras en orden entre distractores.",
-        url: "games/rosco/rosco-page.html",
-        skills: [
-            "atencion electiva",
-            "velocidad ognitiva",
-            "control inhibitorio",
-            "coordinacion visomotora",
-        ],
-    },
-    {
-        nombre: "Detectar Intruso",
-        descripcion: "Identifica el elemento incorrecto entre distractores.",
-        url: "games/detectar-intruso/detectar-intruso-page.html",
-        skills: [
-            "atencion selectiva",
-            "control inhibitorio",
-            "velocidad cognitiva",
-            "coordinacion visomotora",
-        ],
-    },
-    {
-        nombre: "3 Bolas",
-        descripcion: "Sigue varios objetos en movimiento a la vez.",
-        url: "games/tres-bolas/tres-bolas-page.html",
-        skills: ["atencion dividida"],
-    },
-    {
-        nombre: "Flash TikTok",
-        descripcion: "Detecta números que aparecen durante milisegundos.",
-        url: "games/flash-tiktok/flash-tiktok-page.html",
-        skills: ["velocidad cognitiva", "atencion sostenida"],
-    },
-    {
-        nombre: "Eco Visual",
-        descripcion: "Recuerda la posición de varios objetos.",
-        url: "games/eco-visual/eco-visual-page.html",
-        skills: ["memoria espacial"],
-    },
-    {
-        nombre: "Simón Dice",
-        descripcion: "Repite secuencias cada vez más largas.",
-        url: "games/simon-dice/simon-dice-page.html",
-        skills: ["memoria trabajo", "memoria espacial"],
-    },
-    {
-        nombre: "Asociación Rápida",
-        descripcion: "Relaciona símbolos y palabras en poco tiempo.",
-        url: "games/asociacion-rapida/asociacion-rapida-page.html",
-        skills: ["velocidad cognitiva", "memoria trabajo"],
-    },
-    {
-        nombre: "Secuencia Inversa",
-        descripcion: "Repite la secuencia pero al revés.",
-        url: "games/secuencia-inversa/secuencia-inversa-page.html",
-        skills: ["memoria trabajo"],
-    },
-    {
-        nombre: "Silencio Mental",
-        descripcion: "Go/No-Go: pulsa solo cuando corresponde.",
-        url: "games/silencio-mental/silencio-mental-page.html",
-        skills: ["control inhibitorio"],
-    },
-    {
-        nombre: "Stroop",
-        descripcion: "Di el color, no la palabra.",
-        url: "games/stroop/stroop-page.html",
-        skills: ["control inhibitorio", "flexibilidad cognitiva"],
-    },
-    {
-        nombre: "Doble Regla",
-        descripcion: "Cambia de norma según el estímulo.",
-        url: "games/doble-regla/doble-regla-page.html",
-        skills: ["flexibilidad cognitiva", "control inhibitorio"],
-    },
-    {
-        nombre: "Trayectorias Mentales",
-        descripcion: "Planifica el recorrido antes de ejecutarlo.",
-        url: "games/trayectorias-mentales/trayectorias-mentales-page.html",
-        skills: ["planificacion"],
-    },
-    {
-        nombre: "Tiempo de Reacción",
-        descripcion: "Pulsa cuando cambie el color.",
-        url: "games/tiempo-reaccion/tiempo-reaccion-page.html",
-        skills: ["reflejos"],
-    },
-    {
-        nombre: "Objeto Móvil",
-        descripcion: "Haz clic en el objeto que se mueve.",
-        url: "games/objeto-movil/objeto-movil-page.html",
-        skills: ["reflejos", "flexibilidad cognitiva"],
-    },
-    {
-        nombre: "Tarjetas Wisconsin",
-        descripcion: "Cambia la regla de clasificación.",
-        url: "games/wisconsin/wisconsin-page.html",
-        skills: ["flexibilidad cognitiva"],
-    },
-    {
-        nombre: "Memory Cronometrado",
-        descripcion: "Encuentra parejas antes de que acabe el tiempo.",
-        url: "games/memory-cronometrado/memory-cronometrado-page.html",
-        skills: ["memoria espacial", "velocidad cognitiva"],
-    },
-    {
-        nombre: "Contador Mental",
-        descripcion: "Resuelve operaciones rápidas mentalmente.",
-        url: "games/contador-mental/contador-mental-page.html",
-        skills: ["memoria trabajo", "velocidad cognitiva"],
-    },
-    {
-        nombre: "Anticipación de Patrón",
-        descripcion: "Predice el siguiente elemento.",
-        url: "games/anticipacion-patron/anticipacion-patron-page.html",
-        skills: ["planificacion"],
-    },
-    {
-        nombre: "Multitarea",
-        descripcion: "Gestiona dos tareas a la vez.",
-        url: "games/multitarea/multitarea-page.html",
-        skills: ["atencion dividida", "control inhibitorio"],
-    },
-    {
-        nombre: "Mates Express",
-        descripcion: "Arrastra el símbolo correcto para completar la operación.",
-        url: "games/mates-express/mates-express-page.html",
-        skills: [
-            "atencion sostenida",
-            "velocidad cognitiva",
-            "memoria trabajo",
-            "control inhibitorio",
-            "coordinacion visomotora",
-        ],
-    },
-];
-
-// hacer lista accesible globalmente
-window.listaJuegos = listaJuegos;
+const juegosBase = typeof window.getCatalogoJuegos === "function"
+    ? window.getCatalogoJuegos()
+    : [];
 
 function randomSeeded(seed) {
-    let x = Math.sin(seed) * 10000;
+    const x = Math.sin(seed) * 10000;
     return x - Math.floor(x);
 }
 
-function juegosDelDia(cantidad) {
+function juegosDelDia(cantidad = 3) {
     const hoy = new Date();
-    const seed =
-        hoy.getFullYear() * 10000 + (hoy.getMonth() + 1) * 100 + hoy.getDate();
+    const seed = hoy.getFullYear() * 10000 + (hoy.getMonth() + 1) * 100 + hoy.getDate();
+    const indices = [...juegosBase.keys()];
 
-    let indices = [...listaJuegos.keys()];
-
-    for (let i = indices.length - 1; i > 0; i--) {
+    for (let i = indices.length - 1; i > 0; i -= 1) {
         const r = Math.floor(randomSeeded(seed + i) * (i + 1));
         [indices[i], indices[r]] = [indices[r], indices[i]];
     }
 
-    return indices.slice(0, cantidad).map((i) => listaJuegos[i]);
+    return indices.slice(0, cantidad).map((index) => juegosBase[index]);
 }
 
-// helper de renderizado
+function getBadgeClasses(skillSlug) {
+    const accent = window.getSkillDefinition?.(skillSlug)?.accent || "blue";
+    const badgeMap = {
+        blue: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+        sky: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+        cyan: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
+        green: "bg-green-500/10 text-green-600 dark:text-green-400",
+        indigo: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
+        violet: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+        fuchsia: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400",
+        amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+        emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+    };
+
+    return badgeMap[accent] || badgeMap.blue;
+}
+
 function generarTarjeta(juego) {
+    const skillSlug = juego.skills[0];
+    const skillLabel = juego.categoria;
+
     return `
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-md border border-blue-200 dark:border-slate-700 overflow-hidden cursor-pointer" onclick="window.location.href='${juego.url}'">
-            <div class="h-48 bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-                <span class="text-slate-300 text-center text-sm font-medium px-4">${juego.nombre}</span>
+        <article class="bg-white dark:bg-slate-800 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden group">
+            <a href="${juego.url}" class="block h-48 overflow-hidden bg-slate-200 dark:bg-slate-700">
+                <img src="${juego.imagen}" alt="${juego.nombre}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
+            </a>
+
+            <div class="p-6 flex flex-col gap-3">
+                <span class="px-3 py-1 text-sm font-bold uppercase rounded-full w-fit ${getBadgeClasses(skillSlug)}">
+                    ${skillLabel}
+                </span>
+
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white">${juego.nombre}</h3>
+                <p class="text-slate-600 dark:text-slate-300 text-base">${juego.descripcion}</p>
+
+                <a href="${juego.url}" class="mt-auto w-full py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white font-bold text-center hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors">
+                    Entrenar
+                </a>
             </div>
-            <div class="p-6">
-                <h4 class="text-xl font-bold mb-2">${juego.nombre}</h4>
-                <p class="text-slate-400 text-sm mb-4">${juego.descripcion}</p>
-                <button class="w-full py-3 bg-slate-700 hover:bg-blue-600 rounded-xl font-bold transition-colors" onclick="event.stopPropagation();">Jugar ahora</button>
+        </article>
+    `;
+}
+
+function renderJuegos(cantidad = 3) {
+    const contenedor = document.getElementById("juegos-grid");
+    if (!contenedor) return;
+
+    const seleccion = juegosDelDia(cantidad);
+    contenedor.innerHTML = seleccion.map(generarTarjeta).join("");
+}
+
+function generarJuegoDelDia(juego) {
+    const skillLabel = window.getSkillDefinition?.(juego.skills[0])?.label || juego.badge;
+
+    return `
+        <div class="w-full flex flex-col md:flex-row items-center gap-8 lg:gap-12">
+            <img src="${juego.imagen}" alt="${juego.nombre}" class="h-full max-w-200 relative min-h-[18rem] md:min-h-[24rem] rounded-3xl overflow-hidden bg-slate-200 dark:bg-slate-700 block">
+
+            <div class="flex-1 flex flex-col justify-center gap-6">
+                <span class="px-3 py-1 bg-blue-500 text-white text-sm font-bold uppercase tracking-wider rounded-full w-fit">
+                    ${"Recomendado hoy"}
+                </span>
+
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-blue-500 mb-3">${skillLabel}</p>
+                    <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-tight">
+                        ${juego.nombre}
+                    </h1>
+                </div>
+
+                <p class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed max-w-xl">
+                    ${juego.descripcion}
+                </p>
+
+                <div class="flex gap-4 pt-2 flex-wrap">
+                    <a href="${juego.buildUrl}" class="px-8 py-4 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-600 transition">
+                        Jugar ahora
+                    </a>
+                    <a href="${juego.url}" class="px-8 py-4 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+                        Abrir Ficha técnica
+                    </a>
+                </div>
             </div>
         </div>
     `;
 }
 
-function renderJuegos(cantidad) {
-    const contenedor = document.getElementById("juegos-grid");
+function renderJuegoRecomendado(cantidad = 1) {
+    const contenedor = document.getElementById("juego-recomendado");
     if (!contenedor) return;
+
     const seleccion = juegosDelDia(cantidad);
-    contenedor.innerHTML = seleccion.map(generarTarjeta).join("");
+    contenedor.innerHTML = seleccion.map(generarJuegoDelDia).join("");
 }
 
-// exponer función para uso externo
 window.juegosDelDia = juegosDelDia;
 window.renderJuegos = renderJuegos;
-
-// auto-render al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    renderJuegos(3);
-});
+window.renderJuegoRecomendado = renderJuegoRecomendado;
