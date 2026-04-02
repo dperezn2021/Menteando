@@ -51,6 +51,8 @@
     }
 };
 
+
+
 const CATALOGO_JUEGOS = [
     {
         id: "mates-express",
@@ -325,6 +327,9 @@ function getSkillDefinition(skillSlug) {
     return SKILL_DEFINITIONS[skillSlug] || null;
 }
 
+
+window.SKILL_DEFINITIONS = SKILL_DEFINITIONS;
+window.CATALOGO_JUEGOS = CATALOGO_JUEGOS;  // ← añade esto
 window.catalogoJuegos = getCatalogoJuegos();
 window.getCatalogoJuegos = getCatalogoJuegos;
 window.getJuegoById = getJuegoById;

@@ -362,39 +362,7 @@
 
                             <!-- TARJETAS DE TESTS -->
                             <div class="flex flex-col gap-3 mt-4">
-
-                                <!-- Test de Stroop -->
-                                <div
-                                    class="w-full p-3 bg-slate-50 dark:bg-slate-700/20 rounded-lg border border-slate-100 dark:border-slate-600 flex justify-between items-center">
-                                    <div>
-                                        <div class="text-slate-900 dark:text-white text-base font-semibold">Test de
-                                            Stroop</div>
-                                        <div class="text-slate-500 dark:text-slate-300 text-xs">Enfoque: Control</div>
-                                    </div>
-                                    <div class="w-5 h-5 bg-blue-500 rounded"></div>
-                                </div>
-
-                                <!-- Cálculo Rápido -->
-                                <div
-                                    class="w-full p-3 bg-slate-50 dark:bg-slate-700/20 rounded-lg border border-slate-100 dark:border-slate-600 flex justify-between items-center">
-                                    <div>
-                                        <div class="text-slate-900 dark:text-white text-base font-semibold">Cálculo
-                                            Rápido</div>
-                                        <div class="text-slate-500 dark:text-slate-300 text-xs">Enfoque: Velocidad</div>
-                                    </div>
-                                    <div class="w-5 h-5 bg-blue-500 rounded"></div>
-                                </div>
-
-                                <!-- Memoria de Trabajo (Completado hoy) -->
-                                <div
-                                    class="w-full p-3 bg-slate-50 dark:bg-slate-700/20 rounded-lg border border-slate-100 dark:border-slate-600 flex justify-between items-center opacity-50">
-                                    <div>
-                                        <div class="text-slate-900 dark:text-white text-base font-semibold">Memoria de
-                                            Trabajo</div>
-                                        <div class="text-slate-500 dark:text-slate-300 text-xs">Completado hoy</div>
-                                    </div>
-                                    <div class="w-5 h-5 bg-green-500 rounded"></div>
-                                </div>
+                                <div id="tests-grid" class="mt-6 mx-auto w-full"></div>
 
                             </div>
                         </div>
@@ -457,12 +425,14 @@
 
                             </tbody>
                         </table>
-                        <button id="ver-historial-completo" class="w-full mt-4 py-2 text-blue-500 font-bold hover:text-blue-600 transition-colors"
+                        <button id="ver-historial-completo"
+                            class="w-full mt-4 py-2 text-blue-500 font-bold hover:text-blue-600 transition-colors"
                             onclick="mostrarHistorialCompleto()">
                             Ver historial completo
                         </button>
 
-                        <button id="ver-historial-comprimido" class="hidden w-full mt-4 py-2 text-blue-500 font-bold hover:text-blue-600 transition-colors"
+                        <button id="ver-historial-comprimido"
+                            class="hidden w-full mt-4 py-2 text-blue-500 font-bold hover:text-blue-600 transition-colors"
                             onclick="mostrarHistorialComprimido()">
                             Comprimir historial
                         </button>
@@ -594,6 +564,9 @@
     <script src="/js/ultimasSesiones.js"></script>
     <script src="/js/editarAvatar.js"></script>
 
+    <script src="/js/catalogoTests.js"></script>
+    <script src="/js/testsRecomendados.js"></script>
+
 
     <script>
         // Inicializar coach en pantalla de perfil
@@ -664,6 +637,8 @@
                 spanRacha.textContent = racha;
             }
 
+
+            renderTests();
         });
     </script>
 

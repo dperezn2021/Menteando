@@ -126,7 +126,7 @@
     <!--------------------------------MAIN-------------------------------->
     <main class="w-full">
 
-         <!-- CARGAR COACH ANIMADO -->
+        <!-- CARGAR COACH ANIMADO -->
         <div id="coach" class="coach">
             <div id="coach-bubble" class="coach-bubble"></div>
         </div>
@@ -134,13 +134,14 @@
         <!-- HERO SECTION -->
         <section class="mt-8 overflow-hidden">
 
-            <div class="bg-slate-200 dark:bg-slate-800 py-20 rounded-3xl max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row gap-12">
+            <div
+                class="bg-slate-200 dark:bg-slate-800 py-20 rounded-3xl max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row gap-12">
                 <div id="juego-recomendado"></div>
 
             </div>
         </section>
 
-    
+
 
         <!-- SEARCH + FILTER BAR -->
         <section class="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-6">
@@ -291,7 +292,7 @@
         const perfil = getperfil();
         const coachController = new CoachController(perfil);
         coachController.onSeleccionJuego();
-       
+
     </script>
 
     <!-- Cargar juegos del dia  -->
@@ -306,7 +307,7 @@
                 if (headerAvatar) headerAvatar.src = perfil.avatar;
             }
 
-            
+
             const themeToggleBtn = document.getElementById('theme-toggle-btn');
             const root = document.documentElement;
 

@@ -19,6 +19,7 @@ const perfilBase = {
     sesionesDiarias: [0,0,0,0,0,0,0], // Lunes a Domingo
     juegos: {},
     juegoMasJugado: "Cargando...",
+    tests: {},
 
     atencion: 0,
     memoria: 0,

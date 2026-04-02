@@ -27,7 +27,7 @@
         // Recalcular perfil
         recalcularPerfilGlobal(perfil, data.metrics, data.gameId);
 
-  //Actualizar puntos y tiempo
+        //Actualizar puntos y tiempo
         perfil.nivel = getNivel(perfil);
         perfil.puntos = getPuntos(perfil);
         perfil.tiempo = getTiempo(perfil);

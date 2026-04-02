@@ -25,7 +25,7 @@
         if (!span) return;
 
         // Si está vacío, null, undefined o NaN → Nulo
-        if (valor === null || valor === undefined || isNaN(valor)) {
+        if (valor === 0 || valor === null || valor === undefined || isNaN(valor)) {
             span.textContent = "Nulo";
             span.className = "px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded font-medium";
             return;
