@@ -222,43 +222,15 @@
                         <!-- MEDALLAS COMPLETADAS -->
                         <div class="px-6 py-6 border-t border-slate-100 dark:border-slate-700">
                             <div class="flex justify-between items-center mb-4">
-                                <h3 class="font-bold text-slate-900 dark:text-white">Logros completados</h3>
-                                <span class="text-neutral-400 text-sm">2/4</span>
+                                <h3 class="font-bold text-slate-900 dark:text-white">Medallas Conseguidas</h3>
+                                <span id="medallas-contador" class="text-neutral-400 text-sm">0/0</span>
                             </div>
-                            <div class="flex gap-3">
-                                <div
-                                    class="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/20 rounded-full border-4 border-blue-500 flex items-center justify-center">
-                                    <div class="w-8 h-6 bg-blue-500 rounded"></div>
-                                </div>
-                                <div
-                                    class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/40 rounded-full border-4 border-indigo-500 flex items-center justify-center">
-                                    <div class="w-7 h-7 bg-violet-600 rounded"></div>
-                                </div>
-                                <div
-                                    class="w-16 h-16 bg-stone-300 dark:bg-stone-600 rounded-full border-4 border-zinc-600 flex items-center justify-center">
-                                    <div class="w-6 h-7 bg-zinc-600 rounded"></div>
-                                </div>
-                                <div
-                                    class="w-16 h-16 bg-stone-300 dark:bg-stone-600 rounded-full border-4 border-zinc-600 flex items-center justify-center">
-                                    <div class="w-6 h-7 bg-zinc-600 rounded"></div>
-                                </div>
+                            <div id="medallas-container" class="flex gap-2 flex-wrap justify-center">
+                                <!-- Las medallas se generan dinámicamente -->
                             </div>
                         </div>
                     </div>
 
-                    <!-- TARJETA DE LOGRO EN PROGRESO -->
-                    <div
-                        class="bg-gradient-to-r from-blue-100 to-slate-50 dark:from-slate-800 dark:to-slate-900 p-6 rounded-2xl outline outline-1 outline-blue-500 dark:outline-blue-900">
-                        <h3 class="text-sm font-bold uppercase tracking-wide text-blue-500">Logros Completados</h3>
-                        <p class="mt-3 text-base font-bold text-slate-900 dark:text-white">Maestro de los reflejos</p>
-                        <p class="text-xs text-blue-300 mt-1">Consigue más de un 75% en 'Reflejos'</p>
-                        <div class="relative w-full h-2 bg-indigo-950/50 rounded-full mt-4">
-                            <div
-                                class="w-3/4 h-full bg-blue-500 rounded-full shadow-[0px_0px_8px_rgba(99,102,241,0.6)]">
-                            </div>
-                        </div>
-                        <div class="text-right text-[10px] text-blue-300 mt-2">51 / 75</div>
-                    </div>
 
                 </aside>
 
@@ -268,7 +240,7 @@
                     <!-- SECCIÓN: CAPACIDADES COGNITIVAS PRINCIPALES -->
                     <div
                         class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-700">
-                        <h3 class="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-6">Capacidades
+                        <h3 class="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-6 ">Capacidades
                             Cognitivas</h3>
 
                         <!-- BARRAS DE PROGRESO -->
@@ -327,7 +299,7 @@
 
 
                     <!-- TARJETAS RÁPIDAS DE RESUMEN -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div id="tarjetas-resumenes-rapidos" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div
                             class="bg-slate-50 dark:bg-slate-800 p-4 lg:p-5 rounded-xl text-center outline outline-1 outline-slate-200 dark:outline-slate-700">
                             <div class="text-xs uppercase tracking-wide text-slate-500">Tiempo Promedio</div>
@@ -344,47 +316,60 @@
                             class="bg-slate-50 dark:bg-slate-800 p-4 lg:p-5 rounded-xl text-center outline outline-1 outline-slate-200 dark:outline-slate-700">
                             <div class="text-xs uppercase tracking-wide text-slate-500">Días en Racha</div>
                             <div class="text-xl lg:text-2xl font-bold text-blue-500 mt-2"><span
-                                    id="perfil-racha"></span></div>
+                                    id="perfil-racha-total"></span></div>
                         </div>
+
+
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 h-full gap-4 flex-col">
 
                         <!-- SECCIÓN: TESTS RECOMENDADOS -->
                         <div
-                            class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                            class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 ">
 
-                            <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
+                            <h3
+                                class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4 pb-2 border-b-2 border-blue-500 ">
                                 <div class="w-4 h-5 bg-blue-500 rounded"></div>
                                 Tests recomendados
                             </h3>
+                            <p class="mb-4 mt-2 text-slate-500 dark:text-white-400 ">Echa un vistazo los tests recomendados del día</p>
 
 
                             <!-- TARJETAS DE TESTS -->
                             <div class="flex flex-col gap-3 mt-4">
-                                <div id="tests-grid" class="mt-6 mx-auto w-full"></div>
+                                <div id="tests-grid" class=" mx-auto w-full"></div>
 
                             </div>
+                            <div class="justify-center text-center">
+                                <p class="text-slate-500 dark:text-white-400 my-4">¿No te gustan los recomendados?</p>
+                                <a href="/tests.html" class="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 hover:text-blue-500 transition-colors">Prueba otros</a>
+                            </div>
+
                         </div>
 
                         <!-- SECCIÓN: EVOLUCIÓN SEMANAL -->
                         <div
-                            class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-700">
+                            class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-700 ">
 
-                            <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
+                            <h3
+                                class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 pb-2 border-b-2 border-blue-500 ">
                                 <div class="w-5 h-5 bg-blue-500 rounded"></div>
                                 Evolución Semanal
                             </h3>
 
+                            <p class="mb-8 mt-2 text-slate-500 dark:text-white-400 ">Consulta las sesiones completadas
+                                en los últimos 7 días</p>
+                                
                             <!-- CONTENEDOR DEL GRÁFICO -->
-                            <div class="flex items-end gap-3 h-48 px-4">
+                            <div class="flex items-end gap-3 h-80 px-4">
 
                                 <!-- EJE Y -->
                                 <div
                                     class="flex flex-col justify-between h-full text-xs text-slate-500 dark:text-slate-400">
-                                    <span id="maxima-racha"></span>
-                                    <span id="media-racha"></span>
-                                    <span id="minima-racha"></span>
+                                    <span id="maxima-racha-diaria"></span>
+                                    <span id="media-racha-diaria"></span>
+                                    <span id="minima-racha-diaria"></span>
                                 </div>
 
                                 <!-- BARRAS -->
@@ -405,52 +390,63 @@
                             </div>
 
                         </div>
-                    </div>
 
 
-
-                    <!-- SECCIÓN: ÚLTIMAS SESIONES (TABLA RESPONSIVA) -->
-                    <div
-                        class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-700 overflow-x-auto">
-                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Últimas sesiones</h3>
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr class="border-b border-slate-100 dark:border-slate-700">
-                                    <th class="text-left py-3 px-2 font-medium text-slate-500">Juego / Test</th>
-                                    <th class="text-left py-3 px-2 font-medium text-slate-500">Fecha</th>
-                                    <th class="text-right py-3 px-2 font-medium text-slate-500">Puntuación</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-sesiones" class="divide-y divide-slate-100 dark:divide-slate-700">
-
-                            </tbody>
-                        </table>
-                        <button id="ver-historial-completo"
-                            class="w-full mt-4 py-2 text-blue-500 font-bold hover:text-blue-600 transition-colors"
-                            onclick="mostrarHistorialCompleto()">
-                            Ver historial completo
-                        </button>
-
-                        <button id="ver-historial-comprimido"
-                            class="hidden w-full mt-4 py-2 text-blue-500 font-bold hover:text-blue-600 transition-colors"
-                            onclick="mostrarHistorialComprimido()">
-                            Comprimir historial
-                        </button>
                     </div>
                 </div>
 
             </div>
 
-            <!-- MÉTRICAS DETALLADAS INYECTADAS POR datosPerfil.js -->
-            <div
-                class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 mt-6">
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
-                    <div class="w-4 h-5 bg-blue-500 rounded"></div>
-                    Estadísticas según tipo de habilidad
-                </h3>
-                <div id="perfil-detallado">
+            <!-- TARJETA DE LOGRO EN PROGRESO -->
+            <div id="mision-actual"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- SECCIÓN: ÚLTIMAS SESIONES (TABLA RESPONSIVA) -->
+                <div id="ultimas-sesiones"
+                    class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-700 overflow-x-auto">
+                    <h3
+                        class="text-lg font-bold text-slate-900 dark:text-white mb-4 pb-2 border-b-2 border-blue-500 inline-block">
+                        Últimas sesiones</h3>
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-100 dark:border-slate-700">
+                                <th class="text-left py-3 px-2 font-medium text-slate-500">Juego / Test</th>
+                                <th class="text-left py-3 px-2 font-medium text-slate-500">Fecha</th>
+                                <th class="text-right py-3 px-2 font-medium text-slate-500">Puntuación</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-sesiones" class="divide-y divide-slate-100 dark:divide-slate-700">
+
+                        </tbody>
+                    </table>
+                    <button id="ver-historial-completo"
+                        class="w-full mt-4 py-2 text-blue-500 font-bold hover:text-blue-600 transition-colors"
+                        onclick="mostrarHistorialCompleto()">
+                        Ver historial completo
+                    </button>
+
+                    <button id="ver-historial-comprimido"
+                        class="hidden w-full mt-4 py-2 text-blue-500 font-bold hover:text-blue-600 transition-colors"
+                        onclick="mostrarHistorialComprimido()">
+                        Comprimir historial
+                    </button>
                 </div>
+
+
+                <!-- MÉTRICAS DETALLADAS INYECTADAS POR datosPerfil.js -->
+                <div
+                    class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-700 overflow-x-auto">
+                    <h3
+                        class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4 pb-2 border-b-2 border-blue-500">
+                        Estadísticas según tipo de habilidad
+                    </h3>
+                    <div id="perfil-detallado">
+                    </div>
+                </div>
+
+
             </div>
+
 
         </div>
 
@@ -566,7 +562,7 @@
 
     <script src="/js/catalogoTests.js"></script>
     <script src="/js/testsRecomendados.js"></script>
-
+    <script src="/js/logros.js"></script>
 
     <script>
         // Inicializar coach en pantalla de perfil
@@ -630,15 +626,16 @@
             }
 
             //Racha
-            const racha = actualizarRacha();
-            const spanRacha = document.getElementById("perfil-racha");
+            const racha = actualizarRachaTotal();
+            const spanRacha = document.getElementById("perfil-racha-total");
 
             if (spanRacha) {
                 spanRacha.textContent = racha;
             }
 
 
-            renderTests();
+            renderTestsRecomendados();
+            actualizarLogrosYMedallas();
         });
     </script>
 

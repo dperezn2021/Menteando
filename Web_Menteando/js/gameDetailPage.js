@@ -1,16 +1,25 @@
 function getSkillToneClasses(skillSlug) {
     const accent = window.getSkillDefinition?.(skillSlug)?.accent || "blue";
     const badgeMap = {
-        blue: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-        sky: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
-        cyan: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
-        green: "bg-green-500/10 text-green-600 dark:text-green-400",
-        indigo: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
+        // 🟣 ATENCIÓN (morados)
         violet: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+        purple: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
         fuchsia: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400",
+
+        // 🟢 MEMORIA (verdes)
+        green: "bg-green-500/10 text-green-600 dark:text-green-400",
+        emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+
+        // 🔴 VELOCIDAD / REFLEJOS
+        red: "bg-red-500/10 text-red-600 dark:text-red-400",
+        rose: "bg-rose-200/10 text-rose-500 dark:text-rose-400",
+
+        // 🟠 CONTROL EJECUTIVO
+        orange: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
         amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-        emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+        yellow: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
     };
+
 
     return badgeMap[accent] || badgeMap.blue;
 }
@@ -42,18 +51,27 @@ function renderGameDetailPage(gameId) {
 
     const skillColorClasses = juego.skills.map((skillSlug) => {
         const accent = window.getSkillDefinition?.(skillSlug)?.accent || "blue";
-        const colorMap = {
-            blue: "bg-blue-500",
-            sky: "bg-sky-500",
-            cyan: "bg-cyan-500",
-            green: "bg-green-500",
-            indigo: "bg-indigo-500",
+        const badgeMap = {
+            // 🟣 ATENCIÓN (morados)
             violet: "bg-violet-500",
+            purple: "bg-purple-500",
             fuchsia: "bg-fuchsia-500",
+
+            // 🟢 MEMORIA (verdes)
+            green: "bg-green-500",
+            emerald: "bg-emerald-500",
+
+            // 🔴 VELOCIDAD / REFLEJOS
+            red: "bg-red-500",
+            rose: "bg-rose-400",
+
+            // 🟠 CONTROL EJECUTIVO
+            orange: "bg-orange-500",
             amber: "bg-amber-500",
-            emerald: "bg-emerald-500"
+            yellow: "bg-yellow-500"
         };
-        return colorMap[accent] || colorMap.blue;
+
+        return badgeMap[accent];
     });
 
     const howToPlay = (juego.comoJugar || []).map((step, index) => `
@@ -73,8 +91,8 @@ function renderGameDetailPage(gameId) {
         </li>
     `).join("");
 
-    
-    
+
+
 
     content.innerHTML = `
         <section class="max-w-7xl mx-auto py-8 lg:py-10">
@@ -86,7 +104,7 @@ function renderGameDetailPage(gameId) {
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
                         <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                             <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
-                            WebGL disponible
+                            Disponible
                         </span>
                         <a href="${juego.buildUrl.split("/").pop()}" class="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold hover:bg-blue-500 dark:hover:bg-blue-500 dark:hover:text-white transition-colors">
                             Abrir en pantalla completa

@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Menteando - Rosco">
-    <meta name="keywords" content="menteando, rosco, atencion selectiva, reflejos">
+    <meta name="description" content="Menteando - Detectar Intruso">
+    <meta name="keywords" content="menteando, detectar intruso, atencion selectiva, reflejos">
     <meta name="author" content="Daniel Perez Navarro">
-    <title>Menteando | Rosco</title>
+    <title>Menteando | Detectar Intruso</title>
     <link rel="icon" href="../../assets/img/logo.png" type="image/png" sizes="32x32">
     <link rel="stylesheet" href="../../css/unity-clean.css">
 
@@ -49,15 +49,15 @@
     <header id="standalone-header" class="hidden w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
         <div class="container mx-auto px-6 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3 flex-shrink-0">
-                <img src="../../assets/juegos/rosco.png" alt="Logo Rosco" class="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover" />
+                <img src="../../assets/juegos/detector-intrusos.png" alt="Logo Intruso" class="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover" />
                 <div class="flex flex-col leading-tight text-left">
-                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Rosco</h1>
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Detectar Intruso</h1>
                     <p class="text-xs md:text-sm font-normal text-slate-500 dark:text-slate-300">Modo juego completo</p>
                 </div>
             </div>
 
             <nav class="flex flex-row items-center justify-center gap-2 md:gap-3">
-                <a href="rosco-page.html" class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 hover:text-blue-500 transition-colors">Volver a la ficha</a>
+                <a href="detector-intrusos-page.html" class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 hover:text-blue-500 transition-colors">Volver a la ficha</a>
                 <a href="../../games.html" class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 hover:text-blue-500 transition-colors">Catalogo</a>
             </nav>
 
@@ -73,7 +73,7 @@
         </div>
     </header>
 
-    <main id="unity-main" class="min-h-screen flex items-center justify-center p-4 sm:p-6 box-border">
+    <main id="unity-main" class="min-h-screen bg-white dark:bg-slate-900 flex items-center justify-center p-4 sm:p-6 box-border">
         <div id="unity-container">
             <canvas id="unity-canvas" tabindex="-1"></canvas>
         </div>
@@ -89,8 +89,8 @@
         const headerAvatar = document.getElementById('perfil-avatar-header');
         const headerApodo = document.getElementById('perfil-apodo-header');
 
-        if (perfil?.avatar && headerAvatar) headerAvatar.src = perfil.avatar.replace("../", "../../../");
         if (perfil?.apodo && headerApodo) headerApodo.textContent = perfil.apodo;
+        if (perfil?.avatar && headerAvatar) headerAvatar.src = perfil.avatar.replace("../", "../../../");
 
         const syncThemeButton = () => {
             const isDark = root.classList.contains('dark');
@@ -117,15 +117,15 @@
 
         const canvas = document.querySelector('#unity-canvas');
         const buildUrl = 'Build';
-        const loaderUrl = buildUrl + '/rosco.loader.js';
+        const loaderUrl = buildUrl + '/detector-intrusos.loader.js';
 
         const config = {
-            dataUrl: buildUrl + '/rosco.data',
-            frameworkUrl: buildUrl + '/rosco.framework.js',
-            codeUrl: buildUrl + '/rosco.wasm',
+            dataUrl: buildUrl + '/detector-intrusos.data',
+            frameworkUrl: buildUrl + '/detector-intrusos.framework.js',
+            codeUrl: buildUrl + '/detector-intrusos.wasm',
             streamingAssetsUrl: 'StreamingAssets',
             companyName: 'Menteando',
-            productName: 'Rosco',
+            productName: 'Detectar Intruso',
             productVersion: '1.0',
             showBanner: () => {},
             matchWebGLToCanvasSize: false

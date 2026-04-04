@@ -59,6 +59,9 @@ function mostrarHistorialCompleto() {
 
         tbody.appendChild(tr);
     });
+    const tablaSection = document.getElementById("ultimas-sesiones");
+    if (tablaSection) tablaSection.scrollIntoView({ behavior: "smooth" });
+
 }
 
 function mostrarHistorialComprimido() {
@@ -86,7 +89,9 @@ function mostrarHistorialComprimido() {
         tbody.appendChild(tr);
 
     });
-    onclick = () => { window.location.href = `#` };
+    const resumenSection = document.getElementById("mision-activa");
+    if (resumenSection) resumenSection.scrollIntoView({ behavior: "smooth" });
+
 }
 
 function formatearFecha(fechaISO) {
@@ -94,6 +99,7 @@ function formatearFecha(fechaISO) {
     return fecha.toLocaleString("es-ES", {
         day: "2-digit",
         month: "short",
+        year: "2-digit",
         hour: "2-digit",
         minute: "2-digit"
     });

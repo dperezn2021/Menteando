@@ -1,8 +1,15 @@
 const TEST_CATEGORY_STYLES = {
-    atencion: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-    memoria: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
-    control: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
-    reflejos: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+    // 🟣 ATENCIÓN
+    atencion: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+
+    // 🟢 MEMORIA
+    memoria: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+
+    // 🟠 CONTROL EJECUTIVO
+    control: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+
+    // 🔴 REFLEJOS / VELOCIDAD
+    reflejos: "bg-red-500/10 text-red-600 dark:text-red-400"
 };
 
 function getTestsCatalog() {
@@ -25,7 +32,7 @@ function createTestCard(test) {
             <div class="p-6 flex flex-col gap-4">
                 <div class="flex flex-wrap items-center gap-3">
                     <span class="px-3 py-1 text-sm font-bold uppercase rounded-full ${getTestBadgeClasses(test.categoria)}">
-                        ${test.habilidad}
+                        ${test.categoria}
                     </span>
                     <span class="text-sm font-semibold text-slate-500 dark:text-slate-300">${test.duracion}</span>
                 </div>

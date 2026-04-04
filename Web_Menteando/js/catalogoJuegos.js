@@ -1,53 +1,60 @@
 ﻿const SKILL_DEFINITIONS = {
+    // 🟣 ATENCIÓN (morados)
     atencion_sostenida: {
         metricKey: "atencionSostenida",
-        label: "Atencion sostenida",
-        accent: "blue"
+        label: "Atención sostenida",
+        accent: "violet"
     },
     atencion_selectiva: {
         metricKey: "atencionSelectiva",
-        label: "Atencion selectiva",
-        accent: "sky"
+        label: "Atención selectiva",
+        accent: "purple"
     },
     atencion_dividida: {
         metricKey: "atencionDividida",
-        label: "Atencion dividida",
-        accent: "cyan"
+        label: "Atención dividida",
+        accent: "fuchsia"
     },
-    velocidad_cognitiva: {
-        metricKey: "velocidadCognitiva",
-        label: "Velocidad cognitiva",
-        accent: "green"
-    },
+
+    // 🟢 MEMORIA (verdes)
     memoria_trabajo: {
         metricKey: "memoriaTrabajo",
         label: "Memoria de trabajo",
-        accent: "indigo"
+        accent: "green"
     },
     memoria_espacial: {
         metricKey: "memoriaEspacial",
         label: "Memoria espacial",
-        accent: "blue"
+        accent: "emerald"
     },
+
+    // 🔴 VELOCIDAD / REFLEJOS (rojos)
+    velocidad_cognitiva: {
+        metricKey: "velocidadCognitiva",
+        label: "Velocidad cognitiva",
+        accent: "red"
+    },
+    coordinacion_visomotora: {
+        metricKey: "coordinacionVisomotora",
+        label: "Coordinación visomotora",
+        accent: "rose"
+    },
+
+    // 🟠 CONTROL EJECUTIVO (naranjas)
     control_inhibitorio: {
         metricKey: "controlInhibitorio",
         label: "Control inhibitorio",
-        accent: "violet"
+        accent: "orange"
     },
     flexibilidad_cognitiva: {
         metricKey: "flexibilidadCognitiva",
         label: "Flexibilidad cognitiva",
-        accent: "fuchsia"
+        accent: "amber"
     },
     planificacion: {
         metricKey: "planificacion",
-        label: "Planificacion",
-        accent: "amber"
-    },
-    coordinacion_visomotora: {
-        metricKey: "coordinacionVisomotora",
-        label: "Coordinacion visomotora",
-        accent: "emerald"
+        label: "Planificación",
+        accent: "yellow"
     }
 };
 
@@ -55,239 +62,477 @@
 
 const CATALOGO_JUEGOS = [
     {
-        id: "mates-express",
-        aliases: ["math", "mates express"],
-        nombre: "Mates Express",
-        categoria: "atencion",
-        subtitulo: "Ficha del juego",
-        descripcion: "Arrastra el simbolo correcto para completar la operacion antes de que acabe el tiempo.",
-        detalleDescripcion: "Mates Express esta pensado para obligarte a mantener operaciones y opciones en mente mientras tomas decisiones rapidas. Cuanto mas avanzas, mas exige tu memoria activa y tu control del error.",
-        comoJugar: [
-            "Lee la operacion que aparece en pantalla.",
-            "Calcula mentalmente el resultado sin perder tiempo.",
-            "Selecciona la respuesta correcta antes de que termine la ronda.",
-            "Gestiona la dificultad creciente manteniendo precision y ritmo."
+        "id": "detector-intrusos",
+        "aliases": ["intrusos", "detector", "odd-one-out"],
+        "nombre": "Detector de Intrusos",
+        "categoria": "atencion",
+        "subtitulo": "Ficha del juego",
+        "descripcion": "Encuentra el cuadrado diferente entre una cuadrícula que aumenta en tamaño y dificultad.",
+        "detalleDescripcion": "Detector de Intrusos entrena tu capacidad para discriminar estímulos relevantes entre distractores visuales. A medida que la cuadrícula crece, exige mayor precisión, velocidad y control visomotor.",
+        "comoJugar": [
+            "Observa la cuadrícula de figuras.",
+            "Localiza el estímulo que no coincide con los demás.",
+            "Tócalo lo más rápido posible.",
+            "Supera niveles cada vez más complejos."
         ],
-        habilidadesDetalle: [
+        "habilidadesDetalle": [
             {
-                nombre: "Memoria de trabajo",
-                descripcion: "Retienes numeros y operaciones intermedias mientras decides la respuesta."
+                "nombre": "Atención selectiva",
+                "descripcion": "Detectas el estímulo intruso entre distractores visuales."
             },
             {
-                nombre: "Velocidad cognitiva",
-                descripcion: "Procesas informacion numerica con agilidad bajo presion temporal."
+                "nombre": "Atención dividida",
+                "descripcion": "Gestionas simultáneamente color, forma y posición."
             },
             {
-                nombre: "Control inhibitorio",
-                descripcion: "Evitas respuestas impulsivas cuando aparecen opciones muy parecidas."
+                "nombre": "Velocidad cognitiva",
+                "descripcion": "Procesas la cuadrícula rápidamente para responder a tiempo."
             },
             {
-                nombre: "Coordinacion visomotora",
-                descripcion: "Transformas el calculo mental en una seleccion precisa y rapida."
+                "nombre": "Coordinación visomotora",
+                "descripcion": "Transformas la percepción visual en una pulsación precisa."
             }
         ],
-        url: "games/mates-express/mates-express-page.html",
-        buildUrl: "games/mates-express/mates-express-build.html",
-        imagen: "assets/juegos/mates-express.png",
-        logo: "assets/juegos/mates-express.png",
-        heroEyebrow: "Entrenamiento destacado",
-        destacado: true,
-        skills: [
-            "atencion_sostenida",
+        "url": "games/detector-intrusos/detector-intrusos-page.html",
+        "buildUrl": "games/detector-intrusos/detector-intrusos-build.html",
+        "imagen": "assets/juegos/detector-intrusos.png",
+        "logo": "assets/juegos/detector-intrusos.png",
+        "heroEyebrow": "Entrenamiento visual rápido",
+        "destacado": false,
+        "skills": [
+            "atencion_selectiva",
+            "atencion_dividida",
             "velocidad_cognitiva",
+            "coordinacion_visomotora"
+        ]
+    },
+
+    {
+        "id": "doble-canal",
+        "aliases": ["dual-task", "doble tarea"],
+        "nombre": "Doble Canal",
+        "categoria": "atencion",
+        "subtitulo": "Ficha del juego",
+        "descripcion": "Gestiona dos tareas simultáneas: esquivar obstáculos y responder a estímulos.",
+        "detalleDescripcion": "Doble Canal entrena tu capacidad de dividir la atención entre dos flujos de información. Requiere mantener el foco, inhibir errores y coordinar acciones rápidas.",
+        "comoJugar": [
+            "Controla al personaje del lado izquierdo para esquivar obstáculos.",
+            "Responde a los estímulos del lado derecho según la regla.",
+            "Mantén el rendimiento en ambos canales.",
+            "Gestiona la interferencia entre tareas."
+        ],
+        "habilidadesDetalle": [
+            {
+                "nombre": "Atención dividida",
+                "descripcion": "Gestionas dos tareas simultáneas sin perder precisión."
+            },
+            {
+                "nombre": "Atención sostenida",
+                "descripcion": "Mantienes el rendimiento en ambos canales durante toda la partida."
+            },
+            {
+                "nombre": "Flexibilidad cognitiva",
+                "descripcion": "Cambias rápidamente entre estímulos y acciones."
+            },
+            {
+                "nombre": "Planificación",
+                "descripcion": "Anticipas movimientos y respuestas en paralelo."
+            },
+            {
+                "nombre": "Velocidad cognitiva",
+                "descripcion": "Procesas información de dos fuentes a gran velocidad."
+            },
+            {
+                "nombre": "Coordinación visomotora",
+                "descripcion": "Controlas el movimiento del personaje con precisión."
+            }
+        ],
+        "url": "games/doble-canal/doble-canal-page.html",
+        "buildUrl": "games/doble-canal/doble-canal-build.html",
+        "imagen": "assets/juegos/doble-canal.png",
+        "logo": "assets/juegos/doble-canal.png",
+        "heroEyebrow": "Atención dual",
+        "destacado": false,
+        "skills": [
+            "atencion_dividida",
+            "atencion_sostenida",
+            "flexibilidad_cognitiva",
+            "planificacion",
+            "velocidad_cognitiva",
+            "coordinacion_visomotora"
+        ]
+    },
+    {
+        "id": "silencio-mental",
+        "aliases": ["cpt", "go-nogo"],
+        "nombre": "Silencio Mental",
+        "categoria": "atencion",
+        "subtitulo": "Ficha del juego",
+        "descripcion": "Pulsar solo cuando aparece el estímulo objetivo. Inhibir el resto.",
+        "detalleDescripcion": "Silencio Mental es un CPT/Go-NoGo puro que entrena vigilancia, inhibición y discriminación rápida. Mantener la regla activa exige memoria de trabajo.",
+        "comoJugar": [
+            "Observa los estímulos que aparecen en pantalla.",
+            "Pulsa solo cuando aparezca el objetivo.",
+            "Inhibe la respuesta ante distractores.",
+            "Mantén la precisión durante toda la sesión."
+        ],
+        "habilidadesDetalle": [
+            {
+                "nombre": "Atención selectiva",
+                "descripcion": "Distingues estímulos relevantes de distractores."
+            },
+            {
+                "nombre": "Atención sostenida",
+                "descripcion": "Mantienes la vigilancia durante toda la tarea."
+            },
+            {
+                "nombre": "Memoria de trabajo",
+                "descripcion": "Mantienes activa la regla de respuesta."
+            },
+            {
+                "nombre": "Control inhibitorio",
+                "descripcion": "Evitas pulsar cuando aparece un estímulo no objetivo."
+            }
+        ],
+        "url": "games/silencio-mental/silencio-mental-page.html",
+        "buildUrl": "games/silencio-mental/silencio-mental-build.html",
+        "imagen": "assets/juegos/silencio-mental.png",
+        "logo": "assets/juegos/silencio-mental.png",
+        "heroEyebrow": "Control inhibitorio",
+        "destacado": false,
+        "skills": [
+            "atencion_sostenida",
+            "atencion_selectiva",
+            "memoria_trabajo",
+            "control_inhibitorio"
+        ]
+    },
+    {
+        "id": "math",
+        "aliases": ["math-chain", "operaciones"],
+        "nombre": "Operaciones Encadenadas",
+        "categoria": "memoria",
+        "subtitulo": "Ficha del juego",
+        "descripcion": "Resuelve operaciones donde el resultado anterior se usa en la siguiente.",
+        "detalleDescripcion": "Este juego entrena la actualización continua de información, la planificación de pasos y la discriminación rápida de símbolos.",
+        "comoJugar": [
+            "Lee la operación actual.",
+            "Calcula mentalmente el resultado.",
+            "Úsalo para resolver la siguiente operación.",
+            "Mantén precisión y ritmo."
+        ],
+        "habilidadesDetalle": [
+            {
+                "nombre": "Memoria de trabajo",
+                "descripcion": "Mantienes y actualizas resultados intermedios."
+            },
+            {
+                "nombre": "Control inhibitorio",
+                "descripcion": "Evitas errores impulsivos ante opciones similares."
+            },
+            {
+                "nombre": "Planificación",
+                "descripcion": "Anticipas los pasos necesarios para resolver la cadena."
+            },
+            {
+                "nombre": "Velocidad cognitiva",
+                "descripcion": "Procesas operaciones rápidamente bajo presión."
+            },
+            {
+                "nombre": "Atención selectiva",
+                "descripcion": "Distingues símbolos relevantes de distractores."
+            }
+        ],
+        "url": "games/operaciones-encadenadas/operaciones-encadenadas-page.html",
+        "buildUrl": "games/operaciones-encadenadas/operaciones-encadenadas-build.html",
+        "imagen": "assets/juegos/operaciones-encadenadas.png",
+        "logo": "assets/juegos/operaciones-encadenadas.png",
+        "heroEyebrow": "Memoria activa",
+        "destacado": false,
+        "skills": [
             "memoria_trabajo",
             "control_inhibitorio",
-            "coordinacion_visomotora"
-        ]
-    },
-    {
-        id: "rosco",
-        aliases: ["rosco"],
-        nombre: "Rosco",
-        categoria: "control",
-        subtitulo: "Ficha del juego",
-        descripcion: "Encuentra letras en orden entre distractores y acelera tu velocidad de procesamiento.",
-        detalleDescripcion: "Rosco entrena la deteccion rapida de posiciones y la respuesta visual precisa. El reto no es solo ver la opcion correcta, sino hacerlo con velocidad mantenida y sin dejarte llevar por impulsos.",
-        comoJugar: [
-            "Observa la disposicion de las esferas o marcadores en pantalla.",
-            "Localiza rapidamente la posicion objetivo.",
-            "Haz clic con precision antes de que cambie el patron.",
-            "Manten el rendimiento cuando aumente la velocidad de las rondas."
-        ],
-        habilidadesDetalle: [
-            {
-                nombre: "Atencion selectiva",
-                descripcion: "Fijas el foco en la posicion correcta ignorando el resto de referencias."
-            },
-            {
-                nombre: "Velocidad cognitiva",
-                descripcion: "Procesas la informacion espacial con rapidez para responder sin retrasos."
-            },
-            {
-                nombre: "Control inhibitorio",
-                descripcion: "Te ayuda a no pulsar por impulso cuando varias posiciones compiten entre si."
-            },
-            {
-                nombre: "Coordinacion visomotora",
-                descripcion: "Combinas localizacion visual y movimiento exacto de forma sincronizada."
-            }
-        ],
-        url: "games/rosco/rosco-page.html",
-        buildUrl: "games/rosco/rosco-build.html",
-        imagen: "assets/juegos/rosco.png",
-        logo: "assets/juegos/rosco.png",
-        heroEyebrow: "Recomendado hoy",
-        destacado: true,
-        skills: [
-            "atencion_selectiva",
-            "velocidad_cognitiva",
-            "control_inhibitorio",
-            "coordinacion_visomotora"
-        ]
-    },
-    {
-        id: "detectar-intruso",
-        aliases: ["detector de intrusos", "detectar intruso", "detectar intrusos"],
-        nombre: "Detectar Intruso",
-        categoria: "atencion",
-        subtitulo: "Ficha del juego",
-        descripcion: "Identifica el elemento incorrecto entre distractores y responde con precision.",
-        detalleDescripcion: "El objetivo es identificar rapidamente el elemento que rompe la categoria comun del grupo. A medida que avanzas, las relaciones entre objetos son mas sutiles y la toma de decisiones debe ser cada vez mas precisa.",
-        comoJugar: [
-            "Observa el conjunto de elementos que aparece en pantalla.",
-            "Identifica la categoria comun entre los estimulos.",
-            "Haz clic sobre el elemento que no encaja con el resto.",
-        ],
-        habilidadesDetalle: [
-            {
-                nombre: "Atencion selectiva",
-                descripcion: "Filtras estimulos irrelevantes para quedarte con la pista importante."
-            },
-            {
-                nombre: "Control inhibitorio",
-                descripcion: "Evitas respuestas impulsivas ante distractores muy parecidos."
-            },
-            {
-                nombre: "Velocidad cognitiva",
-                descripcion: "Procesas rapidamente la informacion visual para responder a tiempo."
-            },
-            {
-                nombre: "Coordinacion visomotora",
-                descripcion: "Transformas lo que ves en una accion correcta de forma inmediata."
-            }
-        ],
-        url: "games/detectar-intruso/detectar-intruso-page.html",
-        buildUrl: "games/detectar-intruso/detectar-intruso-build.html",
-        imagen: "assets/juegos/detectar-intruso.png",
-        logo: "assets/juegos/detectar-intruso.png",
-        heroEyebrow: "Juego recomendado",
-        destacado: true,
-        skills: [
-            "atencion_selectiva",
-            "control_inhibitorio",
-            "velocidad_cognitiva",
-            "coordinacion_visomotora"
-        ]
-    },
-    {
-        id: "prueba1",
-        nombre: "Juego de prueba 1",
-        categoria: "reflejos",
-        subtitulo: "Ficha del juego",
-        descripcion: "Descripcion breve del juego de prueba 1.",
-        detalleDescripcion: "Descripcion detallada del juego de prueba 1, explicando su objetivo y mecÃ¡nicas principales.",
-        comoJugar: [
-            "Paso 1 para jugar al juego de prueba 1.",
-            "Paso 2 para jugar al juego de prueba 1.",
-            "Paso 3 para jugar al juego de prueba 1."
-        ],
-        habilidadesDetalle: [
-            {
-                nombre: "Habilidad A",
-                descripcion: "Descripcion de la habilidad A entrenada por el juego de prueba 1."
-            },
-            {
-                nombre: "Habilidad B",
-                descripcion: "Descripcion de la habilidad B entrenada por el juego de prueba 1."
-            }
-        ],
-        url: "games/prueba1/prueba1-page.html",
-        buildUrl: "games/prueba1/prueba1-build.html",
-        imagen: "assets/juegos/prueba1.png",
-        logo: "assets/juegos/prueba1.png",
-        heroEyebrow: "Nuevo juego",
-        destacado: false,
-        skills: [
             "planificacion",
-            "velocidad_cognitiva"
+            "velocidad_cognitiva",
+            "atencion_selectiva"
         ]
     },
     {
-        id: "prueba2",
-        nombre: "Juego de prueba 2",
-        categoria: "atencion",
-        subtitulo: "Ficha del juego",
-        descripcion: "Descripcion breve del juego de prueba 2.",
-        detalleDescripcion: "Descripcion detallada del juego de prueba 2, explicando su objetivo y mecÃ¡nicas principales.",
-        comoJugar: [
-            "Paso 1 para jugar al juego de prueba 2.",
-            "Paso 2 para jugar al juego de prueba 2.",
-            "Paso 3 para jugar al juego de prueba 2."
+        "id": "eco-visual",
+        "aliases": ["corsi-visual", "memoria-espacial"],
+        "nombre": "Eco Visual",
+        "categoria": "memoria",
+        "subtitulo": "Ficha del juego",
+        "descripcion": "Memoriza la posición de varios objetos y colócalos después en su sitio.",
+        "detalleDescripcion": "Eco Visual es un Corsi adaptado que entrena memoria espacial, atención selectiva y reorganización mental.",
+        "comoJugar": [
+            "Observa la posición de los objetos.",
+            "Memoriza su distribución.",
+            "Arrástralos a su lugar correcto.",
+            "Completa niveles cada vez más complejos."
         ],
-        habilidadesDetalle: [
+        "habilidadesDetalle": [
             {
-                nombre: "Habilidad A",
-                descripcion: "Descripcion de la habilidad A entrenada por el juego de prueba 2."
+                "nombre": "Memoria espacial",
+                "descripcion": "Retienes la ubicación de varios objetos simultáneamente."
             },
             {
-                nombre: "Habilidad B",
-                descripcion: "Descripcion de la habilidad B entrenada por el juego de prueba 2."
+                "nombre": "Atención selectiva",
+                "descripcion": "Distingues formas y posiciones relevantes."
+            },
+            {
+                "nombre": "Atención sostenida",
+                "descripcion": "Mantienes el foco durante la reconstrucción."
+            },
+            {
+                "nombre": "Flexibilidad cognitiva",
+                "descripcion": "Reorganizas mentalmente la escena cuando es necesario."
             }
         ],
-        url: "games/prueba2/prueba2-page.html",
-        buildUrl: "games/prueba2/prueba2-build.html",
-        imagen: "assets/juegos/prueba2.png",
-        logo: "assets/juegos/prueba2.png",
-        heroEyebrow: "Nuevo juego",
-        destacado: false,
-        skills: [
-            "atencion_dividida",
+        "url": "games/eco-visual/eco-visual-page.html",
+        "buildUrl": "games/eco-visual/eco-visual-build.html",
+        "imagen": "assets/juegos/eco-visual.png",
+        "logo": "assets/juegos/eco-visual.png",
+        "heroEyebrow": "Memoria espacial",
+        "destacado": false,
+        "skills": [
+            "memoria_espacial",
+            "atencion_selectiva",
+            "atencion_sostenida",
             "flexibilidad_cognitiva"
         ]
     },
     {
-        id: "prueba3",
-        nombre: "Juego de prueba 3",
-        categoria: "memoria",
-        subtitulo: "Ficha del juego",
-        descripcion: "Descripcion breve del juego de prueba 3.",
-        detalleDescripcion: "Descripcion detallada del juego de prueba 3, explicando su objetivo y mecÃ¡nicas principales.",
-        comoJugar: [
-            "Paso 1 para jugar al juego de prueba 3.",
-            "Paso 2 para jugar al juego de prueba 3.",
-            "Paso 3 para jugar al juego de prueba 3."
+        "id": "color-match",
+        "aliases": ["stroop", "colores"],
+        "nombre": "Color Match",
+        "categoria": "control",
+        "subtitulo": "Ficha del juego",
+        "descripcion": "Pulsa el color correcto ignorando la palabra escrita.",
+        "detalleDescripcion": "Color Match es un Stroop digital que entrena inhibición, velocidad y gestión de interferencias.",
+        "comoJugar": [
+            "Lee la palabra que aparece.",
+            "Ignora su significado.",
+            "Pulsa el color real del texto.",
+            "Evita caer en la interferencia."
         ],
-        habilidadesDetalle: [
+        "habilidadesDetalle": [
             {
-                nombre: "Habilidad A",
-                descripcion: "Descripcion de la habilidad A entrenada por el juego de prueba 3."
+                "nombre": "Control inhibitorio",
+                "descripcion": "Bloqueas la lectura automática de la palabra."
             },
             {
-                nombre: "Habilidad B",
-                descripcion: "Descripcion de la habilidad B entrenada por el juego de prueba 3."
+                "nombre": "Velocidad cognitiva",
+                "descripcion": "Procesas el estímulo rápidamente para responder a tiempo."
+            },
+            {
+                "nombre": "Atención dividida",
+                "descripcion": "Gestionas simultáneamente color y palabra."
+            },
+            {
+                "nombre": "Memoria de trabajo",
+                "descripcion": "Mantienes activa la regla de respuesta."
             }
         ],
-        url: "games/prueba3/prueba3-page.html",
-        buildUrl: "games/prueba3/prueba3-build.html",
-        imagen: "assets/juegos/prueba3.png",
-        logo: "assets/juegos/prueba3.png",
-        heroEyebrow: "Nuevo juego",
-        destacado: false,
-        skills: [
-            "memoria_espacial",
+        "url": "games/color-match/color-match-page.html",
+        "buildUrl": "games/color-match/color-match-build.html",
+        "imagen": "assets/juegos/color-match.png",
+        "logo": "assets/juegos/color-match.png",
+        "heroEyebrow": "Control inhibitorio",
+        "destacado": false,
+        "skills": [
+            "control_inhibitorio",
+            "velocidad_cognitiva",
+            "atencion_dividida",
             "memoria_trabajo"
         ]
+    },
+    {
+        "id": "cambio-de-reglas",
+        "aliases": ["wcst-digital", "reglas"],
+        "nombre": "Cambio de Reglas",
+        "categoria": "control",
+        "subtitulo": "Ficha del juego",
+        "descripcion": "La regla cambia sin aviso. Adáptate rápidamente.",
+        "detalleDescripcion": "Este juego entrena flexibilidad cognitiva, inhibición y planificación al cambiar criterios de clasificación sin previo aviso.",
+        "comoJugar": [
+            "Lee la regla actual.",
+            "Toca los estímulos que cumplan la norma.",
+            "Adáptate cuando la regla cambie.",
+            "Evita perseverar en la regla anterior."
+        ],
+        "habilidadesDetalle": [
+            {
+                "nombre": "Flexibilidad cognitiva",
+                "descripcion": "Cambias de estrategia cuando la regla se actualiza."
+            },
+            {
+                "nombre": "Control inhibitorio",
+                "descripcion": "Evitas seguir aplicando la regla anterior."
+            },
+            {
+                "nombre": "Planificación",
+                "descripcion": "Decides qué estímulos tocar primero según la norma."
+            },
+            {
+                "nombre": "Memoria espacial",
+                "descripcion": "Recuerdas dónde están los estímulos relevantes."
+            }
+        ],
+        "url": "games/cambio-de-reglas/cambio-de-reglas-page.html",
+        "buildUrl": "games/cambio-de-reglas/cambio-de-reglas-build.html",
+        "imagen": "assets/juegos/cambio-de-reglas.png",
+        "logo": "assets/juegos/cambio-de-reglas.png",
+        "heroEyebrow": "Flexibilidad cognitiva",
+        "destacado": false,
+        "skills": [
+            "flexibilidad_cognitiva",
+            "control_inhibitorio",
+            "planificacion",
+            "memoria_espacial"
+        ]
+    },
+    {
+        "id": "trayectorias-mentales",
+        "aliases": ["tol-digital", "trayectorias"],
+        "nombre": "Trayectorias Mentales",
+        "categoria": "control",
+        "subtitulo": "Ficha del juego",
+        "descripcion": "Planifica el recorrido antes de mover el punto.",
+        "detalleDescripcion": "Un Tower of London adaptado que entrena planificación, memoria activa y representación espacial.",
+        "comoJugar": [
+            "Observa el mapa.",
+            "Elige dirección, fuerza y rebotes.",
+            "Planifica antes de ejecutar.",
+            "Optimiza tus movimientos."
+        ],
+        "habilidadesDetalle": [
+            {
+                "nombre": "Planificación",
+                "descripcion": "Organizas mentalmente los pasos antes de actuar."
+            },
+            {
+                "nombre": "Memoria de trabajo",
+                "descripcion": "Mantienes el plan activo mientras decides."
+            },
+            {
+                "nombre": "Memoria espacial",
+                "descripcion": "Representas mentalmente el mapa y los rebotes."
+            },
+            {
+                "nombre": "Atención sostenida",
+                "descripcion": "Mantienes el foco durante la planificación."
+            }
+        ],
+        "url": "games/trayectorias-mentales/trayectorias-mentales-page.html",
+        "buildUrl": "games/trayectorias-mentales/trayectorias-mentales-build.html",
+        "imagen": "assets/juegos/trayectorias-mentales.png",
+        "logo": "assets/juegos/trayectorias-mentales.png",
+        "heroEyebrow": "Planificación estratégica",
+        "destacado": false,
+        "skills": [
+            "planificacion",
+            "memoria_trabajo",
+            "memoria_espacial",
+            "atencion_sostenida"
+        ]
+    },
+    {
+        "id": "rosco-express",
+        "aliases": ["rosco", "timing"],
+        "nombre": "Rosco Express",
+        "categoria": "reflejos",
+        "subtitulo": "Ficha del juego",
+        "descripcion": "Pulsa cuando la bola roja coincide con la amarilla.",
+        "detalleDescripcion": "Rosco Express entrena sincronización temporal, velocidad de procesamiento y adaptación rápida al cambio de sentido.",
+        "comoJugar": [
+            "Observa el giro del rosco.",
+            "Pulsa justo cuando ambas bolas coincidan.",
+            "Adáptate si cambia el sentido.",
+            "Mejora tu precisión temporal."
+        ],
+        "habilidadesDetalle": [
+            {
+                "nombre": "Flexibilidad cognitiva",
+                "descripcion": "Te adaptas cuando el rosco cambia de sentido."
+            },
+            {
+                "nombre": "Planificación",
+                "descripcion": "Anticipas el momento exacto para pulsar."
+            },
+            {
+                "nombre": "Velocidad cognitiva",
+                "descripcion": "Procesas el movimiento rápidamente para acertar."
+            },
+            {
+                "nombre": "Coordinación visomotora",
+                "descripcion": "Sincronizas percepción y acción con precisión."
+            }
+        ],
+        "url": "games/rosco-express/rosco-express-page.html",
+        "buildUrl": "games/rosco-express/rosco-express-build.html",
+        "imagen": "assets/juegos/rosco-express.png",
+        "logo": "assets/juegos/rosco-express.png",
+        "heroEyebrow": "Sincronización temporal",
+        "destacado": false,
+        "skills": [
+            "velocidad_cognitiva",
+            "coordinacion_visomotora",
+            "flexibilidad_cognitiva",
+            "planificacion",
+        ]
+    },
+    {
+        "id": "reflejos-cruzados",
+        "aliases": ["reflejos", "cross-reflex", "cruzados"],
+        "nombre": "Reflejos Cruzados",
+        "categoria": "reflejos",
+        "subtitulo": "Ficha del juego",
+        "descripcion": "Toca los objetos verdes y esquiva los rojos. A veces cambian de comportamiento.",
+        "detalleDescripcion": "Reflejos Cruzados combina velocidad visomotora con control inhibitorio. Exige discriminar estímulos rápidamente, adaptarse a cambios inesperados y mantener precisión bajo presión.",
+        "comoJugar": [
+            "Toca los objetos verdes que caen por la pantalla.",
+            "Evita tocar los objetos rojos.",
+            "Reacciona rápido si un objeto cambia de comportamiento.",
+            "Mantén la precisión mientras aumenta la velocidad."
+        ],
+        "habilidadesDetalle": [
+            {
+                "nombre": "Atención dividida",
+                "descripcion": "Gestionas simultáneamente varios objetos en movimiento."
+            },
+            {
+                "nombre": "Memoria espacial",
+                "descripcion": "Recuerdas la trayectoria y posición de los objetos relevantes."
+            },
+            {
+                "nombre": "Control inhibitorio",
+                "descripcion": "Evitas tocar los estímulos incorrectos incluso bajo presión."
+            },
+            {
+                "nombre": "Flexibilidad cognitiva",
+                "descripcion": "Te adaptas cuando un objeto cambia su comportamiento."
+            },
+            {
+                "nombre": "Coordinación visomotora",
+                "descripcion": "Sincronizas tus movimientos con la caída de los objetos."
+            }
+        ],
+        "url": "games/reflejos-cruzados/reflejos-cruzados-page.html",
+        "buildUrl": "games/reflejos-cruzados/reflejos-cruzados-build.html",
+        "imagen": "assets/juegos/reflejos-cruzados.png",
+        "logo": "assets/juegos/reflejos-cruzados.png",
+        "heroEyebrow": "Reflejos y precisión",
+        "destacado": false,
+        "skills": [
+            "coordinacion_visomotora",
+            "atencion_dividida",
+            "memoria_espacial",
+            "control_inhibitorio",
+            "flexibilidad_cognitiva"
+        ]
     }
+
 ];
 
 function normalizeGameKey(value) {
@@ -313,6 +558,18 @@ function getJuegoById(gameId) {
         return (juego.aliases || []).some((alias) => normalizeGameKey(alias) === normalizedId);
     }) || null;
 }
+
+function getJuegosBySkills(skills) {
+    return CATALOGO_JUEGOS
+        .map(juego => ({
+            juego,
+            coincidencias: juego.skills.filter(s => skills.includes(s)).length
+        }))
+        .filter(item => item.coincidencias > 0)
+        .sort((a, b) => b.coincidencias - a.coincidencias)
+        .map(item => item.juego);
+}
+
 
 function getJuegoSkillsById(gameId) {
     const juego = getJuegoById(gameId);

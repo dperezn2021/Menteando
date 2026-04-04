@@ -12,7 +12,7 @@
     set("perfil-edad", perfil.edad);
     set("perfil-desde", new Date(perfil.desde).toLocaleDateString("es-ES", { year: "numeric", month: "long" }));
     set("perfil-correo", perfil.correo);
-    set("perfil-racha", perfil.racha);
+    set("perfil-racha-total", perfil.racha);
     set("perfil-puntos", perfil.puntos);
     set("perfil-tiempo", perfil.tiempo);
     set("perfil-sesiones", perfil.sesiones);
@@ -77,93 +77,100 @@
     animateBar("stat-control", "stat-control-text", perfil.control);
     animateBar("stat-reflejos", "stat-reflejos-text", perfil.reflejos);
 
-    // SECCIONES DETALLADAS
+    // SECCIONES DETALLADAS (mejorado)
     const detalle = perfil.detalle;
 
     const secciones = {
         Atención: [
-            ["Atención sostenida", detalle.atencionSostenida],
-            ["Atención selectiva", detalle.atencionSelectiva],
-            ["Atención dividida", detalle.atencionDividida],
+            { nombre: "Atención sostenida", clave: "atencionSostenida", descripcion: "Capacidad de mantener la atención en una tarea durante un período prolongado." },
+            { nombre: "Atención selectiva", clave: "atencionSelectiva", descripcion: "Capacidad de enfocarse en un estímulo relevante ignorando distracciones." },
+            { nombre: "Atención dividida", clave: "atencionDividida", descripcion: "Capacidad de atender a múltiples estímulos o tareas simultáneamente." }
         ],
         Memoria: [
-            ["Memoria de trabajo", detalle.memoriaTrabajo],
-            ["Memoria espacial", detalle.memoriaEspacial],
+            { nombre: "Memoria de trabajo", clave: "memoriaTrabajo", descripcion: "Capacidad de retener y manipular información temporalmente." },
+            { nombre: "Memoria espacial", clave: "memoriaEspacial", descripcion: "Capacidad de recordar la ubicación de objetos en el espacio." }
         ],
-        "Velocidad y reflejos": [
-            ["Velocidad cognitiva", detalle.velocidadCognitiva],
-            ["Coordinación visomotora", detalle.coordinacionVisomotora],
+        Control: [
+            { nombre: "Control inhibitorio", clave: "controlInhibitorio", descripcion: "Capacidad de suprimir respuestas automáticas o irrelevantes." },
+            { nombre: "Flexibilidad cognitiva", clave: "flexibilidadCognitiva", descripcion: "Capacidad de alternar entre tareas o reglas mentales." },
+            { nombre: "Planificación", clave: "planificacion", descripcion: "Capacidad de establecer pasos para alcanzar un objetivo." }
         ],
-        "Funciones ejecutivas": [
-            ["Control inhibitorio", detalle.controlInhibitorio],
-            ["Flexibilidad cognitiva", detalle.flexibilidadCognitiva],
-            ["Planificación", detalle.planificacion],
-        ],
+        Reflejos: [
+            { nombre: "Velocidad cognitiva", clave: "velocidadCognitiva", descripcion: "Rapidez para procesar información y tomar decisiones." },
+            { nombre: "Coordinación visomotora", clave: "coordinacionVisomotora", descripcion: "Coordinación entre lo que se ve y la respuesta motora." }
+        ]
     };
+
+    // Función para obtener color según el valor (0 a 1)
+    function getColorPorValor(valor) {
+        const percent = valor * 100;
+        if (percent < 20) return "bg-red-500";
+        if (percent < 40) return "bg-orange-500";
+        if (percent < 60) return "bg-yellow-500";
+        if (percent < 75) return "bg-blue-500";
+        if (percent < 90) return "bg-green-500";
+        return "bg-purple-500";
+    }
+
+    // Función para obtener texto de nivel
+    function getNivelTexto(valor) {
+        const percent = valor * 100;
+        if (percent < 20) return "Muy bajo";
+        if (percent < 40) return "Bajo";
+        if (percent < 60) return "Medio";
+        if (percent < 75) return "Alto";
+        if (percent < 90) return "Muy alto";
+        return "Excelente";
+    }
 
     const contenedor = document.getElementById("perfil-detallado");
     if (contenedor) {
         contenedor.innerHTML = "";
 
         for (let titulo in secciones) {
-            const bloque = document.createElement("section");
-            bloque.classList.add("detalle-section");
+            const bloque = document.createElement("div");
+            bloque.className = "mb-8"; // margen inferior entre secciones
 
-            let html = `<div class="detalle-title">${titulo}</div>`;
+            // Título de la sección con estilo mejorado
+            bloque.innerHTML = `
+            <h4 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4">
+                ${titulo}
+            </h4>
+        `;
 
-            secciones[titulo].forEach(([nombre, valor]) => {
+            // Grid de tarjetas (2 columnas en móvil, 3 en pantallas grandes)
+            const grid = document.createElement("div");
+            grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4";
+
+            secciones[titulo].forEach(item => {
+                const valor = detalle[item.clave] || 0;
                 const percent = (valor * 100).toFixed(0);
+                const colorBarra = getColorPorValor(valor);
+                const nivelTexto = getNivelTexto(valor);
 
-                html += `
-                <div class="detalle-card">
-                    <div class="detalle-icon">⚡</div>
-                    <div class="detalle-info mt-6">
-                        <div class="detalle-nombre">${nombre}</div>
-                        <div class="detalle-valor">${percent}%</div>
-                    </div>
+                // Crear tarjeta
+                const tarjeta = document.createElement("div");
+                tarjeta.className = "bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200 group";
+                tarjeta.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <div class="font-semibold text-slate-700 dark:text-slate-200">${item.nombre}</div>
+                    <div class="text-sm font-bold ${colorBarra.replace('bg-', 'text-')}">${percent}%</div>
                 </div>
-                `;
+                <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mb-3">
+                    <div class="${colorBarra} h-2.5 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+                </div>
+                <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <span class="capitalize">${nivelTexto}</span>
+                    <span class="cursor-help" title="${item.descripcion}">ⓘ</span>
+                </div>
+            `;
+                grid.appendChild(tarjeta);
             });
 
-            bloque.innerHTML = html;
+            bloque.appendChild(grid);
             contenedor.appendChild(bloque);
         }
     }
-
-    // Consejos personalizados
-    let consejo = "¡Sigue jugando para mejorar tu perfil cognitivo!";
-    if (perfil.atencion < 0.3)
-        consejo = "Tu atención es baja. Prueba juegos de atención sostenida.";
-    else if (perfil.memoria < 0.3)
-        consejo =
-            "Tu memoria necesita refuerzo. Prueba juegos de memoria de trabajo.";
-    else if (perfil.control < 0.3)
-        consejo =
-            "Tu control inhibitorio puede mejorar. Prueba juegos tipo Stroop.";
-    else if (perfil.reflejos < 0.3)
-        consejo =
-            "Tus reflejos están por debajo de la media. Prueba juegos de reacción.";
-
-    set("perfil-consejos", consejo);
-
-    // Tests recomendados
-    const tests = document.getElementById("perfil-tests");
-    if (tests) {
-        tests.innerHTML = "";
-
-        if (perfil.atencion < 0.4)
-            tests.innerHTML += "<li>Test de atención sostenida (TOVA)</li>";
-        if (perfil.memoria < 0.4)
-            tests.innerHTML += "<li>Test de memoria de trabajo (Digit Span)</li>";
-        if (perfil.control < 0.4)
-            tests.innerHTML += "<li>Test de inhibición (Go/No-Go)</li>";
-        if (perfil.reflejos < 0.4)
-            tests.innerHTML += "<li>Test de velocidad de reacción simple</li>";
-
-        if (tests.innerHTML === "")
-            tests.innerHTML = "<li>No necesitas tests adicionales por ahora.</li>";
-    }
-
     // === Pintar etiquetas de días ===
     set("hoy", formatDay(0));
     set("hace-1-dia", formatDay(1));
@@ -173,9 +180,9 @@
     set("hace-5-dias", formatDay(5));
     set("hace-6-dias", formatDay(6));
 
-    set("maxima-racha", calcularRachaMaxima(perfil.sesionesDiarias));
-    set("media-racha", calcularRachaMedia(perfil.sesionesDiarias));
-    set("minima-racha", calcularRachaMinima(perfil.sesionesDiarias));
+    set("maxima-racha-diaria", calcularRachaDiariaMaxima(perfil.sesionesDiarias));
+    set("media-racha-diaria", calcularRachaDiariaMedia(perfil.sesionesDiarias));
+    set("minima-racha-diaria", calcularRachaDiariaMinima(perfil.sesionesDiarias));
 
     // === Pintar gráfica ===
     const diasJugados = getDiasJugadosSemana(perfil);
@@ -206,11 +213,11 @@
         }).join("");
     }
 
-    function calcularRachaMaxima(sesionesDiarias) {
+    function calcularRachaDiariaMaxima(sesionesDiarias) {
         return Math.max(...sesionesDiarias);
     }
 
-    function calcularRachaMedia(sesionesDiarias) {
+    function calcularRachaDiariaMedia(sesionesDiarias) {
         const max = Math.max(...sesionesDiarias);
         const min = Math.min(...sesionesDiarias);
         const sum = max + min;
@@ -224,9 +231,13 @@
 
     }
 
-    function calcularRachaMinima(sesionesDiarias) {
+    function calcularRachaDiariaMinima(sesionesDiarias) {
         return Math.min(...sesionesDiarias);
     }
+
+
+
+
 
     // === MODAL DEL PERFIL ===
     const modal = document.getElementById("modal-editar");
