@@ -13,7 +13,7 @@
     set("perfil-desde", new Date(perfil.desde).toLocaleDateString("es-ES", { year: "numeric", month: "long" }));
     set("perfil-correo", perfil.correo);
     set("perfil-racha-total", perfil.racha);
-    set("perfil-puntos", perfil.puntos);
+    set("perfil-puntos", perfil.puntosString);
     set("perfil-tiempo", perfil.tiempo);
     set("perfil-sesiones", perfil.sesiones);
     set("perfil-apodo-header", perfil.apodo);

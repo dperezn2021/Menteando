@@ -1,58 +1,78 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿//using UnityEngine;
+//using System.Collections;
 
-public class BotonCentralController : MonoBehaviour
-{
-    [Header("Parte móvil del botón")]
-    public Transform parteMovil;
-    public float distancia = 0.2f;
-    public float velocidad = 10f;
+//public class BotonCentralController : MonoBehaviour
+//{
+//    [Header("Parte móvil del botón")]
+//    public Transform parteMovil;
+//    public float distancia = 0.2f;
+//    public float velocidad = 10f;
 
-    private bool animando = false;
-    private Vector3 posInicial;
+//    private bool animando = false;
+//    private Vector3 posInicial;
+//    private RoscoExpressGame juego; // ← referencia al juego
 
-    private RoscoGame juego; // ← ahora es privado
+//    void Start()
+//    {
+//        posInicial = parteMovil.localPosition;
 
-    void Start()
-    {
-        posInicial = parteMovil.localPosition;
-    }
+//        // Asegurar que tiene collider para detectar clicks
+//        if (GetComponent<Collider>() == null)
+//        {
+//            BoxCollider collider = gameObject.AddComponent<BoxCollider>();
+//            Debug.Log("Añadido BoxCollider automáticamente al botón");
+//        }
+//    }
 
-    public void SetJuego(RoscoGame g)
-    {
-        juego = g;
-    }
+//    public void SetJuego(RoscoExpressGame g)
+//    {
+//        juego = g;
+//        Debug.Log("Botón conectado al juego MisionOrbitalGame");
+//    }
 
-    void OnMouseDown()
-    {
-        if (animando) return;
-        if (juego == null) return; // seguridad
+//    void OnMouseDown()
+//    {
+//        if (animando) return;
+//        if (juego == null)
+//        {
+//            Debug.LogError("Botón: juego es NULL. Llama a SetJuego() primero");
+//            return;
+//        }
 
-        juego.PulsarBoton();
-        StartCoroutine(Animar());
-    }
+//        Debug.Log("Botón pulsado - Disparando");
+//        juego.Disparar();
+//        StartCoroutine(Animar());
+//    }
 
-    IEnumerator Animar()
-    {
-        animando = true;
+//    IEnumerator Animar()
+//    {
+//        animando = true;
 
-        Vector3 abajo = posInicial - new Vector3(0, distancia, 0);
+//        Vector3 abajo = posInicial - new Vector3(0, distancia, 0);
 
-        while (Vector3.Distance(parteMovil.localPosition, abajo) > 0.01f)
-        {
-            parteMovil.localPosition = Vector3.Lerp(parteMovil.localPosition, abajo, Time.deltaTime * velocidad);
-            yield return null;
-        }
+//        // Animación hacia abajo
+//        float tiempo = 0;
+//        while (tiempo < 0.15f)  // Animación más controlada
+//        {
+//            tiempo += Time.deltaTime;
+//            float t = tiempo / 0.15f;
+//            parteMovil.localPosition = Vector3.Lerp(posInicial, abajo, t);
+//            yield return null;
+//        }
 
-        yield return new WaitForSeconds(0.05f);
+//        yield return new WaitForSeconds(0.05f);
 
-        while (Vector3.Distance(parteMovil.localPosition, posInicial) > 0.01f)
-        {
-            parteMovil.localPosition = Vector3.Lerp(parteMovil.localPosition, posInicial, Time.deltaTime * velocidad);
-            yield return null;
-        }
+//        // Animación hacia arriba
+//        tiempo = 0;
+//        while (tiempo < 0.15f)
+//        {
+//            tiempo += Time.deltaTime;
+//            float t = tiempo / 0.15f;
+//            parteMovil.localPosition = Vector3.Lerp(abajo, posInicial, t);
+//            yield return null;
+//        }
 
-        parteMovil.localPosition = posInicial;
-        animando = false;
-    }
-}
+//        parteMovil.localPosition = posInicial;
+//        animando = false;
+//    }
+//}

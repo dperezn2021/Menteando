@@ -14,10 +14,20 @@
         // Guardar sesión
         perfil.sesiones++;
         perfil.ultimaSesion = data.timestamp;
-        // Actualizar semana
+        let puntosAAñadir = Number(data.puntos);
+        if (isNaN(puntosAAñadir)) {
+            console.warn("data.puntos no es número:", data.puntos);
+            puntosAAñadir = 0;
+        }
+
+        // Sumar al total (número)
+        perfil.puntos += puntosAAñadir;
+
+        // Actualizar 
+        actualizarPuntosString(perfil);       
         actualizarSesionesDiarias(perfil);
 
-      
+
 
         // Guardar juego
         if (!perfil.juegos[data.gameId]) perfil.juegos[data.gameId] = [];
@@ -29,7 +39,7 @@
 
         //Actualizar puntos y tiempo
         perfil.nivel = getNivel(perfil);
-        perfil.puntos = getPuntos(perfil);
+        perfil.puntosString = getPuntos(perfil);
         perfil.tiempo = getTiempo(perfil);
 
         // Guardar

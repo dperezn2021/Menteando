@@ -61,22 +61,31 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f2\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Framework\Juegos\MisionOrbital\Prefabs\MaterialesNave.cs" />
+    <Compile Include="Assets\Framework\ScriptsGenerales\Managers\GameManager.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\BotonCentralController.cs" />
+    <Compile Include="Assets\Framework\Juegos\RoscoExpress\RoscoExpress.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\Regla.cs" />
-    <Compile Include="Assets\ScriptsManagers\GameManager.cs" />
+    <Compile Include="Assets\Framework\Juegos\MisionOrbital\Prefabs\AsteroideGiratorio.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\Intento.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\Sesion.cs" />
-    <Compile Include="Assets\ScriptsManagers\DifficultyManager.cs" />
+    <Compile Include="Assets\Framework\ScriptsGenerales\Managers\AudioManager.cs" />
+    <Compile Include="Assets\Framework\ScriptsGenerales\Base\BaseGame.cs" />
+    <Compile Include="Assets\Framework\Juegos\MisionOrbital\Prefabs\StarsEffect.cs" />
+    <Compile Include="Assets\Framework\Juegos\OperacionesEncadenadas\OperacionesEncadenadasGame.cs" />
+    <Compile Include="Assets\Framework\Juegos\DetectorDeIntrusos\DetectorDeIntrusosGame.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\ControladorCambioReglas.cs" />
-    <Compile Include="Assets\MatesExpress\MathGame.cs" />
+    <Compile Include="Assets\Framework\Juegos\MisionOrbital\Prefabs\CristalNave.cs" />
     <Compile Include="Assets\Juegos\SilencioMental\Scripts\SilencioMentalController.cs" />
-    <Compile Include="Assets\ScriptsManagers\Base\WebExporter.cs" />
-    <Compile Include="Assets\ScriptsManagers\Base\BaseGame.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
-    <Compile Include="Assets\Rosco\RoscoGame.cs" />
-    <Compile Include="Assets\Intruso\IntruderGame.cs" />
+    <Compile Include="Assets\Framework\ScriptsGenerales\Managers\GameUIManager.cs" />
+    <Compile Include="Assets\Framework\Juegos\MisionOrbital\MisionOrbitalGame.cs" />
+    <Compile Include="Assets\Framework\ScriptsGenerales\Managers\UIManager.cs" />
+    <Compile Include="Assets\Framework\ScriptsGenerales\Managers\DifficultyManager.cs" />
     <Compile Include="Assets\Juegos\ScriptsGenerales\Metricas.cs" />
+    <Compile Include="Assets\Framework\Juegos\OperacionesEncadenadas\UICalculadora.cs" />
     <Compile Include="Assets\Juegos\ScriptsGenerales\SesionJuego.cs" />
+    <Compile Include="Assets\Framework\ScriptsGenerales\Base\WebExporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
@@ -1222,6 +1231,10 @@
     </Reference>
     <Reference Include="Unity.VisualScripting.State">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.2D.Sprite.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.AI.Navigation.Editor.ConversionSystem">

@@ -10,6 +10,7 @@ const perfilBase = {
     racha: 0,
     tiempo: 0,
     puntos: 0,
+    puntosString : "",
     correo: "",
     sesiones: 0,
     nivel: 0,
@@ -138,17 +139,25 @@ function getNivel(perfil){
 }
 
 
-
-function getPuntos(perfil) {
-    const atencion = Number(perfil.atencion) || 0;
-    const control = Number(perfil.control) || 0;
-    const reflejos = Number(perfil.reflejos) || 0;
-    const memoria = Number(perfil.memoria) || 0;
-    const sesiones = Number(perfil.sesiones) || 0;
-    const puntos = (atencion * 0.25 + control * 0.25 + reflejos * 0.25 + memoria * 0.25) * 10000 * sesiones;
-
-    return puntos;
+// ========== FUNCIÓN DE FORMATO ==========
+function formatPuntos(n) {
+    if (typeof n !== 'number' || isNaN(n)) n = 0;
+    if (n < 1000) return Math.floor(n).toString();
+    if (n < 1000000) return (n / 1000).toFixed(1) + "K";
+    return (n / 1000000).toFixed(1) + "M";
 }
+
+// ========== ACTUALIZAR PUNTOS STRING ==========
+function actualizarPuntosString(perfil) {
+    perfil.puntosString = formatPuntos(perfil.puntos);
+    return perfil.puntosString;
+}
+
+// ========== GET PUNTOS (para mostrar) ==========
+function getPuntos(perfil) {
+    return perfil.puntos;
+}
+
 
 
 function getTiempo(perfil) {

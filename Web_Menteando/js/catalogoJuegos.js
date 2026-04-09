@@ -208,7 +208,7 @@ const CATALOGO_JUEGOS = [
         ]
     },
     {
-        "id": "math",
+        "id": "operaciones-encadenadas",
         "aliases": ["math-chain", "operaciones"],
         "nombre": "Operaciones Encadenadas",
         "categoria": "memoria",
