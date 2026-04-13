@@ -15,7 +15,7 @@ El proyecto busca explorar cómo los videojuegos pueden contribuir al aprendizaj
 Se quiere conseguir que la gente adulta o más mayor pueda utilizar los videojuegos para mantener o aumentar sus capacidades cognitivas como memoria, reflejos o flexibilidad mental.
 
 ## Referencias
-Incluir cita al formato bibliográfico usado (BibTeX en `references.bib`).
+Incluir cita al formato bibliográfico usado (BibTeX en `references.bib`)
 
 ## Contacto
 Para dudas: <d.perezn.2021@gmail.com>
