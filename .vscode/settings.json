@@ -1,0 +1,13 @@
+{
+    "liveServer.settings.port": 5501,
+    "editor.quickSuggestions": {
+        "strings": true
+    },
+    "tailwindCSS.classAttributes": [
+        "class",
+        "className"
+    ],
+    "[html]": {
+        "editor.formatOnSave": false
+    }
+}

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+<!-- html en español para la página de juegos; lang=es ayuda en accesibilidad -->
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Menteando - Cognitive Training Games</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+   
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#308ce8",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#111921",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+
+
+    <!--CSS-->
+    <link rel="stylesheet" href="../coach/animacionesCoach.css">
+
+</head>
+
+<!-- body: alternancia entre modo claro/oscuro según clase 'dark'; usa fuente display, color de texto adaptable -->
+
+<body class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased">
+  <div id="coach" class="coach">
+        <div id="coach-bubble" class="coach-bubble"></div>
+    </div>
+    <!-- HEADER -->
+    <header class="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-8 flex flex-wrap items-center justify-between">
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <img src="../assets/img/logo2.png" alt="Logo Menteando" class="w-16 h-16" />
+                <div class="flex flex-col">
+                    <h1 class="text-4xl font-bold text-slate-900 dark:text-white leading-tight">Menteando</h1>
+                    <p class="text-base font-normal text-slate-500 dark:text-slate-300 leading-tight">
+                        Entrena tu mente, pero jugando
+                    </p>
+                </div>
+            </div>
+
+            <nav class="flex flex-wrap items-center gap-6">
+                <a href="index.html"
+                    class="text-xl md:text-2xl font-bold hover:text-blue-500 transition-colors px-2">Inicio</a>
+                <a href="../pruebaTests.html"
+                    class="text-xl md:text-2xl font-bold hover:text-blue-500 transition-colors px-2">Tests</a>
+                <a href="../games.html"
+                    class="text-xl md:text-2xl font-bold hover:text-blue-500 transition-colors px-2">Juegos</a>
+                <a href="about.html"
+                    class="text-xl md:text-2xl font-bold hover:text-blue-500 transition-colors px-2">Acerca De</a>
+            </nav>
+
+            <div class="flex items-center gap-4">
+                <a href="pruebaPerfil.html" class="flex items-center gap-2">
+                    <span id="perfil-apodo-header"
+                        class="text-base font-normal text-slate-500 dark:text-slate-300"></span>
+                    <div
+                        class="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500 bg-blue-500/10 flex items-center justify-center">
+                        <img id="perfil-avatar-header" src="../assets/icon/usuario.webp" alt="Avatar de usuario"
+                            class="w-full h-full object-cover" />
+                    </div>
+                </a>
+                <button id="theme-toggle-btn" class="text-2xl hover:text-blue-500 transition-colors"
+                    onclick="document.documentElement.classList.toggle('dark')">🌓</button>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="px-64">
+        <div class="max-w-9xl mx-auto">
+            <!-- HERO SECTION -->
+            <section class="bg-slate-200 dark:bg-slate-800 rounded-3xl overflow-hidden flex flex-col md:flex-row mb-12">
+
+                <!-- Imagen -->
+                <div class="relative flex-1 h-96">
+                    <img src="https://placehold.co/624x420" alt="Laberinto Mental" class="w-full h-full object-cover">
+
+                    <!-- Degradado -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-neutral-100 dark:from-slate-900 to-transparent">
+                    </div>
+                </div>
+
+                <!-- Contenido -->
+                <div class="flex-1 p-12 flex flex-col gap-4">
+
+                    <!-- Badge -->
+                    <span
+                        class="px-3 py-1 bg-blue-500 text-white text-sm font-bold uppercase tracking-wider rounded-full w-fit">
+                        Recomendado hoy
+                    </span>
+
+                    <!-- Título -->
+                    <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-tight">
+                        Laberinto Mental:<br>Flexibilidad Pro
+                    </h1>
+
+                    <!-- Descripción -->
+                    <p class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed max-w-md">
+                        Mejora tu flexibilidad cognitiva y capacidad de resolución de problemas con este desafío de
+                        navegación espacial dinámica.
+                    </p>
+
+                    <!-- Botones -->
+                    <div class="flex gap-4 pt-4">
+                        <button class="px-8 py-4 bg-blue-500 text-white font-bold rounded-xl flex items-center gap-2">
+                            <div class="w-3 h-4 bg-white rounded-sm"></div>
+                            Jugar ahora
+                        </button>
+
+                        <button
+                            class="px-8 py-4 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white font-bold rounded-xl">
+                            Ver detalles
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- SEARCH + FILTER BAR -->
+            <section class="flex items-center gap-3 overflow-x-auto py-2 scrollbar-none mb-10">
+
+                <div class="flex gap-4 w-full">
+
+                    <!-- Buscador -->
+                    <div class="relative flex-1">
+                        <input type="text" placeholder="Buscar por nombre o habilidad cognitiva..."
+                            class="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm text-gray-700 dark:text-gray-200 text-lg focus:outline-none">
+
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 bg-slate-400 rounded"></div>
+                    </div>
+
+                    <!-- Botón filtros -->
+                    <button
+                        class="px-6 py-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-2">
+                        <div class="w-4 h-4 bg-slate-900 dark:bg-white rounded"></div>
+                        <span class="text-slate-900 dark:text-white text-lg font-bold">Filtros Avanzados</span>
+                    </button>
+
+                </div>
+
+            </section>
+            <!-- CATEGORÍAS -->
+            <div class=" flex items-center gap-3 overflow-x-auto py-2 scrollbar-none mb-10">
+                <button
+                    class="px-4 py-2 bg-blue-500 text-white text-lg font-medium rounded-full shadow-sm whitespace-nowrap">
+                    Todas
+                </button>
+                <button
+                    class="px-4 py-2 bg-white dark:bg-slate-800 text-lg font-medium rounded-full border border-slate-200 dark:border-slate-700 whitespace-nowrap">
+                    Atención
+                </button>
+                <button
+                    class="px-4 py-2 bg-white dark:bg-slate-800 text-lg font-medium rounded-full border border-slate-200 dark:border-slate-700 whitespace-nowrap">
+                    Memoria
+                </button>
+                <button
+                    class="px-4 py-2 bg-white dark:bg-slate-800 text-lg font-medium rounded-full border border-slate-200 dark:border-slate-700 whitespace-nowrap">
+                    Control
+                </button>
+                <button
+                    class="px-4 py-2 bg-white dark:bg-slate-800 text-lg font-medium rounded-full border border-slate-200 dark:border-slate-700 whitespace-nowrap">
+                    Reflejos
+                </button>
+            </div>
+
+            <!-- GRID DE JUEGOS -->
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+
+                <!-- UNITY WEBGL CARD -->
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col md:col-span-2 lg:col-span-2">
+
+                    <div class="flex justify-between items-center p-6 border-b border-slate-200 dark:border-slate-700">
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Concentración Máxima</h3>
+                            <p class="text-slate-500 dark:text-slate-300 text-base">
+                                Sesión rápida • Atención Sostenida
+                            </p>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 bg-blue-500 rounded"></div>
+                            <div class="w-5 h-5 bg-slate-400 rounded"></div>
+                        </div>
+                    </div>
+
+                    <div class="relative bg-black h-96">
+                        <div
+                            class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm flex flex-col items-center justify-center gap-6">
+                            <div class="w-12 h-9 bg-white rounded"></div>
+                            <p class="text-white text-xl font-bold">Cargando motor de entrenamiento...</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="flex justify-between items-center p-6 bg-slate-50 dark:bg-slate-900/30 border-t border-slate-200 dark:border-slate-700">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-blue-400 rounded-full border-2 border-white"></div>
+                            <div class="w-8 h-8 bg-green-400 rounded-full border-2 border-white"></div>
+                            <div class="w-8 h-8 bg-yellow-400 rounded-full border-2 border-white"></div>
+
+                            <div
+                                class="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-full border-2 border-white flex items-center justify-center">
+                                <span class="text-slate-900 dark:text-white text-xs font-bold">+12</span>
+                            </div>
+                        </div>
+
+                        <span class="text-slate-400 dark:text-slate-300 text-sm font-semibold uppercase">
+                            1,240 usuarios entrenando ahora
+                        </span>
+                    </div>
+                </div>
+
+                <!-- CARD 1 -->
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://placehold.co/393x192" class="w-full h-full object-cover" />
+                    </div>
+
+                    <div class="p-6 flex flex-col gap-3">
+                        <span
+                            class="px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-sm font-bold uppercase rounded-sm w-fit">
+                            Memoria Espacial
+                        </span>
+
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white">
+                            Reflejo de Patrones
+                        </h3>
+
+                        <p class="text-slate-600 dark:text-slate-300 text-base">
+                            Memoriza la secuencia y replícala en el orden inverso.
+                        </p>
+
+                        <button
+                            class="w-full py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white font-bold">
+                            Entrenar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARD 2 -->
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://placehold.co/393x192" class="w-full h-full object-cover" />
+                    </div>
+
+                    <div class="px-6 py-4 flex flex-col gap-2">
+                        <span
+                            class="px-2 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-bold uppercase rounded-sm w-fit">
+                            Velocidad
+                        </span>
+
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Caza de Impulsos</h3>
+
+                        <p class="text-slate-600 dark:text-slate-300 text-base">
+                            Test de reacción que mejora tus tiempos de respuesta.
+                        </p>
+
+                        <button
+                            class="w-full py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white font-bold">
+                            Entrenar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARD 3 -->
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://placehold.co/392x192" class="w-full h-full object-cover" />
+                    </div>
+
+                    <div class="px-6 py-4 flex flex-col gap-2">
+                        <span
+                            class="px-2 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 text-sm font-bold uppercase rounded-sm w-fit">
+                            Inhibición
+                        </span>
+
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Semáforo Stroop</h3>
+
+                        <p class="text-slate-600 dark:text-slate-300 text-base">
+                            Ignora el color y lee la palabra, o viceversa.
+                        </p>
+
+                        <button
+                            class="w-full py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white font-bold">
+                            Entrenar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARD 3 -->
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://placehold.co/392x192" class="w-full h-full object-cover" />
+                    </div>
+
+                    <div class="px-6 py-4 flex flex-col gap-2">
+                        <span
+                            class="px-2 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 text-sm font-bold uppercase rounded-sm w-fit">
+                            Inhibición
+                        </span>
+
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Semáforo Stroop</h3>
+
+                        <p class="text-slate-600 dark:text-slate-300 text-base">
+                            Ignora el color y lee la palabra, o viceversa.
+                        </p>
+
+                        <button
+                            class="w-full py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white font-bold">
+                            Entrenar
+                        </button>
+                    </div>
+                </div>
+
+
+            </section>
+            <div class="pt-9">
+                <button class="w-full mt-4 py-2 text-blue-500 font-bold hover:text-blue-600 transition-colors">
+
+                    Ver todo el catálogo de juegos
+                </button>
+            </div>
+
+        </div>
+
+
+
+
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer
+        class="w-full bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-8 lg:py-12 mt-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <!-- Logo y descripción -->
+                <div class="md:col-span-1">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="../assets/img/logo2.png" alt="Logo Menteando" class="w-12 h-12" />
+                        <h3 class="text-2xl font-bold text-blue-500">Menteando</h3>
+                    </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Dedicados a mejorar la calidad de vida de las
+                        personas mayores a través de la tecnología y la ciencia cognitiva.</p>
+                </div>
+
+                <!-- Enlaces -->
+                <div>
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-4">Enlaces</h4>
+                    <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a href="index.html" class="hover:text-blue-500 transition-colors">Inicio</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Blog de Salud</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Ejercicios</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal -->
+                <div>
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Privacidad</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Términos</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <!-- Redes sociales o info adicional -->
+                <div class="md:col-span-1">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-4">Contáctanos</h4>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Estamos aquí para ayudarte en tu camino hacia
+                        una mente más ágil y saludable.</p>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-8 text-center text-sm text-slate-400">
+                <p>&copy; 2025 Menteando Corp. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- SCRIPTS DE COACH E INICIALIZACIÓN -->
+    <script src="../js/perfil.js"></script>
+    <script src="../js/datosPerfil.js"></script>
+    <script src="../coach/mensajesCoach.js"></script>
+    <script src="../coach/cerebroCoach.js"></script>
+    <script src="../coach/entidadCoach.js"></script>
+    <script src="../js/controladorCoach.js"></script>
+    <script>
+        const perfil = getperfil();
+        const coachController = new CoachController(perfil);
+        coachController.onSeleccionJuego(); 
+    </script>
+</body>
+
+
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<!-- elemento html: h-full ocupa toda la altura de la pantalla; bg-slate-950 proporciona fondo oscuro -->
+<html class="h-full bg-slate-950" lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Menteando - Detectar Intruso</title>
+    <!-- Tailwind CSS v3 con plugins: formularios y querys de contenedor -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = { darkMode: 'class' };
+    </script>
+    <style data-purpose="custom-scrollbars">
+        /* Custom scrollbar for a more immersive dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+
+<!-- body: usa altura completa, texto claro sobre fondo oscuro, fuente sans predeterminada, color de selección personalizado -->
+<body class="h-full text-slate-200 font-sans selection:bg-indigo-500/30">
+    <!-- Unified Header -->
+    <!-- header: flex row with spaced items, light/dark border and bg, padding, sticky top -->
+<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <img src="../assets/img/logo2.png" alt="Logo" class="w-8 h-8"/>
+            <span class="text-lg font-bold">Menteando</span>
+        </div>
+        <!-- nav: hidden on small screens, becomes flex row from md breakpoint, gap between links -->
+<nav class="hidden md:flex items-center gap-6">
+            <a class="text-sm font-medium hover:text-primary transition-colors" href="pruebaIndex.html">Inicio</a>
+            <a class="text-sm font-medium hover:text-primary transition-colors" href="pruebaEstadisticas.html">Tests</a>
+            <a class="text-sm font-medium hover:text-primary transition-colors" href="pruebaGames.html">Juegos</a>
+            <a class="text-sm font-medium hover:text-primary transition-colors" href="pruebaAbout.html">Acerca de</a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors">
+                <span class="material-symbols-outlined">dark_mode</span>
+            </button>
+            <img id="header-avatar" src="" alt="Avatar" class="h-9 w-9 rounded-full object-cover cursor-pointer"/>
+        </div>
+    </header>
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const av = document.getElementById('header-avatar');
+        if(av){
+            av.src = 'https://i.pravatar.cc/40?img=' + Math.floor(Math.random()*70+1);
+            av.onclick = ()=> window.location.href='pruebaPerfil.html';
+        }
+    });
+    </script>
+    <!-- main: centered container with responsive horizontal padding and vertical spacing -->
+<main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <!-- BEGIN: GameZone -->
+        <!-- game area section: relative for positioning, margin bottom, overflow hidden, rounded corners, dark bg, heavy shadow, border -->
+<section
+            class="relative mb-12 overflow-hidden rounded-2xl bg-slate-900 shadow-2xl shadow-black/50 border border-slate-800"
+            data-purpose="game-display-area">
+            <div class="relative w-full overflow-hidden" id="unity-container" style="aspect-ratio: 16 / 9;">
+                <!-- The iframe is styled to fill the 16:9 container perfectly -->
+                <iframe allow="autoplay; fullscreen; keyboard" class="absolute inset-0 h-full w-full border-0"
+                    id="detector-intrusos-iframe" src="../games/detector-intrusos/detector-intrusos-build.html"
+                    title="Juego Detectar Intruso"></iframe>
+            </div>
+            <!-- Game Controls Bar -->
+            <div class="flex items-center justify-between bg-slate-800/50 px-6 py-3 border-t border-slate-800">
+                <div class="flex items-center space-x-4">
+                    <span class="flex items-center text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        <span class="mr-2 block h-2 w-2 rounded-full bg-green-500"></span>
+                        En línea
+                    </span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button class="p-2 text-slate-400 hover:text-white transition-colors"
+                        onclick="document.getElementById('detector-intrusos-iframe').requestFullscreen()"
+                        title="Pantalla Completa">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+        <!-- END: GameZone -->
+        <!-- BEGIN: GameDescription -->
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <!-- Instructions & Context -->
+            <div class="lg:col-span-2 space-y-8">
+                <section data-purpose="about-game">
+                    <h2 class="text-2xl font-bold text-white mb-4">Sobre el Juego</h2>
+                    <p class="text-lg leading-relaxed text-slate-400">
+                        "Detectar Intruso" es un desafío de agudeza visual y categorización semántica. Tu misión es
+                        identificar rápidamente qué elemento no pertenece al grupo mostrado. A medida que avanzas, las
+                        relaciones entre los objetos se vuelven más sutiles y el tiempo más limitado.
+                    </p>
+                </section>
+                <section data-purpose="how-to-play">
+                    <h3 class="text-xl font-semibold text-white mb-4">Cómo Jugar</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                            <div
+                                class="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400 font-bold">
+                                1</div>
+                            <p class="text-sm text-slate-300">Observa cuidadosamente el conjunto de imágenes o palabras
+                                que aparecen en pantalla.</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                            <div
+                                class="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400 font-bold">
+                                2</div>
+                            <p class="text-sm text-slate-300">Analiza la categoría común (ej. frutas, herramientas,
+                                colores fríos).</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                            <div
+                                class="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400 font-bold">
+                                3</div>
+                            <p class="text-sm text-slate-300">Haz clic sobre el elemento que NO encaja con el resto
+                                antes de que se agote el tiempo.</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                            <div
+                                class="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400 font-bold">
+                                4</div>
+                            <p class="text-sm text-slate-300">¡Consigue la racha más larga para desbloquear insignias y
+                                mejorar tu puntuación!</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <!-- Cognitive Skills Sidebar -->
+            <aside class="space-y-6">
+                <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6" data-purpose="cognitive-skills">
+                    <h3 class="mb-6 text-lg font-bold text-white flex items-center">
+                        <svg class="mr-2 h-5 w-5 text-indigo-400" fill="currentColor" viewbox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z">
+                            </path>
+                        </svg>
+                        Habilidades Cognitivas
+                    </h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="mr-3 mt-1 flex h-2 w-2 flex-shrink-0 rounded-full bg-indigo-500"></span>
+                            <div>
+                                <span class="block text-sm font-semibold text-slate-200">Atención Selectiva</span>
+                                <p class="text-xs text-slate-500 italic">Capacidad de centrarse en estímulos relevantes
+                                    ignorando distractores.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-3 mt-1 flex h-2 w-2 flex-shrink-0 rounded-full bg-blue-500"></span>
+                            <div>
+                                <span class="block text-sm font-semibold text-slate-200">Velocidad de
+                                    Procesamiento</span>
+                                <p class="text-xs text-slate-500 italic">Tiempo necesario para realizar una tarea mental
+                                    de forma fluida.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-3 mt-1 flex h-2 w-2 flex-shrink-0 rounded-full bg-purple-500"></span>
+                            <div>
+                                <span class="block text-sm font-semibold text-slate-200">Razonamiento Lógico</span>
+                                <p class="text-xs text-slate-500 italic">Habilidad para establecer conexiones y detectar
+                                    inconsistencias.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Feedback/Stats Small Card -->
+                <div class="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-6" data-purpose="game-cta">
+                    <p class="text-sm font-medium text-indigo-300">¿Tienes problemas técnicos?</p>
+                    <p class="mt-1 text-xs text-slate-500 leading-tight">Si el juego no carga correctamente, intenta
+                        recargar la página o verificar tu conexión a internet.</p>
+                    <button
+                        class="mt-4 w-full rounded-lg bg-slate-800 py-2 text-xs font-bold text-white transition-colors hover:bg-slate-700"
+                        onclick="window.location.reload()">
+                        Recargar Juego
+                    </button>
+                </div>
+            </aside>
+        </div>
+        <!-- END: GameDescription -->
+    </main>
+    <!-- Unified Footer -->
+    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark">
+            <div class="mx-auto max-w-7xl px-6 py-16 lg:px-12">
+                <div class="grid md:grid-cols-4 gap-12 lg:gap-24">
+                    <div class="col-span-2">
+                        <div class="flex items-center gap-3 text-primary mb-8">
+                            <svg class="h-10 w-10" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                <path clip-rule="evenodd" d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z" fill="currentColor" fill-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-2xl font-black text-slate-900 dark:text-white">Menteando</span>
+                        </div>
+                        <p class="text-lg text-slate-600 dark:text-slate-400 max-w-sm mb-8 leading-relaxed">
+                            Mejorando vidas a través del entrenamiento cognitivo accesible. Un proyecto de la
+                            Universidad Rey Juan Carlos.
+                        </p>
+                        <div class="flex gap-4">
+                            <a class="h-12 w-12 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-all"
+                                href="#">
+                                <span class="material-symbols-outlined">share</span>
+                            </a>
+                            <a class="h-12 w-12 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-all"
+                                href="#">
+                                <span class="material-symbols-outlined">mail</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-8">Enlaces Rápidos</h4>
+                        <ul class="space-y-4 text-slate-600 dark:text-slate-400">
+                            <li><a class="hover:text-primary transition-colors" href="#">Ejercicios</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Investigación</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Privacidad</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Términos</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-8">Instituciones</h4>
+                        <ul class="space-y-4 text-slate-600 dark:text-slate-400">
+                            <li>Univ. Rey Juan Carlos</li>
+                            <li>Ciencias de la Salud</li>
+                            <li>Lab. Neuropsicología</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
+                    <p>© 2024 Proyecto Menteando. Todos los derechos reservados.</p>
+                    <p>Desarrollado por Daniel Pérez Navarro</p>
+                </div>
+            </div>
+        </footer>
+</body>
+
+</html>

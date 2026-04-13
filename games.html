@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+
+<head>
+    <!-- METADATOS -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Perfil de usuario en Menteando – revisa tus estadísticas cognitivas">
+    <meta name="keywords" content="perfil Menteando, estadísticas, cognitivo, usuario">
+    <meta name="author" content="Daniel Pérez Navarro">
+
+    <!--Valores de la web-->
+    <title>Menteando</title>
+    <link rel="icon" href="assets/img/logo.png" type="image/png" sizes="32x32">
+
+    <script>
+        (() => {
+            const storedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const useDark = storedTheme ? storedTheme === 'dark' : prefersDark;
+
+            document.documentElement.classList.toggle('dark', useDark);
+            document.documentElement.classList.toggle('light', !useDark);
+        })();
+    </script>
+
+
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/catalogoJuegos.js"></script>
+    <script src="/js/perfil.js"></script>
+    <script src="/js/datosPerfil.js"></script>
+    <script src="/coach/mensajesCoach.js"></script>
+    <script src="/coach/cerebroCoach.js"></script>
+    <script src="/coach/entidadCoach.js"></script>
+    <script src="/js/controladorCoach.js"></script>
+
+
+    <!-- Tailwind CSS with plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#3b82f6',
+                            secondary: '#6366f1',
+                            accent: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="/coach/animacionesCoach.css">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+
+<body
+    class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased overflow-x-hidden">
+
+
+    <!-------------------------------------HEADER----------------------------------->
+    <header class="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
+
+            <!-- TÍTULO Y LOGO -->
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <img src="../assets/img/logo2.png" alt="Logo Menteando" class="w-10 h-10 md:w-12 md:h-12" />
+                <div class="flex flex-col leading-tight text-left">
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
+                        Menteando
+                    </h1>
+                    <p class="text-xs md:text-sm font-normal text-slate-500 dark:text-slate-300">
+                        Entrena tu mente, pero jugando
+                    </p>
+                </div>
+            </div>
+
+            <!-- NAVEGACIÓN -->
+            <nav class="flex flex-direction-row md:flex-row items-center justify-center gap-1 md:gap-3">
+                <a href="index.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">
+                    Inicio
+                </a>
+                <a href="tests.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">
+                    Tests
+                </a>
+                <a href="games.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">
+                    Juegos
+                </a>
+                <a href="about.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">
+                    Acerca De
+                </a>
+            </nav>
+
+            <!-- PERFIL Y MODO OSCURO -->
+            <div class="flex items-center gap-3">
+                <a href="perfil.html" class="flex items-center gap-2">
+                    <span id="perfil-apodo-header"
+                        class="text-md md:text-xl font-normal text-slate-500 dark:text-slate-300"></span>
+                    <div
+                        class="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-blue-500 bg-blue-500/10 flex items-center justify-center">
+                        <img id="perfil-avatar-header" src="/assets/icon/usuario.webp" alt="Avatar de usuario"
+                            class="w-full h-full object-cover" />
+                    </div>
+                </a>
+                <button id="theme-toggle-btn"
+                    class="text-lg md:text-2xl text-slate-900 dark:text-white hover:text-blue-500 transition-colors"
+                    onclick="document.documentElement.classList.toggle('dark')">
+                </button>
+            </div>
+
+        </div>
+    </header>
+
+    <!--------------------------------MAIN-------------------------------->
+    <main class="w-full">
+
+        <!-- CARGAR COACH ANIMADO -->
+        <div id="coach" class="coach">
+            <div id="coach-bubble" class="coach-bubble"></div>
+        </div>
+
+        <!-- HERO SECTION -->
+        <section class="mt-8 overflow-hidden">
+
+            <div
+                class="bg-slate-200 dark:bg-slate-800 py-20 rounded-3xl max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row gap-12">
+                <div id="juego-recomendado"></div>
+
+            </div>
+        </section>
+
+
+
+        <!-- SEARCH + FILTER BAR -->
+        <section class="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-6">
+
+            <!-- Título y descripción -->
+            <div class="mt-8">
+                <h2 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-2">
+                    Explorar batería de juegos
+                </h2>
+                <p class="text-slate-600 dark:text-slate-300 text-lg max-w-2xl">
+                    Juega sin límites y mejora en todas las capacidades cognitivas.
+                </p>
+            </div>
+
+            <!-- Barra de búsqueda y filtros -->
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+
+                <!-- Buscador -->
+                <div class="relative flex-1 w-full md:w-auto">
+                    <input id="barra-busqueda" type="text" placeholder="Buscar juego por nombre..."
+                        class="h-14 w-full pl-12 pr-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm text-gray-700 dark:text-gray-200 text-lg focus:outline-none">
+
+                    <!-- Icono lupa -->
+                    <div
+                        class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 bg-slate-400 rounded flex items-center justify-center text-white text-xs">
+                        🔍
+                    </div>
+                </div>
+
+                <!-- Filtros por habilidad -->
+                <div class="flex gap-3 flex-wrap">
+
+                    <div
+                        class="px-4 py-3 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-2">
+                        <div class="w-4 h-4 bg-slate-900 dark:bg-white rounded"></div>
+                        <span class="text-slate-900 dark:text-white font-bold">Filtros Avanzados</span>
+
+                        <select id="habilidad"
+                            class="ml-2 px-4 py-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none">
+                            <option value="">Todas</option>
+                            <option value="atencion_sostenida">Atención sostenida</option>
+                            <option value="atencion_selectiva">Atención selectiva</option>
+                            <option value="atencion_dividida">Atención dividida</option>
+                            <option value="velocidad_cognitiva">Velocidad cognitiva</option>
+                            <option value="memoria_trabajo">Memoria de trabajo</option>
+                            <option value="memoria_espacial">Memoria espacial</option>
+                            <option value="control_inhibitorio">Control inhibitorio</option>
+                            <option value="flexibilidad_cognitiva">Flexibilidad cognitiva</option>
+                            <option value="planificacion">Planificación</option>
+                            <option value="coordinacion_visomotora">Reflejos y coordinación visiomotora</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <!-- Select botones -->
+                        <select id="habilidad-general" class="hidden">
+                            <option value="">Todas</option>
+                            <option value="atencion">Atención</option>
+                            <option value="memoria">Memoria</option>
+                            <option value="control">Control</option>
+                            <option value="reflejos">Reflejos</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Categorías -->
+            <div class="flex flex-wrap gap-2 mt-6">
+                <button data-game-category="" onclick="setFiltro('')"
+                    class="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 dark:hover:border-blue-500 transition-colors">
+                    Todos
+                </button>
+                <button data-game-category="atencion" onclick="setFiltro('atencion')"
+                    class="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 dark:hover:border-blue-500 transition-colors">
+                    Atención
+                </button>
+                <button data-game-category="memoria" onclick="setFiltro('memoria')"
+                    class="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 dark:hover:border-blue-500 transition-colors">
+                    Memoria
+                </button>
+                <button data-game-category="control" onclick="setFiltro('control')"
+                    class="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 dark:hover:border-blue-500 transition-colors">
+                    Control
+                </button>
+                <button data-game-category="reflejos" onclick="setFiltro('reflejos')"
+                    class="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 dark:hover:border-blue-500 transition-colors">
+                    Reflejos
+                </button>
+
+                <!-- GRID DE JUEGOS -->
+                <div id="games-grid" class="mt-6 mx-auto w-full">
+                    <!-- Aquí se inyectan las tarjetas de juegos con JS -->
+                </div>
+            </div>
+
+        </section>
+
+
+    </main>
+
+    <!------------------------------- FOOTER ------------------------>
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+        <div class="max-w-screen-xl mx-auto px-6 pt-8">
+            <div class="flex flex-col md:flex-row items-center md:items-start justify-center gap-12 mb-6">
+
+                <!-- 3 columnas: logo+descripción, enlaces, legal-->
+                <div class="w-full md:w-96 text-center md:text-left">
+                    <div
+                        class="flex flex-col md:flex-row items-center md:items-start gap-3 mb-6 justify-center md:justify-start">
+                        <img src="../assets/img/logo2.png" alt="Logo Menteando" class="w-12 h-12 md:w-16 md:h-16" />
+                        <h3 class="text-2xl md:text-3xl font-black text-blue-500">Menteando</h3>
+                    </div>
+                    <p class="text-sm md:text-base font-normal text-slate-500 dark:text-slate-400">Dedicados a mejorar
+                        la calidad
+                        de vida de las personas mayores a través de la tecnología y la ciencia cognitiva.</p>
+                </div>
+                <div class="w-full md:w-64 text-center md:text-left">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-6">Enlaces de interés</h4>
+                    <ul class="space-y-4 text-slate-500 dark:text-slate-400">
+                        <li><a href="index.html" class="hover:text-blue-500 transition-colors">Inicio</a></li>
+                        <li><a href="games.html" class="hover:text-blue-500 transition-colors">Entrenamiento</a></li>
+                        <li><a href="https://github.com/dperezn2021/Menteando" target="_blank"
+                                class="hover:text-blue-500 transition-colors">GitHub del proyecto</a></li>
+                    </ul>
+                </div>
+                <div class="w-full md:w-64 text-center md:text-left">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-6">Más información</h4>
+                    <ul class="space-y-4 text-slate-500 dark:text-slate-400">
+                        <li><a href="about.html" class="hover:text-blue-500 transition-colors">Acerca de</a></li>
+                        <li><a href="about.html#contacto" class="hover:text-blue-500 transition-colors">Contacto</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-16 border-t border-slate-100 dark:border-slate-800 text-center">
+                <p class="text-sm font-normal text-slate-400">© 2026 Menteando. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- SCRIPTS QUE LLEVAN LA LÓGICA DE LA INTERFAZ -->
+    <!-- Cargar perfil-->
+    <script data-purpose="perfil-logic" src="../js/perfil.js"></script>
+    <script>
+        const perfil = getperfil();
+        const coachController = new CoachController(perfil);
+        coachController.onSeleccionJuego();
+
+    </script>
+
+    <!-- Cargar juegos del dia  -->
+    <script data-purpose="juegos-dia-logic" src="../js/juegosDia.js"></script>
+    <script data-purpose="games-page-logic" src="../js/games.js"></script>
+    <!-- Script de inicialización de interfaz: se ejecuta cuando el DOM está listo -->
+    <script data-purpose="init-interface">
+        document.addEventListener('DOMContentLoaded', () => {
+            const perfil = getperfil();
+            if (perfil.avatar) {
+                const headerAvatar = document.getElementById("perfil-avatar-header");
+                if (headerAvatar) headerAvatar.src = perfil.avatar;
+            }
+
+
+            const themeToggleBtn = document.getElementById('theme-toggle-btn');
+            const root = document.documentElement;
+
+            const syncThemeButton = () => {
+                const isDark = root.classList.contains('dark');
+                themeToggleBtn.textContent = isDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
+                themeToggleBtn.setAttribute(
+                    'aria-label',
+                    isDark ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'
+                );
+            };
+
+            if (themeToggleBtn) {
+                themeToggleBtn.onclick = null;
+                themeToggleBtn.type = 'button';
+                themeToggleBtn.addEventListener('click', () => {
+                    const willUseDark = !root.classList.contains('dark');
+                    root.classList.toggle('dark', willUseDark);
+                    root.classList.toggle('light', !willUseDark);
+                    localStorage.setItem('theme', willUseDark ? 'dark' : 'light');
+                    syncThemeButton();
+                });
+
+                syncThemeButton();
+            }
+
+            renderJuegoRecomendado(1);
+            initGamesPage();
+        });
+
+    </script>
+
+
+</body>
+
+</html>
