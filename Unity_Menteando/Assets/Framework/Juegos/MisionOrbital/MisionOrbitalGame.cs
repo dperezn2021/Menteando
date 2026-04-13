@@ -4,8 +4,8 @@ using UnityEngine;
 public class MisionOrbitalGame : BaseGame
 {
     [Header("Referencias del juego")]
-    public GameObject sistemaOrbital;      // Se activa/desactiva según estado del juego
-    public Transform anilloOrbital;        // Donde se generan los asteroides
+    public GameObject sistemaOrbital;
+    public Transform anilloOrbital;
     public GameObject prefabBala;
     public float velocidadBala = 15f;
 
@@ -15,29 +15,13 @@ public class MisionOrbitalGame : BaseGame
     public Material materialNeutral;
     public Material materialImpacto;
 
-    // Métricas crudas (cognitivas)
+    // Métricas (solo las que realmente usas)
     private int totalIntentos = 0;
     private int aciertos = 0;
-    private int errores = 0;
-    private int omisiones = 0;
-
     private float sumaRT = 0f;
     private float sumaRT2 = 0f;
 
-    private int cambiosSentido = 0;
-    private int anticipacionesCorrectas = 0;
-    private int anticipacionesTotales = 0;
-
-    private float tiempoInicio;
-    private int mejorNivel = 0;
-
-    private int adaptacionesTotales = 0;
-    private int adaptacionesCorrectas = 0;
-    private bool adaptacionActiva = false;
-    private int ciclosDesdeCambio = 0;
-
-
-    // Estadísticas antiguas (las mantengo para no romper nada)
+    // Estadísticas antiguas (las mantengo)
     private int disparosTotales = 0;
     private int fallos = 0;
     private float sumaTiempos = 0f;
@@ -53,24 +37,14 @@ public class MisionOrbitalGame : BaseGame
     private GameObject[] asteroides;
     private int direccion;
     private Coroutine rutinaGiro;
-
+    private float tiempoInicio;
 
     private void Awake()
     {
-        nombre = "mision-orbital";
+        nombre = "mision orbital";
     }
 
-    private void Start()
-    {
-        // ❗ NO GENERAR NADA AQUÍ
-        // El juego solo empieza cuando GameManager llama a ResetGame()
-    }
-
-    private void Update()
-    {
-        if (!GameManager.Instance.estaJugando) return;
-        // Aquí podrías actualizar cosas visuales si quieres
-    }
+    private void Update() { }
 
     // ============================================================
     //  FLUJO DEL JUEGO
@@ -78,32 +52,15 @@ public class MisionOrbitalGame : BaseGame
 
     public override void ResetGame()
     {
-        // Reset de estadísticas antiguas
         disparosTotales = 0;
         fallos = 0;
         sumaTiempos = 0f;
-
         totalIntentos = 0;
         aciertos = 0;
-        errores = 0;
-        omisiones = 0;
-
         sumaRT = 0f;
         sumaRT2 = 0f;
 
-        cambiosSentido = 0;
-        adaptacionesTotales = 0;
-        adaptacionesCorrectas = 0;
-
-        anticipacionesTotales = 0;
-        anticipacionesCorrectas = 0;
-
-        mejorNivel = 0;
-
-        // Reactivar sistema orbital
         sistemaOrbital.SetActive(true);
-
-        // Generar asteroides
         GenerarEstimulos();
     }
 
@@ -114,13 +71,8 @@ public class MisionOrbitalGame : BaseGame
 
     public override void OnGameFinished()
     {
-        // Apagar el sistema orbital
         sistemaOrbital.SetActive(false);
-
-        // Detener rotación
-        girando = false;
         if (rutinaGiro != null) StopCoroutine(rutinaGiro);
-
         EnviarResultados();
     }
 
@@ -143,7 +95,6 @@ public class MisionOrbitalGame : BaseGame
 
         jugando = true;
         girando = true;
-
         ActualizarColores();
 
         direccion = (DifficultyManager.Instance.nivelActual >= 6)
@@ -159,12 +110,8 @@ public class MisionOrbitalGame : BaseGame
     private void AplicarDificultad()
     {
         int nivel = DifficultyManager.Instance.nivelActual;
-
-        if (nivel > mejorNivel) mejorNivel = nivel;
-
         totalAsteroides = Mathf.RoundToInt(Mathf.Lerp(6, 22, nivel / 10f));
         velocidadRotacion = Mathf.Lerp(0.22f, 0.015f, nivel / 10f);
-
         AjustarRoscoACamara();
     }
 
@@ -194,36 +141,31 @@ public class MisionOrbitalGame : BaseGame
 
         anilloOrbital.LookAt(Camera.main.transform);
         anilloOrbital.rotation = Quaternion.Euler(
-            Random.Range(-10.0f,10.0f) ,
+            Random.Range(-10.0f, 10.0f),
             Random.Range(30.0f, 90.0f),
             Random.Range(140.0f, 170.0f)
         );
-
     }
 
     private GameObject CrearAsteroide()
     {
         GameObject asteroide = new GameObject("Asteroide");
 
-        // Cuerpo principal (cubo deformado)
         GameObject cuerpo = GameObject.CreatePrimitive(PrimitiveType.Cube);
         cuerpo.transform.SetParent(asteroide.transform);
         cuerpo.transform.localPosition = Vector3.zero;
 
-        // Escala irregular (parece una roca)
         float escalaX = Random.Range(0.4f, 0.7f);
         float escalaY = Random.Range(0.35f, 0.65f);
         float escalaZ = Random.Range(0.45f, 0.75f);
         cuerpo.transform.localScale = new Vector3(escalaX, escalaY, escalaZ);
 
-        // Añadir bultos (cubos pequeños pegados)
         int numBultos = Random.Range(3, 6);
         for (int j = 0; j < numBultos; j++)
         {
             GameObject bulto = GameObject.CreatePrimitive(PrimitiveType.Cube);
             bulto.transform.SetParent(asteroide.transform);
 
-            // Posición aleatoria alrededor del cuerpo
             Vector3 pos = new Vector3(
                 Random.Range(-0.5f, 0.5f),
                 Random.Range(-0.5f, 0.5f),
@@ -232,15 +174,12 @@ public class MisionOrbitalGame : BaseGame
             pos = pos.normalized * (0.5f + Random.Range(0.1f, 0.3f));
             bulto.transform.localPosition = pos;
 
-            // Escala pequeña y variada
             float bEscala = Random.Range(0.15f, 0.35f);
             bulto.transform.localScale = new Vector3(bEscala, bEscala, bEscala);
         }
 
-        // Eliminar el collider del cuerpo para que no interfiera
         Destroy(cuerpo.GetComponent<Collider>());
 
-        // Añadir un collider al asteroide principal
         SphereCollider collider = asteroide.AddComponent<SphereCollider>();
         collider.radius = 0.5f;
 
@@ -291,12 +230,11 @@ public class MisionOrbitalGame : BaseGame
 
         float tiempoReaccion = Time.time - tiempoInicio;
 
-        // Métricas crudas
+        // Métricas
         totalIntentos++;
         sumaRT += tiempoReaccion;
         sumaRT2 += tiempoReaccion * tiempoReaccion;
 
-        // Estadísticas antiguas
         disparosTotales++;
         sumaTiempos += tiempoReaccion;
 
@@ -305,42 +243,25 @@ public class MisionOrbitalGame : BaseGame
         if (impacto)
             aciertos++;
         else
-        {
-            errores++;
             fallos++;
-        }
-
-        if (prefabBala != null)
-        {
-            Vector3 pos = asteroides[indiceActivo].transform.position;
-            GameObject bala = Instantiate(prefabBala, Vector3.zero, Quaternion.identity);
-            StartCoroutine(MoverBala(bala, pos, impacto));
-        }
-        else
-        {
-            StartCoroutine(Feedback(impacto));
-        }
-
-        if (adaptacionActiva)
-        {
-            if (impacto) adaptacionesCorrectas++;
-            adaptacionActiva = false;
-        }
-
-
-        int distancia = Mathf.Abs(indiceActivo - indiceObjetivo);
-        if (distancia == 1 || distancia == totalAsteroides - 1)
-        {
-            anticipacionesTotales++;
-            if (impacto) anticipacionesCorrectas++;
-        }
-
 
         DifficultyManager.Instance.ActualizarDificultad(
             impacto ? 1f : 0f,
             impacto,
             tiempoReaccion
         );
+
+        if (prefabBala != null)
+        {
+            Vector3 ini = new Vector3(0.0f, 9.0f, -10.0f);
+            Vector3 pos = asteroides[indiceActivo].transform.position;
+            GameObject bala = Instantiate(prefabBala, ini, Quaternion.identity);
+            StartCoroutine(MoverBala(bala, pos, impacto));
+        }
+        else
+        {
+            StartCoroutine(Feedback(impacto));
+        }
     }
 
     private IEnumerator MoverBala(GameObject bala, Vector3 objetivo, bool impacto)
@@ -379,44 +300,6 @@ public class MisionOrbitalGame : BaseGame
         GenerarEstimulos();
     }
 
-    // Métodos de registro extra (si los usas desde fuera, siguen siendo válidos)
-    public void RegistrarIntento(bool acierto, float tiempoReaccion)
-    {
-        totalIntentos++;
-
-        if (acierto)
-            aciertos++;
-        else
-            errores++;
-
-        sumaRT += tiempoReaccion;
-        sumaRT2 += tiempoReaccion * tiempoReaccion;
-    }
-
-    public void RegistrarOmisión()
-    {
-        totalIntentos++;
-        omisiones++;
-    }
-
-
-
-    public void RegistrarCambioSentido()
-    {
-        cambiosSentido++;
-        adaptacionesTotales++;
-        adaptacionActiva = true;
-        ciclosDesdeCambio = 0;
-    }
-
-    public void RegistrarAnticipacion(bool correcta)
-    {
-        anticipacionesTotales++;
-
-        if (correcta)
-            anticipacionesCorrectas++;
-    }
-
     // ============================================================
     //  POSICIONAMIENTO DEL ROSCO
     // ============================================================
@@ -445,7 +328,6 @@ public class MisionOrbitalGame : BaseGame
     private float ObtenerFactorNivel()
     {
         int nivel = DifficultyManager.Instance != null ? DifficultyManager.Instance.nivelActual : 1;
-        // Nivel 1 = 0.5, Nivel 10 = 2.0
         return Mathf.Lerp(0.5f, 2f, (nivel - 1f) / 9f);
     }
 
@@ -457,22 +339,22 @@ public class MisionOrbitalGame : BaseGame
             return m;
 
         float precision = (float)aciertos / totalIntentos;
-        float omissionRate = (float)omisiones / totalIntentos;
-
-        float rtMedio = Mathf.Max(0.01f, sumaRT / Mathf.Max(1, totalIntentos - omisiones));
-        float varRT = Mathf.Max(0, (sumaRT2 / totalIntentos) - (rtMedio * rtMedio));
-
+        float rtMedio = Mathf.Max(0.01f, sumaRT / totalIntentos);
         float factorNivel = ObtenerFactorNivel();
-        float penalizacionOmisiones = 1f - omissionRate;
 
-        m.velocidadCognitiva = Mathf.Clamp01((1f / rtMedio) * factorNivel * penalizacionOmisiones);
+        // ✅ Solo estas dos métricas
+        m.velocidadCognitiva = Mathf.Clamp01((1f / rtMedio) * factorNivel);
         m.coordinacionVisomotora = Mathf.Clamp01(precision * (1f / rtMedio));
-        m.flexibilidadCognitiva = adaptacionesTotales > 0
-            ? (float)adaptacionesCorrectas / adaptacionesTotales
-            : 0f;
-        m.planificacion = anticipacionesTotales > 0
-            ? (float)anticipacionesCorrectas / anticipacionesTotales
-            : 0f;
+
+        // ❌ Las demás a 0
+        m.flexibilidadCognitiva = 0f;
+        m.planificacion = 0f;
+        m.atencionSelectiva = 0f;
+        m.atencionDividida = 0f;
+        m.atencionSostenida = 0f;
+        m.memoriaTrabajo = 0f;
+        m.memoriaEspacial = 0f;
+        m.controlInhibitorio = 0f;
 
         return m;
     }
@@ -481,12 +363,13 @@ public class MisionOrbitalGame : BaseGame
     {
         CognitiveMetrics p = new CognitiveMetrics();
 
-        p.velocidadCognitiva = m.velocidadCognitiva * 0.45f;
-        p.coordinacionVisomotora = m.coordinacionVisomotora * 0.35f;
-        p.flexibilidadCognitiva = m.flexibilidadCognitiva * 0.15f;
-        p.planificacion = m.planificacion * 0.05f;
+        // Pesos ajustados solo para las dos métricas que existen
+        p.velocidadCognitiva = m.velocidadCognitiva * 0.55f;
+        p.coordinacionVisomotora = m.coordinacionVisomotora * 0.45f;
 
-        // No entrenadas en este juego
+        // El resto a 0
+        p.flexibilidadCognitiva = 0f;
+        p.planificacion = 0f;
         p.atencionSelectiva = 0f;
         p.atencionDividida = 0f;
         p.atencionSostenida = 0f;
@@ -503,6 +386,6 @@ public class MisionOrbitalGame : BaseGame
         CognitiveMetrics p = AplicarPesos(m);
 
         WebExporter.EnviarSesion(nombre, p);
-        Debug.Log("📤 Resultados enviados a WebExporter");
+        Debug.Log($"📤 Resultados enviados - Velocidad: {p.velocidadCognitiva:F2}, Coordinación: {p.coordinacionVisomotora:F2}");
     }
 }

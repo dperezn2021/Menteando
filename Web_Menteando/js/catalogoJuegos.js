@@ -437,49 +437,41 @@ const CATALOGO_JUEGOS = [
             "atencion_sostenida"
         ]
     },
+
     {
-        "id": "rosco-express",
-        "aliases": ["rosco", "timing"],
-        "nombre": "Rosco Express",
+        "id": "mision-orbital",
+        "aliases": ["mision", "timing", "orbital"],
+        "nombre": "Misión Orbital",
         "categoria": "reflejos",
-        "subtitulo": "Ficha del juego",
-        "descripcion": "Pulsa cuando la bola roja coincide con la amarilla.",
-        "detalleDescripcion": "Rosco Express entrena sincronización temporal, velocidad de procesamiento y adaptación rápida al cambio de sentido.",
+        "subtitulo": "Sincronización orbital",
+        "descripcion": "Pulsa cuando detectes el asteroide objetivo.",
+        "detalleDescripcion": "Misión Orbital entrena velocidad de procesamiento y coordinación visomotora mediante la sincronización precisa de elementos en movimiento orbital.",
         "comoJugar": [
-            "Observa el giro del rosco.",
-            "Pulsa justo cuando ambas bolas coincidan.",
-            "Adáptate si cambia el sentido.",
-            "Mejora tu precisión temporal."
+            "Observa el anillo de asteroides girando.",
+            "Identifica el asteroide ACTIVO (brillante) y el OBJETIVO (color especial).",
+            "Pulsa en la cruceta para disparar al objetivo.",
+            "Reacciona más rápido para mejorar tu puntuación.",
+            "El juego aumenta la velocidad y cantidad de asteroides progresivamente."
         ],
         "habilidadesDetalle": [
             {
-                "nombre": "Flexibilidad cognitiva",
-                "descripcion": "Te adaptas cuando el rosco cambia de sentido."
-            },
-            {
-                "nombre": "Planificación",
-                "descripcion": "Anticipas el momento exacto para pulsar."
-            },
-            {
                 "nombre": "Velocidad cognitiva",
-                "descripcion": "Procesas el movimiento rápidamente para acertar."
+                "descripcion": "Procesas el movimiento rápidamente para acertar en el momento exacto."
             },
             {
                 "nombre": "Coordinación visomotora",
-                "descripcion": "Sincronizas percepción y acción con precisión."
+                "descripcion": "Sincronizas percepción visual y acción motora con precisión."
             }
         ],
-        "url": "games/rosco-express/rosco-express-page.html",
-        "buildUrl": "games/rosco-express/rosco-express-build.html",
-        "imagen": "assets/juegos/rosco-express.png",
-        "logo": "assets/juegos/rosco-express.png",
-        "heroEyebrow": "Sincronización temporal",
+        "url": "games/mision-orbital/mision-orbital-page.html",
+        "buildUrl": "games/mision-orbital/mision-orbital-build.html",
+        "imagen": "assets/juegos/mision-orbital.png",
+        "logo": "assets/juegos/mision-orbital.png",
+        "heroEyebrow": "Reflejos y sincronización",
         "destacado": false,
         "skills": [
             "velocidad_cognitiva",
-            "coordinacion_visomotora",
-            "flexibilidad_cognitiva",
-            "planificacion",
+            "coordinacion_visomotora"
         ]
     },
     {

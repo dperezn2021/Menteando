@@ -2,27 +2,36 @@
 
 using UnityEngine;
 
+using UnityEngine;
+
 public abstract class BaseGame : MonoBehaviour
 {
     public string nombre;
+    protected bool juegoPausado = false;
 
     public abstract void ResetGame();
+    public abstract void OnGameStart();
+    public abstract void OnGameFinished();
     public abstract CognitiveMetrics CalcularCognicion();
     public abstract CognitiveMetrics AplicarPesos(CognitiveMetrics m);
 
-    public virtual void OnGameStart() { }
-    public virtual void OnGameFinished() { }
+    public virtual void PausarJuego(bool pausar)
+    {
+        juegoPausado = pausar;
+        Debug.Log($"⏸️ {nombre} - Pausado: {juegoPausado}");
+    }
+
+    public virtual bool EstaPausado()
+    {
+        return juegoPausado;
+    }
 }
 
-
-
-
-// CognitiveMetrics.cs
 [System.Serializable]
 public class CognitiveMetrics
 {
-    public float atencionSostenida;
     public float atencionSelectiva;
+    public float atencionSostenida;
     public float atencionDividida;
     public float velocidadCognitiva;
     public float memoriaTrabajo;
@@ -32,7 +41,6 @@ public class CognitiveMetrics
     public float planificacion;
     public float coordinacionVisomotora;
 }
-
 
 [System.Serializable]
 public class GameSessionData

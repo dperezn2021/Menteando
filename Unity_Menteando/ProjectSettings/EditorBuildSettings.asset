@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Framework/Juegos/RoscoExpress/RoscoExpress_SampleScene.unity
     guid: 9484e8b1ad6aec445bc4a102356eaf9b
+  - enabled: 0
+    path: Assets/Framework/Juegos/MisionOrbital/MisionOrbital_SampleScene.unity
+    guid: 4181590a9d7b6064a85be41203388ec5
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

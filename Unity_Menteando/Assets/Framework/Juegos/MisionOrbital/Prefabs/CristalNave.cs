@@ -273,11 +273,11 @@ public class CristalNave : MonoBehaviour
         barraEstaciones.sizeDelta = new Vector2(barraEstaciones.sizeDelta.x, altura);
 
         if (p > 0.7f)
-            barraEstacionesImage.color = Color.Lerp(new Color(1f, 0.5f, 0f), Color.red, (p - 0.7f) / 0.3f);
+            barraEstacionesImage.color = colorSecundario;
         else if (p > 0.3f)
             barraEstacionesImage.color = Color.Lerp(colorSecundario, new Color(1f, 0.5f, 0f), (p - 0.3f) / 0.4f);
         else
-            barraEstacionesImage.color = colorSecundario;
+            barraEstacionesImage.color = Color.Lerp(new Color(1f, 0.5f, 0f), Color.red, (p - 0.7f) / 0.3f);
     }
 
     // ============================================================

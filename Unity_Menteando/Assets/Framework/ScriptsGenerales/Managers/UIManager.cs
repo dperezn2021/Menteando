@@ -46,7 +46,16 @@ public class UIManager : MonoBehaviour
     {
         ConfigurarBotones();
         MostrarSolo(pantallaInicio);
-        cristalCanvas.SetActive(false);
+        AudioManager.Instance.MusicaMenu();
+        if(cristalCanvas == null)
+        {
+            return;
+        }
+        else
+        {
+            cristalCanvas.SetActive(false);
+
+        }
     }
 
     void Update()
@@ -54,7 +63,7 @@ public class UIManager : MonoBehaviour
         if (!GameManager.Instance.estaJugando)
             return;
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && GameManager.Instance.estaJugando)
             TogglePausa();
     }
 
@@ -69,11 +78,8 @@ public class UIManager : MonoBehaviour
 
         botonAjustesInicio.onClick.AddListener(() => {
             AudioManager.Instance.Click();
-            sliderMusica.value = AudioManager.Instance.musicaVolumen;
-            sliderSFX.value = AudioManager.Instance.sfxVolumen;
-
             pantallaAnterior = pantallaInicio;
-            MostrarSolo(pantallaAjustes);
+            MusicaAbrirAjustes(); 
         });
 
         botonPausa.onClick.AddListener(() => {
@@ -82,27 +88,30 @@ public class UIManager : MonoBehaviour
         });
 
         botonReanudar.onClick.AddListener(() => {
+            Debug.Log("🔘 Botón REANUDAR clickeado - ANTES");
             AudioManager.Instance.Click();
+            Debug.Log("🔘 Botón REANUDAR - después de Audio");
             TogglePausa();
+            Debug.Log("🔘 Botón REANUDAR - después de TogglePausa");
         });
 
         botonReiniciar.onClick.AddListener(() => {
+            Debug.Log("🔘 Botón REINICIAR clickeado");
             AudioManager.Instance.Click();
             ReiniciarPartida();
         });
 
         botonMenu.onClick.AddListener(() => {
+            Debug.Log("🔘 Botón MENU clickeado");
             AudioManager.Instance.Click();
             VolverAlMenu();
         });
 
         botonAjustesPausa.onClick.AddListener(() => {
+            Debug.Log("🔘 Botón AJUSTES clickeado");
             AudioManager.Instance.Click();
             pantallaAnterior = pantallaPausa;
-            sliderMusica.value = AudioManager.Instance.musicaVolumen;
-            sliderSFX.value = AudioManager.Instance.sfxVolumen;
-
-            MostrarSolo(pantallaAjustes);
+            MusicaAbrirAjustes();
         });
 
         botonCerrarAjustes.onClick.AddListener(() => {
@@ -120,6 +129,23 @@ public class UIManager : MonoBehaviour
             VolverAlMenu();
         });
     }
+    public void MusicaAbrirAjustes()
+    {
+        // 1. Quitar listeners para evitar que manden 0
+        sliderMusica.onValueChanged.RemoveAllListeners();
+        sliderSFX.onValueChanged.RemoveAllListeners();
+
+        // 2. Sincronizar sliders con el AudioManager
+        sliderMusica.value = AudioManager.Instance.musicaVolumen;
+        sliderSFX.value = AudioManager.Instance.sfxVolumen;
+
+        // 3. Volver a activar listeners
+        sliderMusica.onValueChanged.AddListener(AudioManager.Instance.SetMusicaVolumen);
+        sliderSFX.onValueChanged.AddListener(AudioManager.Instance.SetSFXVolumen);
+
+        // 4. Mostrar panel
+        MostrarSolo(pantallaAjustes);
+    }
 
     void MostrarSolo(GameObject pantalla)
     {
@@ -130,45 +156,77 @@ public class UIManager : MonoBehaviour
         pantallaFinPartida.SetActive(pantalla == pantallaFinPartida);
     }
 
-    void IniciarPartida()
-    {
-        Time.timeScale = 1f;
-
-        MostrarSolo(UIPartida);
-        cristalCanvas.SetActive(true);
-
-        var juego = FindAnyObjectByType<MisionOrbitalGame>(FindObjectsInactive.Include);
-        if (juego != null)
-            juego.sistemaOrbital.SetActive(true);
-
-        GameManager.Instance.EmpezarJuego(juego);
-    }
-
     void ReiniciarPartida()
     {
+        Debug.Log("🎮 ReiniciarPartida - Click en Jugar de nuevo");
+        
         Time.timeScale = 1f;
-
+        pausado = false;
+        
+        // 🔥 Asegurar que la UI de juego está visible
         MostrarSolo(UIPartida);
-        cristalCanvas.SetActive(true);
+        
+        if (cristalCanvas != null)
+            cristalCanvas.SetActive(true);
 
-        var juego = FindAnyObjectByType<MisionOrbitalGame>(FindObjectsInactive.Include);
+        // 🔥 Forzar la recreación del grid
+        var juego = FindAnyObjectByType<DetectorDeIntrusosGame>(FindObjectsInactive.Include);
         if (juego != null)
-            juego.sistemaOrbital.SetActive(true);
+        {
+            // Limpiar cualquier estado residual
+            juego.ResetGame();
+            GameManager.Instance.ReiniciarPartida();
+        }
+        else
+        {
+            Debug.LogError("❌ No se encontró DetectorDeIntrusosGame");
+        }
+    }
+    
+    void IniciarPartida()
+    {
+        Debug.Log("🎮 IniciarPartida");
+        
+        Time.timeScale = 1f;
+        MostrarSolo(UIPartida);
+        
+        if (cristalCanvas != null)
+            cristalCanvas.SetActive(true);
 
-        GameManager.Instance.ReiniciarPartida();
+        var juego = FindAnyObjectByType<BaseGame>(FindObjectsInactive.Include);
+        
+        if (juego == null)
+        {
+            Debug.LogError("❌ No se encontró ningún juego");
+            return;
+        }
+        
+        Debug.Log($"✅ Juego encontrado: {juego.nombre}");
+        
+        // 🔥 Asegurar que el juego se resetea antes de empezar
+        juego.ResetGame();
+        GameManager.Instance.EmpezarJuego(juego);
     }
 
 
     void VolverAlMenu()
     {
         Time.timeScale = 1f;
-
+        pausado = false;
         MostrarSolo(pantallaInicio);
 
         // Ocultar HUD
-        cristalCanvas.SetActive(false);
+        if (cristalCanvas == null)
+        {
+            return;
+        }
+        else
+        {
+            cristalCanvas.SetActive(false);
 
-        // Ocultar rosco
+        }
+
+
         var juego = FindAnyObjectByType<MisionOrbitalGame>(FindObjectsInactive.Include);
         if (juego != null)
             juego.sistemaOrbital.SetActive(false);
@@ -180,25 +238,45 @@ public class UIManager : MonoBehaviour
     {
         pausado = !pausado;
 
+        // Buscar el juego actual
+        var juego = FindAnyObjectByType<BaseGame>(FindObjectsInactive.Include);
+        Debug.Log($"🎮 TogglePausa - pausado: {pausado}, Time.timeScale: {Time.timeScale}");
+
         if (pausado)
         {
             MostrarSolo(pantallaPausa);
-            cristalCanvas.SetActive(false);
-            Time.timeScale = 0f;
+            if (cristalCanvas != null)
+                cristalCanvas.SetActive(false);
+
+            // 🔥 NO tocar Time.timeScale!
+            // Time.timeScale se mantiene en 1f
+
+            // Notificar al GameManager que está pausado
+            GameManager.Instance.PausarJuego(true);
         }
         else
         {
             MostrarSolo(UIPartida);
-            cristalCanvas.SetActive(true);
-            Time.timeScale = 1f;
+            if (cristalCanvas != null)
+                cristalCanvas.SetActive(true);
+
+            // Notificar al GameManager que continúa
+            GameManager.Instance.PausarJuego(false);
         }
     }
-
 
     public void MostrarResultados(CognitiveMetrics m)
     {
         MostrarSolo(pantallaFinPartida);
-        cristalCanvas.SetActive(false);
+        if (cristalCanvas == null)
+        {
+            return;
+        }
+        else
+        {
+            cristalCanvas.SetActive(false);
+
+        }
         Time.timeScale = 0f;
     }
 }

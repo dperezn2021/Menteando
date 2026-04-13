@@ -8,11 +8,11 @@ public class GameManager : MonoBehaviour
     public float duracionPartida = 20f;
     public float tiempoRestante;
     public bool estaJugando;
+    private bool juegoPausadoGlobal = false;
 
     private void Awake()
     {
         Application.runInBackground = true;
-       
 
         if (Instance == null)
         {
@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
         juegoActual = juego;
         tiempoRestante = duracionPartida;
         estaJugando = true;
+        juegoPausadoGlobal = false;
+        Time.timeScale = 1f;  // Asegurar tiempo normal
 
         juegoActual.ResetGame();
     }
@@ -36,20 +38,43 @@ public class GameManager : MonoBehaviour
     {
         tiempoRestante = duracionPartida;
         estaJugando = true;
+        juegoPausadoGlobal = false;
+        Time.timeScale = 1f;
         AudioManager.Instance.MusicaJuego();
 
-        juegoActual.ResetGame();
+        if (juegoActual != null)
+        {
+            juegoActual.ResetGame();
+            juegoActual.OnGameStart();
+        }
     }
 
     public void VolverAlMenu()
     {
         AudioManager.Instance.MusicaMenu();
         estaJugando = false;
+        juegoPausadoGlobal = false;
+        Time.timeScale = 1f;
+    }
+
+    public void PausarJuego(bool pausar)
+    {
+        juegoPausadoGlobal = pausar;
+
+        Debug.Log($"🎮 GameManager.PausarJuego - pausar: {pausar}");
+
+        if (juegoActual != null)
+            juegoActual.PausarJuego(pausar);
+    }
+
+    public bool EstaPausado()
+    {
+        return juegoPausadoGlobal;
     }
 
     private void Update()
     {
-        if (!estaJugando) return;
+        if (!estaJugando || juegoPausadoGlobal) return;
 
         tiempoRestante -= Time.deltaTime;
 
@@ -60,12 +85,17 @@ public class GameManager : MonoBehaviour
     private void AcabarJuego()
     {
         estaJugando = false;
+        juegoPausadoGlobal = false;
 
-        var metricas = juegoActual.CalcularCognicion();
-        var ponderadas = juegoActual.AplicarPesos(metricas);
-        AudioManager.Instance.MusicaVictoria();
+        if (juegoActual != null)
+        {
+            var metricas = juegoActual.CalcularCognicion();
+            var ponderadas = juegoActual.AplicarPesos(metricas);
 
-        juegoActual.OnGameFinished();
-        UIManager.Instance.MostrarResultados(ponderadas);
+            juegoActual.OnGameFinished();
+
+            AudioManager.Instance.MusicaVictoria();
+            UIManager.Instance.MostrarResultados(ponderadas);
+        }
     }
 }
