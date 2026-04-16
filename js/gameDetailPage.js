@@ -161,6 +161,9 @@ function iniciarPantallaCompleta(content) {
     const iframe = document.getElementById("game-iframe");
     
     if (!fullscreenBtn || !iframe) return;
+
+    // Asegurar que el botón no actúe como submit en ningún contexto
+    try { fullscreenBtn.setAttribute('type','button'); } catch (e) {}
     
     let exitBtn = null;
     let originalContainerStyles = {};
@@ -278,6 +281,8 @@ function iniciarPantallaCompleta(content) {
         if (exitBtn) return;
         
         exitBtn = document.createElement("button");
+        // evitar comportamiento por defecto
+        try { exitBtn.setAttribute('type','button'); } catch (e) {}
         exitBtn.id = "exit-fullscreen-btn";
         exitBtn.textContent = "✕ Salir";
         exitBtn.style.cssText = `
@@ -310,7 +315,8 @@ function iniciarPantallaCompleta(content) {
             exitBtn.style.transform = "scale(1)";
         };
         
-        exitBtn.onclick = () => {
+        exitBtn.addEventListener('click', (ev) => {
+            ev.preventDefault();
             if (document.fullscreenElement || document.webkitFullscreenElement) {
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
@@ -323,7 +329,7 @@ function iniciarPantallaCompleta(content) {
                 // salir del overlay fallback
                 restoreOriginalState();
             }
-        };
+        });
         
         document.body.appendChild(exitBtn);
     }
@@ -343,7 +349,9 @@ function iniciarPantallaCompleta(content) {
     }
     
     // Botón principal para entrar en pantalla completa
-    fullscreenBtn.addEventListener("click", async () => {
+    fullscreenBtn.addEventListener("click", async (ev) => {
+        // evitar que un submit u otro handler recargue la página
+        if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
         try {
             const container = iframe.parentElement;
             saveOriginalStyles();
