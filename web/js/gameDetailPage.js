@@ -179,9 +179,8 @@ function iniciarPantallaCompleta(content) {
     function restoreOriginalState() {
         const container = iframe.parentElement;
 
-        // Si usamos overlay, devolver el contenedor a su padre original
-        if (usingOverlayFallback && overlayEl && originalParent) {
-            // quitar estilos del contenedor que añadimos
+        // Si usamos overlay fallback, NO movimos el contenedor — solo restauramos estilos y quitamos el backdrop
+        if (usingOverlayFallback && overlayEl) {
             container.style.position = originalContainerStyles.position || "";
             container.style.top = originalContainerStyles.top || "";
             container.style.left = originalContainerStyles.left || "";
@@ -190,15 +189,10 @@ function iniciarPantallaCompleta(content) {
             container.style.zIndex = originalContainerStyles.zIndex || "";
             container.style.borderRadius = originalContainerStyles.borderRadius || "";
 
-            // mover de vuelta
-            if (originalNextSibling && originalNextSibling.parentElement === originalParent) {
-                originalParent.insertBefore(container, originalNextSibling);
-            } else {
-                originalParent.appendChild(container);
-            }
+            iframe.style.width = originalIframeStyles.width || "";
+            iframe.style.height = originalIframeStyles.height || "";
 
-            // eliminar overlay
-            overlayEl.remove();
+            if (overlayEl.parentElement) overlayEl.parentElement.removeChild(overlayEl);
             overlayEl = null;
             usingOverlayFallback = false;
         } else {
@@ -317,6 +311,7 @@ function iniciarPantallaCompleta(content) {
         
         exitBtn.addEventListener('click', (ev) => {
             ev.preventDefault();
+            if (typeof ev.stopPropagation === 'function') ev.stopPropagation();
             if (document.fullscreenElement || document.webkitFullscreenElement) {
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
@@ -351,7 +346,10 @@ function iniciarPantallaCompleta(content) {
     // Botón principal para entrar en pantalla completa
     fullscreenBtn.addEventListener("click", async (ev) => {
         // evitar que un submit u otro handler recargue la página
-        if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+        if (ev && typeof ev.preventDefault === 'function') {
+            ev.preventDefault();
+            if (typeof ev.stopPropagation === 'function') ev.stopPropagation();
+        }
         try {
             const container = iframe.parentElement;
             saveOriginalStyles();
@@ -382,22 +380,31 @@ function iniciarPantallaCompleta(content) {
                 applyFullscreenStyles();
                 createExitButton();
             } else {
-                // Fallback: overlay absoluto (funciona incluso si requestFullscreen está restringido)
+                // Fallback: overlay/backdrop sin mover el contenedor para evitar recarga del iframe
                 usingOverlayFallback = true;
                 overlayEl = document.createElement('div');
                 overlayEl.className = 'unity-fullscreen-overlay';
-                overlayEl.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;background:#000;display:flex;align-items:stretch;justify-content:center;z-index:9998;';
+                overlayEl.style.cssText = 'position:fixed;inset:0;background:#000;z-index:9998;';
 
-                // mover el contenedor dentro del overlay
+                // Append backdrop (no mover el contenedor)
                 try {
-                    overlayEl.appendChild(container);
                     document.body.appendChild(overlayEl);
 
-                    // aplicar estilos para ocupar pantalla
-                    applyFullscreenStyles();
+                    // aplicar estilos para ocupar pantalla al contenedor SIN moverlo
+                    container.style.position = 'fixed';
+                    container.style.top = '0';
+                    container.style.left = '0';
+                    container.style.width = '100vw';
+                    container.style.height = '100vh';
+                    container.style.zIndex = '9999';
+                    container.style.borderRadius = '0';
+
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+
                     createExitButton();
                 } catch (err) {
-                    console.error('Error al mover el contenedor al overlay:', err);
+                    console.error('Error al crear overlay backdrop:', err);
                 }
             }
 
