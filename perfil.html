@@ -302,9 +302,9 @@
                     <div id="tarjetas-resumenes-rapidos" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div
                             class="bg-slate-50 dark:bg-slate-800 p-4 lg:p-5 rounded-xl text-center outline outline-1 outline-slate-200 dark:outline-slate-700">
-                            <div class="text-xs uppercase tracking-wide text-slate-500">Tiempo Promedio</div>
+                            <div class="text-xs uppercase tracking-wide text-slate-500">Media de sesiones diarias</div>
                             <div class="text-xl lg:text-2xl font-bold text-blue-500 mt-2"><span
-                                    id="perfil-tiempo"></span></div>
+                                    id="media-racha-diaria"></span></div>
                         </div>
                         <div
                             class="bg-slate-50 dark:bg-slate-800 p-4 lg:p-5 rounded-xl text-center outline outline-1 outline-slate-200 dark:outline-slate-700">
@@ -626,7 +626,7 @@
             }
 
             //Racha
-            const racha = actualizarRachaTotal();
+            const racha = actualizarRachaPorSesionCompletada();
             const spanRacha = document.getElementById("perfil-racha-total");
 
             if (spanRacha) {

@@ -10,7 +10,6 @@ const perfilBase = {
     racha: 0,
     tiempo: 0,
     puntos: 0,
-    puntosString : "",
     correo: "",
     sesiones: 0,
     nivel: 0,
@@ -65,7 +64,29 @@ function saveperfil(perfil) {
 
 // === REINICIAR PERFIL ===
 function resetperfil() {
-    saveperfil(perfilBase);
+    // Crear copia limpia del perfilBase
+    const perfilLimpio = JSON.parse(JSON.stringify(perfilBase));
+    perfilLimpio.desde = new Date().toISOString();
+    perfilLimpio.racha = 0;
+    perfilLimpio.ultimaSesion = null;  // Importante para que la racha se reinicie
+    perfilLimpio.sesiones = 0;
+    perfilLimpio.puntos = 0;
+    perfilLimpio.puntosString = "";
+    perfilLimpio.tiempo = 0;
+    perfilLimpio.nivel = 0;
+    perfilLimpio.juegos = {};
+    perfilLimpio.juegoMasJugado = "Cargando...";
+    perfilLimpio.atencion = 0;
+    perfilLimpio.memoria = 0;
+    perfilLimpio.control = 0;
+    perfilLimpio.reflejos = 0;
+    perfilLimpio.detalle = JSON.parse(JSON.stringify(perfilBase.detalle));
+    perfilLimpio.sesionesDiarias = [0, 0, 0, 0, 0, 0, 0];
+    perfilLimpio.ultimaSesionDia = null;
+    
+    saveperfil(perfilLimpio);
+    localStorage.removeItem("medallas_completadas");
+    location.reload();
 }
 
 // === RECALCULAR PERFIL GLOBAL ===
@@ -140,13 +161,12 @@ function getNivel(perfil){
 
 
 // ========== FUNCIÓN DE FORMATO ==========
-function formatPuntos(n) {
-    if (typeof n !== 'number' || isNaN(n)) n = 0;
-    if (n < 1000) return Math.floor(n).toString();
-    if (n < 1000000) return (n / 1000).toFixed(1) + "K";
-    return (n / 1000000).toFixed(1) + "M";
+function formatearPuntos(puntos) {
+    if (typeof puntos !== 'number' || isNaN(puntos)) puntos = 0;
+    if (puntos < 1000) return Math.floor(puntos).toString();
+    if (puntos < 1000000) return (puntos / 1000).toFixed(1) + "K";
+    return (puntos / 1000000).toFixed(1) + "M";
 }
-
 // ========== ACTUALIZAR PUNTOS STRING ==========
 function actualizarPuntosString(perfil) {
     perfil.puntosString = formatPuntos(perfil.puntos);
@@ -170,41 +190,75 @@ function getTiempo(perfil) {
 
     return tiempo;
 }
-function actualizarRachaTotal() {
+
+// Renombrar para claridad - esta función se llama SOLO al completar una sesión de juego
+function actualizarRachaPorSesionCompletada() {
     const perfil = getperfil();
-
-    const hoy = new Date().toDateString(); // Fecha sin horas
-    const ultimaFecha = perfil.ultimaRacha || null;
-
-    // Si es la primera vez
-    if (!ultimaFecha) {
-        perfil.racha = 1;
-        perfil.ultimaRacha = hoy;
-        saveperfil(perfil);
-        return perfil.racha;
-    }
-
-    // Si ya entró hoy → no aumentar
-    if (ultimaFecha === hoy) {
-        return perfil.racha;
-    }
-
-    // Calcular diferencia de días
-    const diffDias = Math.floor(
-        (new Date(hoy) - new Date(ultimaFecha)) / (1000 * 60 * 60 * 24)
-    );
-
-    if (diffDias === 1) {
-        // Día consecutivo → aumentar racha
-        perfil.racha += 1;
+    
+    // Usar ultimaSesion que ya guarda la fecha de la última partida completada
+    const ultimaFechaStr = perfil.ultimaSesion;
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
+    let nuevaRacha = perfil.racha || 0;
+    
+    if (!ultimaFechaStr) {
+        // Primera sesión de su vida
+        nuevaRacha = 1;
     } else {
-        // Se rompió la racha
-        perfil.racha = 1;
+        const ultimaFecha = new Date(ultimaFechaStr);
+        ultimaFecha.setHours(0, 0, 0, 0);
+        
+        const diferenciaDias = Math.floor((hoy - ultimaFecha) / (1000 * 60 * 60 * 24));
+        
+        if (diferenciaDias === 0) {
+            // Ya jugó hoy, no aumentar (evita múltiples sesiones el mismo día)
+            nuevaRacha = perfil.racha;
+        } else if (diferenciaDias === 1) {
+            // Jugó ayer, aumentar racha
+            nuevaRacha = (perfil.racha || 0) + 1;
+        } else {
+            // Pasó más de un día sin jugar, reiniciar racha
+            nuevaRacha = 1;
+        }
     }
-
-    perfil.ultimaRacha = hoy;
+    
+    perfil.racha = nuevaRacha;
     saveperfil(perfil);
+    
+    // Verificar medallas después de actualizar racha
+    if (typeof actualizarLogrosYMedallas === 'function') {
+        actualizarLogrosYMedallas();
+    }
+    
+    // Notificación al alcanzar racha de 7
+    if (nuevaRacha === 7) {
+        console.log("🎉 ¡Medalla desbloqueada! Racha imparable - 7 días seguidos jugando");
+    }
+    
+    return nuevaRacha;
+}
 
+
+// Para mostrar la racha correcta en la UI (no modifica el perfil)
+function obtenerRachaVisible() {
+    const perfil = getperfil();
+    
+    if (!perfil.ultimaSesion) return perfil.racha || 0;
+    
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
+    const ultimaSesion = new Date(perfil.ultimaSesion);
+    ultimaSesion.setHours(0, 0, 0, 0);
+    
+    const diferenciaDias = Math.floor((hoy - ultimaSesion) / (1000 * 60 * 60 * 24));
+    
+    // Si pasó más de 1 día sin jugar, mostrar 0
+    if (diferenciaDias > 1) {
+        return 0;
+    }
+    
     return perfil.racha;
 }
 
@@ -389,8 +443,8 @@ window.activarCoach = activarCoach;
 window.desactivarCoach = desactivarCoach;
 window.getDiasJugadosSemana = getDiasJugadosSemana;
 window.actualizarSesionesDiarias = actualizarSesionesDiarias;
-window.actualizarRachaTotal = actualizarRachaTotal;
-
+window.actualizarRachaPorSesionCompletada = actualizarRachaPorSesionCompletada;
+window.obtenerRachaVisible = obtenerRachaVisible;
 
 window.addEventListener("DOMContentLoaded", () => {
     const badge = document.getElementById("titulo-activar-coach");

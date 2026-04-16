@@ -1,33 +1,27 @@
 ﻿window.SaveGameData = function (jsonString) {
     try {
-        // 1. Reemplazar valores inválidos ANTES de parsear
         jsonString = jsonString
             .replace(/Infinity/g, "0")
             .replace(/-Infinity/g, "0")
             .replace(/NaN/g, "0");
 
-        // 2. Parsear con seguridad
         const data = JSON.parse(jsonString);
-
         const perfil = getperfil();
 
         // Guardar sesión
         perfil.sesiones++;
         perfil.ultimaSesion = data.timestamp;
+        
+        // Actualizar racha
+        actualizarRachaPorSesionCompletada();
+        
+        // Sumar puntos (solo el número)
         let puntosAAñadir = Number(data.puntos);
-        if (isNaN(puntosAAñadir)) {
-            console.warn("data.puntos no es número:", data.puntos);
-            puntosAAñadir = 0;
-        }
-
-        // Sumar al total (número)
+        if (isNaN(puntosAAñadir)) puntosAAñadir = 0;
         perfil.puntos += puntosAAñadir;
 
-        // Actualizar 
-        actualizarPuntosString(perfil);       
+        // Actualizar sesiones diarias
         actualizarSesionesDiarias(perfil);
-
-
 
         // Guardar juego
         if (!perfil.juegos[data.gameId]) perfil.juegos[data.gameId] = [];
@@ -37,9 +31,8 @@
         // Recalcular perfil
         recalcularPerfilGlobal(perfil, data.metrics, data.gameId);
 
-        //Actualizar puntos y tiempo
+        // Actualizar nivel y tiempo
         perfil.nivel = getNivel(perfil);
-        perfil.puntosString = getPuntos(perfil);
         perfil.tiempo = getTiempo(perfil);
 
         // Guardar
