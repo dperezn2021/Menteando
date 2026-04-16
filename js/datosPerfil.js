@@ -29,10 +29,10 @@
     // Puntos formateados
     const puntosFormateados = formatearPuntos(perfil.puntos);
     set("perfil-puntos", puntosFormateados);
-    
+
     // Tiempo (compatibilidad)
     set("perfil-tiempo", getTiempo(perfil));
-    
+
     set("perfil-sesiones", perfil.sesiones);
     set("perfil-apodo-header", perfil.apodo);
     set("perfil-juego-mas-jugado", perfil.juegoMasJugado);
@@ -233,6 +233,7 @@
     const modal = document.getElementById("modal-editar");
     const btnEditar = document.getElementById("btn-editar");
     const btnCerrar = document.getElementById("btn-cerrar-modal");
+    const btnGuardar = document.getElementById("btn-guardar");
     const formModal = document.getElementById("perfil-form");
 
     // Botón del coach (versión original)
@@ -273,28 +274,23 @@
     }
 
     // Guardar cambios
-    if (formModal) {
-        formModal.addEventListener("submit", (e) => {
-            e.preventDefault();
+    formModal.addEventListener("submit", (e) => {
+        e.preventDefault();
 
-            const perfilActual = getperfil();
+        const perfil = getperfil();
 
-            const nameInput = document.getElementById("name");
-            const nicknameInput = document.getElementById("nickname");
-            const ageInput = document.getElementById("age");
-            const emailInput = document.getElementById("email");
+        perfil.nombre = document.getElementById("name").value;
+        perfil.apodo = document.getElementById("nickname").value;
+        perfil.edad = parseInt(document.getElementById("age").value);
+        perfil.correo = document.getElementById("email").value;
 
-            if (nameInput) perfilActual.nombre = nameInput.value;
-            if (nicknameInput) perfilActual.apodo = nicknameInput.value;
-            if (ageInput) perfilActual.edad = parseInt(ageInput.value) || 0;
-            if (emailInput) perfilActual.correo = emailInput.value;
+        saveperfil(perfil);
 
-            saveperfil(perfilActual);
+        modal.style.display = "none";
+        location.reload();
+    });
 
-            if (modal) modal.style.display = "none";
-            location.reload();
-        });
-    }
+
 
     // Cerrar modal si se clica fuera
     if (modal) {
