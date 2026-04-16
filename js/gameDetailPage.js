@@ -154,88 +154,84 @@ function renderGameDetailPage(gameId) {
     const container = document.querySelector("#game-detail-content .relative");
     const iframe = container?.querySelector("iframe");
 
-    if (fullscreenBtn && container && iframe) {
+    if (fullscreenBtn && iframe) {
         fullscreenBtn.addEventListener("click", async () => {
             try {
-                // Guardar estilos originales
-                const originalBorderRadius = container.style.borderRadius;
-                const originalAspectRatio = container.style.aspectRatio;
-                const originalOverflow = container.style.overflow;
-
-                // Quitar bordes y aspect-ratio temporalmente
-                container.style.borderRadius = "0";
-                container.style.aspectRatio = "auto";
-                container.style.overflow = "visible";
-
-                // Poner el contenedor en fullscreen
-                if (container.requestFullscreen) {
-                    await container.requestFullscreen();
-                } else if (container.webkitRequestFullscreen) {
-                    await container.webkitRequestFullscreen();
-                } else if (container.msRequestFullscreen) {
-                    await container.msRequestFullscreen();
-                }
-
-                // Forzar orientación horizontal en móvil
-                if (screen.orientation && screen.orientation.lock) {
-                    try {
-                        await screen.orientation.lock("landscape");
-                    } catch (e) { }
-                }
-
-                // === AÑADIR BOTÓN FLOTANTE PARA SALIR (solo en móvil) ===
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-                if (isMobile && !document.getElementById("exit-fullscreen-btn")) {
-                    const exitBtn = document.createElement("button");
-                    exitBtn.id = "exit-fullscreen-btn";
-                    exitBtn.textContent = "✕ Salir";
-                    exitBtn.style.position = "fixed";
-                    exitBtn.style.top = "20px";
-                    exitBtn.style.right = "20px";
-                    exitBtn.style.zIndex = "10000";
-                    exitBtn.style.backgroundColor = "rgba(0,0,0,0.7)";
-                    exitBtn.style.color = "white";
-                    exitBtn.style.border = "none";
-                    exitBtn.style.borderRadius = "30px";
-                    exitBtn.style.padding = "10px 20px";
-                    exitBtn.style.fontSize = "16px";
-                    exitBtn.style.fontWeight = "bold";
-                    exitBtn.style.cursor = "pointer";
-                    exitBtn.style.backdropFilter = "blur(10px)";
-                    exitBtn.style.webkitBackdropFilter = "blur(10px)";
+                if (isMobile) {
+                    // En móvil: hacer fullscreen al iframe directamente
+                    if (iframe.requestFullscreen) {
+                        await iframe.requestFullscreen();
+                    } else if (iframe.webkitRequestFullscreen) {
+                        await iframe.webkitRequestFullscreen();
+                    } else if (iframe.msRequestFullscreen) {
+                        await iframe.msRequestFullscreen();
+                    }
 
-                    exitBtn.addEventListener("click", () => {
-                        if (document.exitFullscreen) {
-                            document.exitFullscreen();
-                        } else if (document.webkitExitFullscreen) {
-                            document.webkitExitFullscreen();
-                        } else if (document.msExitFullscreen) {
-                            document.msExitFullscreen();
+                    // Forzar orientación horizontal
+                    if (screen.orientation && screen.orientation.lock) {
+                        try {
+                            await screen.orientation.lock("landscape");
+                        } catch (e) {
+                            console.log("No se pudo bloquear orientación:", e);
                         }
-                    });
+                    }
 
-                    document.body.appendChild(exitBtn);
+                    // Añadir botón de salir flotante
+                    if (!document.getElementById("exit-fullscreen-btn")) {
+                        const exitBtn = document.createElement("button");
+                        exitBtn.id = "exit-fullscreen-btn";
+                        exitBtn.textContent = "✕ Salir";
+                        exitBtn.style.position = "fixed";
+                        exitBtn.style.top = "20px";
+                        exitBtn.style.right = "20px";
+                        exitBtn.style.zIndex = "10000";
+                        exitBtn.style.backgroundColor = "rgba(0,0,0,0.7)";
+                        exitBtn.style.color = "white";
+                        exitBtn.style.border = "none";
+                        exitBtn.style.borderRadius = "30px";
+                        exitBtn.style.padding = "10px 20px";
+                        exitBtn.style.fontSize = "16px";
+                        exitBtn.style.fontWeight = "bold";
+                        exitBtn.style.cursor = "pointer";
+                        exitBtn.style.backdropFilter = "blur(10px)";
+
+                        exitBtn.addEventListener("click", () => {
+                            if (document.exitFullscreen) {
+                                document.exitFullscreen();
+                            } else if (document.webkitExitFullscreen) {
+                                document.webkitExitFullscreen();
+                            } else if (document.msExitFullscreen) {
+                                document.msExitFullscreen();
+                            }
+                        });
+
+                        document.body.appendChild(exitBtn);
+                    }
+                } else {
+                    // En escritorio: hacer fullscreen al contenedor
+                    if (container.requestFullscreen) {
+                        await container.requestFullscreen();
+                    } else if (container.webkitRequestFullscreen) {
+                        await container.webkitRequestFullscreen();
+                    } else if (container.msRequestFullscreen) {
+                        await container.msRequestFullscreen();
+                    }
                 }
 
-                // Al salir de fullscreen, restaurar estilos y quitar botón
+                // Al salir de fullscreen, limpiar
                 const exitHandler = () => {
                     if (!document.fullscreenElement) {
-                        container.style.borderRadius = originalBorderRadius || "16px";
-                        container.style.aspectRatio = originalAspectRatio || "16 / 9";
-                        container.style.overflow = originalOverflow || "hidden";
-
-                        // Quitar botón flotante
                         const exitBtn = document.getElementById("exit-fullscreen-btn");
                         if (exitBtn) exitBtn.remove();
-
                         document.removeEventListener("fullscreenchange", exitHandler);
                     }
                 };
                 document.addEventListener("fullscreenchange", exitHandler);
 
             } catch (e) {
-                console.error("Error:", e);
+                console.error("Error al entrar en fullscreen:", e);
             }
         });
     }

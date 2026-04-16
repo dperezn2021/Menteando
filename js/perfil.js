@@ -369,66 +369,94 @@ function enviarMetricasPorCorreo(perfil) {
         .catch(err => console.error("Error enviando correo:", err));
 }
 
+// ------------------------- COACH GLOBAL ---------------------------
 
-
-//------------------------- COACH ---------------------------
-
-function disableCoachForever() {
-    localStorage.setItem("coach_disabled", "true");
-}
-
+// Estado global del coach
 function isCoachDisabled() {
     return localStorage.getItem("coach_disabled") === "true";
 }
 
-
 function activarCoach() {
-    const btnActivarCoach = document.getElementById("btn-activar-coach");
-    const badge = document.getElementById("titulo-activar-coach");
-    const dot = document.getElementById("coach-status-dot");
-
-    if (!badge || !dot) {
-        console.warn("activarCoach(): elementos no encontrados");
-        return;
-    }
-
-    badge.textContent = "Coach Cognitivo Activo";
-
-    if (btnActivarCoach) btnActivarCoach.style.display = "none";
-
-    badge.classList.remove("text-red-500");
-    badge.classList.add("text-blue-500");
-
-    dot.classList.remove("bg-blue-500");
-    dot.classList.add("bg-green-500");
-
     localStorage.setItem("coach_disabled", "false");
 }
 
 function desactivarCoach() {
-    const btnActivarCoach = document.getElementById("btn-activar-coach");
-    const badge = document.getElementById("titulo-activar-coach");
-    const dot = document.getElementById("coach-status-dot");
-
-    if (!badge || !dot) {
-        console.warn("desactivarCoach(): elementos no encontrados");
-        return;
-    }
-
-    badge.textContent = "Coach Cognitivo Desactivado";
-
-    if (btnActivarCoach) btnActivarCoach.style.display = "block";
-
-    badge.classList.remove("text-blue-500");
-    badge.classList.add("text-red-500");
-
-    dot.classList.remove("bg-green-500");
-    dot.classList.add("bg-red-500");
-
     localStorage.setItem("coach_disabled", "true");
 }
 
+// Actualiza el badge y el botón del perfil
+function actualizarUICoach() {
+    const disabled = isCoachDisabled();
 
+    const badge = document.getElementById("titulo-activar-coach");
+    const dot = document.getElementById("coach-status-dot");
+    const btn = document.getElementById("btn-toggle-coach");
+
+    if (!badge || !dot || !btn) return;
+
+    if (disabled) {
+        // Coach desactivado → botón verde para ACTIVAR
+        badge.textContent = "Coach Cognitivo Desactivado";
+        badge.className = "text-red-500 font-semibold";
+
+        dot.className = "w-3 h-3 bg-red-500 rounded-full";
+
+        btn.textContent = "Activar Coach";
+        btn.className =
+            "py-2 px-8 rounded-lg font-bold text-base transition-colors " +
+            "bg-green-200 dark:bg-green-900/30 hover:bg-green-300 dark:hover:bg-green-900/50 " +
+            "text-green-700 dark:text-green-400";
+
+    } else {
+        // Coach activado → botón amarillo para DESACTIVAR
+        badge.textContent = "Coach Cognitivo Activo";
+        badge.className = "text-green-500 font-semibold";
+
+        dot.className = "w-3 h-3 bg-green-500 rounded-full";
+
+        btn.textContent = "Desactivar Coach";
+        btn.className =
+            "py-2 px-8 rounded-lg font-bold text-base transition-colors " +
+            "bg-yellow-200 dark:bg-yellow-900/30 hover:bg-yellow-300 dark:hover:bg-yellow-900/50 " +
+            "text-yellow-700 dark:text-yellow-400";
+    }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    actualizarUICoach();
+
+    const btn = document.getElementById("btn-toggle-coach");
+    if (!btn) return;
+
+    btn.addEventListener("click", () => {
+        if (isCoachDisabled()) activarCoach();
+        else desactivarCoach();
+
+        actualizarUICoach();
+        location.reload(); // Para eliminar el coach del DOM si se desactiva
+    });
+
+    // Si está desactivado → eliminar coach del DOM
+    if (isCoachDisabled()) {
+        const coach = document.getElementById("coach");
+        const bubble = document.getElementById("coach-bubble");
+        if (coach) coach.remove();
+        if (bubble) bubble.remove();
+    }
+});
+
+// -------------------------------- RESET PERFIL ------------------------------------
+
+const btnReset = document.getElementById("btn-reset-perfil");
+
+if (btnReset) {
+    btnReset.addEventListener("click", () => {
+        if (confirm("¿Seguro que quieres reiniciar todo tu progreso cognitivo?")) {
+            resetperfil();
+            location.reload();
+        }
+    });
+}
 
 
 // === HACER TODO GLOBAL PARA UNITY ===
@@ -446,19 +474,3 @@ window.actualizarSesionesDiarias = actualizarSesionesDiarias;
 window.actualizarRachaPorSesionCompletada = actualizarRachaPorSesionCompletada;
 window.obtenerRachaVisible = obtenerRachaVisible;
 
-window.addEventListener("DOMContentLoaded", () => {
-    const badge = document.getElementById("titulo-activar-coach");
-    const dot = document.getElementById("coach-status-dot");
-    const btn = document.getElementById("btn-activar-coach");
-
-    // Si la página NO tiene elementos del coach, no hacemos nada
-    if (!badge || !dot) return;
-
-    if (isCoachDisabled()) {
-        desactivarCoach();
-        const coach = document.getElementById("coach");
-        if (coach) coach.remove();
-    } else {
-        activarCoach();
-    }
-});
