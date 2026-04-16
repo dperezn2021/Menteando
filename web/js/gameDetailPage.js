@@ -167,39 +167,71 @@ function iniciarPantallaCompleta(content) {
     let originalIframeStyles = {};
     let originalBodyOverflow = "";
     let originalHtmlOverflow = "";
+    let overlayEl = null;
+    let originalParent = null;
+    let originalNextSibling = null;
+    let usingOverlayFallback = false;
     
     // Función para restaurar todo al estado original
     function restoreOriginalState() {
         const container = iframe.parentElement;
-        
-        // Restaurar estilos del contenedor
-        container.style.position = originalContainerStyles.position || "";
-        container.style.top = originalContainerStyles.top || "";
-        container.style.left = originalContainerStyles.left || "";
-        container.style.width = originalContainerStyles.width || "";
-        container.style.height = originalContainerStyles.height || "";
-        container.style.zIndex = originalContainerStyles.zIndex || "";
-        container.style.borderRadius = originalContainerStyles.borderRadius || "";
-        
-        // Restaurar estilos del iframe
-        iframe.style.width = originalIframeStyles.width || "";
-        iframe.style.height = originalIframeStyles.height || "";
-        
+
+        // Si usamos overlay, devolver el contenedor a su padre original
+        if (usingOverlayFallback && overlayEl && originalParent) {
+            // quitar estilos del contenedor que añadimos
+            container.style.position = originalContainerStyles.position || "";
+            container.style.top = originalContainerStyles.top || "";
+            container.style.left = originalContainerStyles.left || "";
+            container.style.width = originalContainerStyles.width || "";
+            container.style.height = originalContainerStyles.height || "";
+            container.style.zIndex = originalContainerStyles.zIndex || "";
+            container.style.borderRadius = originalContainerStyles.borderRadius || "";
+
+            // mover de vuelta
+            if (originalNextSibling && originalNextSibling.parentElement === originalParent) {
+                originalParent.insertBefore(container, originalNextSibling);
+            } else {
+                originalParent.appendChild(container);
+            }
+
+            // eliminar overlay
+            overlayEl.remove();
+            overlayEl = null;
+            usingOverlayFallback = false;
+        } else {
+            // Restaurar estilos del contenedor (fullscreen nativo)
+            container.style.position = originalContainerStyles.position || "";
+            container.style.top = originalContainerStyles.top || "";
+            container.style.left = originalContainerStyles.left || "";
+            container.style.width = originalContainerStyles.width || "";
+            container.style.height = originalContainerStyles.height || "";
+            container.style.zIndex = originalContainerStyles.zIndex || "";
+            container.style.borderRadius = originalContainerStyles.borderRadius || "";
+
+            // Restaurar estilos del iframe
+            iframe.style.width = originalIframeStyles.width || "";
+            iframe.style.height = originalIframeStyles.height || "";
+        }
+
         // Restaurar scroll del body
         document.body.style.overflow = originalBodyOverflow;
         document.documentElement.style.overflow = originalHtmlOverflow;
-        
+
         // Eliminar botón flotante si existe
         if (exitBtn) {
             exitBtn.remove();
             exitBtn = null;
         }
+
+        // limpiar listeners extras
+        document.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('orientationchange', onOrientationChange);
+        window.removeEventListener('resize', onOrientationChange);
     }
     
     // Función para guardar estilos originales
     function saveOriginalStyles() {
         const container = iframe.parentElement;
-        
         originalContainerStyles = {
             position: container.style.position,
             top: container.style.top,
@@ -209,6 +241,8 @@ function iniciarPantallaCompleta(content) {
             zIndex: container.style.zIndex,
             borderRadius: container.style.borderRadius
         };
+        originalParent = container.parentElement;
+        originalNextSibling = container.nextElementSibling;
         
         originalIframeStyles = {
             width: iframe.style.width,
@@ -222,7 +256,7 @@ function iniciarPantallaCompleta(content) {
     // Función para aplicar estilos de pantalla completa
     function applyFullscreenStyles() {
         const container = iframe.parentElement;
-        
+        // Asegurarnos que el contenedor ocupa toda la pantalla
         container.style.position = "fixed";
         container.style.top = "0";
         container.style.left = "0";
@@ -230,10 +264,10 @@ function iniciarPantallaCompleta(content) {
         container.style.height = "100vh";
         container.style.zIndex = "9999";
         container.style.borderRadius = "0";
-        
+
         iframe.style.width = "100%";
         iframe.style.height = "100%";
-        
+
         // Ocultar scroll
         document.body.style.overflow = "hidden";
         document.documentElement.style.overflow = "hidden";
@@ -277,12 +311,17 @@ function iniciarPantallaCompleta(content) {
         };
         
         exitBtn.onclick = () => {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            } else if (usingOverlayFallback) {
+                // salir del overlay fallback
+                restoreOriginalState();
             }
         };
         
@@ -292,11 +331,14 @@ function iniciarPantallaCompleta(content) {
     // Evento para cuando se activa el fullscreen nativo del navegador
     function onFullscreenChange() {
         if (document.fullscreenElement || document.webkitFullscreenElement) {
+            usingOverlayFallback = false;
             applyFullscreenStyles();
             createExitButton();
         } else {
+            // Salida del fullscreen nativo
             restoreOriginalState();
             document.removeEventListener("fullscreenchange", onFullscreenChange);
+            document.removeEventListener("webkitfullscreenchange", onFullscreenChange);
         }
     }
     
@@ -304,28 +346,87 @@ function iniciarPantallaCompleta(content) {
     fullscreenBtn.addEventListener("click", async () => {
         try {
             const container = iframe.parentElement;
-            
             saveOriginalStyles();
-            
-            if (container.requestFullscreen) {
-                await container.requestFullscreen();
-            } else if (container.webkitRequestFullscreen) {
-                await container.webkitRequestFullscreen();
-            } else if (container.msRequestFullscreen) {
-                await container.msRequestFullscreen();
+
+            // Intentar fullscreen nativo
+            let enteredNativeFullscreen = false;
+            try {
+                if (container.requestFullscreen) {
+                    await container.requestFullscreen();
+                    enteredNativeFullscreen = true;
+                } else if (container.webkitRequestFullscreen) {
+                    await container.webkitRequestFullscreen();
+                    enteredNativeFullscreen = true;
+                } else if (container.msRequestFullscreen) {
+                    await container.msRequestFullscreen();
+                    enteredNativeFullscreen = true;
+                }
+            } catch (err) {
+                // fallo en requestFullscreen (posible en iframes o móviles)
+                enteredNativeFullscreen = false;
             }
-            
+
             document.addEventListener("fullscreenchange", onFullscreenChange);
-            
-            if (document.fullscreenElement || document.webkitFullscreenElement) {
+            document.addEventListener("webkitfullscreenchange", onFullscreenChange);
+
+            if (enteredNativeFullscreen && (document.fullscreenElement || document.webkitFullscreenElement)) {
+                usingOverlayFallback = false;
                 applyFullscreenStyles();
                 createExitButton();
+            } else {
+                // Fallback: overlay absoluto (funciona incluso si requestFullscreen está restringido)
+                usingOverlayFallback = true;
+                overlayEl = document.createElement('div');
+                overlayEl.className = 'unity-fullscreen-overlay';
+                overlayEl.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;background:#000;display:flex;align-items:stretch;justify-content:center;z-index:9998;';
+
+                // mover el contenedor dentro del overlay
+                try {
+                    overlayEl.appendChild(container);
+                    document.body.appendChild(overlayEl);
+
+                    // aplicar estilos para ocupar pantalla
+                    applyFullscreenStyles();
+                    createExitButton();
+                } catch (err) {
+                    console.error('Error al mover el contenedor al overlay:', err);
+                }
             }
-            
+
+            // listeners para teclado y rotación
+            document.addEventListener('keydown', onKeyDown);
+            window.addEventListener('orientationchange', onOrientationChange);
+            window.addEventListener('resize', onOrientationChange);
+
         } catch (error) {
             console.error("Error al entrar en pantalla completa:", error);
         }
     });
+
+    // Manejar tecla Escape para salir tanto de fullscreen nativo como de nuestro overlay
+    function onKeyDown(e) {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            } else if (usingOverlayFallback) {
+                restoreOriginalState();
+            }
+        }
+    }
+
+    // Ajustes al rotar o redimensionar: reaplicar estilos para cubrir toda la pantalla
+    function onOrientationChange() {
+        // pequeño timeout para permitir que el navegador finalice la rotación
+        setTimeout(() => {
+            if (document.fullscreenElement || usingOverlayFallback) {
+                applyFullscreenStyles();
+            }
+        }, 200);
+    }
 }
 
 
