@@ -209,12 +209,11 @@
                             </button>
                             <div class="flex gap-2">
                                 <button id="btn-reset-perfil"
-                                    class="flex-1 py-2 bg-red-200 dark:bg-red-900/30 hover:bg-red-300 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-lg font-bold text-sm transition-colors">
+                                    class="flex-1 py-2 bg-red-200 dark:bg-red-900/30 hover:bg-red-300 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-lg font-bold   transition-colors">
                                     Reiniciar
                                 </button>
-                                <button id="btn-activar-coach"
-                                    class="flex-1 py-2 bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-900/50 text-orange-500 dark:text-amber-400 rounded-lg font-bold text-sm transition-colors hidden">
-                                    Activar Coach
+                                <button id="btn-toggle-coach"
+                                    class="flex-3 py-2 rounded-lg font-bold text-base transition-colors">Activar Coach
                                 </button>
                             </div>
                         </div>
@@ -304,7 +303,7 @@
                             class="bg-slate-50 dark:bg-slate-800 p-4 lg:p-5 rounded-xl text-center outline outline-1 outline-slate-200 dark:outline-slate-700">
                             <div class="text-xs uppercase tracking-wide text-slate-500">Media de sesiones diarias</div>
                             <div class="text-xl lg:text-2xl font-bold text-blue-500 mt-2"><span
-                                    id="media-racha-diaria"></span></div>
+                                    id="media-racha-diaria"></span>0</div>
                         </div>
                         <div
                             class="bg-slate-50 dark:bg-slate-800 p-4 lg:p-5 rounded-xl text-center outline outline-1 outline-slate-200 dark:outline-slate-700">
@@ -333,7 +332,8 @@
                                 <div class="w-4 h-5 bg-blue-500 rounded"></div>
                                 Tests recomendados
                             </h3>
-                            <p class="mb-4 mt-2 text-slate-500 dark:text-white-400 ">Echa un vistazo los tests recomendados del día</p>
+                            <p class="mb-4 mt-2 text-slate-500 dark:text-white-400 ">Echa un vistazo los tests
+                                recomendados del día</p>
 
 
                             <!-- TARJETAS DE TESTS -->
@@ -343,7 +343,9 @@
                             </div>
                             <div class="justify-center text-center">
                                 <p class="text-slate-500 dark:text-white-400 my-4">¿No te gustan los recomendados?</p>
-                                <a href="/tests.html" class="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 hover:text-blue-500 transition-colors">Prueba otros</a>
+                                <a href="/tests.html"
+                                    class="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 hover:text-blue-500 transition-colors">Prueba
+                                    otros</a>
                             </div>
 
                         </div>
@@ -360,7 +362,7 @@
 
                             <p class="mb-8 mt-2 text-slate-500 dark:text-white-400 ">Consulta las sesiones completadas
                                 en los últimos 7 días</p>
-                                
+
                             <!-- CONTENEDOR DEL GRÁFICO -->
                             <div class="flex items-end gap-3 h-80 px-4">
 
