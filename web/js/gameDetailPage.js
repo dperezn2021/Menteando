@@ -93,7 +93,6 @@ function renderGameDetailPage(gameId) {
                         </button>
                     </div>
                 </article>
-                <!-- El resto del contenido (aside, etc.) se mantiene igual -->
                 <div class="flex flex-col gap-6">
                     <aside class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-6 lg:p-8">
                         <span class="inline-flex px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-sm font-bold uppercase tracking-[0.2em] mb-5">
@@ -135,7 +134,8 @@ function renderGameDetailPage(gameId) {
             </div>
         </section>
     `;
-    // Botón Recargar juego (recarga la página completa)
+    
+    // Botón Recargar juego
     const recargarBtn = Array.from(content.querySelectorAll("button")).find(btn => btn.textContent.includes("Recargar juego"));
     if (recargarBtn) {
         recargarBtn.addEventListener("click", () => {
@@ -143,98 +143,160 @@ function renderGameDetailPage(gameId) {
         });
     }
 
-    // Botón Contactar (lleva a about.html)
+    // Botón Contactar
     const contactarBtn = Array.from(content.querySelectorAll("button")).find(btn => btn.textContent.includes("Contactar"));
     if (contactarBtn) {
         contactarBtn.addEventListener("click", () => {
             window.location.href = "../../about.html#contacto";
         });
     }
+    
+    // Iniciar pantalla completa
+    iniciarPantallaCompleta(content);
+}
+
+function iniciarPantallaCompleta(content) {
     const fullscreenBtn = document.getElementById("fullscreen-btn");
-    const container = document.querySelector("#game-detail-content .relative");
-    const iframe = container?.querySelector("iframe");
-
-    if (fullscreenBtn && iframe) {
-        fullscreenBtn.addEventListener("click", async () => {
-            try {
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-                if (isMobile) {
-                    // En móvil: hacer fullscreen al iframe directamente
-                    if (iframe.requestFullscreen) {
-                        await iframe.requestFullscreen();
-                    } else if (iframe.webkitRequestFullscreen) {
-                        await iframe.webkitRequestFullscreen();
-                    } else if (iframe.msRequestFullscreen) {
-                        await iframe.msRequestFullscreen();
-                    }
-
-                    // Forzar orientación horizontal
-                    if (screen.orientation && screen.orientation.lock) {
-                        try {
-                            await screen.orientation.lock("landscape");
-                        } catch (e) {
-                            console.log("No se pudo bloquear orientación:", e);
-                        }
-                    }
-
-                    // Añadir botón de salir flotante
-                    if (!document.getElementById("exit-fullscreen-btn")) {
-                        const exitBtn = document.createElement("button");
-                        exitBtn.id = "exit-fullscreen-btn";
-                        exitBtn.textContent = "✕ Salir";
-                        exitBtn.style.position = "fixed";
-                        exitBtn.style.top = "20px";
-                        exitBtn.style.right = "20px";
-                        exitBtn.style.zIndex = "10000";
-                        exitBtn.style.backgroundColor = "rgba(0,0,0,0.7)";
-                        exitBtn.style.color = "white";
-                        exitBtn.style.border = "none";
-                        exitBtn.style.borderRadius = "30px";
-                        exitBtn.style.padding = "10px 20px";
-                        exitBtn.style.fontSize = "16px";
-                        exitBtn.style.fontWeight = "bold";
-                        exitBtn.style.cursor = "pointer";
-                        exitBtn.style.backdropFilter = "blur(10px)";
-
-                        exitBtn.addEventListener("click", () => {
-                            if (document.exitFullscreen) {
-                                document.exitFullscreen();
-                            } else if (document.webkitExitFullscreen) {
-                                document.webkitExitFullscreen();
-                            } else if (document.msExitFullscreen) {
-                                document.msExitFullscreen();
-                            }
-                        });
-
-                        document.body.appendChild(exitBtn);
-                    }
-                } else {
-                    // En escritorio: hacer fullscreen al contenedor
-                    if (container.requestFullscreen) {
-                        await container.requestFullscreen();
-                    } else if (container.webkitRequestFullscreen) {
-                        await container.webkitRequestFullscreen();
-                    } else if (container.msRequestFullscreen) {
-                        await container.msRequestFullscreen();
-                    }
+    const iframe = document.getElementById("game-iframe");
+    
+    if (!fullscreenBtn || !iframe) return;
+    
+    fullscreenBtn.addEventListener("click", async () => {
+        try {
+            // Guardar referencia al contenedor padre
+            const container = iframe.parentElement;
+            const originalContainerStyle = {
+                position: container.style.position,
+                top: container.style.top,
+                left: container.style.left,
+                width: container.style.width,
+                height: container.style.height,
+                zIndex: container.style.zIndex,
+                borderRadius: container.style.borderRadius
+            };
+            
+            // Hacer fullscreen al contenedor del iframe
+            if (container.requestFullscreen) {
+                await container.requestFullscreen();
+            } else if (container.webkitRequestFullscreen) {
+                await container.webkitRequestFullscreen();
+            } else if (container.msRequestFullscreen) {
+                await container.msRequestFullscreen();
+            }
+            
+            // Forzar que el contenedor ocupe toda la pantalla
+            container.style.position = "fixed";
+            container.style.top = "0";
+            container.style.left = "0";
+            container.style.width = "100vw";
+            container.style.height = "100vh";
+            container.style.zIndex = "9999";
+            container.style.borderRadius = "0";
+            
+            // El iframe ocupa todo el contenedor
+            iframe.style.width = "100%";
+            iframe.style.height = "100%";
+            
+            // Ocultar scroll
+            document.body.style.overflow = "hidden";
+            document.documentElement.style.overflow = "hidden";
+            
+            // Forzar orientación horizontal en móvil
+            if (screen.orientation && screen.orientation.lock) {
+                try {
+                    await screen.orientation.lock("landscape");
+                } catch (e) {
+                    console.log("No se pudo bloquear orientación:", e);
                 }
-
-                // Al salir de fullscreen, limpiar
-                const exitHandler = () => {
-                    if (!document.fullscreenElement) {
-                        const exitBtn = document.getElementById("exit-fullscreen-btn");
-                        if (exitBtn) exitBtn.remove();
-                        document.removeEventListener("fullscreenchange", exitHandler);
+            }
+            
+            // Crear botón de salir flotante
+            let exitBtn = document.getElementById("exit-fullscreen-btn");
+            if (!exitBtn) {
+                exitBtn = document.createElement("button");
+                exitBtn.id = "exit-fullscreen-btn";
+                exitBtn.textContent = "✕ Salir";
+                exitBtn.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 10000;
+                    background-color: rgba(0,0,0,0.8);
+                    color: white;
+                    border: 2px solid rgba(255,255,255,0.3);
+                    border-radius: 40px;
+                    padding: 12px 24px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    backdrop-filter: blur(10px);
+                    font-family: system-ui, sans-serif;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    transition: all 0.2s ease;
+                `;
+                
+                exitBtn.onmouseenter = () => {
+                    exitBtn.style.backgroundColor = "rgba(255,0,0,0.8)";
+                    exitBtn.style.transform = "scale(1.05)";
+                };
+                
+                exitBtn.onmouseleave = () => {
+                    exitBtn.style.backgroundColor = "rgba(0,0,0,0.8)";
+                    exitBtn.style.transform = "scale(1)";
+                };
+                
+                exitBtn.onclick = () => {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
                     }
                 };
-                document.addEventListener("fullscreenchange", exitHandler);
-
-            } catch (e) {
-                console.error("Error al entrar en fullscreen:", e);
+                
+                document.body.appendChild(exitBtn);
             }
-        });
-    }
+            
+            // Al salir de fullscreen, restaurar todo
+            const exitHandler = () => {
+                if (!document.fullscreenElement) {
+                    // Restaurar contenedor
+                    container.style.position = originalContainerStyle.position || "";
+                    container.style.top = originalContainerStyle.top || "";
+                    container.style.left = originalContainerStyle.left || "";
+                    container.style.width = originalContainerStyle.width || "";
+                    container.style.height = originalContainerStyle.height || "";
+                    container.style.zIndex = originalContainerStyle.zIndex || "";
+                    container.style.borderRadius = originalContainerStyle.borderRadius || "";
+                    
+                    // Restaurar iframe
+                    iframe.style.width = "";
+                    iframe.style.height = "";
+                    
+                    // Restaurar scroll
+                    document.body.style.overflow = "";
+                    document.documentElement.style.overflow = "";
+                    
+                    // Quitar botón
+                    const btn = document.getElementById("exit-fullscreen-btn");
+                    if (btn) btn.remove();
+                    
+                    // Desbloquear orientación
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock();
+                    }
+                    
+                    document.removeEventListener("fullscreenchange", exitHandler);
+                }
+            };
+            
+            document.addEventListener("fullscreenchange", exitHandler);
+            
+        } catch (error) {
+            console.error("Error al entrar en pantalla completa:", error);
+        }
+    });
 }
 
 window.initGameDetailPage = function initGameDetailPage(gameId) {

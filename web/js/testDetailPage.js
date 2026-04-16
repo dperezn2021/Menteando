@@ -347,9 +347,21 @@ function lanzarLogicaDelTest(testId) {
         default: console.warn("Test sin lógica:", testId);
     }
 }
+// ======================================================
+// FUNCIÓN AUXILIAR PARA CONTENEDOR RESPONSIVE
+// ======================================================
+function makeResponsiveContainer(innerHtml, customStyles = "") {
+    return `
+        <div class="w-full h-full overflow-auto p-4 flex items-center justify-center" style="max-height: 100%;">
+            <div class="w-full max-w-full ${customStyles}">
+                ${innerHtml}
+            </div>
+        </div>
+    `;
+}
 
 // ======================================================
-// 1. CORSI (memoria_espacial, memoria_trabajo, atencion_selectiva)
+// 1. CORSI (responsivo)
 // ======================================================
 function initCorsiLogic(testId, callback) {
     const container = document.getElementById("container");
@@ -380,13 +392,13 @@ function initCorsiLogic(testId, callback) {
     }
 
     function renderBloques() {
-        container.innerHTML = `
-            <div class="grid grid-cols-3 gap-4 w-80">
+        container.innerHTML = makeResponsiveContainer(`
+            <div class="grid grid-cols-3 gap-2 sm:gap-4 max-w-md mx-auto">
                 ${Array(9).fill().map((_, i) => `
-                    <div data-id="${i}" class="w-24 h-24 rounded-xl bg-slate-700 cursor-pointer transition"></div>
+                    <div data-id="${i}" class="aspect-square rounded-xl bg-slate-700 cursor-pointer transition hover:bg-slate-600"></div>
                 `).join('')}
             </div>
-        `;
+        `);
     }
 
     function iluminarSecuencia(seq, callbackFn) {
@@ -468,7 +480,7 @@ function initCorsiLogic(testId, callback) {
 }
 
 // ======================================================
-// 2. D2 (atencion_selectiva, velocidad_cognitiva, control_inhibitorio)
+// 2. D2 (responsivo)
 // ======================================================
 function initD2Logic(testId, callback) {
     const container = document.getElementById("container");
@@ -477,7 +489,7 @@ function initD2Logic(testId, callback) {
 
     let lineaActual = 0;
     const totalLineas = 5;
-    const tiempoPorLinea = 20000; // 20 segundos
+    const tiempoPorLinea = 20000;
     const itemsPorLinea = 50;
     let timer = null;
     let totalProcesados = 0;
@@ -488,20 +500,20 @@ function initD2Logic(testId, callback) {
         const linea = [];
         for (let i = 0; i < itemsPorLinea; i++) {
             const letra = Math.random() < 0.5 ? 'd' : 'p';
-            const rayas = Math.floor(Math.random() * 4) + 1; // 1..4
+            const rayas = Math.floor(Math.random() * 4) + 1;
             linea.push({ letra, rayas });
         }
         return linea;
     }
 
     function renderLinea(linea) {
-        container.innerHTML = `
-            <div class="flex flex-wrap gap-2 w-full justify-center">
+        container.innerHTML = makeResponsiveContainer(`
+            <div class="flex flex-wrap gap-1 sm:gap-2 w-full justify-center max-h-[60vh] overflow-y-auto p-2">
                 ${linea.map((stim, idx) => `
-                    <div data-idx="${idx}" class="px-2 py-1 rounded border border-slate-600 cursor-pointer text-white text-lg select-none hover:bg-slate-700 transition">${stim.letra}<sub>${stim.rayas}</sub></div>
+                    <div data-idx="${idx}" class="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded border border-slate-600 cursor-pointer text-white text-sm sm:text-lg select-none hover:bg-slate-700 transition">${stim.letra}<sub>${stim.rayas}</sub></div>
                 `).join('')}
             </div>
-        `;
+        `, "max-h-[60vh]");
     }
 
     function procesarLinea(linea, marcados) {
@@ -571,7 +583,7 @@ function initD2Logic(testId, callback) {
 }
 
 // ======================================================
-// 3. CPT (atencion_sostenida, control_inhibitorio, atencion_selectiva, velocidad_cognitiva)
+// 3. CPT (responsivo)
 // ======================================================
 function initCPTLogic(testId, callback) {
     const container = document.getElementById("container");
@@ -585,14 +597,12 @@ function initCPTLogic(testId, callback) {
     let tiemposReaccion = [];
     let inicioTest = 0;
     let puedeResponder = true;
-    let intervalo;
 
     function generarSecuencia() {
         const seq = [];
         let anterior = '';
         for (let i = 0; i < totalEstímulos; i++) {
             let letra;
-            // Objetivo: X después de A (probabilidad 20% cuando anterior es A)
             if (Math.random() < 0.2 && anterior === 'A') {
                 letra = 'X';
             } else {
@@ -607,7 +617,7 @@ function initCPTLogic(testId, callback) {
     function mostrarSiguiente() {
         if (indice >= totalEstímulos) return finalizarTest();
         const letra = estímulos[indice];
-        container.innerHTML = `<div class="text-8xl font-bold text-white">${letra}</div>`;
+        container.innerHTML = makeResponsiveContainer(`<div class="text-6xl sm:text-8xl font-bold text-white text-center">${letra}</div>`);
         const esObjetivo = (letra === 'X' && (indice > 0 ? estímulos[indice - 1] === 'A' : false));
         const inicioRespuesta = performance.now();
         const handler = (e) => {
@@ -659,7 +669,7 @@ function initCPTLogic(testId, callback) {
 }
 
 // ======================================================
-// 4. WCST (flexibilidad_cognitiva, control_inhibitorio, planificacion, memoria_trabajo)
+// 4. WCST (responsivo)
 // ======================================================
 function initWCSTLogic(testId, callback) {
     const container = document.getElementById("container");
@@ -702,9 +712,7 @@ function initWCSTLogic(testId, callback) {
             if (aciertosConsec >= 5) cambiarRegla();
         } else {
             totalErrores++;
-            if (criterio === (reglaActual === 'color' ? cartaActual.color : reglaActual === 'forma' ? cartaActual.forma : cartaActual.numero.toString())) {
-                // error normal
-            } else {
+            if (criterio !== (reglaActual === 'color' ? cartaActual.color : reglaActual === 'forma' ? cartaActual.forma : cartaActual.numero.toString())) {
                 perseveraciones++;
             }
             aciertosConsec = 0;
@@ -715,20 +723,20 @@ function initWCSTLogic(testId, callback) {
     }
 
     function renderCarta() {
-        container.innerHTML = `
+        container.innerHTML = makeResponsiveContainer(`
             <div class="text-center">
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl inline-block mb-6">
-                    <div class="w-32 h-32 rounded-full mx-auto" style="background:${cartaActual.color};"></div>
-                    <div class="text-2xl mt-2">${cartaActual.forma} x${cartaActual.numero}</div>
+                <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl inline-block mb-4 sm:mb-6">
+                    <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mx-auto" style="background:${cartaActual.color};"></div>
+                    <div class="text-xl sm:text-2xl mt-2">${cartaActual.forma} x${cartaActual.numero}</div>
                 </div>
-                <div class="flex gap-4 justify-center">
-                    <button data-crit="color" class="px-4 py-2 bg-red-500 rounded">Color (${cartaActual.color})</button>
-                    <button data-crit="forma" class="px-4 py-2 bg-green-500 rounded">Forma (${cartaActual.forma})</button>
-                    <button data-crit="numero" class="px-4 py-2 bg-blue-500 rounded">Número (${cartaActual.numero})</button>
+                <div class="flex flex-wrap gap-2 sm:gap-4 justify-center">
+                    <button data-crit="color" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-red-500 rounded text-sm sm:text-base">Color (${cartaActual.color})</button>
+                    <button data-crit="forma" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-green-500 rounded text-sm sm:text-base">Forma (${cartaActual.forma})</button>
+                    <button data-crit="numero" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-500 rounded text-sm sm:text-base">Número (${cartaActual.numero})</button>
                 </div>
-                <div class="mt-4 text-white">Aciertos: ${totalAciertos} | Errores: ${totalErrores}</div>
+                <div class="mt-3 sm:mt-4 text-white text-sm sm:text-base">Aciertos: ${totalAciertos} | Errores: ${totalErrores}</div>
             </div>
-        `;
+        `);
         document.querySelectorAll('[data-crit]').forEach(btn => {
             btn.onclick = () => evaluar(btn.dataset.crit);
         });
@@ -762,7 +770,7 @@ function initWCSTLogic(testId, callback) {
 }
 
 // ======================================================
-// 5. TOWER OF LONDON (planificacion, memoria_trabajo, memoria_espacial, atencion_sostenida)
+// 5. TOWER OF LONDON (responsivo con objetivo visible)
 // ======================================================
 function initTowerOfLondonLogic(testId, callback) {
     const container = document.getElementById("container");
@@ -803,17 +811,36 @@ function initTowerOfLondonLogic(testId, callback) {
     }
 
     function render() {
-        let html = '<div class="flex justify-center gap-8 mb-6">';
-        for (let i = 0; i < 3; i++) {
-            html += `<div data-varilla="${i}" class="bg-slate-700 w-24 h-48 rounded-b-2xl flex flex-col-reverse items-center p-2 border-t-4 border-slate-500">`;
-            estado[i].forEach(bola => {
-                const colorClase = bola === 'rojo' ? 'bg-red-500' : bola === 'verde' ? 'bg-green-500' : 'bg-blue-500';
-                html += `<div class="w-10 h-10 rounded-full ${colorClase} m-1"></div>`;
-            });
-            html += `</div>`;
-        }
-        html += `</div><div class="text-center font-bold">Movimientos: ${movimientos}</div>`;
-        container.innerHTML = html;
+        container.innerHTML = makeResponsiveContainer(`
+            <div class="flex flex-col lg:flex-row justify-center gap-4 sm:gap-8">
+                <div class="text-center">
+                    <h3 class="text-sm sm:text-lg font-bold mb-2">Tu configuración</h3>
+                    <div class="flex justify-center gap-2 sm:gap-4">
+                        ${estado.map((varilla, i) => `
+                            <div data-varilla="${i}" class="bg-slate-700 w-16 sm:w-24 h-32 sm:h-48 rounded-b-2xl flex flex-col-reverse items-center p-1 sm:p-2 border-t-4 border-slate-500 cursor-pointer">
+                                ${varilla.map(bola => `
+                                    <div class="w-6 h-6 sm:w-10 sm:h-10 rounded-full ${bola === 'rojo' ? 'bg-red-500' : bola === 'verde' ? 'bg-green-500' : 'bg-blue-500'} m-0.5 sm:m-1"></div>
+                                `).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-sm sm:text-lg font-bold mb-2">Objetivo</h3>
+                    <div class="flex justify-center gap-2 sm:gap-4">
+                        ${objetivo.map(varilla => `
+                            <div class="bg-slate-600 w-16 sm:w-24 h-32 sm:h-48 rounded-b-2xl flex flex-col-reverse items-center p-1 sm:p-2 border-t-4 border-slate-400 opacity-80">
+                                ${varilla.map(bola => `
+                                    <div class="w-6 h-6 sm:w-10 sm:h-10 rounded-full ${bola === 'rojo' ? 'bg-red-500' : bola === 'verde' ? 'bg-green-500' : 'bg-blue-500'} m-0.5 sm:m-1"></div>
+                                `).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4 sm:mt-6 font-bold text-sm sm:text-base">Movimientos: ${movimientos}</div>
+        `);
+
         document.querySelectorAll('[data-varilla]').forEach(el => {
             el.onclick = () => manejarVarilla(parseInt(el.dataset.varilla));
         });
@@ -824,7 +851,7 @@ function initTowerOfLondonLogic(testId, callback) {
         if (seleccionada === null) {
             if (estado[idx].length > 0) {
                 seleccionada = idx;
-                document.querySelector(`[data-varilla="${idx}"]`).classList.add('ring-4', 'ring-yellow-400');
+                document.querySelector(`[data-varilla="${idx}"]`).classList.add('ring-2', 'ring-yellow-400');
             }
         } else {
             if (seleccionada !== idx) {
@@ -836,7 +863,7 @@ function initTowerOfLondonLogic(testId, callback) {
                     if (JSON.stringify(estado) === JSON.stringify(objetivo)) finalizarTest(true);
                 }
             }
-            document.querySelectorAll('[data-varilla]').forEach(el => el.classList.remove('ring-4', 'ring-yellow-400'));
+            document.querySelectorAll('[data-varilla]').forEach(el => el.classList.remove('ring-2', 'ring-yellow-400'));
             seleccionada = null;
         }
     }
@@ -1349,56 +1376,60 @@ function initDigitSpanLogic(testId, callback) {
 }
 
 // ======================================================
-// 10. TRAIL MAKING TEST A/B (flexibilidad_cognitiva, velocidad_cognitiva, coordinacion_visomotora, atencion_dividida)
+// 10. TRAIL MAKING TEST (versión responsiva sin posiciones absolutas)
 // ======================================================
 function initTMTLogic(testId, callback) {
     const container = document.getElementById("container");
     const startBtn = document.getElementById("start-btn");
     const status = document.getElementById("status");
 
-    let fase = 'A'; // 'A' o 'B'
+    let fase = 'A';
     let elementos = [];
-    let ordenEsperado = [];
     let siguiente = 1;
     let inicioTest = 0;
     let inicioFase = 0;
     let tiempos = { A: 0, B: 0 };
 
     function generarElementos(fase) {
+        const elementosArr = [];
         if (fase === 'A') {
-            // Números del 1 al 8 en posiciones aleatorias
-            const nums = Array.from({ length: 8 }, (_, i) => i + 1);
-            const posiciones = [];
-            for (let i = 0; i < 8; i++) {
-                posiciones.push({ x: Math.random() * 300 + 50, y: Math.random() * 200 + 50, valor: nums[i] });
+            for (let i = 1; i <= 8; i++) {
+                elementosArr.push({ valor: i, orden: i });
             }
-            return posiciones;
         } else {
-            // Alternancia números-letras: 1, A, 2, B, 3, C, 4, D
-            const letras = ['A', 'B', 'C', 'D'];
             const valores = [1, 'A', 2, 'B', 3, 'C', 4, 'D'];
-            const posiciones = [];
-            for (let i = 0; i < 8; i++) {
-                posiciones.push({ x: Math.random() * 300 + 50, y: Math.random() * 200 + 50, valor: valores[i], orden: i + 1 });
+            for (let i = 0; i < valores.length; i++) {
+                elementosArr.push({ valor: valores[i], orden: i + 1 });
             }
-            return posiciones;
         }
+        // Mezclar posiciones
+        return elementosArr.sort(() => Math.random() - 0.5).map((el, idx) => ({
+            ...el,
+            x: (idx % 4) * 70 + 20,
+            y: Math.floor(idx / 4) * 70 + 20
+        }));
     }
 
     function renderFase() {
-        container.innerHTML = `<div class="relative w-full h-96 bg-gray-200 dark:bg-gray-700 rounded" id="canvas"></div>`;
-        const canvasDiv = document.getElementById("canvas");
-        elementos.forEach(el => {
-            const div = document.createElement('div');
-            div.className = "absolute w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center cursor-pointer";
-            div.style.left = `${el.x}px`;
-            div.style.top = `${el.y}px`;
-            div.textContent = el.valor;
-            div.dataset.valor = el.valor;
-            div.onclick = () => {
+        container.innerHTML = makeResponsiveContainer(`
+            <div class="relative w-full min-h-[300px] sm:min-h-[400px] bg-gray-200 dark:bg-gray-700 rounded-lg overflow-auto p-2">
+                <div class="relative w-full h-full" style="min-height: 300px;">
+                    ${elementos.map(el => `
+                        <div data-valor="${el.valor}" class="absolute w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500 text-white flex items-center justify-center cursor-pointer hover:bg-blue-600 transition text-sm sm:text-base"
+                            style="left: ${el.x}%; top: ${el.y}%; transform: translate(-50%, -50%);">
+                            ${el.valor}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `);
+
+        document.querySelectorAll('[data-valor]').forEach(el => {
+            el.onclick = () => {
                 const esperado = fase === 'A' ? siguiente : (siguiente % 2 === 1 ? siguiente : String.fromCharCode(64 + siguiente / 2));
-                if (String(div.dataset.valor) === String(esperado)) {
-                    div.style.backgroundColor = "green";
+                if (String(el.dataset.valor) === String(esperado)) {
+                    el.classList.add('bg-green-500', 'opacity-50', 'cursor-default');
+                    el.style.pointerEvents = 'none';
                     siguiente++;
                     if ((fase === 'A' && siguiente > 8) || (fase === 'B' && siguiente > 8)) {
                         tiempos[fase] = performance.now() - inicioFase;
@@ -1407,16 +1438,16 @@ function initTMTLogic(testId, callback) {
                             siguiente = 1;
                             elementos = generarElementos('B');
                             renderFase();
+                            if (status) status.textContent = "TMT-B: Alterna números y letras (1→A→2→B→3→C→4→D)";
                         } else {
                             finalizarTest();
                         }
                     }
                 } else {
-                    div.style.backgroundColor = "red";
-                    setTimeout(() => div.style.backgroundColor = "blue", 300);
+                    el.classList.add('bg-red-500');
+                    setTimeout(() => el.classList.remove('bg-red-500'), 300);
                 }
             };
-            canvasDiv.appendChild(div);
         });
     }
 
@@ -1443,7 +1474,7 @@ function initTMTLogic(testId, callback) {
         inicioTest = performance.now();
         inicioFase = performance.now();
         renderFase();
-        if (status) status.textContent = "TMT-A: Conecta los números en orden ascendente";
+        if (status) status.textContent = "TMT-A: Conecta los números en orden ascendente (1→2→3→...→8)";
     };
 }
 

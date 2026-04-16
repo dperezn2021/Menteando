@@ -26,20 +26,22 @@
         }
     }
 
+    // Puntos formateados
     const puntosFormateados = formatearPuntos(perfil.puntos);
     set("perfil-puntos", puntosFormateados);
-    set("perfil-tiempo", perfil.tiempo);
+    
+    // Tiempo (compatibilidad)
+    set("perfil-tiempo", getTiempo(perfil));
+    
     set("perfil-sesiones", perfil.sesiones);
     set("perfil-apodo-header", perfil.apodo);
     set("perfil-juego-mas-jugado", perfil.juegoMasJugado);
-    set("perfil-desde", perfil.desde);
 
-    actualizarNivelCognitivo(perfil.nivel);
+    // Nivel cognitivo
     function actualizarNivelCognitivo(valor) {
         const span = document.getElementById("perfil-nivel");
         if (!span) return;
 
-        // Si está vacío, null, undefined o NaN → Nulo
         if (valor === 0 || valor === null || valor === undefined || isNaN(valor)) {
             span.textContent = "Nulo";
             span.className = "px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded font-medium";
@@ -73,6 +75,8 @@
         span.className = `px-2 py-1 rounded font-medium ${clases}`;
     }
 
+    actualizarNivelCognitivo(perfil.nivel);
+
     // Animación de barras principales
     function animateBar(idFill, idText, value) {
         const fill = document.getElementById(idFill);
@@ -92,7 +96,7 @@
     animateBar("stat-control", "stat-control-text", perfil.control);
     animateBar("stat-reflejos", "stat-reflejos-text", perfil.reflejos);
 
-    // SECCIONES DETALLADAS (mejorado)
+    // SECCIONES DETALLADAS
     const detalle = perfil.detalle;
 
     const secciones = {
@@ -116,7 +120,6 @@
         ]
     };
 
-    // Función para obtener color según el valor (0 a 1)
     function getColorPorValor(valor) {
         const percent = valor * 100;
         if (percent < 20) return "bg-red-500";
@@ -127,7 +130,6 @@
         return "bg-purple-500";
     }
 
-    // Función para obtener texto de nivel
     function getNivelTexto(valor) {
         const percent = valor * 100;
         if (percent < 20) return "Muy bajo";
@@ -144,16 +146,10 @@
 
         for (let titulo in secciones) {
             const bloque = document.createElement("div");
-            bloque.className = "mb-8"; // margen inferior entre secciones
+            bloque.className = "mb-8";
 
-            // Título de la sección con estilo mejorado
-            bloque.innerHTML = `
-            <h4 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4">
-                ${titulo}
-            </h4>
-        `;
+            bloque.innerHTML = `<h4 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4">${titulo}</h4>`;
 
-            // Grid de tarjetas (2 columnas en móvil, 3 en pantallas grandes)
             const grid = document.createElement("div");
             grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4";
 
@@ -163,22 +159,21 @@
                 const colorBarra = getColorPorValor(valor);
                 const nivelTexto = getNivelTexto(valor);
 
-                // Crear tarjeta
                 const tarjeta = document.createElement("div");
                 tarjeta.className = "bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200 group";
                 tarjeta.innerHTML = `
-                <div class="flex justify-between items-start mb-2">
-                    <div class="font-semibold text-slate-700 dark:text-slate-200">${item.nombre}</div>
-                    <div class="text-sm font-bold ${colorBarra.replace('bg-', 'text-')}">${percent}%</div>
-                </div>
-                <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mb-3">
-                    <div class="${colorBarra} h-2.5 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
-                </div>
-                <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400">
-                    <span class="capitalize">${nivelTexto}</span>
-                    <span class="cursor-help" title="${item.descripcion}">ⓘ</span>
-                </div>
-            `;
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="font-semibold text-slate-700 dark:text-slate-200">${item.nombre}</div>
+                        <div class="text-sm font-bold ${colorBarra.replace('bg-', 'text-')}">${percent}%</div>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mb-3">
+                        <div class="${colorBarra} h-2.5 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+                        <span class="capitalize">${nivelTexto}</span>
+                        <span class="cursor-help" title="${item.descripcion}">ⓘ</span>
+                    </div>
+                `;
                 grid.appendChild(tarjeta);
             });
 
@@ -186,7 +181,39 @@
             contenedor.appendChild(bloque);
         }
     }
-    // === Pintar etiquetas de días ===
+
+    // === PINTAR GRÁFICA SEMANAL ===
+    function formatDay(resta) {
+        return new Date(Date.now() - resta * 86400000).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
+    }
+
+    function renderGraficoSemanal(datos) {
+        const contenedorGrafico = document.getElementById("grafico-semanal");
+        if (!contenedorGrafico) return;
+
+        const max = Math.max(...datos, 1);
+
+        contenedorGrafico.innerHTML = datos.map(valor => {
+            const altura = (valor / max) * 100;
+            return `<div class="flex-1 bg-blue-500/40 dark:bg-blue-900/60 rounded-t hover:bg-blue-500 transition-all duration-300" style="height: ${altura}%;"></div>`;
+        }).join("");
+    }
+
+    function calcularRachaDiariaMaxima(sesionesDiarias) {
+        return Math.max(...sesionesDiarias);
+    }
+
+    function calcularRachaDiariaMedia(sesionesDiarias) {
+        const max = Math.max(...sesionesDiarias);
+        const min = Math.min(...sesionesDiarias);
+        const media = (max + min) / 2;
+        return (media === max || media === min) ? "" : media;
+    }
+
+    function calcularRachaDiariaMinima(sesionesDiarias) {
+        return Math.min(...sesionesDiarias);
+    }
+
     set("hoy", formatDay(0));
     set("hace-1-dia", formatDay(1));
     set("hace-2-dias", formatDay(2));
@@ -199,60 +226,8 @@
     set("media-racha-diaria", calcularRachaDiariaMedia(perfil.sesionesDiarias));
     set("minima-racha-diaria", calcularRachaDiariaMinima(perfil.sesionesDiarias));
 
-    // === Pintar gráfica ===
     const diasJugados = getDiasJugadosSemana(perfil);
     renderGraficoSemanal(diasJugados);
-
-    // Devuelve fecha restando X días
-    function formatDay(resta) {
-        return new Date(Date.now() - resta * 86400000)
-            .toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
-    }
-
-    // Pinta barras
-    function renderGraficoSemanal(datos) {
-        const contenedor = document.getElementById("grafico-semanal");
-        if (!contenedor) return;
-
-        const max = Math.max(...datos, 1);
-
-        contenedor.innerHTML = datos.map(valor => {
-            const altura = (valor / max) * 100;
-
-            return `
-            <div class="flex-1 bg-blue-500/40 dark:bg-blue-900/60 rounded-t 
-                        hover:bg-blue-500 transition-all duration-300"
-                 style="height: ${altura}%;">
-            </div>
-        `;
-        }).join("");
-    }
-
-    function calcularRachaDiariaMaxima(sesionesDiarias) {
-        return Math.max(...sesionesDiarias);
-    }
-
-    function calcularRachaDiariaMedia(sesionesDiarias) {
-        const max = Math.max(...sesionesDiarias);
-        const min = Math.min(...sesionesDiarias);
-        const sum = max + min;
-        let media = (sum / 2);
-
-        if (media === max || media === min) {
-            return "";
-        } else {
-            return media;
-        }
-
-    }
-
-    function calcularRachaDiariaMinima(sesionesDiarias) {
-        return Math.min(...sesionesDiarias);
-    }
-
-
-
-
 
     // === MODAL DEL PERFIL ===
     const modal = document.getElementById("modal-editar");
@@ -260,85 +235,108 @@
     const btnCerrar = document.getElementById("btn-cerrar-modal");
     const formModal = document.getElementById("perfil-form");
 
+    // Botón del coach (versión original)
     const btnActivarCoach = document.getElementById("btn-activar-coach");
+    if (btnActivarCoach) {
+        btnActivarCoach.style.display = isCoachDisabled() ? "block" : "none";
 
-    btnActivarCoach.style.display = isCoachDisabled() ? "block" : "none";
-
-    btnActivarCoach.addEventListener("click", () => {
-        localStorage.removeItem("coach_disabled");
-        location.reload();
-        btnActivarCoach.style.display = "none";
-        tituloCoach.style.display = "none";
-        activarCoach();
-    });
+        btnActivarCoach.addEventListener("click", () => {
+            localStorage.removeItem("coach_disabled");
+            location.reload();
+        });
+    }
 
     // Abrir modal
-    btnEditar.addEventListener("click", () => {
-        const perfil = getperfil();
+    if (btnEditar) {
+        btnEditar.addEventListener("click", () => {
+            const perfilActual = getperfil();
 
-        document.getElementById("name").value = perfil.nombre;
-        document.getElementById("nickname").value = perfil.apodo;
-        document.getElementById("age").value = perfil.edad;
-        document.getElementById("email").value = perfil.correo;
+            const nameInput = document.getElementById("name");
+            const nicknameInput = document.getElementById("nickname");
+            const ageInput = document.getElementById("age");
+            const emailInput = document.getElementById("email");
 
-        modal.style.display = "flex";
-    });
+            if (nameInput) nameInput.value = perfilActual.nombre;
+            if (nicknameInput) nicknameInput.value = perfilActual.apodo;
+            if (ageInput) ageInput.value = perfilActual.edad;
+            if (emailInput) emailInput.value = perfilActual.correo;
+
+            if (modal) modal.style.display = "flex";
+        });
+    }
 
     // Cerrar modal
-    btnCerrar.addEventListener("click", () => {
-        modal.style.display = "none";
-    });
+    if (btnCerrar && modal) {
+        btnCerrar.addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+    }
 
     // Guardar cambios
-    formModal.addEventListener("submit", (e) => {
-        e.preventDefault();
+    if (formModal) {
+        formModal.addEventListener("submit", (e) => {
+            e.preventDefault();
 
-        const perfil = getperfil();
+            const perfilActual = getperfil();
 
-        perfil.nombre = document.getElementById("name").value;
-        perfil.apodo = document.getElementById("nickname").value;
-        perfil.edad = parseInt(document.getElementById("age").value);
-        perfil.correo = document.getElementById("email").value;
+            const nameInput = document.getElementById("name");
+            const nicknameInput = document.getElementById("nickname");
+            const ageInput = document.getElementById("age");
+            const emailInput = document.getElementById("email");
 
-        saveperfil(perfil);
+            if (nameInput) perfilActual.nombre = nameInput.value;
+            if (nicknameInput) perfilActual.apodo = nicknameInput.value;
+            if (ageInput) perfilActual.edad = parseInt(ageInput.value) || 0;
+            if (emailInput) perfilActual.correo = emailInput.value;
 
-        modal.style.display = "none";
-        location.reload();
-    });
+            saveperfil(perfilActual);
 
-    const btnReset = document.getElementById("btn-reset-perfil");
+            if (modal) modal.style.display = "none";
+            location.reload();
+        });
+    }
 
-    if (btnReset) {
-        btnReset.addEventListener("click", () => {
-            if (
-                confirm("¿Seguro que quieres reiniciar todo tu progreso cognitivo?")
-            ) {
-                resetperfil();
-                location.reload();
+    // Cerrar modal si se clica fuera
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                modal.style.display = "none";
             }
         });
     }
 
+    // === BOTÓN RESET PERFIL ===
+    const btnReset = document.getElementById("btn-reset-perfil");
+    if (btnReset) {
+        btnReset.addEventListener("click", () => {
+            if (confirm("¿Seguro que quieres reiniciar todo tu progreso cognitivo?")) {
+                resetperfil();
+            }
+        });
+    }
 
     // === MODAL DEL AVATAR ===
     const modalAvatar = document.getElementById("modal-avatar");
     const btnCambiarAvatar = document.getElementById("btn-cambiar-avatar");
-    const btnCerrarModal = document.getElementById("cerrar-modal-avatar");
+    const btnCerrarModalAvatar = document.getElementById("cerrar-modal-avatar");
 
-    btnCambiarAvatar.addEventListener("click", () => {
-        modalAvatar.classList.remove("hidden");
-    });
+    if (btnCambiarAvatar && modalAvatar) {
+        btnCambiarAvatar.addEventListener("click", () => {
+            modalAvatar.classList.remove("hidden");
+        });
+    }
 
-    btnCerrarModal.addEventListener("click", () => {
-        modalAvatar.classList.add("hidden");
-    });
-
-    // Cerrar si clicas fuera del modal
-    modalAvatar.addEventListener("click", (e) => {
-        if (e.target === modalAvatar) {
+    if (btnCerrarModalAvatar && modalAvatar) {
+        btnCerrarModalAvatar.addEventListener("click", () => {
             modalAvatar.classList.add("hidden");
-        }
-    });
+        });
+    }
 
-
+    if (modalAvatar) {
+        modalAvatar.addEventListener("click", (e) => {
+            if (e.target === modalAvatar) {
+                modalAvatar.classList.add("hidden");
+            }
+        });
+    }
 });
