@@ -64,9 +64,13 @@ function createLargeCard(juego) {
                     <h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">${juego.nombre}</h3>
                     <p class="text-slate-500 dark:text-slate-300 text-base mt-2">${juego.descripcion}</p>
                 </div>
+
+                 <div class="flex flex-wrap gap-2">
+                    ${juego.skills.slice(0, 3).map((skill) => `<span class="px-3 py-1 text-xs font-bold uppercase rounded-full ${getBadgeClasses(skill)}">${getSkillLabel(skill)}</span>`).join("")}
+                </div>
             </div>
 
-            <a href="${juego.buildUrl || juego.url}" class="relative block bg-slate-950 h-[22rem] md:h-[28rem]">
+            <a href="${juego.url}" class="relative block bg-slate-950 h-[22rem] md:h-[28rem]">
                 <img src="${juego.imagen}" alt="${juego.nombre}" class="w-full h-full object-cover opacity-20">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/35 to-transparent"></div>
                 <div class="group absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
@@ -74,15 +78,6 @@ function createLargeCard(juego) {
                     <div class="group-hover:bg-blue-500 w-36 h-16 rounded-2xl bg-white/10 border border-white/20 backdrop-blur  flex items-center justify-center text-white text-sm font-black">JUGAR</div>
                 </div>
             </a>
-
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-900/30 border-t border-slate-200 dark:border-slate-700">
-                <div class="flex flex-wrap gap-2">
-                    ${juego.skills.slice(0, 3).map((skill) => `<span class="px-3 py-1 text-xs font-bold uppercase rounded-full ${getBadgeClasses(skill)}">${getSkillLabel(skill)}</span>`).join("")}
-                </div>
-
-                <div class="flex gap-3">
-                    <a href="${juego.url}" class="px-5 py-3 rounded-xl bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Ver ficha técnica</a>                </div>
-            </div>
         </article>
     `;
 }

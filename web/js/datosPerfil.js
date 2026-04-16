@@ -12,12 +12,27 @@
     set("perfil-edad", perfil.edad);
     set("perfil-desde", new Date(perfil.desde).toLocaleDateString("es-ES", { year: "numeric", month: "long" }));
     set("perfil-correo", perfil.correo);
-    set("perfil-racha-total", perfil.racha);
-    set("perfil-puntos", perfil.puntosString);
+
+    // MOSTRAR RACHA VISIBLE (sin modificar el perfil)
+    const rachaVisible = obtenerRachaVisible();
+    set("perfil-racha-total", rachaVisible);
+
+    // Opcional: mostrar tooltip si la racha se perdió
+    if (rachaVisible === 0 && perfil.racha > 0) {
+        const rachaElement = document.getElementById("perfil-racha-total");
+        if (rachaElement) {
+            rachaElement.title = "Racha perdida por inactividad. ¡Juega hoy para recuperarla!";
+            rachaElement.classList.add("text-red-500");
+        }
+    }
+
+    const puntosFormateados = formatearPuntos(perfil.puntos);
+    set("perfil-puntos", puntosFormateados);
     set("perfil-tiempo", perfil.tiempo);
     set("perfil-sesiones", perfil.sesiones);
     set("perfil-apodo-header", perfil.apodo);
     set("perfil-juego-mas-jugado", perfil.juegoMasJugado);
+    set("perfil-desde", perfil.desde);
 
     actualizarNivelCognitivo(perfil.nivel);
     function actualizarNivelCognitivo(valor) {

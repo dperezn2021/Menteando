@@ -1,6 +1,30 @@
 
 const SESION_TESTS_KEY = "tests_recomendados_sesion";
 const EXPIRACION_HORAS = 1;
+const ICONOS_CATEGORIA = {
+    memoria: `
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M12 6v6l4 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="9" stroke-width="2"/>
+        </svg>
+    `,
+    atencion: `
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M12 4v16m8-8H4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    `,
+    control: `
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M9 12l2 2 4-4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="9" stroke-width="2"/>
+        </svg>
+    `,
+    reflejos: `
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    `
+};
 
 // Función para barajar un array de forma determinista con una semilla
 function shuffleArrayDeterminista(array, semilla) {
@@ -50,8 +74,8 @@ function obtenerSesionTests(perfil, limite = 3) {
     // Obtener habilidades ordenadas de menor a mayor
     const habilidadesOrdenadas = [
         { nombre: "atencion", valor: perfil.atencion },
-        { nombre: "memoria",  valor: perfil.memoria },
-        { nombre: "control",  valor: perfil.control },
+        { nombre: "memoria", valor: perfil.memoria },
+        { nombre: "control", valor: perfil.control },
         { nombre: "reflejos", valor: perfil.reflejos }
     ].sort((a, b) => a.valor - b.valor);
 
@@ -108,8 +132,8 @@ function obtenerSesionTests(perfil, limite = 3) {
 function obtenerHabilidadesOrdenadas(perfil) {
     return [
         { nombre: "atencion", valor: perfil.atencion },
-        { nombre: "memoria",  valor: perfil.memoria },
-        { nombre: "control",  valor: perfil.control },
+        { nombre: "memoria", valor: perfil.memoria },
+        { nombre: "control", valor: perfil.control },
         { nombre: "reflejos", valor: perfil.reflejos }
     ].sort((a, b) => a.valor - b.valor);
 }
@@ -119,30 +143,56 @@ function generarTarjeta(test) {
     const { nombre, categoria, url, completado } = test;
 
     const coloresCategoria = {
-        memoria:  { fondo: "bg-green-500",  texto: "text-green-500" },
-        atencion: { fondo: "bg-indigo-500", texto: "text-indigo-500" },
-        control:  { fondo: "bg-amber-500",  texto: "text-amber-500" },
-        reflejos: { fondo: "bg-red-500",    texto: "text-red-500" }
+        memoria:  { fondo: "bg-emerald-400/20", icono: "text-emerald-500 dark:text-emerald-400" },
+        atencion: { fondo: "bg-indigo-400/20",  icono: "text-indigo-500 dark:text-indigo-400" },
+        control:  { fondo: "bg-amber-400/20",   icono: "text-amber-500 dark:text-amber-400" },
+        reflejos: { fondo: "bg-red-400/20",     icono: "text-red-500 dark:text-red-400" }
     };
-    const { fondo, texto } = coloresCategoria[categoria] || coloresCategoria.reflejos;
 
-    const tarjetaFondo = completado ? "bg-gray-200 dark:bg-gray-700 opacity-75" : "bg-slate-50 dark:bg-slate-800";
-    const textoCompletado = completado ? "text-slate-400 dark:text-slate-500 line-through" : "text-slate-900 dark:text-white";
+    const { fondo, icono } = coloresCategoria[categoria] || coloresCategoria.atencion;
+
+    const iconoSVG = ICONOS_CATEGORIA[categoria] || ICONOS_CATEGORIA.atencion;
+
+    const fondoNormal = "bg-slate-100 dark:bg-slate-700/40";
+    const fondoHover  = "hover:bg-slate-200 dark:hover:bg-slate-600";
+    const fondoBloqueado = "bg-slate-300 dark:bg-slate-800 opacity-60";
+    const bordeHover = "hover:border-blue-500/50";
+
+    const tarjetaBase =
+        "flex items-center justify-between p-3 rounded-lg transition cursor-pointer border border-transparent";
+
+    const tarjetaFondo = completado
+        ? `${fondoBloqueado} cursor-not-allowed`
+        : `${fondoNormal} ${fondoHover} ${bordeHover}`;
+
+    const textoNombre = completado
+        ? "font-semibold text-sm text-slate-500 dark:text-slate-500 line-through"
+        : "font-semibold text-sm text-slate-900 dark:text-white";
+
+    const textoTiempo = "text-xs text-slate-500 dark:text-slate-400";
 
     const tag = completado ? "div" : "a";
     const href = completado ? "" : `href="${url}"`;
 
     return `
-        <${tag} ${href}
-            class="w-full my-4 p-3 ${tarjetaFondo} rounded-lg border ${completado ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700'} border-slate-100 dark:border-slate-600 flex justify-between items-center">
-            <div>
-                <div class="${textoCompletado} text-base font-bold">${nombre}</div>
-                <div class="${texto} text-xs font-bold">Enfoque: ${categoria}</div>
+        <${tag} ${href} class="${tarjetaBase} ${tarjetaFondo} my-5">
+            <div class="flex items-center gap-3">
+                <div class="p-2 ${fondo} rounded ${icono}">
+                    ${iconoSVG}
+                </div>
+                <div>
+                    <p class="${textoNombre}">${nombre}</p>
+                    <p class="${textoTiempo}">Enfoque: ${categoria}</p>
+                </div>
             </div>
-            <div class="w-5 h-5 ${fondo} rounded"></div>
+
+            <span class="text-xs font-bold ${icono}">
+                ${completado ? "COMPLETADO" : "COMENZAR"}
+            </span>
         </${tag}>
     `;
 }
+
 
 // Renderizar los tests en el grid usando la sesión actual (no recalcula hasta expirar)
 function renderTestsRecomendados(limite = 3) {

@@ -104,7 +104,8 @@ const CATALOGO_JUEGOS = [
             "atencion_dividida",
             "velocidad_cognitiva",
             "coordinacion_visomotora"
-        ]
+        ],
+        "disponible" : "Disponible"
     },
 
     {
@@ -160,7 +161,9 @@ const CATALOGO_JUEGOS = [
             "planificacion",
             "velocidad_cognitiva",
             "coordinacion_visomotora"
-        ]
+        ],
+        "disponible" : "No disponible"
+
     },
     {
         "id": "silencio-mental",
@@ -198,14 +201,15 @@ const CATALOGO_JUEGOS = [
         "buildUrl": "games/silencio-mental/silencio-mental-build.html",
         "imagen": "assets/juegos/silencio-mental.png",
         "logo": "assets/juegos/silencio-mental.png",
-        "heroEyebrow": "Control inhibitorio",
+        "heroEyebrow": "Gestión controlada",
         "destacado": false,
         "skills": [
             "atencion_sostenida",
             "atencion_selectiva",
             "memoria_trabajo",
             "control_inhibitorio"
-        ]
+        ],
+        "disponible" : "No disponible"
     },
     {
         "id": "operaciones-encadenadas",
@@ -255,7 +259,8 @@ const CATALOGO_JUEGOS = [
             "planificacion",
             "velocidad_cognitiva",
             "atencion_selectiva"
-        ]
+        ],
+        "disponible" : "Disponible"
     },
     {
         "id": "eco-visual",
@@ -300,7 +305,8 @@ const CATALOGO_JUEGOS = [
             "atencion_selectiva",
             "atencion_sostenida",
             "flexibilidad_cognitiva"
-        ]
+        ],
+        "disponible" : "No disponible"
     },
     {
         "id": "color-match",
@@ -345,7 +351,8 @@ const CATALOGO_JUEGOS = [
             "velocidad_cognitiva",
             "atencion_dividida",
             "memoria_trabajo"
-        ]
+        ],
+        "disponible" : "No disponible"
     },
     {
         "id": "cambio-de-reglas",
@@ -390,7 +397,8 @@ const CATALOGO_JUEGOS = [
             "control_inhibitorio",
             "planificacion",
             "memoria_espacial"
-        ]
+        ],
+        "disponible" : "No disponible"
     },
     {
         "id": "trayectorias-mentales",
@@ -435,7 +443,8 @@ const CATALOGO_JUEGOS = [
             "memoria_trabajo",
             "memoria_espacial",
             "atencion_sostenida"
-        ]
+        ],
+        "disponible" : "No disponible"
     },
 
     {
@@ -472,7 +481,8 @@ const CATALOGO_JUEGOS = [
         "skills": [
             "velocidad_cognitiva",
             "coordinacion_visomotora"
-        ]
+        ],
+        "disponible" : "Disponible"
     },
     {
         "id": "reflejos-cruzados",
@@ -522,7 +532,8 @@ const CATALOGO_JUEGOS = [
             "memoria_espacial",
             "control_inhibitorio",
             "flexibilidad_cognitiva"
-        ]
+        ],
+        "disponible" : "No disponible"
     }
 
 ];
