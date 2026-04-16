@@ -14,11 +14,15 @@
   transition:
     opacity 0.4s ease,
     transform 0.4s ease;
-  z-index: 9999;
+  /* Dejar z-index bajo para que los modales (z-50) queden por encima */
+  z-index: 40;
+  /* Por defecto no debe capturar clicks cuando está oculto */
+  pointer-events: none;
 }
 
 .coach.visible {
   opacity: 0.9;
+  pointer-events: auto;
 }
 
 .coach.visible .coach-bubble {
