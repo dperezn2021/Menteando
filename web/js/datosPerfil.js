@@ -233,7 +233,6 @@
     const modal = document.getElementById("modal-editar");
     const btnEditar = document.getElementById("btn-editar");
     const btnCerrar = document.getElementById("btn-cerrar-modal");
-    const btnGuardar = document.getElementById("btn-guardar");
     const formModal = document.getElementById("perfil-form");
 
     // Botón del coach (versión original)

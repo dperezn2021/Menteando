@@ -437,7 +437,7 @@ window.formatearPuntos = formatearPuntos;
 window.getTiempo = getTiempo;
 window.getUltimasSesiones = getUltimasSesiones;
 
-// ========== INICIALIZACIÓN ==========
+
 // ========== INICIALIZACIÓN ==========
 document.addEventListener("DOMContentLoaded", () => {
     // 1. Actualizar UI del coach (badge y dot)
