@@ -8,6 +8,8 @@ const perfilBase = {
     edad: 0,
     desde: new Date().toISOString(),
     racha: 0,
+    rachaMaxima: 0,
+    nuevaRachaMaxima: false,
     puntos: 0,
     correo: "",
     sesiones: 0,
@@ -79,12 +81,14 @@ function resetperfil() {
     perfilLimpio.detalle = JSON.parse(JSON.stringify(perfilBase.detalle));
     perfilLimpio.sesionesDiarias = [0, 0, 0, 0, 0, 0, 0];
     perfilLimpio.ultimaSesionDia = null;
+    perfilLimpio.rachaMaxima = 0;
+    perfilLimpio.nuevaRachaMaxima = false;
 
     saveperfil(perfilLimpio);
     localStorage.removeItem("medallas_completadas");
+    localStorage.removeItem("ultimo_dia_jugado"); // ✅ Limpiar también esto
     location.reload();
 }
-
 // === RECALCULAR PERFIL GLOBAL ===
 function recalcularPerfilGlobal(perfil, metrics, gameId) {
     const skills = typeof window.getJuegoSkillsById === "function"
@@ -165,66 +169,73 @@ function getTiempo(perfil) {
 }
 
 // ========== ACTUALIZAR RACHA POR SESIÓN COMPLETADA ==========
-function actualizarRachaPorSesionCompletada() {
-    const perfil = getperfil();
-
-    const ultimaFechaStr = perfil.ultimaSesion;
+function actualizarRachaPorSesionCompletada(perfil) {
+    // Fecha actual (la sesión que acabamos de jugar)
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-
-    let nuevaRacha = perfil.racha || 0;
-
-    if (!ultimaFechaStr) {
-        nuevaRacha = 1;
-    } else {
-        const ultimaFecha = new Date(ultimaFechaStr);
-        ultimaFecha.setHours(0, 0, 0, 0);
-
-        const diferenciaDias = Math.floor((hoy - ultimaFecha) / (1000 * 60 * 60 * 24));
-
+    
+    // Obtener la última fecha que jugó del localStorage
+    const ultimoDiaJugadoStr = localStorage.getItem("ultimo_dia_jugado");
+    
+    let nuevaRacha = 1;
+    
+    if (ultimoDiaJugadoStr) {
+        const ultimoDia = new Date(ultimoDiaJugadoStr);
+        ultimoDia.setHours(0, 0, 0, 0);
+        
+        const diferenciaDias = Math.floor((hoy - ultimoDia) / 86400000);
+        
         if (diferenciaDias === 0) {
-            nuevaRacha = perfil.racha;
+            // Mismo día → no cambia la racha
+            nuevaRacha = perfil.racha || 1;
         } else if (diferenciaDias === 1) {
+            // Día consecutivo → aumenta
             nuevaRacha = (perfil.racha || 0) + 1;
         } else {
+            // Pasó más de un día → se reinicia
             nuevaRacha = 1;
         }
     }
-
+    
+    // Actualizar racha en el perfil
     perfil.racha = nuevaRacha;
-    saveperfil(perfil);
-
-    if (typeof actualizarLogrosYMedallas === 'function') {
-        actualizarLogrosYMedallas();
+    
+    // Verificar si es nueva racha máxima
+    if (nuevaRacha > (perfil.rachaMaxima || 0)) {
+        perfil.rachaMaxima = nuevaRacha;
+        perfil.nuevaRachaMaxima = true;
     }
-
-    if (nuevaRacha === 7) {
-        console.log("🎉 ¡Medalla desbloqueada! Racha imparable - 7 días seguidos jugando");
-    }
-
-    return nuevaRacha;
+    
+    // Guardar el día actual en localStorage
+    localStorage.setItem("ultimo_dia_jugado", hoy.toISOString());
+    
+    console.log(`🔥 Racha: ${nuevaRacha} días | Máxima: ${perfil.rachaMaxima}`);
+    
+    return perfil;
 }
 
-// ========== OBTENER RACHA VISIBLE (PARA MOSTRAR) ==========
-function obtenerRachaVisible() {
-    const perfil = getperfil();
-
-    if (!perfil.ultimaSesion) return perfil.racha || 0;
-
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-
-    const ultimaSesion = new Date(perfil.ultimaSesion);
-    ultimaSesion.setHours(0, 0, 0, 0);
-
-    const diferenciaDias = Math.floor((hoy - ultimaSesion) / (1000 * 60 * 60 * 24));
-
-    if (diferenciaDias > 1) {
-        return 0;
-    }
-
-    return perfil.racha;
+function calcularRachaDiariaMaxima(arr) {
+    return Math.max(...arr);
 }
+
+function calcularRachaDiariaMedia(arr) {
+    const sum = arr.reduce((a, b) => a + b, 0);
+    return (sum / arr.length).toFixed(1);
+}
+
+function calcularRachaDiariaMinima(arr) {
+    return Math.min(...arr);
+}
+
+function calcularRachaUltimos7Dias(arr) {
+    let racha = 0;
+    for (let i = arr.length - 1; i >= 0; i--) {
+        if (arr[i] > 0) racha++;
+        else break;
+    }
+    return racha;
+}
+
 
 // ========== OBTENER ÚLTIMAS SESIONES ==========
 function getUltimasSesiones(perfil, limite = 3) {
@@ -249,6 +260,7 @@ function sincronizarSesionesDiarias(perfil) {
     const hoyStr = new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
 
     if (!perfil.ultimaSesionDia) {
+        perfil.sesionesDiarias = [0, 0, 0, 0, 0, 0, 0]; // ← LIMPIA
         perfil.ultimaSesionDia = hoyStr;
         saveperfil(perfil);
         return;
@@ -298,42 +310,6 @@ function calcularDiasPasados(fechaAnteriorStr, fechaActualStr) {
     return Math.floor((fecha2 - fecha1) / 86400000);
 }
 
-// ========== SAVEGAMEDATA PARA UNITY ==========
-window.SaveGameData = function(jsonString) {
-    try {
-        jsonString = jsonString
-            .replace(/Infinity/g, "0")
-            .replace(/-Infinity/g, "0")
-            .replace(/NaN/g, "0");
-
-        const data = JSON.parse(jsonString);
-        const perfil = getperfil();
-
-        perfil.sesiones++;
-        perfil.ultimaSesion = data.timestamp;
-
-        actualizarRachaPorSesionCompletada();
-
-        let puntosAAñadir = Number(data.puntos);
-        if (isNaN(puntosAAñadir)) puntosAAñadir = 0;
-        perfil.puntos += puntosAAñadir;
-
-        actualizarSesionesDiarias(perfil);
-
-        if (!perfil.juegos[data.gameId]) perfil.juegos[data.gameId] = [];
-        perfil.juegos[data.gameId].push(data.metrics);
-        perfil.juegos[data.gameId][perfil.juegos[data.gameId].length - 1].timestamp = data.timestamp;
-
-        recalcularPerfilGlobal(perfil, data.metrics, data.gameId);
-
-        perfil.nivel = getNivel(perfil);
-
-        saveperfil(perfil);
-
-    } catch (e) {
-        console.error("Error al guardar datos del juego:", e, jsonString);
-    }
-};
 
 // ========== ENVIAR MÉTRICAS POR CORREO ==========
 function enviarMetricasPorCorreo(perfil) {
@@ -412,7 +388,7 @@ function desactivarCoach() {
 
     localStorage.setItem("coach_disabled", "true");
 
-    
+
 }
 
 function disableCoachForever() {
@@ -432,18 +408,20 @@ window.desactivarCoach = desactivarCoach;
 window.getDiasJugadosSemana = getDiasJugadosSemana;
 window.actualizarSesionesDiarias = actualizarSesionesDiarias;
 window.actualizarRachaPorSesionCompletada = actualizarRachaPorSesionCompletada;
-window.obtenerRachaVisible = obtenerRachaVisible;
 window.formatearPuntos = formatearPuntos;
 window.getTiempo = getTiempo;
 window.getUltimasSesiones = getUltimasSesiones;
-
+window.calcularRachaUltimos7Dias = calcularRachaUltimos7Dias;
+window.calcularRachaDiariaMaxima = calcularRachaDiariaMaxima;
+window.calcularRachaDiariaMedia = calcularRachaDiariaMedia;
+window.calcularRachaDiariaMinima = calcularRachaDiariaMinima;
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener("DOMContentLoaded", () => {
     // 1. Actualizar UI del coach (badge y dot)
     const badge = document.getElementById("titulo-activar-coach");
     const dot = document.getElementById("coach-status-dot");
-    
+
     if (badge && dot) {
         if (isCoachDisabled()) {
             badge.textContent = "Coach Cognitivo Desactivado";
@@ -459,7 +437,7 @@ document.addEventListener("DOMContentLoaded", () => {
             dot.classList.add("bg-green-500");
         }
     }
-    
+
     // 2. Botón toggle coach
     const btnToggleCoach = document.getElementById("btn-toggle-coach");
     if (btnToggleCoach) {
@@ -470,7 +448,7 @@ document.addEventListener("DOMContentLoaded", () => {
             btnToggleCoach.textContent = "Desactivar Coach";
             btnToggleCoach.className = "flex-1 py-2 rounded-lg font-bold text-base transition-colors bg-yellow-200 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-300 dark:hover:bg-yellow-900/50";
         }
-        
+
         btnToggleCoach.addEventListener("click", () => {
             if (isCoachDisabled()) {
                 localStorage.setItem("coach_disabled", "false");
@@ -480,13 +458,6 @@ document.addEventListener("DOMContentLoaded", () => {
             location.reload();
         });
     }
+
     
-    // 3. Inicializar CoachController si existe
-    if (typeof CoachController !== 'undefined' && !isCoachDisabled()) {
-        const perfil = getperfil();
-        const coachController = new CoachController(perfil);
-        if (coachController && typeof coachController.onPantallaPerfil === 'function') {
-            coachController.onPantallaPerfil();
-        }
-    }
 });

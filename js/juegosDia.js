@@ -85,11 +85,11 @@ function generarJuegoDelDia(juego) {
 
     return `
         <div class="w-full flex flex-col md:flex-row items-center gap-8 lg:gap-12">
-            <img src="${juego.imagen}" alt="${juego.nombre}" class="h-full max-w-200 relative min-h-[18rem] md:min-h-[24rem] rounded-3xl overflow-hidden bg-slate-200 dark:bg-slate-700 block">
+
 
             <div class="flex-1 flex flex-col justify-center gap-6">
                 <span class="px-3 py-1 bg-blue-500 text-white text-sm font-bold uppercase tracking-wider rounded-full w-fit">
-                    ${"Recomendado hoy"}
+                    Recomendado hoy
                 </span>
 
                 <div>
@@ -112,9 +112,16 @@ function generarJuegoDelDia(juego) {
                     </a>
                 </div>
             </div>
+            
+            <img 
+                src="${juego.imagen}" 
+                alt="${juego.nombre}"
+                class="w-full max-w-sm md:max-w-md lg:max-w-lg rounded-3xl object-cover aspect-video md:aspect-square bg-slate-200 dark:bg-slate-700"
+            >
         </div>
     `;
 }
+
 
 function renderJuegoRecomendado(cantidad = 1) {
     const contenedor = document.getElementById("juego-recomendado");

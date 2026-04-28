@@ -40,7 +40,7 @@
 
 <body class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased">
 
-    <header class="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+    <header class="header-auto-hide w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3 flex-shrink-0">
                 <img src="../assets/img/logo2.png" alt="Logo" class="w-10 h-10 md:w-12 md:h-12" />
@@ -96,12 +96,12 @@
             </div>
         </section>
 
-        <!-- Mission & Vision -->
+        <!-- Mission & Vision - TAMAÑOS IGUALADOS -->
         <section class="py-16 md:py-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
                     <div class="group relative p-1">
-                        <div class="relative flex flex-col gap-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 shadow-sm">
+                        <div class="relative flex flex-col gap-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 shadow-sm h-full">
                             <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
                                 <div class="size-6 bg-blue-500 rounded"></div>
                             </div>
@@ -110,7 +110,7 @@
                         </div>
                     </div>
                     <div class="group relative p-1">
-                        <div class="relative h-full flex flex-col gap-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 shadow-sm">
+                        <div class="relative flex flex-col gap-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 shadow-sm h-full">
                             <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
                                 <div class="size-6 bg-blue-500 rounded"></div>
                             </div>
@@ -206,38 +206,89 @@
             </div>
         </section>
 
-        <!-- FAQ -->
+        <!-- FAQ - AMPLIADA Y CON SENTIDO -->
         <section class="py-16 md:py-20">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16">
                     <h2 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">Preguntas Frecuentes</h2>
                     <p class="mt-4 text-slate-600 dark:text-slate-400">Resolvemos tus dudas sobre el uso de la plataforma.</p>
                 </div>
-                <div class="space-y-8">
-                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6" open>
-                        <summary class="flex cursor-pointer items-center justify-between font-bold text-lg text-slate-900 dark:text-white list-none">
+                <div class="space-y-4">
+                    <!-- FAQ 1 -->
+                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
                             <span>¿Tengo que pagar para usar Menteando?</span>
-                            <span class="transition-transform duration-300 group-open:rotate-180">▼</span>
+                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
                         </summary>
-                        <div class="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">No, Menteando es actualmente parte de un proyecto de investigación educativa y es accesible de forma gratuita.</div>
+                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">No, Menteando es actualmente parte de un proyecto de investigación educativa y es accesible de forma gratuita.</div>
                     </details>
-                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6">
-                        <summary class="flex cursor-pointer items-center justify-between font-bold text-lg text-slate-900 dark:text-white list-none">
+
+                    <!-- FAQ 2 -->
+                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
                             <span>¿Sirve como herramienta clínica?</span>
-                            <span class="transition-transform duration-300 group-open:rotate-180">▼</span>
+                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
                         </summary>
-                        <div class="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Debe utilizarse como una herramienta complementaria y no como sustituto de un asesoramiento o tratamiento clínico profesional.</div>
+                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Debe utilizarse como una herramienta complementaria y no como sustituto de un asesoramiento o tratamiento clínico profesional.</div>
                     </details>
-                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6">
-                        <summary class="flex cursor-pointer items-center justify-between font-bold text-lg text-slate-900 dark:text-white list-none">
-                            <span>¿Cómo contacto con el equipo?</span>
-                            <span class="transition-transform duration-300 group-open:rotate-180">▼</span>
+
+                    <!-- FAQ 3 -->
+                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                            <span>¿Cómo se guarda mi progreso?</span>
+                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
                         </summary>
-                        <div class="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
-                            Puede contactar con nosotros a través de nuestro formulario de contacto.
-                            <br><br>
-                            <button class="rounded-xl px-8 py-4 text-base font-bold bg-slate-800 text-white hover:bg-slate-700 transition" onclick="window.location.href='#contacto'">Formulario de Contacto</button>
+                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Todo tu progreso se guarda automáticamente en tu navegador usando localStorage. No necesitas registro ni contraseñas.</div>
+                    </details>
+
+                    <!-- FAQ 4 -->
+                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                            <span>¿Puedo perder mis datos si cambio de navegador?</span>
+                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Sí, los datos están vinculados al navegador y dispositivo. Si cambias de navegador o usas otro dispositivo, el progreso no se transferirá automáticamente.</div>
+                    </details>
+
+                    <!-- FAQ 5 -->
+                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                            <span>¿Qué diferencia hay entre juegos y tests?</span>
+                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Los juegos entrenan tus habilidades y mejoran tu perfil. Los tests miden tu nivel real sin modificarlo, como una evaluación.</div>
+                    </details>
+
+                    <!-- FAQ 6 -->
+                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                            <span>¿Cómo contacto con el equipo?</span>
+                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                            Puedes contactar con nosotros a través del formulario de contacto más abajo en esta misma página.
+                            <div class="mt-4">
+                                <button class="rounded-xl px-6 py-3 text-sm font-bold bg-slate-800 text-white hover:bg-slate-700 transition" onclick="document.getElementById('contacto').scrollIntoView({behavior: 'smooth'})">Ir al formulario</button>
+                            </div>
                         </div>
+                    </details>
+
+                    <!-- FAQ 7 -->
+                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                            <span>¿Puedo eliminar mis datos?</span>
+                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Sí, desde tu perfil puedes usar el botón "Reiniciar" para borrar todo tu progreso. También puedes borrar los datos manualmente desde la configuración de tu navegador.</div>
+                    </details>
+
+                    <!-- FAQ 8 -->
+                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                            <span>¿Hay versión para móvil?</span>
+                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Menteando está diseñado para ser responsive y funciona correctamente en móviles, tablets y ordenadores.</div>
                     </details>
                 </div>
             </div>
@@ -299,15 +350,16 @@
                     <h4 class="font-bold text-slate-900 dark:text-white mb-6">Enlaces de interés</h4>
                     <ul class="space-y-4 text-slate-500 dark:text-slate-400">
                         <li><a href="index.html" class="hover:text-blue-500 transition-colors">Inicio</a></li>
-                        <li><a href="#" class="hover:text-blue-500 transition-colors">Entrenamiento</a></li>
-                        <li><a href="#" class="hover:text-blue-500 transition-colors">GitHub</a></li>
+                        <li><a href="games.html" class="hover:text-blue-500 transition-colors">Juegos</a></li>
+                        <li><a href="tests.html" class="hover:text-blue-500 transition-colors">Tests</a></li>
                     </ul>
                 </div>
                 <div class="w-full md:w-64 text-center md:text-left">
                     <h4 class="font-bold text-slate-900 dark:text-white mb-6">Más información</h4>
                     <ul class="space-y-4 text-slate-500 dark:text-slate-400">
                         <li><a href="about.html" class="hover:text-blue-500 transition-colors">Acerca de</a></li>
-                        <li><a href="about.html#contacto" class="hover:text-blue-500 transition-colors">Contacto</a></li>
+                        <li><a href="#contacto" class="hover:text-blue-500 transition-colors">Contacto</a></li>
+                        <li><a href="#" class="hover:text-blue-500 transition-colors">GitHub</a></li>
                     </ul>
                 </div>
             </div>
@@ -326,7 +378,6 @@
     <script>
         const perfil = getperfil();
         const coachController = new CoachController(perfil);
-        coachController.onPantallaAbout();
     </script>
     <script>
         const themeToggleBtn = document.getElementById('theme-toggle-btn');

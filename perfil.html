@@ -57,7 +57,7 @@
 <body class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased">
 
     <!-------------------------------------HEADER----------------------------------->
-    <header class="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+    <header class="header-auto-hide w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
         <div class="container mx-auto px-6 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
 
             <!-- TÍTULO Y LOGO -->
@@ -121,6 +121,7 @@
         <div id="coach" class="coach">
             <div id="coach-bubble" class="coach-bubble"></div>
         </div>
+
 
         <!-- CONTENEDOR PRINCIPAL CON DOS COLUMNAS -->
         <div class="container mx-auto px-4 lg:px-6 py-8 lg:py-12">
@@ -192,7 +193,16 @@
                                 <span class="text-slate-500">Nivel cognitivo</span>
                                 <span id="perfil-nivel"
                                     class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded font-medium">
-                                    Nulo
+
+                                </span>
+                            </div>
+
+                            <div
+                                class="flex justify-between text-sm border-t border-slate-100 dark:border-slate-700 pt-3">
+                                <span class="text-slate-500">Racha máxima</span>
+                                <span id="perfil-racha-color"
+                                    class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded font-medium">
+
                                 </span>
                             </div>
                         </div>
@@ -319,6 +329,7 @@
                         </div>
 
 
+
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 h-full gap-4 flex-col">
@@ -355,12 +366,12 @@
                             class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm outline outline-1 outline-slate-200 dark:outline-slate-700 ">
 
                             <h3
-                                class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 pb-2 border-b-2 border-blue-500 ">
+                                class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4 pb-2 border-b-2 border-blue-500 ">
                                 <div class="w-5 h-5 bg-blue-500 rounded"></div>
                                 Evolución Semanal
                             </h3>
 
-                            <p class="mb-8 mt-2 text-slate-500 dark:text-white-400 ">Consulta las sesiones completadas
+                            <p class="mb-4 mt-2 text-slate-500 dark:text-white-400 ">Consulta las sesiones completadas
                                 en los últimos 7 días</p>
 
                             <!-- CONTENEDOR DEL GRÁFICO -->
@@ -552,6 +563,36 @@
         </div>
     </div>
 
+    <!-- MODAL RACHA MAXIMA -->
+    <div id="modal-racha-maxima"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center z-50 hidden"
+        style="display: none; align-items: center !important; justify-content: center !important;">
+
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-2xl text-center max-w-sm mx-4 animate-pulse-slow">
+
+            <!-- Emoji en lugar de imagen (para evitar 404) -->
+            <div
+                class="w-20 h-20 mx-auto mb-4 text-5xl flex items-center justify-center bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
+                🏆
+            </div>
+
+            <h2 class="text-xl font-bold text-amber-500 dark:text-amber-400 mb-2">
+                ¡Nueva racha máxima!
+            </h2>
+
+            <p id="modal-racha-numero" class="text-3xl font-extrabold text-blue-600 dark:text-blue-400">
+                0 días
+            </p>
+
+            <button id="cerrar-modal-racha"
+                class="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-2 rounded-lg transition-colors">
+                Continuar
+            </button>
+        </div>
+    </div>
+
+
+
     <!-- SCRIPTS DE COACH E INICIALIZACIÓN -->
     <script src="/js/perfil.js"></script>
     <script src="/js/datosPerfil.js"></script>
@@ -570,7 +611,6 @@
         // Inicializar coach en pantalla de perfil
         const perfil = getperfil();
         const coachController = new CoachController(perfil);
-        coachController.onPantallaPerfil();
     </script>
 
     <script>
@@ -628,16 +668,49 @@
             }
 
             //Racha
-            const racha = actualizarRachaPorSesionCompletada();
-            const spanRacha = document.getElementById("perfil-racha-total");
 
-            if (spanRacha) {
-                spanRacha.textContent = racha;
-            }
+            const dias = getDiasJugadosSemana(perfil);
+
+
 
 
             renderTestsRecomendados();
             actualizarLogrosYMedallas();
+        });
+    </script>
+
+    <!-- Al final del body, después de inicializar el coach -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const perfil = getperfil();
+            const coachController = new CoachController(perfil);
+
+            // Hacer el coach accesible globalmente para otros scripts
+            window.coachController = coachController;
+
+            // ===== SUBCONTEXTO: EDITAR PERFIL =====
+            const btnEditar = document.getElementById("btn-editar");
+            if (btnEditar) {
+                btnEditar.addEventListener("mouseenter", () => {
+                    coachController.onPantallaPerfil("editar");
+                });
+            }
+
+            // ===== SUBCONTEXTO: COACH (activar/desactivar) =====
+            const btnToggleCoach = document.getElementById("btn-toggle-coach");
+            if (btnToggleCoach) {
+                btnToggleCoach.addEventListener("mouseenter", () => {
+                    coachController.onPantallaPerfil("coach");
+                });
+            }
+
+            // ===== SUBCONTEXTO: MEDALLAS (al pasar ratón) =====
+            const medallasContainer = document.getElementById("medallas-container");
+            if (medallasContainer) {
+                medallasContainer.addEventListener("mouseenter", () => {
+                    coachController.onPantallaPerfil("medallas");
+                });
+            }
         });
     </script>
 

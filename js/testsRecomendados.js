@@ -1,6 +1,6 @@
 
 const SESION_TESTS_KEY = "tests_recomendados_sesion";
-const EXPIRACION_HORAS = 1;
+const EXPIRACION_HORAS = 0.25;
 const ICONOS_CATEGORIA = {
     memoria: `
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,6 +38,7 @@ function shuffleArrayDeterminista(array, semilla) {
     return resultado;
 }
 
+// Reemplaza la función obtenerSesionTests con esta versión mejorada
 function obtenerSesionTests(perfil, limite = 3) {
     const ahora = Date.now();
     const guardado = localStorage.getItem(SESION_TESTS_KEY);
@@ -47,10 +48,6 @@ function obtenerSesionTests(perfil, limite = 3) {
     if (sesion && sesion.expiraEn && sesion.expiraEn > ahora) {
         sesionValida = true;
         console.log(`Sesión válida hasta ${new Date(sesion.expiraEn).toLocaleString()}`);
-    } else if (sesion) {
-        console.log(`Sesión expirada (expiraba ${new Date(sesion.expiraEn).toLocaleString()})`);
-    } else {
-        console.log("No hay sesión guardada");
     }
 
     if (sesionValida) {
@@ -66,52 +63,69 @@ function obtenerSesionTests(perfil, limite = 3) {
     }
 
     // --- Generar nueva selección ---
-    console.log("Generando nueva selección de tests...");
+    console.log("🔄 Generando nuevos tests recomendados según tus habilidades más bajas...");
     const catalogo = window.getCatalogoTests?.() || [];
     const testsNoCompletados = catalogo.filter(t => !t.completado);
     if (testsNoCompletados.length === 0) return [];
 
-    // Obtener habilidades ordenadas de menor a mayor
-    const habilidadesOrdenadas = [
-        { nombre: "atencion", valor: perfil.atencion },
-        { nombre: "memoria", valor: perfil.memoria },
-        { nombre: "control", valor: perfil.control },
-        { nombre: "reflejos", valor: perfil.reflejos }
-    ].sort((a, b) => a.valor - b.valor);
-
-    // Semilla que cambia cada 2 minutos (para pruebas). En producción: cada 8 horas.
-    const intervaloMs = 2 * 60 * 1000; // 2 minutos
-    const semilla = Math.floor(ahora / intervaloMs);
-    console.log(`Semilla actual: ${semilla}`);
+    // Obtener habilidades con sus valores (0-1)
+    const habilidades = [
+        { nombre: "atencion", valor: perfil.atencion || 0, porcentaje: Math.round((perfil.atencion || 0) * 100) },
+        { nombre: "memoria", valor: perfil.memoria || 0, porcentaje: Math.round((perfil.memoria || 0) * 100) },
+        { nombre: "control", valor: perfil.control || 0, porcentaje: Math.round((perfil.control || 0) * 100) },
+        { nombre: "reflejos", valor: perfil.reflejos || 0, porcentaje: Math.round((perfil.reflejos || 0) * 100) }
+    ];
+    
+    // Ordenar de menor a mayor (las más débiles primero)
+    const habilidadesOrdenadas = [...habilidades].sort((a, b) => a.valor - b.valor);
+    
+    console.log("📊 TUS HABILIDADES (de peor a mejor):");
+    habilidadesOrdenadas.forEach(h => {
+        console.log(`   ${h.nombre}: ${h.porcentaje}%`);
+    });
 
     const seleccionados = [];
     const yaConsiderados = new Set();
 
+    // PRIMERO: Intentar seleccionar tests de las habilidades más débiles
     for (let habilidad of habilidadesOrdenadas) {
         if (seleccionados.length >= limite) break;
-        let disponibles = testsNoCompletados.filter(t =>
-            t.categoria?.toLowerCase() === habilidad.nombre &&
-            !yaConsiderados.has(t.id)
-        );
-        // Barajar de forma determinista según la semilla
-        disponibles = shuffleArrayDeterminista(disponibles, semilla);
+        
+        // Buscar tests NO completados de esta categoría
+        let disponibles = testsNoCompletados.filter(t => {
+            const categoriaMatch = t.categoria?.toLowerCase() === habilidad.nombre;
+            const noConsiderado = !yaConsiderados.has(t.id);
+            return categoriaMatch && noConsiderado;
+        });
+        
+        // Mezclar un poco para variedad
+        disponibles = shuffleArrayDeterminista(disponibles, habilidad.valor * 10000);
+        
         for (let test of disponibles) {
             if (seleccionados.length >= limite) break;
             seleccionados.push(test);
             yaConsiderados.add(test.id);
+            console.log(`   ✅ Recomendado: ${test.nombre} (${habilidad.nombre} - ${habilidad.porcentaje}%)`);
         }
     }
 
-    // Rellenar si faltan (con cualquier test no completado, también barajado)
+    // SEGUNDO: Si aún faltan, completar con tests aleatorios de cualquier categoría
     if (seleccionados.length < limite) {
+        console.log("   ⚠️ Faltan tests, completando con recomendaciones generales...");
         let restantes = testsNoCompletados.filter(t => !yaConsiderados.has(t.id));
-        restantes = shuffleArrayDeterminista(restantes, semilla + 1);
-        seleccionados.push(...restantes.slice(0, limite - seleccionados.length));
+        restantes = shuffleArrayDeterminista(restantes, Date.now());
+        const aAgregar = restantes.slice(0, limite - seleccionados.length);
+        aAgregar.forEach(test => {
+            seleccionados.push(test);
+            yaConsiderados.add(test.id);
+            console.log(`   📝 Añadido: ${test.nombre} (${test.categoria})`);
+        });
     }
 
-    console.log("Tests seleccionados:", seleccionados.map(t => t.nombre));
+    console.log(`🎯 Tests seleccionados (${seleccionados.length}/${limite}):`);
+    seleccionados.forEach(t => console.log(`   - ${t.nombre}`));
 
-    // Guardar sesión con expiración
+    // Guardar sesión con expiración (1 hora)
     const nuevaSesion = {
         tests: seleccionados.map(t => ({
             id: t.id,
@@ -124,10 +138,9 @@ function obtenerSesionTests(perfil, limite = 3) {
         generadoEn: ahora
     };
     localStorage.setItem(SESION_TESTS_KEY, JSON.stringify(nuevaSesion));
-    console.log(`Nueva sesión guardada, expira ${new Date(nuevaSesion.expiraEn).toLocaleString()}`);
+    
     return nuevaSesion.tests;
 }
-
 // Función auxiliar para ordenar habilidades
 function obtenerHabilidadesOrdenadas(perfil) {
     return [
