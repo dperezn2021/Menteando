@@ -6,7 +6,7 @@ function CoachEntity(element, bubble) {
 }
 
 CoachEntity.prototype.show = function(msg) {
-    this.bubble.innerText = msg;
+    this.bubble.innerHTML = msg;
     if (this.element && this.element.style) this.element.style.pointerEvents = "auto"; // permitir clics cuando visible
     this.element.classList.add("visible");
     this.visible = true;

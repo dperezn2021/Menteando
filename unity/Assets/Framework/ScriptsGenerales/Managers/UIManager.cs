@@ -170,7 +170,7 @@ public class UIManager : MonoBehaviour
             cristalCanvas.SetActive(true);
 
         // 🔥 Forzar la recreación del grid
-        var juego = FindAnyObjectByType<DetectorDeIntrusosGame>(FindObjectsInactive.Include);
+        var juego = FindAnyObjectByType<BaseGame>(FindObjectsInactive.Include);
         if (juego != null)
         {
             // Limpiar cualquier estado residual

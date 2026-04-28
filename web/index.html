@@ -66,7 +66,7 @@
     class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased overflow-x-hidden">
 
     <!-------------------------------------HEADER----------------------------------->
-    <header class="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+    <header class="header-auto-hide w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
         <div class="container mx-auto px-6 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
 
             <!-- TÍTULO Y LOGO -->
@@ -136,8 +136,8 @@
                 <h1
                     class="text-6xl md:text-8xl text-center justify-center font-black text-slate-900 dark:text-white leading-[94px]">
                     Mantén tu
-                    mente<br>
-                    <span class="text-blue-500">activa</span> y joven
+                     <span class="text-blue-500">mente</span><br>
+                   </span> activa y joven   
                 </h1>
                 <p class="max-w-2xl mx-auto text-2xl font-normal text-gray-700 dark:text-slate-400 leading-7 mt-10">
                     Ejercicios cognitivos diseñados para mantener tu cerebro ágil, joven y saludable. Divertido, fácil
@@ -246,10 +246,10 @@
                     <div class="flex flex-col lg:flex-row gap-6 lg:gap-7">
 
                         <!-- AVATAR -->
-                        <div class="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden border-8 border-blue-500/20">
+                        <a href="perfil.html" class="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden border-8 border-blue-500/20">
                             <img id="perfil-avatar" src="/assets/icon/usuario.webp" alt="Avatar de usuario"
                                 class="w-full h-full object-cover" />
-                        </div>
+                        </a>
 
 
                         <!-- NOMBRE Y ESTADÍSTICAS -->
@@ -258,7 +258,7 @@
                                     id="perfil-nombre"></span></h3>
                             <p class="text-lg lg:text-xl font-normal text-slate-500 dark:text-slate-400 mb-4"><span
                                     id="perfil-edad"></span> años • Jugando desde <span id="perfil-desde"></span></p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <a href="perfil.html" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div class="p-4 bg-neutral-100 dark:bg-slate-700 rounded-2xl text-center">
                                     <p class="text-blue-500 font-bold uppercase text-sm mb-1">Nivel</p>
                                     <p id="perfil-nivel">
@@ -279,7 +279,7 @@
                                     <p class="text-2xl font-black text-slate-900 dark:text-white" id="perfil-puntos">
                                     </p>
                                 </div>
-                            </div>
+                            </a>
 
                             <!-- BOTÓN DE ENTRENAR -->
                             <div class="mt-6">
@@ -373,7 +373,6 @@
     <script>
         const perfil = getperfil();
         const coachController = new CoachController(perfil);
-        coachController.onMenuPrincipal();
         document.addEventListener("DOMContentLoaded", () => {
             const perfil = getperfil();
             if (perfil.avatar) {

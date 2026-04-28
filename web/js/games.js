@@ -108,6 +108,27 @@ function createCompactCard(juego) {
 }
 
 function renderFeaturedGames(destacados) {
+
+    // 1. Obtener o crear sessionId
+    let sessionId = sessionStorage.getItem("gamesSessionId");
+    if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        sessionStorage.setItem("gamesSessionId", sessionId);
+    }
+
+    // 2. Obtener sessionId guardado en localStorage
+    let lastSessionId = localStorage.getItem("gamesLastSessionId");
+    let layoutMode = localStorage.getItem("gamesLayoutMode");
+
+    // 3. Si la sesión cambió → refresco → generar layout nuevo
+    if (sessionId !== lastSessionId) {
+        layoutMode = Math.floor(Math.random() * 4);
+        localStorage.setItem("gamesLayoutMode", layoutMode);
+        localStorage.setItem("gamesLastSessionId", sessionId);
+    } else {
+        layoutMode = parseInt(layoutMode, 10);
+    }
+
     if (!destacados.length) return "";
 
     // CASOS ESPECIALES
@@ -138,11 +159,8 @@ function renderFeaturedGames(destacados) {
     // MÁS DE 3 DESTACADOS
     let [principal, lateral, ...inferiores] = destacados;
 
-    // Elegir un modo aleatorio
-    const modo = Math.floor(Math.random() * 4);
-
-    // MODO A — Grandes primero
-    if (modo === 0) {
+    // USAR layoutMode — NO generar uno nuevo
+    if (layoutMode === 0) {
         return `
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch my-8">
                 ${createLargeCard(principal)}
@@ -155,8 +173,7 @@ function renderFeaturedGames(destacados) {
         `;
     }
 
-    // MODO A — Grandes primero
-    if (modo === 1) {
+    if (layoutMode === 1) {
         return `
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch my-8">
                 ${createCompactCard(lateral)}
@@ -169,8 +186,7 @@ function renderFeaturedGames(destacados) {
         `;
     }
 
-    // MODO A — Grandes primero
-    if (modo === 2) {
+    if (layoutMode === 2) {
         return `
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 my-8">
             ${inferiores.map(createCompactCard).join("")}
@@ -183,7 +199,7 @@ function renderFeaturedGames(destacados) {
     `;
     }
 
-    // MODO C — Todas pequeñas → grandes al final
+    // MODO 3 — Todas pequeñas → grandes al final
     return `
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 my-8">
             ${inferiores.map(createCompactCard).join("")}
@@ -195,6 +211,7 @@ function renderFeaturedGames(destacados) {
         </div>
     `;
 }
+
 
 function createEmptyState() {
     return `

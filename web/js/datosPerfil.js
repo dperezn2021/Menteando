@@ -14,17 +14,13 @@
     set("perfil-correo", perfil.correo);
 
     // MOSTRAR RACHA VISIBLE (sin modificar el perfil)
-    const rachaVisible = obtenerRachaVisible();
-    set("perfil-racha-total", rachaVisible);
+    sincronizarSesionesDiarias(perfil);
+    saveperfil(perfil);
 
-    // Opcional: mostrar tooltip si la racha se perdió
-    if (rachaVisible === 0 && perfil.racha > 0) {
-        const rachaElement = document.getElementById("perfil-racha-total");
-        if (rachaElement) {
-            rachaElement.title = "Racha perdida por inactividad. ¡Juega hoy para recuperarla!";
-            rachaElement.classList.add("text-red-500");
-        }
-    }
+    const diasJugados = [...perfil.sesionesDiarias];
+    const ultimos7 = diasJugados; // array EXACTO de lo que se pinta
+
+
 
     // Puntos formateados
     const puntosFormateados = formatearPuntos(perfil.puntos);
@@ -140,6 +136,48 @@
         return "Excelente";
     }
 
+    // Función para mostrar la racha con colores (similar a nivel cognitivo)
+    function mostrarRachaConColor(racha) {
+        const span = document.getElementById("perfil-racha-color");
+        if (!span) return;
+
+        if (racha === 0 || racha === null || racha === undefined) {
+            span.textContent = "0 días";
+            span.className = "px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded font-medium";
+            return;
+        }
+
+        let texto = "";
+        let clases = "";
+
+        if (racha < 3) {
+            texto = `${racha} ${racha === 1 ? 'día' : 'días'}`;
+            clases = "bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300";
+        } else if (racha < 7) {
+            texto = `${racha} días`;
+            clases = "bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300";
+        } else if (racha < 14) {
+            texto = `${racha} días 🔥`;
+            clases = "bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300";
+        } else if (racha < 21) {
+            texto = `${racha} días ⭐`;
+            clases = "bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300";
+        } else if (racha < 30) {
+            texto = `${racha} días 🏆`;
+            clases = "bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300";
+        } else {
+            texto = `${racha} días 👑`;
+            clases = "bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300";
+        }
+
+        span.textContent = texto;
+        span.className = `px-3 py-1.5 rounded-lg font-medium ${clases}`;
+    }
+
+    // Llamar a la función con la racha actual
+    const rachaActual = perfil.racha || 0;
+    mostrarRachaConColor(rachaActual);
+
     const contenedor = document.getElementById("perfil-detallado");
     if (contenedor) {
         contenedor.innerHTML = "";
@@ -199,20 +237,9 @@
         }).join("");
     }
 
-    function calcularRachaDiariaMaxima(sesionesDiarias) {
-        return Math.max(...sesionesDiarias);
-    }
 
-    function calcularRachaDiariaMedia(sesionesDiarias) {
-        const max = Math.max(...sesionesDiarias);
-        const min = Math.min(...sesionesDiarias);
-        const media = (max + min) / 2;
-        return (media === max || media === min) ? "" : media;
-    }
 
-    function calcularRachaDiariaMinima(sesionesDiarias) {
-        return Math.min(...sesionesDiarias);
-    }
+
 
     set("hoy", formatDay(0));
     set("hace-1-dia", formatDay(1));
@@ -222,11 +249,12 @@
     set("hace-5-dias", formatDay(5));
     set("hace-6-dias", formatDay(6));
 
-    set("maxima-racha-diaria", calcularRachaDiariaMaxima(perfil.sesionesDiarias));
-    set("media-racha-diaria", calcularRachaDiariaMedia(perfil.sesionesDiarias));
-    set("minima-racha-diaria", calcularRachaDiariaMinima(perfil.sesionesDiarias));
 
-    const diasJugados = getDiasJugadosSemana(perfil);
+    set("maxima-racha-diaria", calcularRachaDiariaMaxima(ultimos7));
+    set("media-racha-diaria", calcularRachaDiariaMedia(ultimos7));
+    set("minima-racha-diaria", calcularRachaDiariaMinima(ultimos7));
+    set("perfil-racha-total", perfil.racha);  // usa la racha real guardada
+
     renderGraficoSemanal(diasJugados);
 
     // === MODAL DEL PERFIL ===
@@ -334,4 +362,49 @@
             }
         });
     }
+
+
+    if (perfil.nuevaRachaMaxima) {
+        const modal = document.getElementById("modal-racha-maxima");
+        const numero = document.getElementById("modal-racha-numero");
+
+        if (modal && numero) {
+            numero.textContent = `${perfil.rachaMaxima} ${perfil.rachaMaxima === 1 ? 'día' : 'días'}`;
+
+            // FORZAR display flex para centrar
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+
+            // Opcional: quitar hidden si existe
+            modal.classList.remove("hidden");
+        }
+    }
+    // Botón cerrar modal - AQUÍ se resetea la bandera
+    const btnCerrarRacha = document.getElementById("cerrar-modal-racha");
+    if (btnCerrarRacha) {
+        const nuevoBoton = btnCerrarRacha.cloneNode(true);
+        btnCerrarRacha.parentNode.replaceChild(nuevoBoton, btnCerrarRacha);
+
+        nuevoBoton.addEventListener("click", () => {
+            const perfilActual = getperfil();
+            perfilActual.nuevaRachaMaxima = false;
+            saveperfil(perfilActual);
+
+            const modal = document.getElementById("modal-racha-maxima");
+            if (modal) {
+                modal.style.display = 'none';  // ← usar style en lugar de classList
+                modal.classList.add("hidden");
+            }
+
+            // Actualizar la UI de la racha después de cerrar
+            mostrarRachaConColor(perfilActual.racha || 0);
+
+            // Actualizar medallas por si acaso
+            if (typeof actualizarLogrosYMedallas === 'function') {
+                actualizarLogrosYMedallas();
+            }
+        });
+    }
+
 });

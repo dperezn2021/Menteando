@@ -17,7 +17,7 @@ public class ControladorCambioReglas : MonoBehaviour
 
     private bool partidaActiva = true;
 
-    public List<Regla> reglas = new List<Regla>();
+    public List<ReglaAntigua> reglas = new List<ReglaAntigua>();
     private int indiceReglaActual = 0;
     private float tiempoReglaActual = 0f;
 
@@ -27,8 +27,8 @@ public class ControladorCambioReglas : MonoBehaviour
     {
         tiempoRestante = duracionPartida;
         tiempoDesdeInicio = 0f;
-        reglas.Add(new Regla("Pulsa el botón si el fondo es azul", true, 5f));
-        reglas.Add(new Regla("No pulses si el fondo es rojo", false, 5f));
+        reglas.Add(new ReglaAntigua("Pulsa el botón si el fondo es azul", true, 5f));
+        reglas.Add(new ReglaAntigua("No pulses si el fondo es rojo", false, 5f));
 
         textoRegla.text = reglas[indiceReglaActual].descripcion;
     }
@@ -77,7 +77,7 @@ public class ControladorCambioReglas : MonoBehaviour
     {
         if (!partidaActiva) return;
 
-        Regla reglaActual = reglas[indiceReglaActual];
+        ReglaAntigua reglaActual = reglas[indiceReglaActual];
 
         Intento intento = new Intento();
         intento.indiceRegla = indiceReglaActual;
