@@ -1,90 +1,161 @@
 const TEST_CATEGORY_STYLES = {
-    // 🟣 ATENCIÓN
-    atencion: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
-
-    // 🟢 MEMORIA
-    memoria: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-
-    // 🟠 CONTROL EJECUTIVO
-    control: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-
-    // 🔴 REFLEJOS / VELOCIDAD
-    reflejos: "bg-red-500/10 text-red-600 dark:text-red-400"
+    atencion: "bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300",
+    memoria: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300",
+    control: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300",
+    reflejos: "bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300"
 };
 
 function getTestsCatalog() {
-    return typeof window.getCatalogoTests === "function"
-        ? window.getCatalogoTests()
-        : [];
+    return typeof window.getCatalogoTests === "function" ? window.getCatalogoTests() : [];
 }
 
 function getTestBadgeClasses(categoria) {
     return TEST_CATEGORY_STYLES[categoria] || TEST_CATEGORY_STYLES.atencion;
 }
 
-function createTestCard(test) {
-    return `
-        <article class="bg-white dark:bg-slate-800 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden group">
-            <a href="${test.url}" class="block h-52 overflow-hidden bg-slate-200 dark:bg-slate-700">
-                <img src="${test.imagen}" alt="${test.nombre}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
-            </a>
+function getDurationColor(duracion) {
+    const minutos = parseInt(duracion);
+    if (minutos <= 5) return "text-green-600 dark:text-green-400";
+    if (minutos <= 10) return "text-yellow-600 dark:text-yellow-400";
+    return "text-orange-600 dark:text-orange-400";
+}
 
-            <div class="p-6 flex flex-col gap-4">
-                <div class="flex flex-wrap items-center gap-3">
-                    <span class="px-3 py-1 text-sm font-bold uppercase rounded-full ${getTestBadgeClasses(test.categoria)}">
+function createTestCard(test) {
+    const duracionColor = getDurationColor(test.duracion);
+    
+    const categoriaColor = {
+        atencion: "violet",
+        memoria: "emerald",
+        control: "amber",
+        reflejos: "rose"
+    }[test.categoria] || "blue";
+    
+    return `
+        <article class="group bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <a href="${test.url}" class="block h-40 overflow-hidden bg-slate-200 dark:bg-slate-700">
+                <img src="${test.imagen}" alt="${test.nombre}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
+            </a>
+            <div class="p-5 flex flex-col gap-3">
+                <!-- Badges: duración izquierda, categoría derecha -->
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold ${duracionColor}">${test.duracion}</span>
+                    <span class="px-2.5 py-1 text-xs font-bold uppercase rounded-full bg-${categoriaColor}-100 dark:bg-${categoriaColor}-900/30 text-${categoriaColor}-700 dark:text-${categoriaColor}-300">
                         ${test.categoria}
                     </span>
-                    <span class="text-sm font-semibold text-slate-500 dark:text-slate-300">${test.duracion}</span>
                 </div>
-
-                <div>
-                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">${test.nombre}</h3>
-                    <p class="text-slate-600 dark:text-slate-300">${test.descripcion}</p>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white line-clamp-2">${test.nombre}</h3>
+                <p class="text-slate-600 dark:text-slate-300 text-sm line-clamp-2">${test.descripcion.substring(0, 100)}${test.descripcion.length > 100 ? '...' : ''}</p>
+                
+                <!-- Habilidades con colores de SKILL_DEFINITIONS -->
+                <div class="flex flex-wrap gap-1.5 mt-1">
+                    ${test.habilidades.slice(0, 3).map(h => {
+                        const def = SKILL_DEFINITIONS[h];
+                        const color = def?.accent || "slate";
+                        const label = def?.label || h.substring(0, 8);
+                        return `<span class="px-2 py-0.5 rounded-full text-xs bg-${color}-100 dark:bg-${color}-900/30 text-${color}-700 dark:text-${color}-300">${label}</span>`;
+                    }).join('')}
+                    ${test.habilidades.length > 3 ? `<span class="px-2 py-0.5 rounded-full text-xs bg-slate-100 dark:bg-slate-700 text-slate-500">+${test.habilidades.length - 3}</span>` : ''}
                 </div>
-
-                <p class="text-sm text-slate-500 dark:text-slate-400">${test.resumen}</p>
-
-                <a href="${test.url}" class="mt-auto inline-flex items-center justify-center w-full py-3 rounded-xl bg-blue-500 text-white font-bold hover:bg-blue-600 transition-colors">
-                    Ver test
+                
+                <a href="${test.url}" class="mt-2 inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-all">
+                    Realizar test
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
                 </a>
             </div>
         </article>
     `;
 }
 
-function createFeaturedTest(test) {
-    return `
-        <div class="w-full flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-            <a href="${test.url}" class="relative flex-1 min-h-[18rem] md:min-h-[24rem] rounded-3xl overflow-hidden bg-slate-200 dark:bg-slate-700 block">
-                <img src="${test.imagen}" alt="${test.nombre}" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-r from-slate-950/65 via-slate-950/25 to-transparent"></div>
-            </a>
-
-            <div class="flex-1 flex flex-col gap-6">
-                <span class="px-3 py-1 bg-blue-500 text-white text-sm font-bold uppercase tracking-wider rounded-full w-fit">
-                    ${test.heroEyebrow || "Test recomendado"}
-                </span>
-
-                <div>
-                    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-blue-500 mb-3">${test.habilidad}</p>
-                    <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-tight">${test.nombre}</h1>
-                </div>
-
-                <p class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed max-w-xl">${test.resumen}</p>
-
-                <ul class="space-y-3 text-slate-600 dark:text-slate-300">
-                    ${test.bloques.slice(0, 3).map((bloque) => `<li class="flex gap-3"><span class="text-blue-500 font-black">-</span><span>${bloque}</span></li>`).join("")}
-                </ul>
-
-                <div class="flex gap-4 flex-wrap">
-                    <a href="${test.url}" class="px-8 py-4 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-600 transition">
-                        Abrir test
-                    </a>
-                    <a href="#tests-grid" class="px-8 py-4 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition">
-                        Ver bateria
-                    </a>
-                </div>
+function createFeaturedTest(test, habilidadRecomendada = null, porcentaje = null) {
+    const duracionColor = getDurationColor(test.duracion);
+    
+    // Obtener el color de la categoría desde las habilidades del test
+    const categoriaColor = {
+        atencion: "violet",
+        memoria: "emerald",
+        control: "amber",
+        reflejos: "rose"
+    }[test.categoria] || "blue";
+    
+    let mensajeRecomendacion = '';
+    if (habilidadRecomendada && porcentaje !== null) {
+        const habilidadNombre = {
+            atencion: 'atención',
+            memoria: 'memoria',
+            control: 'control',
+            reflejos: 'reflejos'
+        }[habilidadRecomendada] || habilidadRecomendada;
+        
+        mensajeRecomendacion = `
+            <div class="flex items-center gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <p class="text-sm text-amber-700 dark:text-amber-300">
+                    Tu habilidad más baja es <strong>${habilidadNombre}</strong> (${porcentaje}%)
+                </p>
             </div>
+        `;
+    }
+    
+    return `
+  
+        <div class="w-full flex flex-col lg:flex-row items-center gap-6 lg:gap-10 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 sm:p-6 lg:p-8 shadow-lg">
+
+            <!-- Imagen -->
+            <a href="${test.url}" class="relative w-full lg:flex-1 min-h-[200px] lg:min-h-[240px] rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-700">
+                <img src="${test.imagen}" alt="${test.nombre}" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
+            </a>
+            
+            <!-- Contenido -->
+            <div class="w-full lg:flex-1 flex flex-col gap-4">
+                
+                <!-- Badges: recomendado + duración a la izquierda, categoría a la derecha -->
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-3 py-1 bg-blue-500 text-white text-xs font-bold uppercase tracking-wider rounded-full">Recomendado</span>
+                        <span class="text-xs font-semibold ${duracionColor}">${test.duracion}</span>
+                    </div>
+                    <span class="px-2.5 py-1 text-xs font-bold uppercase rounded-full bg-${categoriaColor}-100 dark:bg-${categoriaColor}-900/30 text-${categoriaColor}-700 dark:text-${categoriaColor}-300">
+                        ${test.categoria}
+                    </span>
+                </div>
+                
+                <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">${test.nombre}</h2>
+                <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">${test.resumen}</p>
+                
+                <!-- Habilidades del test (usando SKILL_DEFINITIONS) -->
+                <div class="flex flex-wrap gap-2">
+                    ${test.habilidades.slice(0, 3).map(h => {
+                        const def = SKILL_DEFINITIONS[h];
+                        const color = def?.accent || "slate";
+                        const label = def?.label || h.replace(/_/g, ' ');
+                        return `<span class="px-2 py-1 rounded-full text-xs bg-${color}-100 dark:bg-${color}-900/30 text-${color}-700 dark:text-${color}-300">${label}</span>`;
+                    }).join('')}
+                    ${test.habilidades.length > 3 ? `<span class="px-2 py-1 rounded-full text-xs bg-slate-100 dark:bg-slate-700 text-slate-500">+${test.habilidades.length - 3}</span>` : ''}
+                </div>
+                
+                <!-- Botones -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="${test.url}" class="flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all">
+                        Comenzar
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </a>
+                    <a href="#tests-grid" class="flex items-center justify-center px-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                        Otros
+                    </a>
+
+                </div>
+                
+            </div>
+        </div>
+        <div class="mt-6">
+          ${mensajeRecomendacion}
         </div>
     `;
 }
@@ -92,11 +163,46 @@ function createFeaturedTest(test) {
 function renderFeaturedTest() {
     const contenedor = document.getElementById("test-recomendado");
     if (!contenedor) return;
-
-    const [test] = getTestsCatalog();
-    if (!test) return;
-
-    contenedor.innerHTML = createFeaturedTest(test);
+    
+    const perfil = window.getperfil();
+    const tests = getTestsCatalog();
+    if (!tests.length) return;
+    
+    // Obtener habilidades del perfil (valores 0-1)
+    const habilidades = {
+        atencion: perfil.atencion || 0,
+        memoria: perfil.memoria || 0,
+        control: perfil.control || 0,
+        reflejos: perfil.reflejos || 0
+    };
+    
+    // Encontrar la habilidad más baja
+    let habilidadMasBaja = "atencion";
+    let valorMasBajo = 1;
+    for (const [key, val] of Object.entries(habilidades)) {
+        if (val < valorMasBajo) {
+            valorMasBajo = val;
+            habilidadMasBaja = key;
+        }
+    }
+    
+    // Buscar tests de esa categoría
+    const testsDeHabilidad = tests.filter(test => test.categoria === habilidadMasBaja);
+    
+    // Si hay tests de esa categoría, recomendar uno aleatorio
+    let testRecomendado;
+    if (testsDeHabilidad.length > 0) {
+        testRecomendado = testsDeHabilidad[Math.floor(Math.random() * testsDeHabilidad.length)];
+    } else {
+        // Si no hay tests de esa categoría, recomendar el primer test disponible
+        testRecomendado = tests[0];
+    }
+    
+    // Calcular porcentaje para mostrar en mensaje
+    const porcentaje = Math.round(valorMasBajo * 100);
+    
+    // Crear HTML con indicación de por qué se recomienda
+    contenedor.innerHTML = createFeaturedTest(testRecomendado, habilidadMasBaja, porcentaje);
 }
 
 function renderTestsPage({ search = "", category = "" } = {}) {
@@ -105,64 +211,50 @@ function renderTestsPage({ search = "", category = "" } = {}) {
 
     const normalizedSearch = search.trim().toLowerCase();
     const tests = getTestsCatalog().filter((test) => {
-        const matchesSearch = !normalizedSearch
-            || test.nombre.toLowerCase().includes(normalizedSearch)
-            || test.descripcion.toLowerCase().includes(normalizedSearch)
-            || test.habilidad.toLowerCase().includes(normalizedSearch);
+        const matchesSearch = !normalizedSearch || test.nombre.toLowerCase().includes(normalizedSearch);
         const matchesCategory = !category || test.categoria === category;
-
         return matchesSearch && matchesCategory;
     });
 
     if (!tests.length) {
         contenedor.innerHTML = `
-            <div class="rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 p-10 text-center">
-                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-3">No hemos encontrado tests</h3>
-                <p class="text-slate-600 dark:text-slate-300">Prueba con otro nombre o cambia la categoria.</p>
+            <div class="col-span-full rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 p-12 text-center">
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">No encontramos tests</h3>
+                <p class="text-slate-600 dark:text-slate-400">Prueba con otro nombre o cambia la categoría.</p>
             </div>
         `;
         return;
     }
 
-    contenedor.innerHTML = `
-        <div class="grid grid-cols-2 gap-8">
-            ${tests.map(createTestCard).join("")}
-        </div>
-    `;
+    contenedor.innerHTML = tests.map(createTestCard).join('');
 }
 
 window.setTestCategory = function setTestCategory(category) {
     const buttons = document.querySelectorAll("[data-test-category]");
-
     buttons.forEach((button) => {
         const isActive = button.dataset.testCategory === category;
         button.classList.toggle("bg-blue-500", isActive);
         button.classList.toggle("text-white", isActive);
         button.classList.toggle("bg-slate-100", !isActive);
         button.classList.toggle("dark:bg-slate-800", !isActive);
+        button.classList.toggle("text-slate-700", !isActive);
     });
-
     window.__testCategoryFilter = category;
     window.__syncTestsPage?.();
 };
 
 window.initTestsPage = function initTestsPage() {
     const barraBusqueda = document.getElementById("tests-barra-busqueda");
-
     const sync = () => {
         renderTestsPage({
             search: barraBusqueda?.value || "",
             category: window.__testCategoryFilter || ""
         });
     };
-
     window.__syncTestsPage = sync;
     window.__testCategoryFilter = window.__testCategoryFilter || "";
-
     barraBusqueda?.addEventListener("input", sync);
-
     sync();
 };
 
 window.renderFeaturedTest = renderFeaturedTest;
-

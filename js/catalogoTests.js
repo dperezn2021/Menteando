@@ -280,7 +280,13 @@ function getTestById(testId) {
     }) || null;
 }
 
-
-window.catalogoTests = getCatalogoTests();
+// ========== EXPORTS GLOBALES ==========
+window.CATALOGO_TESTS = CATALOGO_TESTS;
 window.getCatalogoTests = getCatalogoTests;
 window.getTestById = getTestById;
+window.normalizeTestKey = normalizeTestKey;
+
+// También exportar para que esté disponible inmediatamente
+if (typeof CATALOGO_TESTS !== 'undefined') {
+    console.log("✅ catalogoTests.js cargado correctamente:", CATALOGO_TESTS.length, "tests");
+}

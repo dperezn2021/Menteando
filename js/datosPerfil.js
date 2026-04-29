@@ -261,7 +261,6 @@
     const modal = document.getElementById("modal-editar");
     const btnEditar = document.getElementById("btn-editar");
     const btnCerrar = document.getElementById("btn-cerrar-modal");
-    const formModal = document.getElementById("perfil-form");
 
     // Botón del coach (versión original)
     const btnActivarCoach = document.getElementById("btn-activar-coach");
@@ -300,23 +299,32 @@
         });
     }
 
-    // Guardar cambios
-    formModal.addEventListener("submit", (e) => {
-        e.preventDefault();
+    // Guardar cambios - con verificación de existencia
+    const formModal = document.getElementById("perfil-form");
+    if (formModal) {
+        formModal.addEventListener("submit", (e) => {
+            e.preventDefault();
 
-        const perfil = getperfil();
+            const perfil = getperfil();
 
-        perfil.nombre = document.getElementById("name").value;
-        perfil.apodo = document.getElementById("nickname").value;
-        perfil.edad = parseInt(document.getElementById("age").value);
-        perfil.correo = document.getElementById("email").value;
+            const nameInput = document.getElementById("name");
+            const nicknameInput = document.getElementById("nickname");
+            const ageInput = document.getElementById("age");
+            const emailInput = document.getElementById("email");
 
-        saveperfil(perfil);
+            if (nameInput) perfil.nombre = nameInput.value;
+            if (nicknameInput) perfil.apodo = nicknameInput.value;
+            if (ageInput) perfil.edad = parseInt(ageInput.value);
+            if (emailInput) perfil.correo = emailInput.value;
 
-        modal.style.display = "none";
-        location.reload();
-    });
+            saveperfil(perfil);
 
+            const modal = document.getElementById("modal-editar");
+            if (modal) modal.style.display = "none";
+
+            location.reload();
+        });
+    }
 
 
     // Cerrar modal si se clica fuera

@@ -8,21 +8,36 @@
         const data = JSON.parse(jsonString);
         const perfil = getperfil();
 
-        // Guardar valores ANTES de actualizar para calcular diferencia
-        const habilidadAnterior = perfil[data.skill] || 0;
+        // Guardar valores ANTES de actualizar
+        const habilidadesAntes = {
+            atencion: perfil.atencion || 0,
+            memoria: perfil.memoria || 0,
+            control: perfil.control || 0,
+            reflejos: perfil.reflejos || 0
+        };
         
         perfil.sesiones++;
         perfil.ultimaSesion = data.timestamp;
         
-        actualizarRachaPorSesionCompletada(perfil);
+        // ACTUALIZAR RACHA - pasar el perfil como parámetro
+        if (typeof actualizarRachaPorSesionCompletada === 'function') {
+            actualizarRachaPorSesionCompletada(perfil);
+        }
 
         let puntosAAñadir = Number(data.puntos);
         if (isNaN(puntosAAñadir)) puntosAAñadir = 0;
         
         perfil.puntos += puntosAAñadir;
-        actualizarSesionesDiarias(perfil);
+        
+        // ACTUALIZAR SESIONES DIARIAS
+        if (typeof actualizarSesionesDiarias === 'function') {
+            actualizarSesionesDiarias(perfil);
+        }
 
-        if (!perfil.juegos[data.gameId]) perfil.juegos[data.gameId] = [];
+        // ===== GUARDAR LA SESIÓN EN EL HISTORIAL =====
+        if (!perfil.juegos[data.gameId]) {
+            perfil.juegos[data.gameId] = [];
+        }
         
         const sessionData = {
             ...data.metrics,
@@ -31,7 +46,11 @@
         };
         
         perfil.juegos[data.gameId].push(sessionData);
-        recalcularPerfilGlobal(perfil, data.metrics, data.gameId);
+        
+        // RECALCULAR HABILIDADES
+        if (typeof recalcularPerfilGlobal === 'function') {
+            recalcularPerfilGlobal(perfil, data.metrics, data.gameId);
+        }
         
         // Calcular la habilidad que más cambió
         const habilidades = ["atencion", "memoria", "control", "reflejos"];
@@ -40,27 +59,39 @@
         
         for (const skill of habilidades) {
             const nuevoValor = perfil[skill] || 0;
-            const diferencia = Math.abs(nuevoValor * 100 - habilidadAnterior * 100);
+            const valorAnterior = habilidadesAntes[skill] || 0;
+            const diferencia = Math.abs((nuevoValor - valorAnterior) * 100);
             if (diferencia > mayorDiferencia) {
                 mayorDiferencia = diferencia;
                 skillCambiada = skill;
             }
         }
         
-        const nuevaMedalla = verificarNuevaMedalla(perfil); // Función que detecta medallas nuevas
+        // Verificar medallas nuevas (función simple)
+        let nuevaMedalla = false;
+        const medallasCompletadas = JSON.parse(localStorage.getItem("medallas_completadas") || "[]");
         
-        perfil.nivel = getNivel(perfil);
+        if (perfil.reflejos >= 0.75 && !medallasCompletadas.includes("reflejos_75")) nuevaMedalla = true;
+        if (perfil.atencion >= 0.80 && !medallasCompletadas.includes("atencion_80")) nuevaMedalla = true;
+        if (perfil.memoria >= 0.70 && !medallasCompletadas.includes("memoria_70")) nuevaMedalla = true;
+        if (perfil.control >= 0.75 && !medallasCompletadas.includes("control_75")) nuevaMedalla = true;
+        if (perfil.racha >= 7 && !medallasCompletadas.includes("racha_7")) nuevaMedalla = true;
+        if (perfil.sesiones >= 20 && !medallasCompletadas.includes("sesiones_20")) nuevaMedalla = true;
+        
+        perfil.nivel = typeof getNivel === 'function' ? getNivel(perfil) : 0;
         saveperfil(perfil);
         
-        // ========== MOSTRAR MENSAJE DEL COACH ==========
-        if (typeof coachController !== 'undefined' && coachController && !isCoachDisabled()) {
+        // Mostrar mensaje del coach si existe
+        if (typeof coachController !== 'undefined' && coachController && typeof isCoachDisabled === 'function' && !isCoachDisabled()) {
             const diferenciaPorcentaje = Math.round(mayorDiferencia);
-            coachController.onResultados(skillCambiada, diferenciaPorcentaje, nuevaMedalla);
+            if (typeof coachController.onResultados === 'function') {
+                coachController.onResultados(skillCambiada, diferenciaPorcentaje, nuevaMedalla);
+            }
         }
         
-        console.log(`✅ Sesión guardada | Puntos: ${puntosAAñadir} | Mejora en: ${skillCambiada}: ${mayorDiferencia}%`);
+        console.log(`✅ Sesión guardada | Juego: ${data.gameId} | Puntos: ${puntosAAñadir} | Sesiones totales: ${perfil.sesiones}`);
 
     } catch (e) {
-        console.error("Error al guardar datos del juego:", e, jsonString);
+        console.error("❌ Error al guardar datos del juego:", e, jsonString);
     }
 };
