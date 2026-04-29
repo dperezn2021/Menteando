@@ -21,74 +21,70 @@ function renderTestDetailPage(testId) {
 
     document.title = `Menteando | ${test.nombre}`;
 
-    // Generar badges para TODAS las habilidades del test
     const skillsHTML = test.habilidades.map(skill => {
-        const definicion = window.getSkillDefinition(skill);
-        const colorLetra = "text-" + definicion.accent + "-500";
-        const colorFondo = "bg-" + definicion.accent + "-200"
-        const label = definicion?.label || skill;
-        return `<span class="px-3 py-1 rounded-full text-sm font-bold ${colorFondo} ${colorLetra}">${label}</span>`;
+        const definicion = window.getSkillDefinition?.(skill);
+        const colorLetra = definicion ? `text-${definicion.accent}-500` : "text-blue-500";
+        const colorFondo = definicion ? `bg-${definicion.accent}-100 dark:bg-${definicion.accent}-900/30` : "bg-blue-100 dark:bg-blue-900/30";
+        const label = definicion?.label || skill.replace(/_/g, ' ');
+        return `<span class="px-3 py-1 rounded-full text-xs font-bold ${colorFondo} ${colorLetra}">${label}</span>`;
     }).join('');
 
     const howItWorks = (test.bloques || []).map((step, index) => `
-        <li class="flex items-start gap-4">
-            <span class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 font-bold flex items-center justify-center flex-shrink-0">${index + 1}</span>
-            <span class="text-slate-600 dark:text-slate-300 leading-7">${step}</span>
+        <li class="flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-500 text-sm font-bold flex items-center justify-center flex-shrink-0">${index + 1}</span>
+            <span class="text-slate-600 dark:text-slate-300 leading-relaxed">${step}</span>
         </li>
     `).join("");
 
     content.innerHTML = `
-        <section class="max-w-7xl mx-auto py-8 lg:py-10">
-            <div class="grid grid-cols-1 xl:grid-cols-[1.35fr_0.85fr] gap-8">
-
-                <!-- COLUMNA IZQUIERDA: TEST INTERACTIVO -->
-                <article class="flex flex-col h-full rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
-
-                    <div class="relative flex-1 aspect-video bg-slate-950 flex items-center justify-center">
+        <div class="max-w-7xl mx-auto px-4 py-8 lg:py-12">
+            <div class="grid grid-cols-1 xl:grid-cols-[1.4fr_0.9fr] gap-8">
+                <!-- COLUMNA IZQUIERDA -->
+                <div class="flex flex-col h-full rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg">
+                    <div class="relative flex-1 bg-slate-900 min-h-[400px] flex items-center justify-center">
                         <div id="container" class="w-full h-full flex items-center justify-center"></div>
                     </div>
-
-                    <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
-                        <button id="start-btn"
-                            class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
+                    <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+                        <button id="start-btn" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all duration-200 shadow-md">
                             Iniciar ${test.nombre}
                         </button>
                     </div>
-                </article>
+                </div>
 
-                <!-- COLUMNA DERECHA: INFORMACIÓN -->
-                <aside class="flex flex-col gap-6">
-
-                    <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-6 lg:p-8">
-                        <span class="inline-flex px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-sm font-bold uppercase tracking-[0.2em] mb-5">
+                <!-- COLUMNA DERECHA -->
+                <div class="flex flex-col gap-6">
+                    <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg p-6">
+                        <span class="inline-block px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wider mb-4">
                             ${test.heroEyebrow || "Test cognitivo"}
                         </span>
-
-                        <h2 class="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white leading-tight mb-4">
+                        <h2 class="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white leading-tight mb-3">
                             ${test.nombre}
                         </h2>
-
-                        <p class="text-lg leading-8 text-slate-600 dark:text-slate-300 mb-6">
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
                             ${test.descripcion}
                         </p>
-
-                        <div class="flex flex-wrap gap-3">
-                                ${skillsHTML}
+                        <div class="flex flex-wrap gap-2">
+                            ${skillsHTML}
                         </div>
                     </div>
 
-                    <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-6 lg:p-8">
-                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-5">Cómo funciona</h3>
-                        <ol class="space-y-4">${howItWorks}</ol>
+                    <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Cómo funciona
+                        </h3>
+                        <ol class="space-y-3">
+                            ${howItWorks}
+                        </ol>
                     </div>
-
-                </aside>
+                </div>
             </div>
 
-            <!-- RESULTADOS -->
-            <div id="result" class="hidden mt-10 p-8 rounded-3xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 shadow-xl"></div>
-
-        </section>
+            <!-- RESULTADOS (mejorados) -->
+            <div id="result" class="hidden mt-10"></div>
+        </div>
     `;
 
     lanzarLogicaDelTest(testId);
@@ -97,27 +93,27 @@ function renderTestDetailPage(testId) {
 window.initTestDetailPage = function initTestDetailPage(testId) {
     const perfil = typeof window.getperfil === "function" ? window.getperfil() : null;
     const themeToggleBtn = document.getElementById("theme-toggle-btn");
-    console.log(themeToggleBtn)
     const root = document.documentElement;
     const headerAvatar = document.getElementById("perfil-avatar-header");
 
-    if (perfil?.avatar && headerAvatar) headerAvatar.src = perfil.avatar.replace("../", "../../../");
+    if (perfil?.avatar && headerAvatar) headerAvatar.src = perfil.avatar;
 
     const syncThemeButton = () => {
         const isDark = root.classList.contains("dark");
         if (themeToggleBtn) {
-            themeToggleBtn.textContent = isDark ? "\u2600\uFE0F" : "\uD83C\uDF19";
-            themeToggleBtn.setAttribute("aria-label", isDark ? "Cambiar a tema claro" : "Cambiar a tema oscuro");
+            themeToggleBtn.textContent = isDark ? "☀️" : "🌙";
         }
     };
 
-    themeToggleBtn?.addEventListener("click", () => {
-        const willUseDark = !root.classList.contains("dark");
-        root.classList.toggle("dark", willUseDark);
-        root.classList.toggle("light", !willUseDark);
-        localStorage.setItem("theme", willUseDark ? "dark" : "light");
-        syncThemeButton();
-    });
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener("click", () => {
+            const willUseDark = !root.classList.contains("dark");
+            root.classList.toggle("dark", willUseDark);
+            root.classList.toggle("light", !willUseDark);
+            localStorage.setItem("theme", willUseDark ? "dark" : "light");
+            syncThemeButton();
+        });
+    }
 
     syncThemeButton();
     renderTestDetailPage(testId);
@@ -135,162 +131,155 @@ window.initTestDetailPage = function initTestDetailPage(testId) {
 // Función auxiliar para mostrar métricas con nombres amigables
 function renderMetricas(metrics) {
     const nombreMetrica = {
-        aciertos: '✅ Aciertos',
-        errores: '❌ Errores totales',
-        precision: '🎯 Precisión',
-        tiempoTotalMs: '⏱️ Tiempo total (ms)',
-        tiempoMedioRespuestaMs: '⚡ Tiempo medio respuesta (ms)',
-        spanMaximo: '🧠 Span máximo',
-        erroresComision: '⚠️ Errores de comisión',
-        erroresOmision: '👻 Errores de omisión',
-        totalMarcados: '✏️ Total marcados'
+        aciertos: 'Aciertos',
+        errores: 'Errores totales',
+        precision: 'Precisión',
+        tiempoTotalMs: 'Tiempo total',
+        tiempoMedioRespuestaMs: 'Tiempo medio respuesta',
+        spanMaximo: 'Span máximo',
+        erroresComision: 'Errores de comisión',
+        erroresOmision: 'Errores de omisión',
+        totalMarcados: 'Total marcados',
+        velocidad: 'Velocidad (estímulos/seg)'
     };
 
     const metricasMostrables = Object.entries(metrics)
         .filter(([key, value]) => value !== undefined && value !== null && typeof value !== 'object')
         .map(([key, value]) => {
             const nombre = nombreMetrica[key] || key;
-            const valorFormateado = typeof value === 'number' ? value.toFixed(2) : value;
-            return `<li><strong>${nombre}:</strong> ${valorFormateado}</li>`;
+            let valorFormateado = value;
+            if (key === 'tiempoTotalMs' || key === 'tiempoMedioRespuestaMs') {
+                valorFormateado = `${Math.round(value)} ms`;
+            } else if (key === 'precision' && typeof value === 'number') {
+                valorFormateado = `${Math.round(value * 100)}%`;
+            } else if (typeof value === 'number') {
+                valorFormateado = value.toFixed(2);
+            }
+            return { nombre, valor: valorFormateado };
         });
 
-    if (metricasMostrables.length === 0) {
-        return '<p>No hay métricas disponibles</p>';
-    }
-
-    return `<ul class="space-y-1">${metricasMostrables.join('')}</ul>`;
+    return metricasMostrables;
 }
 
-function normalizarSkill(skill) {
-    if (typeof skill !== 'string') return '';
-    return skill
-        .toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/\s+/g, "_")
-        .replace(/[^a-z0-9_]/g, "");
-}
-
-function recomendarJuegos(habilidadesDebiles) {
-    const juegos = window.catalogoJuegos || window.CATALOGO_JUEGOS || [];
-    if (!habilidadesDebiles.length) return [];
-
-    // Obtener categorías únicas a partir de las habilidades débiles
-    const categoriasDebiles = new Set();
-    habilidadesDebiles.forEach(h => {
-        const cat = getCategoriaFromHabilidad(h);
-        if (cat) categoriasDebiles.add(cat);
-    });
-
-    if (categoriasDebiles.size === 0) return [];
-
-    console.log("🎯 Categorías a recomendar:", [...categoriasDebiles]);
-
-    return juegos.filter(juego => {
-        const categoriaJuego = juego.categoria?.toLowerCase();
-        const coincide = categoriasDebiles.has(categoriaJuego);
-        if (coincide) console.log(`✅ "${juego.nombre}" (categoría: ${categoriaJuego})`);
-        return coincide;
-    });
-}
-
-function getCategoriaFromHabilidad(habilidad) {
-    const mapa = {
-        // Atención
-        atencion_selectiva: "atencion",
-        atencion_sostenida: "atencion",
-        velocidad_dividida: "atencion",
-        // Memoria
-        memoria_trabajo: "memoria",
-        memoria_espacial: "memoria",
-        //Reflejos
-        velocidad_cognitiva: "reflejos",
-        coordinacion_visomotora: "reflejos",
-        // Control ejecutivo
-        control_inhibitorio: "control",
-        planificacion: "control",
-        flexibilidad_cognitiva: "control"
-    };
-    return mapa[habilidad] || null;
-}
-
-
-function renderTarjetaJuego(juego, completado = false) {
-    const tag = completado ? 'div' : 'a';
-    const href = completado ? '' : `href="../${juego.url}"`;
-    const tarjetaFondo = completado ? 'bg-green-50 dark:bg-green-950/30' : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700';
-    const textoCompletado = completado ? 'line-through text-green-600 dark:text-green-400' : '';
-    const texto = completado ? 'text-green-600 dark:text-green-400' : 'text-slate-500 dark:text-slate-400';
-    const fondo = completado ? 'bg-green-500' : 'bg-blue-500';
-
-    const categoria = juego.categoria || 'Cognitivo';
-    const nombre = juego.nombre;
-
-    return `
-        <${tag} ${href}
-            class="w-full my-3 p-3 ${tarjetaFondo} rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center cursor-${completado ? "default" : "pointer"} transition-all duration-200">
-
-            <div>
-                <div class="${textoCompletado} dark:text-white text-base font-bold">${nombre}</div>
-                <div class="${texto} text-xs font-bold">Enfoque: ${normalizarCategoria(categoria)}</div>
-            </div>
-
-            <div class="w-5 h-5 ${fondo} rounded-full shadow-sm"></div>
-        </${tag}>
-    `;
-}
-
-function normalizarCategoria(categoria) {
-    const mapa = {
-        atencion: "Atención",
-        memoria: "Memoria",
-        reflejos: "Reflejos",
-        control: "Control"
-    };
-    return mapa[categoria] || null;
-
-
-}
-
-function renderResultadosUniversales(resultado, habilidadesDebiles, juegosRecomendados, test) {
-    const resultBox = document.getElementById("result");
-    resultBox.classList.remove("hidden");
-
-    // Si no hay juegos recomendados (porque no hay habilidades débiles), 
-    // recomendamos juegos basados en las habilidades que evalúa el test
-    let juegosHTML = '';
-    if (juegosRecomendados.length) {
-        juegosHTML = juegosRecomendados.map(juego => renderTarjetaJuego(juego, false)).join('');
+function renderTarjetaResultado(metricas, habilidadesDebiles, juegosRecomendados, test) {
+    const metricasMostradas = renderMetricas(metricas);
+    
+    // Determinar color según rendimiento general
+    const precision = metricas.precision || 0;
+    let colorResultado = "blue";
+    let mensajeResultado = "";
+    
+    if (precision >= 0.8) {
+        colorResultado = "green";
+        mensajeResultado = "Excelente rendimiento";
+    } else if (precision >= 0.6) {
+        colorResultado = "blue";
+        mensajeResultado = "Buen trabajo";
+    } else if (precision >= 0.4) {
+        colorResultado = "yellow";
+        mensajeResultado = "Puedes mejorar";
     } else {
-        // Recomendar juegos según las habilidades del test (no las débiles)
-        const juegosPorHabilidad = recomendarJuegos(test.habilidades);
-        juegosHTML = juegosPorHabilidad.length
-            ? juegosPorHabilidad.map(juego => renderTarjetaJuego(juego, false)).join('')
-            : '<p class="text-slate-500">No hay juegos relacionados con este test aún.</p>';
+        colorResultado = "red";
+        mensajeResultado = "Áreas de mejora detectadas";
     }
-
-    resultBox.innerHTML = `
-        <h3 class="text-3xl font-black mb-4">Resultados del test</h3>
-        <div class="text-sm bg-slate-900 text-slate-200 p-4 rounded-xl mb-4 overflow-auto">
-            ${renderMetricas(resultado.metrics)}
+    
+    const bgColor = {
+        green: "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800",
+        blue: "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800",
+        yellow: "bg-yellow-50 dark:bg-yellow-950/30 border-yellow-200 dark:border-yellow-800",
+        red: "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800"
+    };
+    
+    const iconColor = {
+        green: "text-green-600",
+        blue: "text-blue-600",
+        yellow: "text-yellow-600",
+        red: "text-red-600"
+    };
+    
+    return `
+        <div class="rounded-2xl border ${bgColor[colorResultado]} bg-white dark:bg-slate-900 shadow-xl overflow-hidden">
+            <!-- Cabecera -->
+            <div class="px-6 py-4 border-b ${bgColor[colorResultado]}">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Resultados del test</h3>
+                        <p class="text-sm ${iconColor[colorResultado]} font-medium mt-1">${mensajeResultado}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full ${bgColor[colorResultado]} flex items-center justify-center">
+                        <svg class="w-6 h-6 ${iconColor[colorResultado]}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Métricas en grid -->
+            <div class="p-6">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+                    ${metricasMostradas.map(m => `
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-slate-900 dark:text-white">${m.valor}</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">${m.nombre}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <!-- Habilidades débiles -->
+                ${habilidadesDebiles.length > 0 ? `
+                    <div class="mb-6 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+                        <h4 class="font-bold text-amber-700 dark:text-amber-400 mb-2 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            Habilidades a mejorar
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${habilidadesDebiles.map(h => {
+                                const def = window.getSkillDefinition?.(h);
+                                const color = def?.accent || "amber";
+                                return `<span class="px-3 py-1 rounded-full text-xs font-bold bg-${color}-100 dark:bg-${color}-900/30 text-${color}-700 dark:text-${color}-300">${def?.label || h}</span>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                ` : `
+                    <div class="mb-6 p-4 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
+                        <p class="text-green-700 dark:text-green-400 font-medium flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            ¡No se detectaron dificultades significativas! Tu rendimiento es excelente.
+                        </p>
+                    </div>
+                `}
+                
+                <!-- Juegos recomendados -->
+                ${juegosRecomendados.length > 0 ? `
+                    <div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Juegos recomendados
+                        </h4>
+                        <div class="space-y-2">
+                            ${juegosRecomendados.map(juego => `
+                                <a href="../${juego.url}" class="flex items-center justify-between p-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors group">
+                                    <div>
+                                        <div class="font-medium text-slate-900 dark:text-white">${juego.nombre}</div>
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">Entrena: ${juego.categoria}</div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                    </svg>
+                                </a>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
         </div>
-        <h4 class="text-xl font-bold mt-6 mb-3">🧠 Habilidades que debes entrenar</h4>
-        ${habilidadesDebiles.length
-            ? `<ul class="mb-6 space-y-1">
-                ${habilidadesDebiles.map(h => `
-                    <li class="flex items-center gap-2">
-                        <span class="w-2 h-2 bg-${window.getSkillDefinition(h)?.accent}-500 rounded-full"></span>
-                        <span class="text-slate-700 dark:text-slate-300">${window.getSkillDefinition(h)?.label || h}</span>
-                    </li>
-                `).join("")}
-            </ul>
-            <h4 class="text-xl font-bold mb-3">🎮 Juegos recomendados para mejorar</h4>
-            <div class="space-y-2">${juegosHTML}</div>`
-            : `<p class="mb-6 text-green-600 font-semibold">
-                ¡Buen trabajo! No se detectan dificultades significativas.
-            </p>
-            <h4 class="text-xl font-bold mb-3">💪🏻 Puedes seguir entrenando con estos juegos</h4>
-            <div class="space-y-2">${juegosHTML}</div>`
-        }
     `;
 }
 
@@ -299,9 +288,25 @@ function procesarResultadosTest(resultado) {
     if (!test) return;
 
     const juegosRecomendados = recomendarJuegos(resultado.habilidadesDebiles);
-    renderResultadosUniversales(resultado, resultado.habilidadesDebiles, juegosRecomendados, test);
+    const resultBox = document.getElementById("result");
+    
+    if (resultBox) {
+        resultBox.innerHTML = renderTarjetaResultado(
+            resultado.metrics, 
+            resultado.habilidadesDebiles, 
+            juegosRecomendados, 
+            test
+        );
+        resultBox.classList.remove("hidden");
+        
+        // Scroll suave a resultados
+        setTimeout(() => {
+            resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    }
 
     const perfil = window.getperfil();
+    if (!perfil.tests) perfil.tests = {};
     if (!perfil.tests[resultado.testId]) perfil.tests[resultado.testId] = [];
     perfil.tests[resultado.testId].push({
         testId: resultado.testId,
@@ -310,7 +315,6 @@ function procesarResultadosTest(resultado) {
         habilidadesDebiles: resultado.habilidadesDebiles
     });
 
-    // Marcar el test como completado en el perfil
     if (!perfil.testsCompletados) perfil.testsCompletados = {};
     perfil.testsCompletados[resultado.testId] = true;
 
@@ -319,6 +323,40 @@ function procesarResultadosTest(resultado) {
     if (typeof window.notificarTestCompletado === "function") {
         window.notificarTestCompletado();
     }
+}
+
+function recomendarJuegos(habilidadesDebiles) {
+    const juegos = window.catalogoJuegos || window.CATALOGO_JUEGOS || [];
+    if (!habilidadesDebiles.length) return [];
+
+    const categoriasDebiles = new Set();
+    habilidadesDebiles.forEach(h => {
+        const cat = getCategoriaFromHabilidad(h);
+        if (cat) categoriasDebiles.add(cat);
+    });
+
+    if (categoriasDebiles.size === 0) return [];
+
+    return juegos.filter(juego => {
+        const categoriaJuego = juego.categoria?.toLowerCase();
+        return categoriasDebiles.has(categoriaJuego) && juego.disponible === "Disponible";
+    }).slice(0, 4);
+}
+
+function getCategoriaFromHabilidad(habilidad) {
+    const mapa = {
+        atencion_selectiva: "atencion",
+        atencion_sostenida: "atencion",
+        atencion_dividida: "atencion",
+        memoria_trabajo: "memoria",
+        memoria_espacial: "memoria",
+        velocidad_cognitiva: "reflejos",
+        coordinacion_visomotora: "reflejos",
+        control_inhibitorio: "control",
+        planificacion: "control",
+        flexibilidad_cognitiva: "control"
+    };
+    return mapa[habilidad] || null;
 }
 
 // ======================= FASE 2 ==========================
@@ -347,9 +385,7 @@ function lanzarLogicaDelTest(testId) {
         default: console.warn("Test sin lógica:", testId);
     }
 }
-// ======================================================
-// FUNCIÓN AUXILIAR PARA CONTENEDOR RESPONSIVE
-// ======================================================
+
 function makeResponsiveContainer(innerHtml, customStyles = "") {
     return `
         <div class="w-full h-full overflow-auto p-4 flex items-center justify-center" style="max-height: 100%;">
@@ -359,6 +395,7 @@ function makeResponsiveContainer(innerHtml, customStyles = "") {
         </div>
     `;
 }
+
 
 // ======================================================
 // 1. CORSI (responsivo)
@@ -393,9 +430,9 @@ function initCorsiLogic(testId, callback) {
 
     function renderBloques() {
         container.innerHTML = makeResponsiveContainer(`
-            <div class="grid grid-cols-3 gap-2 sm:gap-4 max-w-md mx-auto">
+            <div class="grid grid-cols-3 gap-2 max-w-md mx-auto">
                 ${Array(9).fill().map((_, i) => `
-                    <div data-id="${i}" class="aspect-square rounded-xl bg-slate-700 cursor-pointer transition hover:bg-slate-600"></div>
+                    <div data-id="${i}" class="aspect-square rounded-xl bg-slate-700 cursor-pointer hover:bg-slate-600 transition-all"></div>
                 `).join('')}
             </div>
         `);
@@ -429,13 +466,10 @@ function initCorsiLogic(testId, callback) {
 
         iluminarSecuencia(secuencia, () => {
             let respuesta = [];
-            let inicioRespuesta = performance.now();
             const clickHandler = (e) => {
                 if (!puedeResponder) return;
                 const id = e.target.closest("[data-id]")?.dataset.id;
                 if (id === undefined) return;
-                tiemposRespuesta.push(performance.now() - inicioRespuesta);
-                inicioRespuesta = performance.now();
                 respuesta.push(Number(id));
                 if (respuesta.length === secuencia.length) {
                     puedeResponder = false;
@@ -459,14 +493,12 @@ function initCorsiLogic(testId, callback) {
         container.onclick = null;
         const spanMaximo = nivel - 1;
         const tiempoTotal = performance.now() - inicioTest;
-        const tiempoMedio = tiemposRespuesta.length ? tiemposRespuesta.reduce((a, b) => a + b, 0) / tiemposRespuesta.length : 0;
         const habilidades = [];
         if (spanMaximo < 4) habilidades.push("memoria_espacial");
         if (errores >= 2) habilidades.push("memoria_trabajo");
-        if (tiempoMedio > 900) habilidades.push("atencion_selectiva");
         callback({
             testId, timestamp: Date.now(),
-            metrics: { spanMaximo, errores, precision: spanMaximo / (spanMaximo + errores) || 0, tiempoTotalMs: Math.round(tiempoTotal), tiempoMedioRespuestaMs: Math.round(tiempoMedio) },
+            metrics: { spanMaximo, errores, precision: spanMaximo / (spanMaximo + errores) || 0, tiempoTotalMs: Math.round(tiempoTotal) },
             habilidadesDebiles: habilidades
         });
         startBtn.classList.remove("hidden");
@@ -478,6 +510,7 @@ function initCorsiLogic(testId, callback) {
         iniciarNivel();
     };
 }
+
 
 // ======================================================
 // 2. D2 (responsivo)
