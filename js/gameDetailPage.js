@@ -132,8 +132,32 @@ function renderGameDetailPage(gameId) {
                     <ul class="space-y-5">${skillsDetail}</ul>
                 </aside>
             </div>
+
+            <div class="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-6 mt-6">
+                <div class="flex items-center gap-3 mb-3">
+                <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                    </path>
+                </svg>
+                <p class="text-sm font-medium text-indigo-400">¿Qué te ha parecido este juego?</p>
+            </div>
+                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Tu opinión nos ayuda a mejorar.
+                    Comparte tu experiencia o reporta algún problema.</p>
+                <div class="flex gap-3 mt-4">
+                    <button id="btn-opinar-juego"
+                        class="flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white py-2 text-sm font-bold transition">
+                        💬 Escribir opinión
+                    </button>
+                    <button id="btn-reportar-juego"
+                        class="flex-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                        🚩 Reportar problema
+                    </button>
+                </div>
+            </div>
         </section>
     `;
+
 
     // Botón Recargar juego
     const recargarBtn = Array.from(content.querySelectorAll("button")).find(btn => btn.textContent.includes("Recargar juego"));
@@ -151,6 +175,26 @@ function renderGameDetailPage(gameId) {
         });
     }
 
+
+
+    // Botón Escribir opinión
+    const btnOpinar = document.getElementById("btn-opinar-juego");
+    if (btnOpinar) {
+        btnOpinar.addEventListener("click", () => {
+            // Redirigir a about.html con categoría "juego" pre-seleccionada
+            window.location.href = "../../about.html?categoria=juego#seccion-comentarios";
+        });
+    }
+
+    // Botón Reportar problema
+    const btnReportar = document.getElementById("btn-reportar-juego");
+    if (btnReportar) {
+        btnReportar.addEventListener("click", () => {
+            // Redirigir al formulario de contacto
+            window.location.href = "../../about.html?tipo=reporte#contacto";
+        });
+    }
+
     // Iniciar pantalla completa
     iniciarPantallaCompleta(content);
 }
@@ -159,12 +203,12 @@ function renderGameDetailPage(gameId) {
 function iniciarPantallaCompleta(content) {
     const fullscreenBtn = document.getElementById("fullscreen-btn");
     const iframe = document.getElementById("game-iframe");
-    
+
     if (!fullscreenBtn || !iframe) return;
 
     // Asegurar que el botón no actúe como submit en ningún contexto
-    try { fullscreenBtn.setAttribute('type','button'); } catch (e) {}
-    
+    try { fullscreenBtn.setAttribute('type', 'button'); } catch (e) { }
+
     let exitBtn = null;
     let originalContainerStyles = {};
     let originalIframeStyles = {};
@@ -174,7 +218,7 @@ function iniciarPantallaCompleta(content) {
     let originalParent = null;
     let originalNextSibling = null;
     let usingOverlayFallback = false;
-    
+
     // Función para restaurar todo al estado original
     function restoreOriginalState() {
         const container = iframe.parentElement;
@@ -225,7 +269,7 @@ function iniciarPantallaCompleta(content) {
         window.removeEventListener('orientationchange', onOrientationChange);
         window.removeEventListener('resize', onOrientationChange);
     }
-    
+
     // Función para guardar estilos originales
     function saveOriginalStyles() {
         const container = iframe.parentElement;
@@ -240,16 +284,16 @@ function iniciarPantallaCompleta(content) {
         };
         originalParent = container.parentElement;
         originalNextSibling = container.nextElementSibling;
-        
+
         originalIframeStyles = {
             width: iframe.style.width,
             height: iframe.style.height
         };
-        
+
         originalBodyOverflow = document.body.style.overflow;
         originalHtmlOverflow = document.documentElement.style.overflow;
     }
-    
+
     // Función para aplicar estilos de pantalla completa
     function applyFullscreenStyles() {
         const container = iframe.parentElement;
@@ -269,14 +313,14 @@ function iniciarPantallaCompleta(content) {
         document.body.style.overflow = "hidden";
         document.documentElement.style.overflow = "hidden";
     }
-    
+
     // Función para crear botón flotante de salir
     function createExitButton() {
         if (exitBtn) return;
-        
+
         exitBtn = document.createElement("button");
         // evitar comportamiento por defecto
-        try { exitBtn.setAttribute('type','button'); } catch (e) {}
+        try { exitBtn.setAttribute('type', 'button'); } catch (e) { }
         exitBtn.id = "exit-fullscreen-btn";
         exitBtn.textContent = "✕ Salir";
         exitBtn.style.cssText = `
@@ -298,17 +342,17 @@ function iniciarPantallaCompleta(content) {
             transition: all 0.2s ease;
             z-index: 10001;
         `;
-        
+
         exitBtn.onmouseenter = () => {
             exitBtn.style.backgroundColor = "rgba(255,0,0,0.8)";
             exitBtn.style.transform = "scale(1.05)";
         };
-        
+
         exitBtn.onmouseleave = () => {
             exitBtn.style.backgroundColor = "rgba(0,0,0,0.8)";
             exitBtn.style.transform = "scale(1)";
         };
-        
+
         exitBtn.addEventListener('click', (ev) => {
             ev.preventDefault();
             if (typeof ev.stopPropagation === 'function') ev.stopPropagation();
@@ -325,10 +369,10 @@ function iniciarPantallaCompleta(content) {
                 restoreOriginalState();
             }
         });
-        
+
         document.body.appendChild(exitBtn);
     }
-    
+
     // Evento para cuando se activa el fullscreen nativo del navegador
     function onFullscreenChange() {
         if (document.fullscreenElement || document.webkitFullscreenElement) {
@@ -342,7 +386,7 @@ function iniciarPantallaCompleta(content) {
             document.removeEventListener("webkitfullscreenchange", onFullscreenChange);
         }
     }
-    
+
     // Botón principal para entrar en pantalla completa
     fullscreenBtn.addEventListener("click", async (ev) => {
         // evitar que un submit u otro handler recargue la página

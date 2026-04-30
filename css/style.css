@@ -425,13 +425,130 @@ footer a {
     }
 }
 
-/* Header con auto-ocultación en móvil */
+/* =========================
+    DARK MODE
+    ========================= */
+    .comentario-card {
+    transition: all 0.2s ease;
+}
+
+.comentario-card:hover {
+    transform: translateY(-2px);
+}
+
+/* =========================
+    HEADER RESPONSIVE - MÓVIL
+    ========================= */
+
+/* Header normal en desktop */
 .header-auto-hide {
     transition: transform 0.3s ease-in-out;
 }
 
 .header-hidden {
     transform: translateY(-100%);
+}
+
+/* MÓVIL: header más compacto */
+@media (max-width: 768px) {
+    header {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        padding: 0 !important;
+    }
+    
+    /* Header más pequeño */
+    header .container {
+        padding: 8px 12px !important;
+    }
+    
+    /* Ocultar el subtítulo en móvil */
+    header .flex-col p {
+        display: none;
+    }
+    
+    /* Título más pequeño */
+    header h1 {
+        font-size: 1.25rem !important;
+    }
+    
+    /* Logo más pequeño */
+    header img {
+        width: 32px !important;
+        height: 32px !important;
+    }
+    
+    /* Navegación más compacta */
+    header nav {
+        gap: 0.5rem !important;
+    }
+    
+    header nav a {
+        font-size: 0.9rem !important;
+        padding: 0 0.5rem !important;
+    }
+    
+    /* Avatar más pequeño */
+    header .rounded-full {
+        width: 32px !important;
+        height: 32px !important;
+    }
+    
+    /* Botón tema más pequeño */
+    #theme-toggle-btn {
+        font-size: 1.2rem !important;
+    }
+    
+    /* Compensar espacio del header fijo */
+    body {
+        padding-top: 60px !important;
+    }
+}
+
+/* Menú hamburguesa */
+.menu-hamburguesa {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: currentColor;
+    padding: 0 8px;
+}
+
+@media (max-width: 768px) {
+    .menu-hamburguesa {
+        display: block;
+    }
+    
+    .menu-container nav {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .menu-container nav a {
+        font-size: 1.2rem;
+        padding: 0.5rem;
+        display: block;
+        text-align: center;
+    }
+}
+
+/* Tablet (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    header h1 {
+        font-size: 1.5rem !important;
+    }
+    
+    header nav a {
+        font-size: 1rem !important;
+    }
 }
 
 /* Asegurar que el header tiene posición fija en móvil */
