@@ -92,6 +92,9 @@
 
     <main id="test-detail-content"></main>
 
+    
+
+
     <!-- Script de inicialización de interfaz: se ejecuta cuando el DOM está listo -->
     <script data-purpose="init-interface">
         document.addEventListener('DOMContentLoaded', () => {
@@ -100,6 +103,26 @@
 
         });
     </script>
+
+    <script>
+        // En la página del juego, después de cargar el contenido
+        const btnOpinar = document.getElementById("btn-opinar-juego");
+        if (btnOpinar) {
+            btnOpinar.addEventListener("click", () => {
+                // Redirigir a la sección de comentarios con categoría "juego"
+                window.location.href = "/about.html#seccion-comentarios";
+                // También se puede abrir un modal o scroll al formulario
+            });
+        }
+
+        const btnReportar = document.getElementById("btn-reportar-juego");
+        if (btnReportar) {
+            btnReportar.addEventListener("click", () => {
+                window.location.href = "/about.html#contacto";
+            });
+        }
+    </script>
+
 </body>
 
 </html>

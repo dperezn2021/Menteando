@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html class="light" lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,8 +19,10 @@
         })();
     </script>
 
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="js/correoSoporte.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
         tailwind.config = {
@@ -34,43 +37,58 @@
         }
     </script>
 
+
     <link rel="stylesheet" href="/coach/animacionesCoach.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased">
 
-    <header class="header-auto-hide w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
+    <header
+        class="header-auto-hide w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3 flex-shrink-0">
                 <img src="../assets/img/logo2.png" alt="Logo" class="w-10 h-10 md:w-12 md:h-12" />
                 <div class="flex flex-col leading-tight text-left">
                     <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Menteando</h1>
-                    <p class="text-xs md:text-sm font-normal text-slate-500 dark:text-slate-300">Entrena tu mente, pero jugando</p>
+                    <p class="text-xs md:text-sm font-normal text-slate-500 dark:text-slate-300">Entrena tu mente, pero
+                        jugando</p>
                 </div>
             </div>
 
             <nav class="flex flex-direction-row md:flex-row items-center justify-center gap-1 md:gap-3">
-                <a href="index.html" class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Inicio</a>
-                <a href="tests.html" class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Tests</a>
-                <a href="games.html" class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Juegos</a>
-                <a href="about.html" class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Acerca De</a>
+                <a href="index.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Inicio</a>
+                <a href="tests.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Tests</a>
+                <a href="games.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Juegos</a>
+                <a href="about.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Acerca
+                    De</a>
             </nav>
 
             <div class="flex items-center gap-3">
                 <a href="perfil.html" class="flex items-center gap-2">
-                    <span id="perfil-apodo-header" class="text-md md:text-xl font-normal text-slate-500 dark:text-slate-300"></span>
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-blue-500 bg-blue-500/10">
-                        <img id="perfil-avatar-header" src="/assets/icon/usuario.webp" alt="Avatar" class="w-full h-full object-cover" />
+                    <span id="perfil-apodo-header"
+                        class="text-md md:text-xl font-normal text-slate-500 dark:text-slate-300"></span>
+                    <div
+                        class="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-blue-500 bg-blue-500/10">
+                        <img id="perfil-avatar-header" src="/assets/icon/usuario.webp" alt="Avatar"
+                            class="w-full h-full object-cover" />
                     </div>
                 </a>
-                <button id="theme-toggle-btn" class="text-lg md:text-2xl text-slate-900 dark:text-white hover:text-blue-500 transition-colors"></button>
+                <button id="theme-toggle-btn"
+                    class="text-lg md:text-2xl text-slate-900 dark:text-white hover:text-blue-500 transition-colors"></button>
             </div>
         </div>
     </header>
 
     <main class="w-full">
-        <div id="coach" class="coach"><div id="coach-bubble" class="coach-bubble"></div></div>
+        <div id="coach" class="coach">
+            <div id="coach-bubble" class="coach-bubble"></div>
+        </div>
 
         <!-- Hero Section -->
         <section class="py-16 md:py-20 lg:py-24">
@@ -78,18 +96,30 @@
                 <div class="grid lg:grid-cols-2 gap-16 items-center">
                     <div class="relative z-10 flex flex-col gap-8">
                         <div>
-                            <span class="inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary">Sobre Nosotros</span>
-                            <h1 class="mt-6 text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.1]">Potenciando la <span class="text-primary">Salud Cognitiva</span> para Todos.</h1>
+                            <span
+                                class="inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary">Sobre
+                                Nosotros</span>
+                            <h1
+                                class="mt-6 text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.1]">
+                                Potenciando la <span class="text-primary">Salud Cognitiva</span> para Todos.</h1>
                         </div>
-                        <p class="text-lg leading-relaxed text-slate-600 dark:text-slate-400 max-w-xl">Menteando es una iniciativa digital nacida de la intersección entre la neuropsicología y la tecnología moderna.</p>
+                        <p class="text-lg leading-relaxed text-slate-600 dark:text-slate-400 max-w-xl">Menteando es una
+                            iniciativa digital nacida de la intersección entre la neuropsicología y la tecnología
+                            moderna.</p>
                         <div class="flex flex-wrap gap-4">
-                            <button class="px-8 py-4 bg-slate-800 text-white rounded-2xl font-bold text-xl hover:scale-105 transition" onclick="window.location.href='tests.html'">Empezar a entrenar</button>
-                            <a href="#contexto-academico" class="px-8 py-4 bg-blue-500 text-white rounded-2xl font-bold text-xl hover:scale-105 transition">Nuestra historia</a>
+                            <button
+                                class="px-8 py-4 bg-slate-800 text-white rounded-2xl font-bold text-xl hover:scale-105 transition"
+                                onclick="window.location.href='tests.html'">Empezar a entrenar</button>
+                            <a href="#contexto-academico"
+                                class="px-8 py-4 bg-blue-500 text-white rounded-2xl font-bold text-xl hover:scale-105 transition">Nuestra
+                                historia</a>
                         </div>
                     </div>
                     <div class="relative">
-                        <div class="relative md:aspect-[2.5/3] aspect-[6/3] overflow-hidden rounded-2xl bg-slate-200 dark:bg-slate-800 shadow-2xl">
-                            <img alt="Brain illustration" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5jeLUrkwZBTmgOrpxNJV0Y9wIuX4q7IGxIQmrWdRoTsytmUXuvyxH5mjomtvT8VJxU_Vj-ympkTsGi_Ty7Qni9e-MQk6hW_pz2yWESb86BXqgh_HbGmQ9EEhlC2H7xxqUiGNJnhHY2RpZBL1RxA_mEDrVCuQhmQj0Q0qDVRMU53LKkW1Q6EDWeVtrjb6on0EYqdZ14KhUgEFhldy-9eZGIqe9D2JSFgOH_uNjAekAE_P8Gccxat5cb--SuZJiSzvzQImamcp3bAjF" />
+                        <div
+                            class="relative md:aspect-[2.5/3] aspect-[6/3] overflow-hidden rounded-2xl bg-slate-200 dark:bg-slate-800 shadow-2xl">
+                            <img alt="Brain illustration" class="h-full w-full object-cover"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5jeLUrkwZBTmgOrpxNJV0Y9wIuX4q7IGxIQmrWdRoTsytmUXuvyxH5mjomtvT8VJxU_Vj-ympkTsGi_Ty7Qni9e-MQk6hW_pz2yWESb86BXqgh_HbGmQ9EEhlC2H7xxqUiGNJnhHY2RpZBL1RxA_mEDrVCuQhmQj0Q0qDVRMU53LKkW1Q6EDWeVtrjb6on0EYqdZ14KhUgEFhldy-9eZGIqe9D2JSFgOH_uNjAekAE_P8Gccxat5cb--SuZJiSzvzQImamcp3bAjF" />
                         </div>
                     </div>
                 </div>
@@ -101,21 +131,29 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
                     <div class="group relative p-1">
-                        <div class="relative flex flex-col gap-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 shadow-sm h-full">
-                            <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
+                        <div
+                            class="relative flex flex-col gap-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 shadow-sm h-full">
+                            <div
+                                class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
                                 <div class="size-6 bg-blue-500 rounded"></div>
                             </div>
                             <h3 class="text-3xl font-black text-slate-900 dark:text-white">Nuestra Misión</h3>
-                            <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">Hacer accesible el entrenamiento cognitivo con herramientas digitales simples, eficaces y basadas en evidencia científica.</p>
+                            <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">Hacer accesible el
+                                entrenamiento cognitivo con herramientas digitales simples, eficaces y basadas en
+                                evidencia científica.</p>
                         </div>
                     </div>
                     <div class="group relative p-1">
-                        <div class="relative flex flex-col gap-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 shadow-sm h-full">
-                            <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
+                        <div
+                            class="relative flex flex-col gap-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 shadow-sm h-full">
+                            <div
+                                class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
                                 <div class="size-6 bg-blue-500 rounded"></div>
                             </div>
                             <h3 class="text-3xl font-black text-slate-900 dark:text-white">Nuestra Visión</h3>
-                            <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">Convertirnos en una referencia en entrenamiento cognitivo digital, conectando investigación científica con herramientas que la gente use en su día a día.</p>
+                            <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">Convertirnos en una
+                                referencia en entrenamiento cognitivo digital, conectando investigación científica con
+                                herramientas que la gente use en su día a día.</p>
                         </div>
                     </div>
                 </div>
@@ -127,17 +165,26 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid gap-16">
                     <div class="flex flex-col gap-12">
-                        <h2 class="text-center text-4xl md:text-5xl font-black text-slate-900 dark:text-white">Contexto Académico</h2>
+                        <h2 class="text-center text-4xl md:text-5xl font-black text-slate-900 dark:text-white">Contexto
+                            Académico</h2>
                         <div class="grid lg:grid-cols-2 gap-16 items-center">
-                            <p class="text-lg leading-relaxed text-slate-600 dark:text-slate-400">Menteando es un proyecto desarrollado por <span class="font-bold">Daniel Pérez Navarro</span>, estudiante del Grado de Diseño y Desarrollo de Videojuegos en la <span class="font-bold">Universidad Rey Juan Carlos (URJC)</span>.<br><br>El desarrollo representa un año de trabajo académico, investigación y desarrollo de un TFG en el ámbito de la neuropsicología y estimulación cognitiva.</p>
-                            <div class="flex items-center gap-6 p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <p class="text-lg leading-relaxed text-slate-600 dark:text-slate-400">Menteando es un
+                                proyecto desarrollado por <span class="font-bold">Daniel Pérez Navarro</span>,
+                                estudiante del Grado de Diseño y Desarrollo de Videojuegos en la <span
+                                    class="font-bold">Universidad Rey Juan Carlos (URJC)</span>.<br><br>El desarrollo
+                                representa un año de trabajo académico, investigación y desarrollo de un TFG en el
+                                ámbito de la neuropsicología y estimulación cognitiva.</p>
+                            <div
+                                class="flex items-center gap-6 p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                                 <div class="w-24 h-24 rounded-2xl overflow-hidden shadow-md border-2 border-blue-500">
                                     <img src="assets/img/dani-orla.jpeg" class="w-full h-full object-cover">
                                 </div>
                                 <div class="flex flex-col">
-                                    <h4 class="text-2xl font-bold text-slate-900 dark:text-white">Daniel Pérez Navarro</h4>
+                                    <h4 class="text-2xl font-bold text-slate-900 dark:text-white">Daniel Pérez Navarro
+                                    </h4>
                                     <p class="text-blue-500 text-lg font-medium">Director & Desarrollador</p>
-                                    <p class="text-slate-500 dark:text-slate-400 text-base">Técnico DAM y estudiante de GDDV.</p>
+                                    <p class="text-slate-500 dark:text-slate-400 text-base">Técnico DAM y estudiante de
+                                        GDDV.</p>
                                 </div>
                             </div>
                         </div>
@@ -149,57 +196,87 @@
         <!-- Taxonomía -->
         <section class="py-16 md:py-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-center text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">Qué entrenas exactamente</h2>
-                <p class="text-center mx-auto mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl">Cada juego está diseñado para mejorar habilidades cognitivas concretas.</p>
+                <h2 class="text-center text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+                    Qué entrenas exactamente</h2>
+                <p class="text-center mx-auto mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl">Cada juego está
+                    diseñado para mejorar habilidades cognitivas concretas.</p>
                 <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-10">
                     <!-- Atención -->
-                    <div class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div
+                        class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
                         <div class="flex items-center gap-4 mb-4">
                             <img class="w-10 h-10" src="assets/icon/atencion.png" alt="">
                             <h3 class="text-2xl font-bold text-blue-600">Atención</h3>
                         </div>
-                        <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">La base de casi todo: mantener el foco, ignorar distracciones y gestionar varias tareas.</p>
+                        <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">La base de casi todo: mantener el
+                            foco, ignorar distracciones y gestionar varias tareas.</p>
                         <div class="space-y-5">
-                            <div><strong class="text-slate-900 dark:text-white">Sostenida</strong><p class="text-slate-500">Mantener la concentración durante periodos largos.</p></div>
-                            <div><strong class="text-slate-900 dark:text-white">Selectiva</strong><p class="text-slate-500">Centrarte en lo importante ignorando distracciones.</p></div>
-                            <div><strong class="text-slate-900 dark:text-white">Dividida</strong><p class="text-slate-500">Gestionar varias tareas al mismo tiempo.</p></div>
+                            <div><strong class="text-slate-900 dark:text-white">Sostenida</strong>
+                                <p class="text-slate-500">Mantener la concentración durante periodos largos.</p>
+                            </div>
+                            <div><strong class="text-slate-900 dark:text-white">Selectiva</strong>
+                                <p class="text-slate-500">Centrarte en lo importante ignorando distracciones.</p>
+                            </div>
+                            <div><strong class="text-slate-900 dark:text-white">Dividida</strong>
+                                <p class="text-slate-500">Gestionar varias tareas al mismo tiempo.</p>
+                            </div>
                         </div>
                     </div>
                     <!-- Memoria -->
-                    <div class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div
+                        class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
                         <div class="flex items-center gap-4 mb-4">
                             <img class="w-10 h-10" src="assets/icon/memoria.png" alt="">
                             <h3 class="text-2xl font-bold text-emerald-600">Memoria</h3>
                         </div>
-                        <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">Te permite guardar, usar y recuperar información cuando la necesitas.</p>
+                        <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">Te permite guardar, usar y
+                            recuperar información cuando la necesitas.</p>
                         <div class="space-y-5">
-                            <div><strong class="text-slate-900 dark:text-white">Memoria de trabajo</strong><p class="text-slate-500">Usar información en tiempo real para pensar y decidir.</p></div>
-                            <div><strong class="text-slate-900 dark:text-white">Memoria espacial</strong><p class="text-slate-500">Recordar posiciones, patrones y ubicaciones.</p></div>
+                            <div><strong class="text-slate-900 dark:text-white">Memoria de trabajo</strong>
+                                <p class="text-slate-500">Usar información en tiempo real para pensar y decidir.</p>
+                            </div>
+                            <div><strong class="text-slate-900 dark:text-white">Memoria espacial</strong>
+                                <p class="text-slate-500">Recordar posiciones, patrones y ubicaciones.</p>
+                            </div>
                         </div>
                     </div>
                     <!-- Velocidad -->
-                    <div class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div
+                        class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
                         <div class="flex items-center gap-4 mb-4">
                             <img class="w-10 h-10" src="assets/icon/reflejos.png" alt="">
                             <h3 class="text-2xl font-bold text-rose-600">Velocidad y Reflejos</h3>
                         </div>
-                        <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">Qué tan rápido percibes, procesas y reaccionas ante estímulos.</p>
+                        <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">Qué tan rápido percibes, procesas y
+                            reaccionas ante estímulos.</p>
                         <div class="space-y-5">
-                            <div><strong class="text-slate-900 dark:text-white">Velocidad cognitiva</strong><p class="text-slate-500">Procesar información rápidamente y responder sin retraso.</p></div>
-                            <div><strong class="text-slate-900 dark:text-white">Coordinación visomotora</strong><p class="text-slate-500">Coordinar lo que ves con lo que haces.</p></div>
+                            <div><strong class="text-slate-900 dark:text-white">Velocidad cognitiva</strong>
+                                <p class="text-slate-500">Procesar información rápidamente y responder sin retraso.</p>
+                            </div>
+                            <div><strong class="text-slate-900 dark:text-white">Coordinación visomotora</strong>
+                                <p class="text-slate-500">Coordinar lo que ves con lo que haces.</p>
+                            </div>
                         </div>
                     </div>
                     <!-- Control -->
-                    <div class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div
+                        class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
                         <div class="flex items-center gap-4 mb-4">
                             <img class="w-10 h-10" src="assets/icon/control.png" alt="">
                             <h3 class="text-2xl font-bold text-amber-600">Control Ejecutivo</h3>
                         </div>
-                        <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">Regula decisiones, adaptación y control del comportamiento.</p>
+                        <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">Regula decisiones, adaptación y
+                            control del comportamiento.</p>
                         <div class="space-y-5">
-                            <div><strong class="text-slate-900 dark:text-white">Control inhibitorio</strong><p class="text-slate-500">Evitar respuestas impulsivas o automáticas.</p></div>
-                            <div><strong class="text-slate-900 dark:text-white">Flexibilidad cognitiva</strong><p class="text-slate-500">Cambiar de estrategia cuando algo deja de funcionar.</p></div>
-                            <div><strong class="text-slate-900 dark:text-white">Planificación</strong><p class="text-slate-500">Organizar pasos y anticipar resultados.</p></div>
+                            <div><strong class="text-slate-900 dark:text-white">Control inhibitorio</strong>
+                                <p class="text-slate-500">Evitar respuestas impulsivas o automáticas.</p>
+                            </div>
+                            <div><strong class="text-slate-900 dark:text-white">Flexibilidad cognitiva</strong>
+                                <p class="text-slate-500">Cambiar de estrategia cuando algo deja de funcionar.</p>
+                            </div>
+                            <div><strong class="text-slate-900 dark:text-white">Planificación</strong>
+                                <p class="text-slate-500">Organizar pasos y anticipar resultados.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -210,85 +287,137 @@
         <section class="py-16 md:py-20">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">Preguntas Frecuentes</h2>
-                    <p class="mt-4 text-slate-600 dark:text-slate-400">Resolvemos tus dudas sobre el uso de la plataforma.</p>
+                    <h2 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">Preguntas
+                        Frecuentes</h2>
+                    <p class="mt-4 text-slate-600 dark:text-slate-400">Resolvemos tus dudas sobre el uso de la
+                        plataforma.</p>
                 </div>
                 <div class="space-y-4">
                     <!-- FAQ 1 -->
-                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
-                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                    <details
+                        class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary
+                            class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
                             <span>¿Tengo que pagar para usar Menteando?</span>
-                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                            <span
+                                class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
                         </summary>
-                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">No, Menteando es actualmente parte de un proyecto de investigación educativa y es accesible de forma gratuita.</div>
+                        <div
+                            class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                            No, Menteando es actualmente parte de un proyecto de investigación educativa y es accesible
+                            de forma gratuita.</div>
                     </details>
 
                     <!-- FAQ 2 -->
-                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
-                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                    <details
+                        class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary
+                            class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
                             <span>¿Sirve como herramienta clínica?</span>
-                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                            <span
+                                class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
                         </summary>
-                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Debe utilizarse como una herramienta complementaria y no como sustituto de un asesoramiento o tratamiento clínico profesional.</div>
+                        <div
+                            class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                            Debe utilizarse como una herramienta complementaria y no como sustituto de un asesoramiento
+                            o tratamiento clínico profesional.</div>
                     </details>
 
                     <!-- FAQ 3 -->
-                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
-                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                    <details
+                        class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary
+                            class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
                             <span>¿Cómo se guarda mi progreso?</span>
-                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                            <span
+                                class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
                         </summary>
-                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Todo tu progreso se guarda automáticamente en tu navegador usando localStorage. No necesitas registro ni contraseñas.</div>
+                        <div
+                            class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                            Todo tu progreso se guarda automáticamente en tu navegador usando localStorage. No necesitas
+                            registro ni contraseñas.</div>
                     </details>
 
                     <!-- FAQ 4 -->
-                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
-                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                    <details
+                        class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary
+                            class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
                             <span>¿Puedo perder mis datos si cambio de navegador?</span>
-                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                            <span
+                                class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
                         </summary>
-                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Sí, los datos están vinculados al navegador y dispositivo. Si cambias de navegador o usas otro dispositivo, el progreso no se transferirá automáticamente.</div>
+                        <div
+                            class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                            Sí, los datos están vinculados al navegador y dispositivo. Si cambias de navegador o usas
+                            otro dispositivo, el progreso no se transferirá automáticamente.</div>
                     </details>
 
                     <!-- FAQ 5 -->
-                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
-                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                    <details
+                        class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary
+                            class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
                             <span>¿Qué diferencia hay entre juegos y tests?</span>
-                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                            <span
+                                class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
                         </summary>
-                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Los juegos entrenan tus habilidades y mejoran tu perfil. Los tests miden tu nivel real sin modificarlo, como una evaluación.</div>
+                        <div
+                            class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                            Los juegos entrenan tus habilidades y mejoran tu perfil. Los tests miden tu nivel real sin
+                            modificarlo, como una evaluación.</div>
                     </details>
 
                     <!-- FAQ 6 -->
-                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
-                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                    <details
+                        class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary
+                            class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
                             <span>¿Cómo contacto con el equipo?</span>
-                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                            <span
+                                class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
                         </summary>
-                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
-                            Puedes contactar con nosotros a través del formulario de contacto más abajo en esta misma página.
+                        <div
+                            class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                            Puedes contactar con nosotros a través del formulario de contacto más abajo en esta misma
+                            página.
                             <div class="mt-4">
-                                <button class="rounded-xl px-6 py-3 text-sm font-bold bg-slate-800 text-white hover:bg-slate-700 transition" onclick="document.getElementById('contacto').scrollIntoView({behavior: 'smooth'})">Ir al formulario</button>
+                                <button
+                                    class="rounded-xl px-6 py-3 text-sm font-bold bg-slate-800 text-white hover:bg-slate-700 transition"
+                                    onclick="document.getElementById('contacto').scrollIntoView({behavior: 'smooth'})">Ir
+                                    al formulario</button>
                             </div>
                         </div>
                     </details>
 
                     <!-- FAQ 7 -->
-                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
-                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                    <details
+                        class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary
+                            class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
                             <span>¿Puedo eliminar mis datos?</span>
-                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                            <span
+                                class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
                         </summary>
-                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Sí, desde tu perfil puedes usar el botón "Reiniciar" para borrar todo tu progreso. También puedes borrar los datos manualmente desde la configuración de tu navegador.</div>
+                        <div
+                            class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                            Sí, desde tu perfil puedes usar el botón "Reiniciar" para borrar todo tu progreso. También
+                            puedes borrar los datos manualmente desde la configuración de tu navegador.</div>
                     </details>
 
                     <!-- FAQ 8 -->
-                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
-                        <summary class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
+                    <details
+                        class="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                        <summary
+                            class="flex cursor-pointer items-center justify-between p-6 font-bold text-lg text-slate-900 dark:text-white list-none">
                             <span>¿Hay versión para móvil?</span>
-                            <span class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
+                            <span
+                                class="transition-transform duration-300 group-open:rotate-180 text-slate-500">▼</span>
                         </summary>
-                        <div class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">Menteando está diseñado para ser responsive y funciona correctamente en móviles, tablets y ordenadores.</div>
+                        <div
+                            class="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                            Menteando está diseñado para ser responsive y funciona correctamente en móviles, tablets y
+                            ordenadores.</div>
                     </details>
                 </div>
             </div>
@@ -297,13 +426,19 @@
         <!-- CTA -->
         <section class="py-16 md:py-20">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="relative overflow-hidden rounded-[2.5rem] bg-slate-800 px-8 py-16 text-center text-white shadow-2xl">
+                <div
+                    class="relative overflow-hidden rounded-[2.5rem] bg-slate-800 px-8 py-16 text-center text-white shadow-2xl">
                     <div class="relative z-10 mx-auto max-w-2xl">
                         <h2 class="text-4xl md:text-5xl font-black">¿Listo para empezar a entrenar tu mente?</h2>
-                        <p class="mt-6 text-lg text-slate-200">Únete a miles de usuarios que ya están mejorando su calidad de vida.</p>
+                        <p class="mt-6 text-lg text-slate-200">Únete a miles de usuarios que ya están mejorando su
+                            calidad de vida.</p>
                         <div class="mt-10 flex flex-wrap justify-center gap-4">
-                            <button class="rounded-xl bg-blue-500 px-8 py-4 text-base font-bold text-white hover:bg-blue-600 transition" onclick="window.location.href='games.html'">Juega Ahora</button>
-                            <button class="rounded-xl bg-slate-700 px-8 py-4 text-base font-bold text-white hover:bg-slate-600 transition" onclick="window.location.href='tests.html'">Conoce qué mejorar</button>
+                            <button
+                                class="rounded-xl bg-blue-500 px-8 py-4 text-base font-bold text-white hover:bg-blue-600 transition"
+                                onclick="window.location.href='games.html'">Juega Ahora</button>
+                            <button
+                                class="rounded-xl bg-slate-700 px-8 py-4 text-base font-bold text-white hover:bg-slate-600 transition"
+                                onclick="window.location.href='tests.html'">Conoce qué mejorar</button>
                         </div>
                     </div>
                 </div>
@@ -315,23 +450,112 @@
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white">Contacto</h2>
-                    <p class="text-xl text-slate-600 dark:text-slate-400 mt-4">¿Tienes dudas, sugerencias o quieres colaborar? Escríbenos.</p>
+                    <p class="text-xl text-slate-600 dark:text-slate-400 mt-4">¿Tienes dudas, sugerencias o quieres
+                        colaborar? Escríbenos.</p>
                 </div>
-                <form class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 md:p-10 space-y-6">
+
+                <form id="contacto-form"
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 md:p-10 space-y-6">
                     <div>
                         <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-2">Nombre</label>
-                        <input type="text" class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tu nombre" required>
+                        <input type="text" id="contacto-nombre"
+                            class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Tu nombre" required>
                     </div>
                     <div>
-                        <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-2">Correo electrónico</label>
-                        <input type="email" class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="tucorreo@ejemplo.com" required>
+                        <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-2">Correo
+                            electrónico</label>
+                        <input type="email" id="contacto-email"
+                            class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="tucorreo@ejemplo.com" required>
                     </div>
                     <div>
                         <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-2">Mensaje</label>
-                        <textarea rows="5" class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Cuéntanos en qué podemos ayudarte" required></textarea>
+                        <textarea id="contacto-mensaje" rows="5"
+                            class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Cuéntanos en qué podemos ayudarte" required></textarea>
                     </div>
-                    <button type="submit" class="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl transition" onclick="enviarCorreoSoporte()">Enviar mensaje</button>
+                    <button type="submit"
+                        class="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl transition">Enviar
+                        mensaje</button>
                 </form>
+            </div>
+        </section>
+
+        <!-- Sección de comentarios -->
+        <section class="py-16 bg-slate-50 dark:bg-slate-900/50" id="seccion-comentarios">
+            <div class="max-w-4xl mx-auto px-4">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-2">
+                        💬 Comentarios de la comunidad
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-400">
+                        Comparte tu experiencia, sugerencias o reporta problemas
+                    </p>
+                </div>
+
+                <!-- Formulario para añadir comentario -->
+                <!-- Filtros de categoría -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button data-categoria="todos" onclick="filtrarComentarios('todos')"
+                        class="filtro-btn px-4 py-2 rounded-full bg-blue-500 text-white text-sm font-semibold transition-all">Todos</button>
+                    <button data-categoria="general" onclick="filtrarComentarios('general')"
+                        class="filtro-btn px-4 py-2 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold transition-all">💬
+                        General</button>
+                    <button data-categoria="sugerencia" onclick="filtrarComentarios('sugerencia')"
+                        class="filtro-btn px-4 py-2 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold transition-all">💡
+                        Sugerencia</button>
+                    <button data-categoria="error" onclick="filtrarComentarios('error')"
+                        class="filtro-btn px-4 py-2 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold transition-all">🐛
+                        Error</button>
+                    <button data-categoria="pregunta" onclick="filtrarComentarios('pregunta')"
+                        class="filtro-btn px-4 py-2 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold transition-all">❓
+                        Pregunta</button>
+                    <button data-categoria="test" onclick="filtrarComentarios('test')"
+                        class="filtro-btn px-4 py-2 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold transition-all">📝
+                        Test</button>
+                    <button data-categoria="juego" onclick="filtrarComentarios('juego')"
+                        class="filtro-btn px-4 py-2 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold transition-all">🎮
+                        Juego</button>
+                </div>
+
+                <!-- Formulario para añadir comentario -->
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 mb-8 border border-slate-200 dark:border-slate-700">
+                    <div class="flex items-center gap-4 mb-4">
+                        <img src="/assets/icon/usuario.webp" alt="Avatar"
+                            class="w-12 h-12 rounded-full border-2 border-blue-500" id="comentario-avatar">
+                        <div class="flex-1">
+                            <input type="text" id="comentario-usuario"
+                                class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white cursor-not-allowed font-semibold"
+                                readonly disabled>
+                        </div>
+                        <select id="comentario-categoria"
+                            class="px-4 py-2 rounded-xl border bg-white dark:bg-slate-800">
+                            <option value="general">💬 General</option>
+                            <option value="sugerencia">💡 Sugerencia</option>
+                            <option value="error">🐛 Error</option>
+                            <option value="pregunta">❓ Pregunta</option>
+                            <option value="test">📝 Test</option>
+                            <option value="juego">🎮 Juego</option>
+                        </select>
+                    </div>
+                    <textarea id="comentario-texto" rows="3" placeholder="Escribe tu comentario..."
+                        class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                    <div class="flex justify-end mt-4">
+                        <button id="btn-publicar"
+                            class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                            Publicar comentario
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de comentarios -->
+                <div id="comentarios-container" class="space-y-4"></div>
             </div>
         </section>
     </main>
@@ -340,11 +564,13 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
             <div class="flex flex-col md:flex-row items-center md:items-start justify-center gap-12 mb-6">
                 <div class="w-full md:w-96 text-center md:text-left">
-                    <div class="flex flex-col md:flex-row items-center md:items-start gap-3 mb-6 justify-center md:justify-start">
+                    <div
+                        class="flex flex-col md:flex-row items-center md:items-start gap-3 mb-6 justify-center md:justify-start">
                         <img src="../assets/img/logo2.png" alt="Logo" class="w-12 h-12 md:w-16 md:h-16" />
                         <h3 class="text-2xl md:text-3xl font-black text-blue-500">Menteando</h3>
                     </div>
-                    <p class="text-sm md:text-base font-normal text-slate-500 dark:text-slate-400">Dedicados a mejorar la calidad de vida.</p>
+                    <p class="text-sm md:text-base font-normal text-slate-500 dark:text-slate-400">Dedicados a mejorar
+                        la calidad de vida.</p>
                 </div>
                 <div class="w-full md:w-64 text-center md:text-left">
                     <h4 class="font-bold text-slate-900 dark:text-white mb-6">Enlaces de interés</h4>
@@ -370,6 +596,9 @@
     </footer>
 
     <script src="/js/perfil.js"></script>
+    <script src="/js/emailService.js"></script>
+    <script src="/js/comentarios.js"></script>
+
     <script src="/js/datosPerfil.js"></script>
     <script src="/coach/mensajesCoach.js"></script>
     <script src="/coach/cerebroCoach.js"></script>
@@ -384,7 +613,7 @@
         const root = document.documentElement;
         const syncThemeButton = () => {
             const isDark = root.classList.contains('dark');
-            if(themeToggleBtn) themeToggleBtn.textContent = isDark ? '☀️' : '🌙';
+            if (themeToggleBtn) themeToggleBtn.textContent = isDark ? '☀️' : '🌙';
         };
         if (themeToggleBtn) {
             themeToggleBtn.addEventListener('click', () => {
@@ -403,5 +632,20 @@
             }
         });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            initEmailJS();  // Inicializar EmailJS
+
+            const form = document.getElementById("contacto-form");
+            if (form) {
+                form.addEventListener("submit", enviarContacto);
+            }
+        });
+
+        
+    </script>
+
 </body>
+
 </html>

@@ -311,32 +311,6 @@ function calcularDiasPasados(fechaAnteriorStr, fechaActualStr) {
 }
 
 
-// ========== ENVIAR MÉTRICAS POR CORREO ==========
-function enviarMetricasPorCorreo(perfil) {
-    if (!perfil.correo) {
-        console.warn("El usuario no tiene correo, no se envía nada.");
-        return;
-    }
-
-    const data = {
-        name: "Menteando",
-        email: "no-reply@menteando.com",
-        time: new Date(),
-        seasons: perfil.sesiones,
-        user_name: perfil.nombre,
-        user_email: perfil.correo,
-        metrics_json: JSON.stringify(perfil.detalle, null, 2),
-        memoria: (perfil.memoria * 100).toFixed(0),
-        control: (perfil.control * 100).toFixed(0),
-        atencion: (perfil.atencion * 100).toFixed(0),
-        reflejos: (perfil.reflejos * 100).toFixed(0),
-        nivel: perfil.nivel
-    };
-
-    emailjs.send("service_uzpz3sb", "template_n0n5tvp", data)
-        .then(() => console.log("Correo enviado correctamente"))
-        .catch(err => console.error("Error enviando correo:", err));
-}
 
 // ========== COACH ==========
 function isCoachDisabled() {

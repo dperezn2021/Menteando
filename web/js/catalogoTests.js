@@ -69,25 +69,31 @@ const CATALOGO_TESTS = [
         "heroEyebrow": "Flexibilidad cognitiva",
         "bloques": ["Cuatro cartas de estímulo fijas.", "Cada carta de respuesta tiene color, forma y número.", "Elige con qué carta de estímulo coincide.", "La regla cambia silenciosamente cada 10 aciertos."]
     },
+
     {
         "id": "mec",
-        "nombre": "Mini-Examen Cognoscitivo (MEC)",
+        "nombre": "Mini-Examen Cognoscitivo de Lobo",
         "categoria": "memoria",
-        "habilidades": ["memoria_trabajo", "atencion_sostenida"],
-        "duracion": "10 min",
-        "descripcion": "Evaluación breve de orientación, memoria, cálculo y lenguaje. Versión adaptada del MMSE.",
-        "resumen": "Responde preguntas de orientación, memoria, cálculo y lenguaje.",
+        "habilidades": ["memoria_trabajo", "atencion_sostenida", "planificacion", "velocidad_cognitiva", "flexibilidad_cognitiva", "control_inhibitorio"],
+        "duracion": "12 min",
+        "descripcion": "Versión digital del Mini-Examen Cognoscitivo de Lobo (30 puntos). Evalúa orientación, memoria, cálculo y lenguaje sin necesidad de elementos físicos.",
+        "resumen": "Evalúa funciones cognitivas globales mediante preguntas de orientación, memoria y lenguaje.",
         "imagen": "assets/tests/mec.jpg",
         "url": "tests/mec-page.html",
         "completado": false,
-        "heroEyebrow": "Cribado cognitivo global",
-        "bloques": ["Orientación temporal (5 ítems).", "Memoria inmediata (3 palabras).", "Cálculo (restas de 7).", "Memoria diferida (recuerdo de palabras).", "Lenguaje (nominación, repetición, orden, escritura)."]
+        "heroEyebrow": "Cribado cognitivo",
+        "bloques": [
+            "Orientación temporal y espacial.",
+            "Fijación y memoria diferida.",
+            "Cálculo.",
+            "Lenguaje: comprensión, repetición, fluencia verbal y antónimos."
+        ]
     },
     {
         "id": "tavec",
-        "nombre": "TAVEC – Test de Aprendizaje Verbal",
+        "nombre": "TAVEC – Test de Aprendizaje Verbal España-Complutense",
         "categoria": "memoria",
-        "habilidades": ["memoria_trabajo", "planificacion", "atencion_sostenida"],
+        "habilidades": ["memoria_trabajo", "planificacion", "atencion_sostenida", "flexibilidad_cognitiva"],
         "duracion": "15 min",
         "descripcion": "Aprende una lista de 16 palabras en 5 ensayos, luego lista de interferencia, recuerdo inmediato, demorado y reconocimiento.",
         "resumen": "Evalúa aprendizaje verbal, interferencia y olvido.",
@@ -100,8 +106,8 @@ const CATALOGO_TESTS = [
     {
         "id": "stroop",
         "nombre": "Stroop Test",
-        "categoria": "control",
-        "habilidades": ["control_inhibitorio", "velocidad_cognitiva", "atencion_dividida"],
+        "categoria": "atencion",
+        "habilidades": ["atencion_dividida", "control_inhibitorio", "velocidad_cognitiva"],
         "duracion": "6 min",
         "descripcion": "Di el color de la tinta, ignora el significado de la palabra. Mide control inhibitorio y resistencia a la interferencia.",
         "resumen": "Selecciona el color de la tinta, no la palabra.",
@@ -128,8 +134,8 @@ const CATALOGO_TESTS = [
     {
         "id": "tmt",
         "nombre": "Trail Making Test A/B",
-        "categoria": "control",
-        "habilidades": ["flexibilidad_cognitiva", "velocidad_cognitiva", "coordinacion_visomotora", "atencion_dividida"],
+        "categoria": "reflejos",
+        "habilidades": [ "velocidad_cognitiva", "coordinacion_visomotora", "atencion_dividida", "atencion_sostenida","control_inhibitorio", "flexibilidad_cognitiva",],
         "duracion": "6 min",
         "descripcion": "Parte A: conecta números en orden. Parte B: alterna números y letras (1-A-2-B...).",
         "resumen": "Conecta en orden ascendente o alternando números y letras.",
@@ -137,13 +143,13 @@ const CATALOGO_TESTS = [
         "url": "tests/tmt-page.html",
         "completado": false,
         "heroEyebrow": "Flexibilidad y velocidad",
-        "bloques": ["TMT-A: 1→2→3→...→8.", "TMT-B: 1→A→2→B→3→C→4→D.", "Se cronometra cada parte.", "Evalúa flexibilidad cognitiva."]
+        "bloques": ["TMT-A: 1→2→3→...→8.", "TMT-B: 1→A→2→B→3→C→4→D.", "Se cronometra cada parte.", "Evalúa flexibilidad cognitiva, velocidad, coordinación visomotora y atención dividida."]
     },
     {
         "id": "symbol-search",
         "nombre": "Symbol Search",
         "categoria": "reflejos",
-        "habilidades": ["velocidad_cognitiva", "atencion_selectiva", "coordinacion_visomotora"],
+        "habilidades": ["velocidad_cognitiva", "coordinacion_visomotora","atencion_selectiva", "atencion_sostenida"],
         "duracion": "4 min",
         "descripcion": "Decide cuál de dos opciones es igual al símbolo objetivo. Mide velocidad de procesamiento visual.",
         "resumen": "Encuentra el símbolo igual al objetivo.",
@@ -172,14 +178,14 @@ const CATALOGO_TESTS = [
         "nombre": "Go/No-Go Test",
         "categoria": "control",
         "habilidades": ["control_inhibitorio", "atencion_sostenida", "velocidad_cognitiva"],
-        "duracion": "5 min",
-        "descripcion": "Presiona ESPACIO solo al ver 'X', ignora la 'O'. Mide inhibición motora.",
-        "resumen": "Pulsa ESPACIO para 'X', no para 'O'.",
+        "duracion": "2 min",
+        "descripcion": "Pulsa cuando veas una 'X', no pulses si la letra es 'O'. Mide inhibición motora.",
+        "resumen": "Pulsa en las 'X', ignora las 'O'.",
         "imagen": "assets/tests/gonogo.jpg",
         "url": "tests/gng-page.html",
         "completado": false,
         "heroEyebrow": "Inhibición motora",
-        "bloques": ["30 estímulos (70% 'X', 30% 'O').", "Pulsa ESPACIO en 'X'.", "No pulses en 'O'.", "Se cuenta aciertos, comisiones y omisiones."]
+        "bloques": ["Pulsa en la 'X'.", "No pulses en 'O'.", "Tienes 1 segundo para responder.", "Se cuenta aciertos, comisiones y omisiones."]
     }
 ];
 

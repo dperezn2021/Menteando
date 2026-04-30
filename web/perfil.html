@@ -57,7 +57,8 @@
 <body class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased">
 
     <!-------------------------------------HEADER----------------------------------->
-    <header class="header-auto-hide w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+    <header
+        class="header-auto-hide w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
         <div class="container mx-auto px-6 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
 
             <!-- TÍTULO Y LOGO -->
@@ -594,7 +595,9 @@
 
 
     <!-- SCRIPTS DE COACH E INICIALIZACIÓN -->
+    <script src="/js/emailService.js"></script>
     <script src="/js/perfil.js"></script>
+
     <script src="/js/datosPerfil.js"></script>
     <script src="/coach/mensajesCoach.js"></script>
     <script src="/coach/cerebroCoach.js"></script>
@@ -614,14 +617,14 @@
     </script>
 
     <script>
-        // Inicializar EmailJS para envío de métricas
         document.addEventListener("DOMContentLoaded", () => {
-            emailjs.init("lUupELiv1r8lHB85U");
-            const botonEmail = document.getElementById("btn-correo");
-            if (botonEmail) {
-                botonEmail.addEventListener("click", () => {
+            initEmailJS();  // Inicializar EmailJS una sola vez
+
+            const btnCorreo = document.getElementById("btn-correo");
+            if (btnCorreo) {
+                btnCorreo.addEventListener("click", () => {
+                    const perfil = getperfil();
                     enviarMetricasPorCorreo(perfil);
-                    alert("Correo enviado (si EmailJS está configurado correctamente)");
                 });
             }
         });
