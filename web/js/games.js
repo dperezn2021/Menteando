@@ -61,7 +61,10 @@ function createLargeCard(juego) {
             <div class="flex justify-between items-center p-6 border-b border-slate-200 dark:border-slate-700 gap-4">
                 <div>
                     <p class="text-sm font-semibold uppercase tracking-[0.2em] text-blue-500 mb-2">${juego.heroEyebrow || "Destacado"}</p>
-                    <h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">${juego.nombre}</h3>
+                   <div class="flex flex-row gap-2 grow">
+                    ${juego.logo ? `<img src="${juego.logo}" alt="${juego.nombre}" class="w-10 h-10 object-cover">` : ""}
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white">${juego.nombre}</h3>
+                   </div>
                     <p class="text-slate-500 dark:text-slate-300 text-base mt-2">${juego.descripcion}</p>
                 </div>
 
@@ -93,10 +96,13 @@ function createCompactCard(juego) {
 
             <div class="p-6 flex flex-col gap-3 grow">
                 <span class="px-3 py-1 text-sm font-bold uppercase rounded-full w-fit ${getBadgeClasses(skillSlug)}">
-                    ${getSkillLabel(skillSlug)}
+                    ${getSkillLabel(skillSlug)} 
                 </span>
-
+                   <div class="flex flex-row gap-2 grow">
+                    ${juego.logo ? `<img src="${juego.logo}" alt="${juego.nombre}" class="w-10 h-10 object-cover">` : ""}
                 <h3 class="text-2xl font-bold text-slate-900 dark:text-white">${juego.nombre}</h3>
+                   </div>
+               
                 <p class="text-slate-600 dark:text-slate-300 text-base">${juego.descripcion}</p>
 
                 <a href="${juego.url}" class="mt-auto w-full py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white font-bold text-center hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors">

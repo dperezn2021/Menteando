@@ -61,7 +61,10 @@ function generarTarjeta(juego) {
                     ${skillLabel}
                 </span>
 
+                 <div class="flex flex-row gap-2 grow">
+                    ${juego.logo ? `<img src="${juego.logo}" alt="${juego.nombre}" class="w-10 h-10 object-cover">` : ""}
                 <h3 class="text-2xl font-bold text-slate-900 dark:text-white">${juego.nombre}</h3>
+                   </div>
                 <p class="text-slate-600 dark:text-slate-300 text-base">${juego.descripcion}</p>
 
                 <a href="${juego.url}" class="mt-auto w-full py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white font-bold text-center hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors">
@@ -84,40 +87,52 @@ function generarJuegoDelDia(juego) {
     const skillLabel = window.getSkillDefinition?.(juego.skills[0])?.label || juego.badge;
 
     return `
-        <div class="w-full flex flex-col md:flex-row items-center gap-8 lg:gap-12">
+        <div class="w-full flex flex-col lg:flex-row items-center gap-6 lg:gap-10 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 sm:p-10 lg:p-14 shadow-lg">
 
+            <!-- Contenido -->
+            <div class="w-full lg:flex-1 flex flex-col gap-4">
 
-            <div class="flex-1 flex flex-col justify-center gap-6">
-                <span class="px-3 py-1 bg-blue-500 text-white text-sm font-bold uppercase tracking-wider rounded-full w-fit">
-                    Recomendado hoy
-                </span>
-
-                <div>
-                    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-blue-500 mb-3">${skillLabel}</p>
-                    <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-tight">
-                        ${juego.nombre}
-                    </h1>
+                <div class="flex items-center gap-2">
+                    <span class="px-3 py-1 bg-blue-500 text-white text-xs font-bold uppercase tracking-wider rounded-full">
+                        Recomendado hoy
+                    </span>
                 </div>
 
-                <p class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed max-w-xl">
+                <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
+                    ${juego.nombre}
+                </h2>
+
+                <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
                     ${juego.descripcion}
                 </p>
 
-                <div class="flex gap-4 pt-2 flex-wrap">
-                    <a href="${juego.buildUrl}" class="px-8 py-4 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-600 transition">
+                <div class="flex flex-wrap gap-2">
+                    ${juego.skills.slice(0, 3).map(s => {
+                    const def = window.getSkillDefinition?.(s);
+                    const color = def?.accent || "slate";
+                    const label = def?.label || s;
+                    return `<span class="px-2 py-1 rounded-full text-xs bg-${color}-100 dark:bg-${color}-900/30 text-${color}-700 dark:text-${color}-300">${label}</span>`;
+                    }).join("")}
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                    <a href="${juego.url}" class="flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all">
                         Jugar ahora
                     </a>
-                    <a href="${juego.url}" class="px-8 py-4 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition">
-                        Abrir Ficha técnica
+                    <a href="about.html#seccion-comentarios" class="flex items-center justify-center px-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                        Opina sobre el juego
                     </a>
                 </div>
+
             </div>
+
             
-            <img 
-                src="${juego.imagen}" 
-                alt="${juego.nombre}"
-                class="w-full max-w-sm md:max-w-md lg:max-w-lg rounded-3xl object-cover aspect-video md:aspect-square bg-slate-200 dark:bg-slate-700"
-            >
+            <!-- Imagen -->
+            <a href="${juego.url}" class="relative w-full lg:flex-1 min-h-[200px] lg:min-h-[240px] rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-700">
+                <img src="${juego.imagen}" alt="${juego.nombre}" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
+            </a>
+
         </div>
     `;
 }
