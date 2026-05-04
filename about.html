@@ -7,7 +7,7 @@
     <meta name="description" content="Menteando - Acerca de nosotros">
     <meta name="author" content="Daniel Pérez Navarro">
     <title>Menteando | Acerca de</title>
-    <link rel="icon" href="assets/img/logo.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="assets/img/logo_1.png" type="image/png" sizes="32x32">
 
     <script>
         (() => {
@@ -49,7 +49,7 @@
         <div
             class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3 flex-shrink-0">
-                <img src="../assets/img/logo2.png" alt="Logo" class="w-10 h-10 md:w-12 md:h-12" />
+                <img src="../assets/img/logo_1.png" alt="Logo" class="w-10 h-10 md:w-12 md:h-12" />
                 <div class="flex flex-col leading-tight text-left">
                     <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Menteando</h1>
                     <p class="text-xs md:text-sm font-normal text-slate-500 dark:text-slate-300">Entrena tu mente, pero
@@ -65,7 +65,7 @@
                 <a href="games.html"
                     class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Juegos</a>
                 <a href="about.html"
-                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Acerca
+                    class="text-lg md:text-2xl font-bold text-blue-500 hover:text-blue-700 transition-colors px-2">Acerca
                     De</a>
             </nav>
 
@@ -206,7 +206,7 @@
                         class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
                         <div class="flex items-center gap-4 mb-4">
                             <img class="w-10 h-10" src="assets/icon/atencion.png" alt="">
-                            <h3 class="text-2xl font-bold text-blue-600">Atención</h3>
+                            <h3 class="text-2xl font-bold text-fuchsia-600">Atención</h3>
                         </div>
                         <p class="text-slate-700 dark:text-slate-300 mb-6 text-base">La base de casi todo: mantener el
                             foco, ignorar distracciones y gestionar varias tareas.</p>
@@ -560,40 +560,52 @@
         </section>
     </main>
 
+    <!------------------------------- FOOTER ------------------------>
     <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <div class="max-w-screen-xl mx-auto px-6 pt-8">
             <div class="flex flex-col md:flex-row items-center md:items-start justify-center gap-12 mb-6">
+
+                <!-- 3 columnas: logo+descripción, enlaces, legal-->
                 <div class="w-full md:w-96 text-center md:text-left">
-                    <div
-                        class="flex flex-col md:flex-row items-center md:items-start gap-3 mb-6 justify-center md:justify-start">
-                        <img src="../assets/img/logo2.png" alt="Logo" class="w-12 h-12 md:w-16 md:h-16" />
-                        <h3 class="text-2xl md:text-3xl font-black text-blue-500">Menteando</h3>
+                    <div class="flex items-center gap-3 flex-shrink-0">
+                        <img src="../assets/img/logo_1.png" alt="Logo Menteando" class="w-10 h-10 md:w-12 md:h-12" />
+                        <div class="flex flex-col leadig-ntight text-left">
+                            <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
+                                Menteando
+                            </h1>
+                        </div>
                     </div>
-                    <p class="text-sm md:text-base font-normal text-slate-500 dark:text-slate-400">Dedicados a mejorar
-                        la calidad de vida.</p>
+
+                    <p class="text-sm md:text-base font-normal text-slate-500 dark:text-slate-400 pt-4">Dedicados a
+                        mejorar
+                        la calidad
+                        de vida de las personas mayores a través de la tecnología y la ciencia cognitiva.</p>
                 </div>
                 <div class="w-full md:w-64 text-center md:text-left">
                     <h4 class="font-bold text-slate-900 dark:text-white mb-6">Enlaces de interés</h4>
                     <ul class="space-y-4 text-slate-500 dark:text-slate-400">
                         <li><a href="index.html" class="hover:text-blue-500 transition-colors">Inicio</a></li>
-                        <li><a href="games.html" class="hover:text-blue-500 transition-colors">Juegos</a></li>
-                        <li><a href="tests.html" class="hover:text-blue-500 transition-colors">Tests</a></li>
+                        <li><a href="games.html" class="hover:text-blue-500 transition-colors">Entrenamiento</a></li>
+                        <li><a href="https://github.com/dperezn2021/Menteando" target="_blank"
+                                class="hover:text-blue-500 transition-colors">GitHub del proyecto</a></li>
                     </ul>
                 </div>
                 <div class="w-full md:w-64 text-center md:text-left">
                     <h4 class="font-bold text-slate-900 dark:text-white mb-6">Más información</h4>
                     <ul class="space-y-4 text-slate-500 dark:text-slate-400">
                         <li><a href="about.html" class="hover:text-blue-500 transition-colors">Acerca de</a></li>
-                        <li><a href="#contacto" class="hover:text-blue-500 transition-colors">Contacto</a></li>
-                        <li><a href="#" class="hover:text-blue-500 transition-colors">GitHub</a></li>
+                        <li><a href="about.html#contacto" class="hover:text-blue-500 transition-colors">Contacto</a>
+                        </li>
                     </ul>
                 </div>
             </div>
+
             <div class="pt-16 border-t border-slate-100 dark:border-slate-800 text-center">
                 <p class="text-sm font-normal text-slate-400">© 2026 Menteando. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
+
 
     <script src="/js/perfil.js"></script>
     <script src="/js/emailService.js"></script>
@@ -643,7 +655,7 @@
             }
         });
 
-        
+
     </script>
 
 </body>

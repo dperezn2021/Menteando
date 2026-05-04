@@ -175,8 +175,8 @@
     }
 
     // Llamar a la función con la racha actual
-    const rachaActual = perfil.racha || 0;
-    mostrarRachaConColor(rachaActual);
+    const rachaMaxima = perfil.rachaMaxima || 0;
+    mostrarRachaConColor(rachaMaxima);
 
     const contenedor = document.getElementById("perfil-detallado");
     if (contenedor) {
@@ -406,7 +406,7 @@
             }
 
             // Actualizar la UI de la racha después de cerrar
-            mostrarRachaConColor(perfilActual.racha || 0);
+            mostrarRachaConColor(perfilActual.rachaMaxima || 0);
 
             // Actualizar medallas por si acaso
             if (typeof actualizarLogrosYMedallas === 'function') {

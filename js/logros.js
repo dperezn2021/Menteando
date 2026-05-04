@@ -1,6 +1,13 @@
+const ICONOS = {
+    reflejos: "⚡",
+    atencion: "👁️",
+    memoria: "🧠",
+    control: "🛡️",
+    racha: "🔥",
+    sesiones: "🏆"
+};
 
-
-// Definición de medallas (pueden ser las mismas que los logros)
+// Definición de medallas
 const MEDALLAS = [
     {
         id: "reflejos_75",
@@ -8,9 +15,8 @@ const MEDALLAS = [
         descripcion: "Consigue más de un 75% en Reflejos",
         categoria: "reflejos",
         color: "red",
-        icono: "../assets/icon/medallas/reflejos_75.webp",
+        icono: ICONOS.reflejos,
         completa: false,
-
         condicion: (perfil) => {
             const actual = Math.round(perfil.reflejos * 100);
             const objetivo = 75;
@@ -23,10 +29,8 @@ const MEDALLAS = [
         descripcion: "Alcanza un 80% en Atención",
         categoria: "atencion",
         color: "blue",
-        icono: "../assets/icon/medallas/reflejos_75.webp",
-
+        icono: ICONOS.atencion,
         completa: false,
-
         condicion: (perfil) => {
             const actual = Math.round(perfil.atencion * 100);
             const objetivo = 80;
@@ -39,10 +43,8 @@ const MEDALLAS = [
         descripcion: "Supera el 70% en Memoria",
         categoria: "memoria",
         color: "green",
-        icono: "../assets/icon/medallas/reflejos_75.webp",
-
+        icono: ICONOS.memoria,
         completa: false,
-
         condicion: (perfil) => {
             const actual = Math.round(perfil.memoria * 100);
             const objetivo = 70;
@@ -55,10 +57,8 @@ const MEDALLAS = [
         descripcion: "Logra un 75% en Control inhibitorio",
         categoria: "control",
         color: "amber",
-        icono: "../assets/icon/medallas/reflejos_75.webp",
-
+        icono: ICONOS.control,
         completa: false,
-
         condicion: (perfil) => {
             const actual = Math.round(perfil.control * 100);
             const objetivo = 75;
@@ -71,10 +71,8 @@ const MEDALLAS = [
         descripcion: "Mantén una racha de 7 días jugando",
         categoria: "racha",
         color: "purple",
-        icono: "../assets/icon/medallas/reflejos_75.webp",
-
+        icono: ICONOS.racha,
         completa: false,
-
         condicion: (perfil) => {
             const actual = perfil.racha || 0;
             const objetivo = 7;
@@ -87,8 +85,7 @@ const MEDALLAS = [
         descripcion: "Completa 20 sesiones de juego",
         categoria: "sesiones",
         color: "cyan",
-        icono: "../assets/icon/medallas/reflejos_75.webp",
-
+        icono: ICONOS.sesiones,
         completa: false,
         condicion: (perfil) => {
             const actual = perfil.sesiones || 0;
@@ -222,13 +219,11 @@ function renderizarMedallas() {
     const completadas = medallas.filter(m => m.completada);
     const total = medallas.length;
 
-    // Actualizar contador
     const contadorSpan = document.getElementById("medallas-contador");
     if (contadorSpan) {
         contadorSpan.textContent = `${completadas.length}/${total}`;
     }
 
-    // Generar HTML de medallas (mostrar todas, completadas con color, no completadas grises)
     contenedor.innerHTML = medallas.map(medalla => {
         const completada = medalla.completada;
         const colorMap = {
@@ -240,18 +235,15 @@ function renderizarMedallas() {
             cyan: "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20"
         };
         const colorClase = completada ? colorMap[medalla.color] : "border-zinc-300 bg-stone-100 dark:border-zinc-600 dark:bg-stone-800";
-        const iconoClase = completada ? `<img class="" src="${medalla.icono}"></img>` : `<div class=" w-8 h-8 rounded-full bg-zinc-400 dark:bg-zinc-600">
-        </div>`;
 
         return `
-        <div class=" flex flex-col items-center justify-center w-24 gap-2 text-center">
-            <div class="w-16 h-16  ${colorClase} rounded-full border-4 flex items-center justify-center transition-all duration-200 ${completada ? `shadow-md` : `opacity-50`}" title="${completada ? `${medalla.nombre} (${medalla.actual}/${medalla.objetivo})` : `Bloqueada`}">
-                <div class="rounded-full">${iconoClase}</div>
+            <div class="flex flex-col items-center justify-center w-24 gap-2 text-center">
+                <div class="w-16 h-16 ${colorClase} rounded-full border-4 flex items-center justify-center transition-all duration-200 ${completada ? 'shadow-md' : 'opacity-50'}">
+                    <div class="text-3xl ${completada ? 'shadow-md' : 'opacity-0'}">${medalla.icono}</div>
+                </div>
+                <p class="text-xs font-semibold uppercase text-center tracking-wide text-${medalla.color}-500 dark:text-${medalla.color}-600">${medalla.nombre}</p>
             </div>
-            
-            <p class="text-xs font-semibold uppercase test-center tracking-wide text-${medalla.color}-500 dark:text-${medalla.color}-600">${medalla.nombre}</p>
-        </div>`;
-
+        `;
     }).join("");
 }
 

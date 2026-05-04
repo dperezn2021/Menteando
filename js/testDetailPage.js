@@ -566,10 +566,9 @@ function initD2Logic(testId, callback) {
 
     let lineaActual = 0;
     const totalLineas = 5;
-    const tiempoPorLinea = 10000;  // 20 segundos por línea
-    const itemsPorLinea = 30;      // 30 estímulos por línea
+    const tiempoPorLinea = 10000;
+    const itemsPorLinea = 30;
 
-    // Añadir al inicio de la función
     let aciertosPorLinea = [];
     let erroresComisionPorLinea = [];
     let erroresOmisionPorLinea = [];
@@ -579,29 +578,11 @@ function initD2Logic(testId, callback) {
     let inicioTest = 0;
 
     function formatearConComillas(letra, rayas) {
-        // Generar todas las combinaciones posibles según el número de rayas
         const combinaciones = {
-            1: [
-                { arriba: 0, abajo: 1 }
-            ],
-            2: [
-                { arriba: 2, abajo: 0 },
-                { arriba: 0, abajo: 2 },
-                { arriba: 1, abajo: 1 }
-            ],
-            3: [
-                { arriba: 3, abajo: 0 },
-                { arriba: 0, abajo: 3 },
-                { arriba: 2, abajo: 1 },
-                { arriba: 1, abajo: 2 }
-            ],
-            4: [
-                { arriba: 4, abajo: 0 },
-                { arriba: 0, abajo: 4 },
-                { arriba: 3, abajo: 1 },
-                { arriba: 1, abajo: 3 },
-                { arriba: 2, abajo: 2 }
-            ]
+            1: [{ arriba: 0, abajo: 1 }],
+            2: [{ arriba: 2, abajo: 0 }, { arriba: 0, abajo: 2 }, { arriba: 1, abajo: 1 }],
+            3: [{ arriba: 3, abajo: 0 }, { arriba: 0, abajo: 3 }, { arriba: 2, abajo: 1 }, { arriba: 1, abajo: 2 }],
+            4: [{ arriba: 4, abajo: 0 }, { arriba: 0, abajo: 4 }, { arriba: 3, abajo: 1 }, { arriba: 1, abajo: 3 }, { arriba: 2, abajo: 2 }]
         };
 
         const opciones = combinaciones[rayas] || combinaciones[2];
@@ -609,18 +590,17 @@ function initD2Logic(testId, callback) {
 
         const comillasArriba = "'".repeat(seleccion.arriba);
         const comillasAbajo = "'".repeat(seleccion.abajo);
-
-        // Para mantener altura constante (evita desplazamiento al hacer hover)
         const alturaArriba = seleccion.arriba === 0 ? 'invisible' : '';
 
         return `
-        <div class="d2-estimulo flex flex-col items-center justify-center min-w-[48px]">
-            <div class="rayas-arriba text-lg leading-none h-6 ${alturaArriba}">${comillasArriba || "'"}</div>
-            <div class="letra text-xl font-bold">${letra}</div>
-            <div class="rayas-abajo text-lg leading-none mt-1">${comillasAbajo}</div>
-        </div>
-    `;
+            <div class="d2-estimulo flex flex-col items-center justify-center min-w-[48px]">
+                <div class="rayas-arriba text-lg leading-none h-6 ${alturaArriba} text-slate-600 dark:text-slate-400">${comillasArriba || "'"}</div>
+                <div class="letra text-xl font-bold text-slate-900 dark:text-white">${letra}</div>
+                <div class="rayas-abajo text-lg leading-none mt-1 text-slate-600 dark:text-slate-400">${comillasAbajo}</div>
+            </div>
+        `;
     }
+
     function generarLinea() {
         const linea = [];
         for (let i = 0; i < itemsPorLinea; i++) {
@@ -638,7 +618,7 @@ function initD2Logic(testId, callback) {
                     <div data-idx="${idx}" 
                          data-letra="${stim.letra}" 
                          data-rayas="${stim.rayas}"
-                         class="estimulo cursor-pointer rounded-lg transition-all duration-150 p-2 flex justify-center items-center ">
+                         class="estimulo cursor-pointer rounded-lg transition-all duration-150 p-2 flex justify-center items-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700">
                         ${formatearConComillas(stim.letra, stim.rayas)}
                     </div>
                 `).join('')}
@@ -646,7 +626,6 @@ function initD2Logic(testId, callback) {
         `);
     }
 
-    // En procesarLinea, guardar métricas de esa línea
     function procesarLinea(linea, marcados, lineaIndex) {
         let aciertosLinea = 0, comisionesLinea = 0, omisionesLinea = 0;
 
@@ -673,7 +652,7 @@ function initD2Logic(testId, callback) {
 
     function iniciarLinea() {
         if (lineaActual >= totalLineas) return finalizarTest();
-        if (status) status.textContent = `Línea ${lineaActual + 1}/${totalLineas} · Haz clic en las 'd' con DOS comillas (una arriba y una abajo)`;
+        if (status) status.textContent = `Línea ${lineaActual + 1}/${totalLineas} · Haz clic en las 'd' con DOS comillas`;
 
         const linea = generarLinea();
         renderLinea(linea);
@@ -685,10 +664,12 @@ function initD2Logic(testId, callback) {
             const idx = parseInt(div.dataset.idx);
             if (marcados.includes(idx)) {
                 marcados = marcados.filter(i => i !== idx);
-                div.classList.remove('bg-blue-600');
+                div.classList.remove('bg-blue-500', 'dark:bg-blue-600');
+                div.classList.add('bg-slate-100', 'dark:bg-slate-800');
             } else {
                 marcados.push(idx);
-                div.classList.add('bg-blue-600');
+                div.classList.remove('bg-slate-100', 'dark:bg-slate-800');
+                div.classList.add('bg-blue-500', 'dark:bg-blue-600');
             }
         };
 
@@ -705,26 +686,15 @@ function initD2Logic(testId, callback) {
         clearTimeout(timer);
         container.onclick = null;
 
-        // Calcular precisión selectiva (capacidad de discriminar objetivos)
         const precisionSelectiva = aciertos / (aciertos + erroresComision) || 0;
-
-        // Calcular atención sostenida (caída de rendimiento entre líneas)
-        // Necesitaríamos registrar aciertos/errores por línea para calcular la tendencia
-        // Por ahora, usamos una aproximación con omisiones
         const tasaOmisiones = erroresOmision / (aciertos + erroresOmision) || 0;
 
         const habilidades = [];
 
-        // Atención selectiva: baja precisión para discriminar
         if (precisionSelectiva < 0.7) habilidades.push("atencion_selectiva");
-
-        // Atención sostenida: muchas omisiones (no marcó objetivos)
         if (tasaOmisiones > 0.3) habilidades.push("atencion_sostenida");
-
-        // Control inhibitorio: muchas comisiones (marcó distractores)
         if (erroresComision > 8) habilidades.push("control_inhibitorio");
 
-        // Calcular caída de atención sostenida (diferencia entre primeras y últimas líneas)
         const primerasLineas = aciertosPorLinea.slice(0, 2).reduce((a, b) => a + b, 0) / 2;
         const ultimasLineas = aciertosPorLinea.slice(-2).reduce((a, b) => a + b, 0) / 2;
         const caidaRendimiento = Math.max(0, primerasLineas - ultimasLineas);
@@ -746,6 +716,7 @@ function initD2Logic(testId, callback) {
         startBtn.classList.remove("hidden");
         if (status) status.textContent = "";
     }
+
     startBtn.onclick = () => {
         startBtn.classList.add("hidden");
         lineaActual = 0;
@@ -757,6 +728,7 @@ function initD2Logic(testId, callback) {
         iniciarLinea();
     };
 }
+
 // ======================================================
 // 3. CPT (responsivo)
 // ======================================================

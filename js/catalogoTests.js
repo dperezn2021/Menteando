@@ -135,7 +135,7 @@ const CATALOGO_TESTS = [
         "id": "tmt",
         "nombre": "Trail Making Test A/B",
         "categoria": "reflejos",
-        "habilidades": [ "velocidad_cognitiva", "coordinacion_visomotora", "atencion_dividida", "atencion_sostenida","control_inhibitorio", "flexibilidad_cognitiva",],
+        "habilidades": ["velocidad_cognitiva", "coordinacion_visomotora", "atencion_dividida", "atencion_sostenida", "control_inhibitorio", "flexibilidad_cognitiva",],
         "duracion": "6 min",
         "descripcion": "Parte A: conecta números en orden. Parte B: alterna números y letras (1-A-2-B...).",
         "resumen": "Conecta en orden ascendente o alternando números y letras.",
@@ -149,7 +149,7 @@ const CATALOGO_TESTS = [
         "id": "symbol-search",
         "nombre": "Symbol Search",
         "categoria": "reflejos",
-        "habilidades": ["velocidad_cognitiva", "coordinacion_visomotora","atencion_selectiva", "atencion_sostenida"],
+        "habilidades": ["velocidad_cognitiva", "coordinacion_visomotora", "atencion_selectiva", "atencion_sostenida"],
         "duracion": "4 min",
         "descripcion": "Decide cuál de dos opciones es igual al símbolo objetivo. Mide velocidad de procesamiento visual.",
         "resumen": "Encuentra el símbolo igual al objetivo.",
@@ -201,13 +201,15 @@ function normalizeTestKey(value) {
 
 function getCatalogoTests() {
     const perfil = window.getperfil();
+    // Asegurar que testsCompletados existe
     const testsCompletados = perfil?.testsCompletados || {};
+
     return CATALOGO_TESTS.map(test => ({
         ...test,
+        // Solo marcar como completado si está explícitamente en testsCompletados
         completado: testsCompletados[test.id] === true
     }));
 }
-
 function getTestById(testId) {
     const normalizedId = normalizeTestKey(testId);
 
