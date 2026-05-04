@@ -170,11 +170,9 @@ function getTiempo(perfil) {
 
 // ========== ACTUALIZAR RACHA POR SESIÓN COMPLETADA ==========
 function actualizarRachaPorSesionCompletada(perfil) {
-    // Fecha actual (la sesión que acabamos de jugar)
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
     
-    // Obtener la última fecha que jugó del localStorage
     const ultimoDiaJugadoStr = localStorage.getItem("ultimo_dia_jugado");
     
     let nuevaRacha = 1;
@@ -185,31 +183,28 @@ function actualizarRachaPorSesionCompletada(perfil) {
         
         const diferenciaDias = Math.floor((hoy - ultimoDia) / 86400000);
         
+        console.log(`📅 Diferencia de días: ${diferenciaDias} | Último día: ${ultimoDia.toLocaleDateString()} | Hoy: ${hoy.toLocaleDateString()}`);
+        
         if (diferenciaDias === 0) {
-            // Mismo día → no cambia la racha
             nuevaRacha = perfil.racha || 1;
         } else if (diferenciaDias === 1) {
-            // Día consecutivo → aumenta
             nuevaRacha = (perfil.racha || 0) + 1;
         } else {
-            // Pasó más de un día → se reinicia
             nuevaRacha = 1;
         }
     }
     
-    // Actualizar racha en el perfil
     perfil.racha = nuevaRacha;
     
-    // Verificar si es nueva racha máxima
     if (nuevaRacha > (perfil.rachaMaxima || 0)) {
         perfil.rachaMaxima = nuevaRacha;
         perfil.nuevaRachaMaxima = true;
     }
     
-    // Guardar el día actual en localStorage
+    // Guardar el día actual
     localStorage.setItem("ultimo_dia_jugado", hoy.toISOString());
     
-    console.log(`🔥 Racha: ${nuevaRacha} días | Máxima: ${perfil.rachaMaxima}`);
+    console.log(`🔥 Racha actualizada: ${nuevaRacha} días | Máxima: ${perfil.rachaMaxima}`);
     
     return perfil;
 }
@@ -433,5 +428,5 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    
+
 });

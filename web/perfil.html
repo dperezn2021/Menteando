@@ -691,29 +691,6 @@
             // Hacer el coach accesible globalmente para otros scripts
             window.coachController = coachController;
 
-            // ===== SUBCONTEXTO: EDITAR PERFIL =====
-            const btnEditar = document.getElementById("btn-editar");
-            if (btnEditar) {
-                btnEditar.addEventListener("mouseenter", () => {
-                    coachController.onPantallaPerfil("editar");
-                });
-            }
-
-            // ===== SUBCONTEXTO: COACH (activar/desactivar) =====
-            const btnToggleCoach = document.getElementById("btn-toggle-coach");
-            if (btnToggleCoach) {
-                btnToggleCoach.addEventListener("mouseenter", () => {
-                    coachController.onPantallaPerfil("coach");
-                });
-            }
-
-            // ===== SUBCONTEXTO: MEDALLAS (al pasar ratón) =====
-            const medallasContainer = document.getElementById("medallas-container");
-            if (medallasContainer) {
-                medallasContainer.addEventListener("mouseenter", () => {
-                    coachController.onPantallaPerfil("medallas");
-                });
-            }
         });
     </script>
 
