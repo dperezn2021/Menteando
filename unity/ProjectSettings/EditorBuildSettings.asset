@@ -11,10 +11,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Juegos/SilencioMental/Scenes/SilencioMental_SampleScene.unity
     guid: 47222f1f64a49214c926270f2cb6e1f1
-  - enabled: 0
+  - enabled: 1
     path: Assets/Framework/Juegos/OperacionesEncadenadas/OperacionesEncadenadas_SampleScene.unity
     guid: 304a8c822b7834947a903f874e717638
-  - enabled: 1
+  - enabled: 0
     path: Assets/Framework/Juegos/DetectorDeIntrusos/DetectorDeIntrusos_SampleScene.unity
     guid: 870f46d583ee90b4581b22df28d8a2a3
   - enabled: 0
