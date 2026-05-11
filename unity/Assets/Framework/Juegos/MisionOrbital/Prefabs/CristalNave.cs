@@ -208,12 +208,25 @@ public class CristalNave : MonoBehaviour
         textoRect.offsetMin = Vector2.zero;
         textoRect.offsetMax = Vector2.zero;
 
+        // Primero, mueve el archivo a: Assets/Resources/space age SDF.asset
+
         TextMeshProUGUI texto = textoObj.AddComponent<TextMeshProUGUI>();
-        texto.text = "DISPARAR";
+        texto.text = "disparar";
         texto.fontSize = 18;
         texto.color = Color.white;
         texto.alignment = TextAlignmentOptions.Center;
         texto.raycastTarget = false;
+
+        TMP_FontAsset fuente = Resources.Load<TMP_FontAsset>("space age SDF");
+        if (fuente != null)
+        {
+            texto.font = fuente;
+            Debug.Log("✅ Fuente cargada correctamente: " + fuente.name);
+        }
+        else
+        {
+            Debug.LogError("❌ No se encontró la fuente 'space age SDF' en la carpeta Resources");
+        }
     }
 
     void DispararMisionOrbital()

@@ -8,24 +8,16 @@ public class UIDetectorIntrusos : MonoBehaviour
     [Header("Referencias al Juego")]
     public DetectorDeIntrusosGame juego;
     public GridLayoutGroup gridLayout;
-    public ResponsiveGridController responsiveGrid;
     public LupaFlotante lupaScript;
 
     [Header("Textos UI")]
-    public TextMeshProUGUI textoTiempoRonda;
+    public TextMeshProUGUI textoTiempoPartida;    // Tiempo total de partida (GameManager)
     public TextMeshProUGUI textoAciertos;
     public TextMeshProUGUI textoNivel;
-    public TextMeshProUGUI textoFeedback;
     public TextMeshProUGUI textoTotalCasos;
 
-    [Header("Barra de tiempo")]
-    public Image barraTiempo;
-
-
-    [Header("Efectos Lupa")]
-    public float lupaVelocidadMovimiento = 0.5f;
-    public float lupaRadioMovimiento = 150f;
-    public float lupaVelocidadRotacion = 0.5f;
+    [Header("Barras de tiempo")]
+    public Image barraTiempoRonda;       // Barra del tiempo de ronda
 
     [Header("Colores")]
     public Color colorIntruso = new Color(0.96f, 0.77f, 0.26f, 1f);
@@ -38,14 +30,8 @@ public class UIDetectorIntrusos : MonoBehaviour
     public float altoCelda = 100f;
     public float espaciado = 15f;
 
-    // Posiciones fijas para los elementos decorativos
-    private Vector2 posicionFijaClip;
-    private Vector2 posicionFijaChincheta;
-    private bool posicionesInicializadas = false;
-
     private Coroutine lupaCoroutine;
-    private Vector3 lupaPosicionInicial;
-    private float anguloLupa = 0;
+    private float tiempoPartidaTotal = 60f; // Duración total de la partida (se actualiza desde GameManager)
 
     private void Start()
     {
@@ -56,46 +42,50 @@ public class UIDetectorIntrusos : MonoBehaviour
         {
             juego.OnTiempoRondaActualizado += ActualizarTiempoRonda;
             juego.OnPuntuacionActualizada += ActualizarPuntuacion;
-            juego.OnNivelActualizado += ActualizarNivel;  // 🔥 Suscribirse
-            juego.OnFeedback += MostrarFeedback;
-            juego.OnRondaTerminada += LimpiarFeedback;
+            juego.OnNivelActualizado += ActualizarNivel;
             juego.OnGridSizeChanged += ActualizarGridSize;
         }
 
-        // 🔥 Buscar la lupa si no está asignada
         if (lupaScript == null)
             lupaScript = FindAnyObjectByType<LupaFlotante>();
 
         ConfigurarGridLayout();
+
+        // Obtener duración total de la partida desde GameManager
+        if (GameManager.Instance != null)
+            tiempoPartidaTotal = GameManager.Instance.duracionPartida;
     }
 
+    private void Update()
+    {
+        // Actualizar tiempo total de partida
+        if (GameManager.Instance != null && textoTiempoPartida != null)
+        {
+            float tiempoRestante = GameManager.Instance.tiempoRestante;
+            int segundos = Mathf.Max(0, Mathf.CeilToInt(tiempoRestante));
+            textoTiempoPartida.text = $"{segundos / 60:00}:{segundos % 60:00}";
 
+        
+        }
+    }
 
     private void ConfigurarGridLayout()
     {
         if (gridLayout == null) return;
 
-        if (responsiveGrid == null)
-            responsiveGrid = gridLayout.GetComponent<ResponsiveGridController>();
+        // Calcular tamaño de celda según pantalla
+        float anchoPantalla = ((RectTransform)gridLayout.transform).rect.width;
+        float nuevoAnchoCelda = Mathf.Clamp(anchoPantalla / 6f, 70f, 120f);
 
-        if (responsiveGrid == null)
-            responsiveGrid = gridLayout.gameObject.AddComponent<ResponsiveGridController>();
-
-        responsiveGrid.grid = gridLayout;
-        responsiveGrid.minCellSize = Mathf.Min(anchoCelda, altoCelda) * 0.55f;
-        responsiveGrid.maxCellSize = Mathf.Max(anchoCelda, altoCelda);
-        responsiveGrid.minSpacing = Mathf.Max(4f, espaciado * 0.4f);
-        responsiveGrid.maxSpacing = espaciado;
-        responsiveGrid.Apply(3, 4);
+        gridLayout.cellSize = new Vector2(nuevoAnchoCelda, nuevoAnchoCelda);
+        gridLayout.spacing = new Vector2(espaciado, espaciado);
+        gridLayout.startAxis = GridLayoutGroup.Axis.Horizontal;
+        gridLayout.childAlignment = TextAnchor.MiddleCenter;
     }
 
     private void ActualizarGridSize(int filas, int columnas)
     {
-        if (responsiveGrid != null)
-        {
-            responsiveGrid.Apply(filas, columnas);
-        }
-        else if (gridLayout != null)
+        if (gridLayout != null)
         {
             gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             gridLayout.constraintCount = columnas;
@@ -104,13 +94,12 @@ public class UIDetectorIntrusos : MonoBehaviour
 
     private void ActualizarTiempoRonda(float tiempo)
     {
-        if (textoTiempoRonda != null)
-            textoTiempoRonda.text = $"{tiempo:F1}s";
+       
 
-        if (barraTiempo != null && juego != null)
+        if (barraTiempoRonda != null && juego != null)
         {
-            barraTiempo.fillAmount = tiempo / juego.tiempoPorEnsayo;
-            barraTiempo.color = tiempo < 0.5f ? colorFeedbackError : colorIntruso;
+            barraTiempoRonda.fillAmount = tiempo / juego.tiempoPorEnsayo;
+            barraTiempoRonda.color = tiempo < 0.5f ? colorFeedbackError : colorIntruso;
         }
     }
 
@@ -132,32 +121,8 @@ public class UIDetectorIntrusos : MonoBehaviour
             lupaScript.ActualizarParametrosPorNivel(nivel);
     }
 
-    private void MostrarFeedback(bool acierto)
-    {
-        string mensaje = acierto ? "CORRECTO!" : "ERROR!";
 
-        if (textoFeedback != null)
-        {
-            textoFeedback.text = mensaje;
-            textoFeedback.fontSize = 40;
-            textoFeedback.alignment = TextAlignmentOptions.Center;
 
-            if (acierto)
-                textoFeedback.color = Color.green;
-            else
-                textoFeedback.color = Color.red;
-
-            Invoke("LimpiarFeedback", 0.5f);
-        }
-    }
-
-    private void LimpiarFeedback()
-    {
-        if (textoFeedback != null)
-        {
-            textoFeedback.text = "";
-        }
-    }
 
     private void OnDestroy()
     {
@@ -166,8 +131,6 @@ public class UIDetectorIntrusos : MonoBehaviour
             juego.OnTiempoRondaActualizado -= ActualizarTiempoRonda;
             juego.OnPuntuacionActualizada -= ActualizarPuntuacion;
             juego.OnNivelActualizado -= ActualizarNivel;
-            juego.OnFeedback -= MostrarFeedback;
-            juego.OnRondaTerminada -= LimpiarFeedback;
             juego.OnGridSizeChanged -= ActualizarGridSize;
         }
 

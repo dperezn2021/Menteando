@@ -19,8 +19,8 @@ public class DetectorDeIntrusosGame : BaseGame
     public AnimationCurve curvaTiempo;
 
     [Header("Tamaño de celdas UI")]
-    public float celdaAncho = 90f;
-    public float celdaAlto = 90f;
+    public float celdaAncho = 150f;
+    public float celdaAlto = 150f;
 
     private bool juegoTerminado = false;
     private int filas;
@@ -49,6 +49,7 @@ public class DetectorDeIntrusosGame : BaseGame
     public System.Action<bool> OnFeedback;
     public System.Action OnRondaTerminada;
     public System.Action<int, int> OnGridSizeChanged;
+
     private void Awake()
     {
         nombre = "detector-intrusos";
@@ -131,6 +132,8 @@ public class DetectorDeIntrusosGame : BaseGame
         tiempoInicio = Time.time;
         tiempoRondaRestante = tiempoPorEnsayo;
 
+        Debug.Log($"🔄 RONDA {totalIntentos} - Nivel {nivel} - Tiempo: {tiempoPorEnsayo}s");
+
         temporizadorCoroutine = StartCoroutine(TemporizadorEnsayo());
     }
 
@@ -153,6 +156,17 @@ public class DetectorDeIntrusosGame : BaseGame
         intrusoIndex = Random.Range(0, total);
         celdas = new GameObject[total];
 
+        if (gridContainer != null)
+        {
+            GridLayoutGroup grid = gridContainer.GetComponent<GridLayoutGroup>();
+            if (grid != null)
+            {
+                grid.cellSize = new Vector2(celdaAncho, celdaAlto);
+                grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+                grid.constraintCount = columnas;
+            }
+        }
+
         for (int i = 0; i < total; i++)
         {
             GameObject icono = Instantiate(prefabIcono, gridContainer);
@@ -161,32 +175,43 @@ public class DetectorDeIntrusosGame : BaseGame
 
             bool esIntruso = (i == intrusoIndex);
 
-            CeldaData data = icono.GetComponent<CeldaData>();
-            if (data == null)
-                data = icono.AddComponent<CeldaData>();
+            Image img = icono.GetComponent<Image>();
+            Button btn = icono.GetComponent<Button>();
 
-            data.esIntruso = esIntruso;
-            data.indice = i;
-
-            CeldaUI celdaUI = icono.GetComponent<CeldaUI>();
-            if (celdaUI != null)
+            if (img == null)
             {
-                celdaUI.Configurar(() => ClickCelda(data.indice));
-
-                if (esIntruso && spriteIntruso != null)
-                    celdaUI.SetSprite(spriteIntruso);
-                else if (spriteNormal != null)
-                    celdaUI.SetSprite(spriteNormal);
+                Debug.LogError($"❌ Celda {i} no tiene Image component");
+                continue;
             }
+
+            if (btn == null)
+            {
+                Debug.LogError($"❌ Celda {i} no tiene Button component");
+                continue;
+            }
+
+            if (esIntruso && spriteIntruso != null)
+                img.sprite = spriteIntruso;
+            else if (spriteNormal != null)
+                img.sprite = spriteNormal;
+
+            img.color = Color.white;
+
+            int indiceCapturado = i;
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() => ClickCelda(indiceCapturado));
         }
+
+        Debug.Log($"🎯 Grid {filas}x{columnas} - Intruso en celda {intrusoIndex}");
     }
 
     private void ClickCelda(int indice)
     {
+        Debug.Log($"🖱️ CLICK en celda {indice} - RondaActiva: {rondaActiva} | JuegoTerminado: {juegoTerminado} | Pausado: {juegoPausado}");
+
         if (!rondaActiva || juegoTerminado || juegoPausado) return;
 
         rondaActiva = false;
-        Debug.Log($"🎯 ClickCelda - juegoPausado: {juegoPausado}");
 
         if (temporizadorCoroutine != null)
             StopCoroutine(temporizadorCoroutine);
@@ -207,6 +232,7 @@ public class DetectorDeIntrusosGame : BaseGame
             float rendimiento = Mathf.Clamp01(1f - (rt / tiempoPorEnsayo));
             DifficultyManager.Instance?.ActualizarDificultad(rendimiento, true, rt);
             AudioManager.Instance.Acierto();
+            Debug.Log($"✅ ACIERTO! Tiempo: {rt:F2}s | Aciertos: {aciertos}");
         }
         else
         {
@@ -214,6 +240,7 @@ public class DetectorDeIntrusosGame : BaseGame
             OnFeedback?.Invoke(false);
             DifficultyManager.Instance?.ActualizarDificultad(0f, false, rt);
             AudioManager.Instance.Error();
+            Debug.Log($"❌ ERROR! Clic en distractor | Errores: {errores}");
         }
 
         OnPuntuacionActualizada?.Invoke(aciertos, totalIntentos);
@@ -247,6 +274,8 @@ public class DetectorDeIntrusosGame : BaseGame
             OnFeedback?.Invoke(false);
             DifficultyManager.Instance?.ActualizarDificultad(0f, false, rtPenalizacion);
 
+            Debug.Log($"⏰ OMISIÓN! No se pulsó a tiempo | Omisiones: {omisiones}");
+
             yield return new WaitForSeconds(0.5f);
             OnRondaTerminada?.Invoke();
             GenerarEstimulos();
@@ -271,49 +300,33 @@ public class DetectorDeIntrusosGame : BaseGame
     {
         CognitiveMetrics m = new CognitiveMetrics();
 
-        if (totalIntentos == 0) return m;
+        int rondasTotales = aciertos + errores + omisiones;
+        if (rondasTotales == 0) return m;
 
-        float precision = (float)aciertos / totalIntentos;
-        float errorRate = (float)errores / totalIntentos;
-        float omissionRate = (float)omisiones / totalIntentos;
-        float rtMedio = sumaRT / Mathf.Max(1, totalIntentos - omisiones);
-        float rtVar = Mathf.Max(0, (sumaRT2 / Mathf.Max(1, totalIntentos)) - (rtMedio * rtMedio));
+        float precisionReal = (float)aciertos / rondasTotales;
+        float rtMedio = sumaRT / Mathf.Max(1, aciertos + errores);
 
         int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
-        float factorNivel = 1f + ((nivel - 1f) / 9f);
         float tiempoEsperado = curvaTiempo.Evaluate(nivel);
-        float velocidadRaw = tiempoEsperado / Mathf.Max(0.3f, rtMedio);
-
-        float penalizacionFallos = 1f - (errorRate * 0.8f);
-        float penalizacionOmisiones = 1f - (omissionRate * 1.2f);
-
-        m.atencionSelectiva = Mathf.Clamp01(precision * penalizacionFallos * (1f + (factorNivel - 1f) * 0.5f));
-        m.velocidadCognitiva = Mathf.Clamp01(velocidadRaw * penalizacionOmisiones * (1f + (factorNivel - 1f) * 0.3f));
-
-        float coordinacionRaw = (precision + velocidadRaw) / 2f;
-        m.coordinacionVisomotora = Mathf.Clamp01(coordinacionRaw * penalizacionFallos * penalizacionOmisiones);
+        float velocidad = Mathf.Clamp01(tiempoEsperado / Mathf.Max(0.5f, rtMedio));
 
         int totalElementos = filas * columnas;
-        float demandaAtencional = Mathf.Clamp01((totalElementos - 12f) / 16f);
-        m.atencionDividida = Mathf.Clamp01(precision * (1f - omissionRate * 0.5f) * (1f + demandaAtencional * 0.5f));
+        float demandaAtencional = Mathf.Clamp01((totalElementos - 12f) / 20f);
 
-        m.controlInhibitorio = Mathf.Clamp01(1f - (errorRate * 1.2f));
+        Debug.Log($"📊 FINAL - Rondas: {rondasTotales} | Aciertos: {aciertos} | Errores: {errores} | Omisiones: {omisiones}");
+        Debug.Log($"📊 Precisión real: {precisionReal:P0} | Tiempo medio: {rtMedio:F2}s | Velocidad: {velocidad:P0}");
+        Debug.Log($"📊 Nivel alcanzado: {nivel} | Grid: {filas}x{columnas}");
 
-        float consistencia = 1f - Mathf.Clamp01(rtVar / 2f);
-        m.atencionSostenida = consistencia * (1f - omissionRate * 0.5f);
+        m.atencionSelectiva = precisionReal;
+        m.velocidadCognitiva = velocidad;
+        m.coordinacionVisomotora = precisionReal * velocidad;
+        m.atencionDividida = precisionReal * (0.5f + demandaAtencional * 0.5f);
 
-        if (aciertosLista.Count >= 3)
-        {
-            int aciertosRecientes = 0;
-            int inicio = Mathf.Max(0, aciertosLista.Count - 5);
-            for (int i = inicio; i < aciertosLista.Count; i++)
-                if (aciertosLista[i]) aciertosRecientes++;
-            m.memoriaTrabajo = (float)aciertosRecientes / Mathf.Min(5, aciertosLista.Count - inicio);
-        }
-
-        m.flexibilidadCognitiva = Mathf.Clamp01((precision + velocidadRaw) / 2f * (1f + (nivel - 1f) / 9f * 0.3f));
-
+        m.atencionSostenida = 0f;
+        m.memoriaTrabajo = 0f;
         m.memoriaEspacial = 0f;
+        m.controlInhibitorio = 0f;
+        m.flexibilidadCognitiva = 0f;
         m.planificacion = 0f;
 
         return m;
@@ -328,10 +341,12 @@ public class DetectorDeIntrusosGame : BaseGame
         p.coordinacionVisomotora = m.coordinacionVisomotora * 0.15f;
         p.atencionDividida = m.atencionDividida * 0.05f;
 
-        p.atencionSostenida = m.atencionSostenida * 0.01f;
-        p.memoriaTrabajo = m.memoriaTrabajo * 0.01f;
-        p.controlInhibitorio = m.controlInhibitorio * 0.01f;
-        p.flexibilidadCognitiva = m.flexibilidadCognitiva * 0.01f;
+        p.atencionSostenida = 0f;
+        p.memoriaTrabajo = 0f;
+        p.memoriaEspacial = 0f;
+        p.controlInhibitorio = 0f;
+        p.flexibilidadCognitiva = 0f;
+        p.planificacion = 0f;
 
         return p;
     }
@@ -358,6 +373,9 @@ public class DetectorDeIntrusosGame : BaseGame
 
         CognitiveMetrics m = CalcularCognicion();
         CognitiveMetrics p = AplicarPesos(m);
+
+        Debug.Log($"📤 Enviando resultados - Selectiva: {p.atencionSelectiva:F2}, Velocidad: {p.velocidadCognitiva:F2}");
+
         WebExporter.EnviarSesion(nombre, p);
     }
 

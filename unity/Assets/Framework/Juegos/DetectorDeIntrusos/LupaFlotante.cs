@@ -25,6 +25,7 @@ public class LupaFlotante : MonoBehaviour
     private Vector3 posicionInicial;
     private float angulo = 0;
 
+
     void Start()
     {
         posicionInicial = transform.localPosition;

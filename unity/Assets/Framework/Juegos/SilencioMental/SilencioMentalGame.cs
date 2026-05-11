@@ -47,6 +47,7 @@ public class SilencioMentalGame : BaseGame
     private bool esperandoRespuesta = false;
     private bool feedbackVisible = false;
     private bool finalizado = false;
+    private bool enPausa = false;
     private float inicioPartida;
 
     private string objIcono;
@@ -74,8 +75,6 @@ public class SilencioMentalGame : BaseGame
     private int mejorRacha = 0;
     private List<float> tiemposReaccion = new List<float>();
 
-    // Control de pausa
-    private bool enPausa = false;
     private Coroutine rutinaActual = null;
 
     private void Awake()
@@ -118,7 +117,6 @@ public class SilencioMentalGame : BaseGame
 
     public override void ResetGame()
     {
-        // Detener todo
         if (rutinaActual != null) StopCoroutine(rutinaActual);
 
         if (ui == null) ui = FindFirstObjectByType<UISilencioMental>();
@@ -168,7 +166,6 @@ public class SilencioMentalGame : BaseGame
         objTam = ObtenerFontSize(objTamanio);
     }
 
-    // CORUTINA PRINCIPAL CON PAUSA MANUAL
     private IEnumerator SecuenciaRecordar()
     {
         activo = false;
@@ -177,12 +174,24 @@ public class SilencioMentalGame : BaseGame
         ui?.MostrarMensaje("Recuerda tu lección:", Color.white);
         OnMostrarIcono?.Invoke(objIcono, objColor, objTam);
 
-        yield return EsperarSegundos(tiempoRecordar);
+        float tiempoPasado = 0;
+        while (tiempoPasado < tiempoRecordar)
+        {
+            if (!enPausa)
+                tiempoPasado += Time.deltaTime;
+            yield return null;
+        }
 
         OnOcultarTodo?.Invoke();
         mostrandoObjetivo = false;
 
-        yield return EsperarSegundos(tiempoEntreEstimulos);
+        tiempoPasado = 0;
+        while (tiempoPasado < tiempoEntreEstimulos)
+        {
+            if (!enPausa)
+                tiempoPasado += Time.deltaTime;
+            yield return null;
+        }
 
         activo = true;
         inicioPartida = Time.time;
@@ -221,7 +230,13 @@ public class SilencioMentalGame : BaseGame
 
     private IEnumerator TemporizadorOmision()
     {
-        yield return EsperarSegundos(duracionEst);
+        float tiempoPasado = 0;
+        while (tiempoPasado < duracionEst)
+        {
+            if (!enPausa)
+                tiempoPasado += Time.deltaTime;
+            yield return null;
+        }
 
         if (esperandoRespuesta && activo && !mostrandoObjetivo && !feedbackVisible && !enPausa)
         {
@@ -231,6 +246,7 @@ public class SilencioMentalGame : BaseGame
                 omisiones++;
                 racha = 0;
                 if (ui != null) StartCoroutine(ui.MostrarFeedbackTemporal("ERROR", Color.red));
+                AudioManager.Instance?.Error();
                 feedbackVisible = true;
                 OnOcultarTodo?.Invoke();
                 rutinaActual = StartCoroutine(ReiniciarPorFallo());
@@ -244,6 +260,7 @@ public class SilencioMentalGame : BaseGame
                 if (racha > mejorRacha) mejorRacha = racha;
                 OnRacha?.Invoke(racha);
                 if (ui != null) StartCoroutine(ui.MostrarFeedbackTemporal("CORRECTO", Color.green));
+                AudioManager.Instance?.Acierto();
                 feedbackVisible = true;
                 OnOcultarTodo?.Invoke();
                 if (racha % 5 == 0) SubirNivel();
@@ -272,6 +289,7 @@ public class SilencioMentalGame : BaseGame
             if (racha > mejorRacha) mejorRacha = racha;
             OnRacha?.Invoke(racha);
             if (ui != null) StartCoroutine(ui.MostrarFeedbackTemporal("CORRECTO", Color.green));
+            AudioManager.Instance?.Acierto();
             float rendimiento = Mathf.Clamp01(1f - (tiempoRespuesta / duracionEst));
             DifficultyManager.Instance?.ActualizarDificultad(rendimiento, true, tiempoRespuesta);
             if (racha % 5 == 0) SubirNivel();
@@ -283,6 +301,7 @@ public class SilencioMentalGame : BaseGame
             puntos = Mathf.Max(0, puntos - 1f);
             OnRacha?.Invoke(0);
             if (ui != null) StartCoroutine(ui.MostrarFeedbackTemporal("ERROR", Color.red));
+            AudioManager.Instance?.Error();
             DifficultyManager.Instance?.ActualizarDificultad(0f, false, tiempoRespuesta);
         }
 
@@ -293,7 +312,13 @@ public class SilencioMentalGame : BaseGame
 
     private IEnumerator MostrarFeedbackYContinuar()
     {
-        yield return EsperarSegundos(tiempoFeedback);
+        float tiempoPasado = 0;
+        while (tiempoPasado < tiempoFeedback)
+        {
+            if (!enPausa)
+                tiempoPasado += Time.deltaTime;
+            yield return null;
+        }
         OnOcultarTodo?.Invoke();
         feedbackVisible = false;
         if (activo && !enPausa) GenerarSiguienteEstimulo();
@@ -302,7 +327,13 @@ public class SilencioMentalGame : BaseGame
     private IEnumerator ReiniciarPorFallo()
     {
         activo = false;
-        yield return EsperarSegundos(tiempoFeedback);
+        float tiempoPasado = 0;
+        while (tiempoPasado < tiempoFeedback)
+        {
+            if (!enPausa)
+                tiempoPasado += Time.deltaTime;
+            yield return null;
+        }
 
         DifficultyManager.Instance?.ResetDifficulty(1);
         OnNivel?.Invoke(1);
@@ -312,22 +343,28 @@ public class SilencioMentalGame : BaseGame
         ui?.MostrarMensaje("Recuerda tu lección:", Color.white);
         OnMostrarIcono?.Invoke(objIcono, objColor, objTam);
 
-        yield return EsperarSegundos(tiempoRecordar);
+        tiempoPasado = 0;
+        while (tiempoPasado < tiempoRecordar)
+        {
+            if (!enPausa)
+                tiempoPasado += Time.deltaTime;
+            yield return null;
+        }
 
         OnOcultarTodo?.Invoke();
         mostrandoObjetivo = false;
 
-        yield return EsperarSegundos(tiempoEntreEstimulos);
+        tiempoPasado = 0;
+        while (tiempoPasado < tiempoEntreEstimulos)
+        {
+            if (!enPausa)
+                tiempoPasado += Time.deltaTime;
+            yield return null;
+        }
 
         activo = true;
         feedbackVisible = false;
         if (!enPausa) GenerarSiguienteEstimulo();
-    }
-
-    // 🔥 ESPERA QUE RESPETA LA PAUSA
-    private IEnumerator EsperarSegundos(float segundos)
-    {
-        yield return GamePause.WaitWhileNotPaused(segundos, () => enPausa || finalizado);
     }
 
     private void GenerarDistractorParecido()
@@ -431,7 +468,7 @@ public class SilencioMentalGame : BaseGame
 
     private void Update()
     {
-        if (!activo || mostrandoObjetivo || feedbackVisible || enPausa || finalizado) return;
+        if (!activo || mostrandoObjetivo || feedbackVisible || finalizado || enPausa) return;
 
         if (GameManager.Instance != null)
             OnTiempoPartida?.Invoke(GameManager.Instance.tiempoRestante);
@@ -479,12 +516,29 @@ public class SilencioMentalGame : BaseGame
         base.PausarJuego(pausar);
         enPausa = pausar;
 
-        Debug.Log($"⏸️ SilencioMental - Pausa: {pausar}, activo: {activo}");
-
-        if (!pausar && activo && !mostrandoObjetivo && !feedbackVisible && !esperandoRespuesta)
+        if (AudioManager.Instance?.musicaSource != null)
         {
-            // Al reanudar, si no hay estímulo activo, generar uno
-            GenerarSiguienteEstimulo();
+            if (pausar)
+                AudioManager.Instance.musicaSource.Pause();
+            else
+                AudioManager.Instance.musicaSource.UnPause();
         }
+
+        // 🔥 AL REANUDAR, FORZAR REINICIO DE LA LECCIÓN
+        if (!pausar)
+        {
+            if (rutinaActual != null) StopCoroutine(rutinaActual);
+            OnOcultarTodo?.Invoke();
+            activo = false;
+            mostrandoObjetivo = false;
+            esperandoRespuesta = false;
+            feedbackVisible = false;
+
+            // Volver a empezar la lección
+            ElegirNuevoObjetivo();
+            rutinaActual = StartCoroutine(SecuenciaRecordar());
+        }
+
+        Debug.Log($"⏸️ Pausa: {pausar} | enPausa: {enPausa}");
     }
 }

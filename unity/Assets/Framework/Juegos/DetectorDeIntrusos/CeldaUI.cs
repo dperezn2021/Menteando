@@ -14,6 +14,9 @@ public class CeldaUI : MonoBehaviour
         imagen = GetComponent<Image>();
         boton = GetComponent<Button>();
 
+        if (imagen == null)
+            Debug.LogError($"❌ CeldaUI: No se encontró Image en {gameObject.name}");
+
         if (boton != null)
             boton.interactable = true;
     }
@@ -26,18 +29,27 @@ public class CeldaUI : MonoBehaviour
         {
             boton.onClick.RemoveAllListeners();
             boton.onClick.AddListener(() => {
-                if (!destruida && onClickCallback != null && !GameManager.Instance.EstaPausado())
+                if (!destruida && onClickCallback != null && GameManager.Instance != null && !GameManager.Instance.EstaPausado())
                     onClickCallback?.Invoke();
             });
         }
     }
+
     public void SetSprite(Sprite sprite)
     {
-        if (imagen != null && !destruida)
+        if (imagen == null)
         {
-            imagen.sprite = sprite;
-            imagen.preserveAspect = true;
+            Debug.LogError($"❌ CeldaUI.SetSprite: imagen es null en {gameObject.name}");
+            return;
         }
+
+        imagen.sprite = sprite;
+        imagen.preserveAspect = true;
+
+        // 🔥 FORZAR que se vea (color blanco para mostrar el sprite correctamente)
+        imagen.color = Color.white;
+
+        Debug.Log($"✅ Sprite asignado a {gameObject.name}: {(sprite != null ? sprite.name : "NULL")}");
     }
 
     public void SetColor(Color color)
