@@ -1,8 +1,5 @@
 ﻿using UnityEngine;
 
-using UnityEngine;
-
-using UnityEngine;
 
 public abstract class BaseGame : MonoBehaviour
 {

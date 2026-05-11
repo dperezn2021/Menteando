@@ -1,166 +1,175 @@
-﻿//using UnityEngine;
-//using TMPro;
-//using UnityEngine.UI;
-//using System.Collections;
+﻿using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
 
-//public class UICalculadora : MonoBehaviour
-//{
-//    [Header("Elementos UI (TMP)")]
-//    public TextMeshProUGUI textoOperacion;
-//    public TMP_InputField inputRespuesta;
+public class UICalculadora : MonoBehaviour
+{
+    [Header("Elementos UI (TMP)")]
+    public TextMeshProUGUI textoOperacion;
+    public TMP_InputField inputRespuesta;
 
-//    [Header("Botones")]
-//    public Button[] botonesNumeros;  // 0-9
-//    public Button botonClear;        // Limpia todo (C)
-//    public Button botonDelete;       // Borra último dígito (⌫)
-//    public Button botonIgual;
-//    public Button botonMenos;
+    [Header("Botones")]
+    public Button[] botonesNumeros;  // 0-9
+    public Button botonClear;        // C
+    public Button botonDelete;       // ⌫
+    public Button botonIgual;        // =
+    public Button botonMenos;        // -
 
-//    private OperacionesEncadenadasGame gameLogic;
+    private OperacionesEncadenadasGame gameLogic;
 
-//    void Start()
-//    {
-//        // Configurar botones numéricos
-//        for (int i = 0; i < botonesNumeros.Length; i++)
-//        {
-//            int num = i;
-//            if (botonesNumeros[i] != null)
-//            {
-//                botonesNumeros[i].onClick.AddListener(() => {
-//                    GameUIManager.Instance?.ReproducirSonido(GameUIManager.Instance.sonidoClick);
-//                    AgregarNumero(num);
-//                });
-//            }
-            
-//        }
-//        if (botonClear) botonClear.onClick.AddListener(LimpiarInput);
-//        if (botonDelete) botonDelete.onClick.AddListener(BorrarUltimoDigito);
-//        if (botonIgual) botonIgual.onClick.AddListener(EnviarRespuesta);
-//        if (botonMenos) botonMenos.onClick.AddListener(AgregarSignoMenos);
+    void Start()
+    {
+        // BOTONES NUMÉRICOS
+        for (int i = 0; i < botonesNumeros.Length; i++)
+        {
+            int num = i;
+            botonesNumeros[i].onClick.AddListener(() =>
+            {
+                AudioManager.Instance?.Click();
+                AgregarNumero(num);
+            });
+        }
 
+        // BOTONES ESPECIALES
+        botonClear.onClick.AddListener(() =>
+        {
+            AudioManager.Instance?.Click();
+            LimpiarInput();
+        });
 
-//        if (inputRespuesta)
-//        {
-//            inputRespuesta.contentType = TMP_InputField.ContentType.IntegerNumber;
-//            inputRespuesta.characterLimit = 6;
-//            inputRespuesta.text = "0";
-//        }
-//        if (textoOperacion) textoOperacion.text = "";
-//    }
+        botonDelete.onClick.AddListener(() =>
+        {
+            AudioManager.Instance?.Click();
+            BorrarUltimoDigito();
+        });
 
-//    public void Inicializar(OperacionesEncadenadasGame logic)
-//    {
-//        gameLogic = logic;
-//        LimpiarInput();
-//    }
+        botonIgual.onClick.AddListener(() =>
+        {
+            AudioManager.Instance?.Click();
+            EnviarRespuesta();
+        });
 
-//    public void AgregarNumero(int num)
-//    {
-//        if (inputRespuesta == null) return;
-//        string current = inputRespuesta.text;
-//        bool esNegativo = current.StartsWith("-");
-//        if (esNegativo) current = current.Substring(1);
-//        if (current == "0") current = "";
-//        current += num.ToString();
-//        if (current.Length > 5) current = current.Substring(0, 5);
-//        inputRespuesta.text = esNegativo ? "-" + current : current;
-//        GameUIManager.Instance?.ReproducirSonido(GameUIManager.Instance.sonidoClick);
+        botonMenos.onClick.AddListener(() =>
+        {
+            AudioManager.Instance?.Click();
+            AgregarSignoMenos();
+        });
 
-//    }
+        // INPUT
+        inputRespuesta.contentType = TMP_InputField.ContentType.IntegerNumber;
+        inputRespuesta.characterLimit = 6;
+        inputRespuesta.text = "0";
+        inputRespuesta.DeactivateInputField();
+    }
 
-//    public void AgregarSignoMenos()
-//    {
-//        if (inputRespuesta == null) return;
-//        string current = inputRespuesta.text;
-//        if (current.StartsWith("-")) return;
-//        if (current == "0" || string.IsNullOrEmpty(current))
-//            inputRespuesta.text = "-";
-//        else
-//            inputRespuesta.text = "-" + current;
+    public void Inicializar(OperacionesEncadenadasGame logic)
+    {
+        gameLogic = logic;
+        LimpiarInput();
+    }
 
-//        GameUIManager.Instance?.ReproducirSonido(GameUIManager.Instance.sonidoClick);
+    // ============================
+    // INPUT NUMÉRICO
+    // ============================
+    public void AgregarNumero(int num)
+    {
+        string current = inputRespuesta.text;
+        bool negativo = current.StartsWith("-");
 
-//    }
+        if (negativo) current = current.Substring(1);
+        if (current == "0") current = "";
 
-//    public void BorrarUltimoDigito()
-//    {
-//        if (inputRespuesta == null) return;
-//        string current = inputRespuesta.text;
-//        if (string.IsNullOrEmpty(current) || current == "0") return;
-//        if (current == "-")
-//        {
-//            inputRespuesta.text = "0";
-//            return;
-//        }
-//        current = current.Substring(0, current.Length - 1);
-//        if (string.IsNullOrEmpty(current) || current == "-")
-//            inputRespuesta.text = "0";
-//        else
-//            inputRespuesta.text = current;
+        current += num.ToString();
+        if (current.Length > 5) current = current.Substring(0, 5);
 
-//        GameUIManager.Instance?.ReproducirSonido(GameUIManager.Instance.sonidoClick);
+        inputRespuesta.text = negativo ? "-" + current : current;
+        inputRespuesta.DeactivateInputField();
+    }
 
-//    }
+    public void AgregarSignoMenos()
+    {
+        string current = inputRespuesta.text;
 
-//    public void LimpiarInput()
-//    {
-//        if (inputRespuesta) inputRespuesta.text = "0";
-//        GameUIManager.Instance?.ReproducirSonido(GameUIManager.Instance.sonidoClick);
+        if (!current.StartsWith("-"))
+            inputRespuesta.text = current == "0" ? "-" : "-" + current;
 
-//    }
+        inputRespuesta.DeactivateInputField();
+    }
 
-//    public void EnviarRespuesta()
-//    {
-//        if (inputRespuesta == null) return;
-//        if (int.TryParse(inputRespuesta.text, out int respuesta))
-//        {
-//            gameLogic?.EnviarRespuesta(respuesta);
-//            LimpiarInput();
-//        }
-//    }
+    public void BorrarUltimoDigito()
+    {
+        string current = inputRespuesta.text;
 
-//    public void ActualizarOperacion(string operacion)
-//    {
-//        if (textoOperacion) textoOperacion.text = operacion;
-//    }
+        if (current == "-" || current.Length <= 1)
+            inputRespuesta.text = "0";
+        else
+            inputRespuesta.text = current.Substring(0, current.Length - 1);
 
-//    public void MostrarMensajeMemorizacion(string mensaje, float duracion)
-//    {
-//        StartCoroutine(MostrarMensajeCoroutine(mensaje, duracion));
-//    }
+        inputRespuesta.DeactivateInputField();
+    }
 
-//    private IEnumerator MostrarMensajeCoroutine(string mensaje, float duracion)
-//    {
-//        if (textoOperacion == null) yield break;
-//        string original = textoOperacion.text;
-//        textoOperacion.text = mensaje;
-//        yield return new WaitForSeconds(duracion);
-//        textoOperacion.text = original;
-//    }
+    public void LimpiarInput()
+    {
+        inputRespuesta.text = "0";
+        inputRespuesta.DeactivateInputField();
+    }
 
-//    private void Update()
-//    {
-//        if (gameLogic == null) return;
+    // ============================
+    // ENVÍO DE RESPUESTA
+    // ============================
+    public void EnviarRespuesta()
+    {
+        inputRespuesta.DeactivateInputField();
 
-//        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-//            EnviarRespuesta();
+        if (int.TryParse(inputRespuesta.text, out int r))
+        {
+            gameLogic?.EnviarRespuesta(r);
+            LimpiarInput();
+        }
+    }
 
-//        for (int i = 0; i <= 9; i++)
-//        {
+    // ============================
+    // OPERACIÓN Y MEMORIZACIÓN
+    // ============================
+    public void MostrarOperacion(string operacion)
+    {
+        textoOperacion.text = operacion;
+    }
 
-//            if (Input.GetKeyDown(KeyCode.Alpha0 + i) || Input.GetKeyDown(KeyCode.Keypad0 + i))
-//            {
-//                AgregarNumero(i);
-//            }
-//        }
+    public void MostrarMemorizacion(string msg)
+    {
+        textoOperacion.text = msg;
+    }
 
-//        if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus))
-//            AgregarSignoMenos();
+    public void OcultarMemorizacion()
+    {
+        textoOperacion.text = "";
+    }
 
-//        if (Input.GetKeyDown(KeyCode.Delete) || Input.GetKeyDown(KeyCode.Backspace))
-//            BorrarUltimoDigito();
+    // ============================
+    // TECLADO
+    // ============================
+    private void Update()
+    {
+        if (gameLogic == null) return;
 
-//        if (Input.GetKeyDown(KeyCode.C))
-//            LimpiarInput();
-//    }
-//}
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+            EnviarRespuesta();
+
+        for (int i = 0; i <= 9; i++)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha0 + i) ||
+                Input.GetKeyDown(KeyCode.Keypad0 + i))
+                AgregarNumero(i);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus))
+            AgregarSignoMenos();
+
+        if (Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Delete))
+            BorrarUltimoDigito();
+
+        if (Input.GetKeyDown(KeyCode.C))
+            LimpiarInput();
+    }
+}

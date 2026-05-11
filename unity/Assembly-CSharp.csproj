@@ -66,6 +66,7 @@
     <Compile Include="Assets\Framework\ScriptsGenerales\Managers\GameManager.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\BotonCentralController.cs" />
     <Compile Include="Assets\Framework\Juegos\RoscoExpress\RoscoExpress.cs" />
+    <Compile Include="Assets\Framework\Juegos\Doble Canal\DobleCanalUIManager.cs" />
     <Compile Include="Assets\Framework\Juegos\SilencioMental\SilencioMentalGame.cs" />
     <Compile Include="Assets\Framework\Juegos\MisionOrbital\Prefabs\AsteroideGiratorio.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\Intento.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Assets\Framework\Juegos\DetectorDeIntrusos\UIDetectorIntrusos.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Managers\AudioManager.cs" />
     <Compile Include="Assets\CeldaUI.cs" />
+    <Compile Include="Assets\Framework\Juegos\EcoVisual\EcoVisualGame.cs" />
     <Compile Include="Assets\Framework\Juegos\SilencioMental\UISilencioMental.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Base\BaseGame.cs" />
     <Compile Include="Assets\Framework\Juegos\MisionOrbital\Prefabs\StarsEffect.cs" />
@@ -90,8 +92,12 @@
     <Compile Include="Assets\Juegos\ScriptsGenerales\Metricas.cs" />
     <Compile Include="Assets\Framework\Juegos\OperacionesEncadenadas\UICalculadora.cs" />
     <Compile Include="Assets\Juegos\ScriptsGenerales\SesionJuego.cs" />
+    <Compile Include="Assets\Framework\Juegos\ReflejosCruzados\ReflejosCruzadosGame.cs" />
+    <Compile Include="Assets\Framework\Juegos\Doble Canal\DobleCanalGame.cs" />
+    <Compile Include="Assets\Framework\Juegos\SilencioMental\IconGenerator.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Base\WebExporter.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\ReglaAntigua.cs" />
+    <Compile Include="Assets\Framework\Juegos\SilencioMental\IconAssetGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

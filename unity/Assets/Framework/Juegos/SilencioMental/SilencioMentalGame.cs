@@ -2,499 +2,403 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.UI;
 
 public class SilencioMentalGame : BaseGame
 {
-    [Header("Configuración")]
-    public float duracionPartida = 120f;
-    public float tiempoMostrandoObjetivo = 3f;
+    [Header("Tiempos")]
+    public float tiempoRecordar = 2.5f;
+    public float tiempoFeedback = 1f;
+    public float tiempoEntreEstimulos = 0.5f;
 
-    [Header("Dificultad - Curvas")]
-    public AnimationCurve curvaTiempoEntreSprites;
-    public AnimationCurve curvaProbabilidadObjetivo;
+    [Header("Curvas (nivel 1 a 10)")]
+    public AnimationCurve duracionEstimulo;
+    public AnimationCurve probObjetivo;
+    public AnimationCurve tamanioMin;
+    public AnimationCurve tamanioMax;
 
-    [Header("Características")]
-    public List<Color> coloresDisponibles;
-    public List<string> nombresColores;
-    public List<string> formasDisponibles;
-    public List<string> tamaniosDisponibles;
+    [Header("Íconos")]
+    public List<string> letras = new List<string> { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+    public List<string> numeros = new List<string> { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+    public List<string> simbolos = new List<string> { "$", "€", "£", "+", "-", "*", "/", "%", "#", "@", "&", "?", "!", ">", "<" };
+    private List<string> todosIconos;
+    private Dictionary<char, string> categoria;
+
+    public List<Color> colores = new List<Color> { Color.red, Color.green, Color.blue, Color.yellow, Color.magenta, Color.cyan, new Color(1f, 0.5f, 0f), Color.white };
 
     [Header("UI")]
-    public UISilencioMental uiSilencioMental;
+    public UISilencioMental ui;
 
-    // Eventos para UI
-    public System.Action<int, int> OnRacha;
-    public System.Action<float> OnTiempoRestante;
-    public System.Action<int, int, int> OnEstadisticas;
-    public System.Action<int> OnNivelActualizado;
-    public System.Action<Sprite, string> OnMostrarObjetivo;
-    public System.Action OnOcultarObjetivo;
-
-    // 🔥 NUEVO EVENTO PARA ICONOS TMP
-    public System.Action<string, Color, int> OnMostrarEstimulo;
-    public System.Action OnOcultarEstimulo;
+    // Eventos
+    public System.Action<int> OnRacha;
+    public System.Action<float> OnTiempoPartida;
+    public System.Action<int> OnNivel;
+    public System.Action<string, Color, int> OnMostrarIcono;
+    public System.Action<string, Color> OnMostrarMensaje;
+    public System.Action OnOcultarTodo;
 
     // Estado
-    private bool juegoActivo = true;
+    private bool activo = false;
+    private bool mostrandoObjetivo = false;
     private bool esperandoRespuesta = false;
-    private bool mostrandoObjetivoInicial = false;
-    private SpriteData spriteObjetivo;
-    private SpriteData spriteActual;
-    private float tiempoProximoEstimulo;
-    private float tiempoInicioPartida;
+    private bool feedbackVisible = false;
+    private float inicioPartida;
 
-    // Métricas
+    private string objIcono;
+    private Color objColor;
+    private int objTam;
+
+    private string estIcono;
+    private Color estColor;
+    private int estTam;
+    private float inicioEstimulo;
+    private float duracionEst;
+
     private int aciertos = 0;
-    private int errores = 0;
+    private int fallosComision = 0;
     private int omisiones = 0;
-    private List<float> tiemposReaccion = new List<float>();
-
-    // Racha
-    private int rachaActual = 0;
+    private float puntos = 0f;
+    private int racha = 0;
     private int mejorRacha = 0;
 
-    // Banco de “sprites” lógicos (solo datos, ya no texturas)
-    private List<SpriteData> todosLosSprites = new List<SpriteData>();
-
-    // Lista de iconos TMP
-    private readonly string[] iconosTMP = {
-        "●","○","■","□","▲","△","▼","▽","◆","◇",
-        "★","☆","✦","✧","✩","✪","✫","✬","✭","✮","✯",
-        "←","↑","→","↓","↖","↗","↘","↙"
-    };
+    // Control de pausa
+    private bool enPausa = false;
+    private Coroutine rutinaActual = null;
 
     private void Awake()
     {
         nombre = "silencio-mental";
-        InicializarColores();
+        InicializarListas();
         InicializarCurvas();
-        GenerarBancoDeSprites(); // solo datos: color, forma, tamaño, nombre
     }
 
-    private void InicializarColores()
+    private void InicializarListas()
     {
-        coloresDisponibles = new List<Color>
-        {
-            Color.red, new Color(0f, 0.8f, 0f), Color.blue, Color.yellow,
-            new Color(0.8f, 0f, 0.8f), new Color(1f, 0.5f, 0f),
-            new Color(0f, 0.8f, 0.8f), new Color(1f, 0.2f, 0.5f),
-            new Color(0.5f, 0.3f, 0.8f), new Color(0.8f, 0.5f, 0.2f)
-        };
+        todosIconos = new List<string>();
+        todosIconos.AddRange(letras);
+        todosIconos.AddRange(numeros);
+        todosIconos.AddRange(simbolos);
 
-        nombresColores = new List<string> {
-            "Rojo", "Verde", "Azul", "Amarillo", "Morado", "Naranja",
-            "Cian", "Rosa", "Violeta", "Marrón"
-        };
-
-        formasDisponibles = new List<string> {
-            "Círculo", "Cuadrado", "Triángulo", "Hexágono",
-            "Estrella", "Corazón", "Rombo", "Pentágono"
-        };
-
-        tamaniosDisponibles = new List<string> { "Pequeño", "Mediano", "Grande" };
+        categoria = new Dictionary<char, string>();
+        foreach (string s in letras) foreach (char c in s) categoria[c] = "letra";
+        foreach (string s in numeros) foreach (char c in s) categoria[c] = "numero";
+        foreach (string s in simbolos) foreach (char c in s) categoria[c] = "simbolo";
     }
 
     private void InicializarCurvas()
     {
-        if (curvaTiempoEntreSprites == null || curvaTiempoEntreSprites.keys.Length == 0)
+        if (duracionEstimulo == null || duracionEstimulo.keys.Length == 0)
         {
-            curvaTiempoEntreSprites = new AnimationCurve();
-            curvaTiempoEntreSprites.AddKey(1, 2.5f);
-            curvaTiempoEntreSprites.AddKey(3, 2.2f);
-            curvaTiempoEntreSprites.AddKey(5, 1.8f);
-            curvaTiempoEntreSprites.AddKey(7, 1.4f);
-            curvaTiempoEntreSprites.AddKey(10, 0.8f);
+            duracionEstimulo = new AnimationCurve();
+            duracionEstimulo.AddKey(1, 2.5f);
+            duracionEstimulo.AddKey(5, 1.8f);
+            duracionEstimulo.AddKey(10, 1.0f);
         }
-
-        if (curvaProbabilidadObjetivo == null || curvaProbabilidadObjetivo.keys.Length == 0)
+        if (probObjetivo == null || probObjetivo.keys.Length == 0)
         {
-            curvaProbabilidadObjetivo = new AnimationCurve();
-            curvaProbabilidadObjetivo.AddKey(1, 0.50f);
-            curvaProbabilidadObjetivo.AddKey(3, 0.40f);
-            curvaProbabilidadObjetivo.AddKey(5, 0.30f);
-            curvaProbabilidadObjetivo.AddKey(7, 0.20f);
-            curvaProbabilidadObjetivo.AddKey(10, 0.15f);
+            probObjetivo = new AnimationCurve();
+            probObjetivo.AddKey(1, 0.40f);
+            probObjetivo.AddKey(5, 0.30f);
+            probObjetivo.AddKey(10, 0.20f);
         }
-    }
-
-    private void GenerarBancoDeSprites()
-    {
-        todosLosSprites.Clear();
-        int id = 0;
-
-        foreach (Color color in coloresDisponibles)
+        if (tamanioMin == null || tamanioMin.keys.Length == 0)
         {
-            foreach (string forma in formasDisponibles)
-            {
-                foreach (string tamanio in tamaniosDisponibles)
-                {
-                    SpriteData sprite = new SpriteData();
-                    sprite.id = id++;
-                    sprite.color = color;
-                    sprite.colorNombre = nombresColores[coloresDisponibles.IndexOf(color)];
-                    sprite.forma = forma;
-                    sprite.tamanio = tamanio;
-                    sprite.nombre = $"{forma} {sprite.colorNombre} ({tamanio})";
-                    sprite.textura = null; // ya no usamos textura para estímulos
-
-                    todosLosSprites.Add(sprite);
-                }
-            }
+            tamanioMin = new AnimationCurve();
+            tamanioMin.AddKey(1, 60);
+            tamanioMin.AddKey(10, 40);
         }
-
-        Debug.Log($"✅ Banco generado: {todosLosSprites.Count} combinaciones");
+        if (tamanioMax == null || tamanioMax.keys.Length == 0)
+        {
+            tamanioMax = new AnimationCurve();
+            tamanioMax.AddKey(1, 120);
+            tamanioMax.AddKey(10, 80);
+        }
     }
 
     public override void ResetGame()
     {
-        if (uiSilencioMental == null)
-            uiSilencioMental = FindFirstObjectByType<UISilencioMental>();
+        // Detener todo
+        if (rutinaActual != null) StopCoroutine(rutinaActual);
 
-        if (uiSilencioMental == null)
-        {
-            Debug.LogWarning("⚠️ No se encontró UISilencioMental");
-            return;
-        }
+        if (ui == null) ui = FindFirstObjectByType<UISilencioMental>();
 
-        // Suscribir eventos
-        OnRacha += uiSilencioMental.ActualizarRacha;
-        OnTiempoRestante += uiSilencioMental.ActualizarTiempo;
-        OnNivelActualizado += uiSilencioMental.ActualizarNivel;
-        OnMostrarObjetivo += uiSilencioMental.MostrarObjetivo;
-        OnOcultarObjetivo += uiSilencioMental.OcultarObjetivo;
+        OnRacha -= ui.ActualizarRacha;
+        OnTiempoPartida -= ui.ActualizarTiempo;
+        OnNivel -= ui.ActualizarNivel;
+        OnMostrarIcono -= ui.MostrarIcono;
+        OnOcultarTodo -= ui.OcultarTodo;
 
-        OnMostrarEstimulo += uiSilencioMental.MostrarIconoAleatorio;
-        OnOcultarEstimulo += uiSilencioMental.OcultarEstimulo;
+        OnRacha += ui.ActualizarRacha;
+        OnTiempoPartida += ui.ActualizarTiempo;
+        OnNivel += ui.ActualizarNivel;
+        OnMostrarIcono += ui.MostrarIcono;
+        OnOcultarTodo += ui.OcultarTodo;
 
-        juegoActivo = false;
+        activo = false;
+        mostrandoObjetivo = false;
         esperandoRespuesta = false;
+        feedbackVisible = false;
+        enPausa = false;
 
-        aciertos = errores = omisiones = 0;
-        tiemposReaccion.Clear();
-        rachaActual = mejorRacha = 0;
+        aciertos = fallosComision = omisiones = 0;
+        puntos = 0f;
+        racha = 0;
+        mejorRacha = 0;
 
-        SeleccionarObjetivoAleatorio();
-        StartCoroutine(MostrarObjetivoInicial());
+        if (DifficultyManager.Instance != null) DifficultyManager.Instance.nivelActual = 1;
+        OnNivel?.Invoke(1);
+        OnRacha?.Invoke(0);
+
+        ElegirNuevoObjetivo();
+        rutinaActual = StartCoroutine(SecuenciaRecordar());
     }
 
-    private void SeleccionarObjetivoAleatorio()
+    private void ElegirNuevoObjetivo()
     {
-        spriteObjetivo = todosLosSprites[Random.Range(0, todosLosSprites.Count)];
-        Debug.Log($"🎯 OBJETIVO: {spriteObjetivo.nombre}");
+        objIcono = todosIconos[Random.Range(0, todosIconos.Count)];
+        objColor = colores[Random.Range(0, colores.Count)];
+        int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
+        int min = Mathf.RoundToInt(tamanioMin.Evaluate(nivel));
+        int max = Mathf.RoundToInt(tamanioMax.Evaluate(nivel));
+        objTam = Random.Range(min, max + 1);
     }
 
-    // --------- LÓGICA DE SELECCIÓN (igual que antes) ---------
-
-    private float CalcularSimilitud(SpriteData a, SpriteData b)
+    // CORUTINA PRINCIPAL CON PAUSA MANUAL
+    private IEnumerator SecuenciaRecordar()
     {
-        float similitud = 0;
-        if (a.forma == b.forma) similitud += 0.5f;
-        if (a.colorNombre == b.colorNombre) similitud += 0.3f;
-        if (a.tamanio == b.tamanio) similitud += 0.2f;
-        return similitud;
+        activo = false;
+        mostrandoObjetivo = true;
+
+        ui.MostrarMensaje("Recuerda tu lección:", Color.white);
+        OnMostrarIcono?.Invoke(objIcono, objColor, objTam);
+
+        yield return EsperarSegundos(tiempoRecordar);
+
+        OnOcultarTodo?.Invoke();
+        mostrandoObjetivo = false;
+
+        yield return EsperarSegundos(tiempoEntreEstimulos);
+
+        activo = true;
+        inicioPartida = Time.time;
+        GenerarSiguienteEstimulo();
     }
 
-    private SpriteData SeleccionarSiguienteSprite()
+    private void GenerarSiguienteEstimulo()
     {
-        if (todosLosSprites == null || todosLosSprites.Count == 0)
-        {
-            Debug.LogError("❌ No hay sprites en el banco");
-            return null;
-        }
-
-        if (spriteObjetivo == null)
-        {
-            Debug.LogError("❌ spriteObjetivo es null");
-            return todosLosSprites[0];
-        }
+        if (!activo || enPausa) return;
 
         int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
-        float probObjetivo = curvaProbabilidadObjetivo.Evaluate(nivel);
+        duracionEst = duracionEstimulo.Evaluate(nivel);
+        float prob = probObjetivo.Evaluate(nivel);
+        bool esObjetivo = Random.value < prob;
 
-        // ¿Objetivo o distractor?
-        if (Random.value < probObjetivo)
-            return spriteObjetivo;
-
-        var distractores = todosLosSprites.Where(s => s != spriteObjetivo).ToList();
-        if (distractores.Count == 0)
+        if (esObjetivo)
         {
-            Debug.LogWarning("⚠️ No hay distractores, usando objetivo");
-            return spriteObjetivo;
+            estIcono = objIcono;
+            estColor = objColor;
+            estTam = objTam;
+        }
+        else
+        {
+            char c = objIcono[0];
+            string cat = categoria.ContainsKey(c) ? categoria[c] : "letra";
+            var candidatos = todosIconos.Where(i => i != objIcono && categoria.ContainsKey(i[0]) && categoria[i[0]] == cat).ToList();
+            if (candidatos.Count == 0) candidatos = todosIconos.Where(i => i != objIcono).ToList();
+            estIcono = candidatos[Random.Range(0, candidatos.Count)];
+            estColor = colores[Random.Range(0, colores.Count)];
+            int min = Mathf.RoundToInt(tamanioMin.Evaluate(nivel));
+            int max = Mathf.RoundToInt(tamanioMax.Evaluate(nivel));
+            estTam = Random.Range(min, max + 1);
         }
 
-        // Ponderar por similitud
-        List<float> pesos = new List<float>();
-        foreach (var d in distractores)
-        {
-            float similitud = CalcularSimilitud(spriteObjetivo, d);
-            float peso = Mathf.Pow(similitud, 2f);
-            pesos.Add(peso);
-        }
-
-        float totalPeso = pesos.Sum();
-        if (totalPeso == 0)
-            return distractores[Random.Range(0, distractores.Count)];
-
-        float random = Random.value * totalPeso;
-        float acumulado = 0;
-
-        for (int i = 0; i < distractores.Count; i++)
-        {
-            acumulado += pesos[i];
-            if (random <= acumulado)
-                return distractores[i];
-        }
-
-        return distractores[Random.Range(0, distractores.Count)];
+        OnMostrarIcono?.Invoke(estIcono, estColor, estTam);
+        esperandoRespuesta = true;
+        inicioEstimulo = Time.time;
+        rutinaActual = StartCoroutine(TemporizadorOmision());
     }
 
-    // ---------------------------------------------------------
-
-    private IEnumerator MostrarObjetivoInicial()
+    private IEnumerator TemporizadorOmision()
     {
-        mostrandoObjetivoInicial = true;
-        juegoActivo = false;
+        yield return EsperarSegundos(duracionEst);
 
-        // Objetivo: seguimos usando un sprite placeholder (puedes mejorarlo luego)
-        Texture2D tex = new Texture2D(128, 128);
-        Sprite sprite = Sprite.Create(tex, new Rect(0, 0, 128, 128), new Vector2(0.5f, 0.5f));
-
-        OnMostrarObjetivo?.Invoke(sprite, spriteObjetivo.nombre);
-
-        yield return new WaitForSeconds(tiempoMostrandoObjetivo);
-
-        OnOcultarObjetivo?.Invoke();
-        mostrandoObjetivoInicial = false;
-
-        juegoActivo = true;
-        tiempoInicioPartida = Time.time;
-        tiempoProximoEstimulo = Time.time + ObtenerTiempoEntreSprites();
-
-        ActualizarUI();
-    }
-
-    private float ObtenerTiempoEntreSprites()
-    {
-        int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
-        return curvaTiempoEntreSprites.Evaluate(nivel);
-    }
-
-    private void Update()
-    {
-        if (!juegoActivo || mostrandoObjetivoInicial) return;
-
-        if (Input.GetKeyDown(KeyCode.Space))
-            Responder();
-
-        float tiempoTranscurrido = Time.time - tiempoInicioPartida;
-        OnTiempoRestante?.Invoke(duracionPartida - tiempoTranscurrido);
-
-        if (tiempoTranscurrido >= duracionPartida)
-        {
-            TerminarJuego();
-            return;
-        }
-
-        if (!esperandoRespuesta && Time.time >= tiempoProximoEstimulo)
-        {
-            GenerarEstimuloTMP();
-            esperandoRespuesta = true;
-            tiempoProximoEstimulo = Time.time + ObtenerTiempoEntreSprites();
-            StartCoroutine(AutoOmision());
-        }
-    }
-
-    private void GenerarEstimuloTMP()
-    {
-        if (spriteObjetivo == null)
-        {
-            Debug.LogError("❌ spriteObjetivo es null");
-            return;
-        }
-
-        spriteActual = SeleccionarSiguienteSprite();
-        if (spriteActual == null)
-        {
-            Debug.LogError("❌ spriteActual es null");
-            return;
-        }
-
-        spriteActual.tiempoAparicion = Time.time;
-
-        // Icono aleatorio
-        string icono = iconosTMP[Random.Range(0, iconosTMP.Length)];
-
-        // Color del estímulo = color del “sprite lógico”
-        Color color = spriteActual.color;
-
-        // Tamaño según tamaño lógico
-        int fontSize = spriteActual.tamanio switch
-        {
-            "Pequeño" => 140,
-            "Mediano" => 200,
-            "Grande" => 260,
-            _ => 200
-        };
-
-        OnMostrarEstimulo?.Invoke(icono, color, fontSize);
-
-        bool esObjetivo = (spriteActual == spriteObjetivo);
-        Debug.Log($"💭 Estímulo: {(esObjetivo ? "OBJETIVO ✅" : "DISTRACTOR ❌")} - {spriteActual.nombre} - Icono {icono}");
-    }
-
-    private IEnumerator AutoOmision()
-    {
-        yield return new WaitForSeconds(1.5f);
-
-        if (esperandoRespuesta && juegoActivo && !mostrandoObjetivoInicial)
+        if (esperandoRespuesta && activo && !mostrandoObjetivo && !feedbackVisible && !enPausa)
         {
             esperandoRespuesta = false;
-            OnOcultarEstimulo?.Invoke();
+            bool eraObjetivo = (estIcono == objIcono);
 
-            if (spriteActual == spriteObjetivo)
+            if (eraObjetivo)
             {
                 omisiones++;
-                rachaActual = 0;
-                ResetearNivelPorFallo();
+                racha = 0;
+                StartCoroutine(ui.MostrarFeedbackTemporal("ERROR", Color.red));
+                feedbackVisible = true;
+                OnOcultarTodo?.Invoke();
+                rutinaActual = StartCoroutine(ReiniciarPorFallo());
             }
             else
             {
                 aciertos++;
-                rachaActual++;
-                if (rachaActual > mejorRacha) mejorRacha = rachaActual;
-
-                if (rachaActual >= 5)
-                    SubirNivel();
+                puntos += 0.25f;
+                racha++;
+                if (racha > mejorRacha) mejorRacha = racha;
+                OnRacha?.Invoke(racha);
+                StartCoroutine(ui.MostrarFeedbackTemporal("CORRECTO", Color.green));
+                feedbackVisible = true;
+                OnOcultarTodo?.Invoke();
+                if (racha % 5 == 0) SubirNivel();
+                rutinaActual = StartCoroutine(MostrarFeedbackYContinuar());
             }
-
-            ActualizarUI();
         }
     }
 
     public void Responder()
     {
-        if (!esperandoRespuesta || !juegoActivo || mostrandoObjetivoInicial) return;
+        if (!activo || mostrandoObjetivo || !esperandoRespuesta || feedbackVisible || enPausa) return;
 
+        if (rutinaActual != null) StopCoroutine(rutinaActual);
         esperandoRespuesta = false;
-        float tiempoRespuesta = Time.time - spriteActual.tiempoAparicion;
-        tiemposReaccion.Add(tiempoRespuesta);
 
-        OnOcultarEstimulo?.Invoke();
+        bool fueObjetivo = (estIcono == objIcono);
 
-        if (spriteActual == spriteObjetivo)
+        if (fueObjetivo)
         {
             aciertos++;
-            rachaActual++;
-            if (rachaActual > mejorRacha) mejorRacha = rachaActual;
-
-            float rendimiento = Mathf.Clamp01(1f - (tiempoRespuesta / ObtenerTiempoEntreSprites()));
-            DifficultyManager.Instance?.ActualizarDificultad(rendimiento, true, tiempoRespuesta);
-
-            if (rachaActual >= 5)
-                SubirNivel();
+            puntos += 1f;
+            racha++;
+            if (racha > mejorRacha) mejorRacha = racha;
+            OnRacha?.Invoke(racha);
+            StartCoroutine(ui.MostrarFeedbackTemporal("CORRECTO", Color.green));
+            float rendimiento = Mathf.Clamp01(1f - ((Time.time - inicioEstimulo) / duracionEst));
+            DifficultyManager.Instance?.ActualizarDificultad(rendimiento, true, Time.time - inicioEstimulo);
+            if (racha % 5 == 0) SubirNivel();
         }
         else
         {
-            errores++;
-            rachaActual = 0;
-            ResetearNivelPorFallo();
-            DifficultyManager.Instance?.ActualizarDificultad(0f, false, tiempoRespuesta);
+            fallosComision++;
+            racha = 0;
+            puntos = Mathf.Max(0, puntos - 1f);
+            OnRacha?.Invoke(0);
+            StartCoroutine(ui.MostrarFeedbackTemporal("ERROR", Color.red));
+            DifficultyManager.Instance?.ActualizarDificultad(0f, false, Time.time - inicioEstimulo);
         }
 
-        ActualizarUI();
+        feedbackVisible = true;
+        OnOcultarTodo?.Invoke();
+        rutinaActual = StartCoroutine(fueObjetivo ? MostrarFeedbackYContinuar() : ReiniciarPorFallo());
+    }
+
+    private IEnumerator MostrarFeedbackYContinuar()
+    {
+        yield return EsperarSegundos(tiempoFeedback);
+        OnOcultarTodo?.Invoke();
+        feedbackVisible = false;
+        if (activo && !enPausa) GenerarSiguienteEstimulo();
+    }
+
+    private IEnumerator ReiniciarPorFallo()
+    {
+        activo = false;
+        yield return EsperarSegundos(tiempoFeedback);
+
+        if (DifficultyManager.Instance != null) DifficultyManager.Instance.nivelActual = 1;
+        OnNivel?.Invoke(1);
+        ElegirNuevoObjetivo();
+
+        mostrandoObjetivo = true;
+        ui.MostrarMensaje("Recuerda tu lección:", Color.white);
+        OnMostrarIcono?.Invoke(objIcono, objColor, objTam);
+
+        yield return EsperarSegundos(tiempoRecordar);
+
+        OnOcultarTodo?.Invoke();
+        mostrandoObjetivo = false;
+
+        yield return EsperarSegundos(tiempoEntreEstimulos);
+
+        activo = true;
+        feedbackVisible = false;
+        if (!enPausa) GenerarSiguienteEstimulo();
+    }
+
+    // 🔥 ESPERA QUE RESPETA LA PAUSA
+    private IEnumerator EsperarSegundos(float segundos)
+    {
+        float tiempoPasado = 0f;
+        while (tiempoPasado < segundos)
+        {
+            if (!enPausa)
+                tiempoPasado += Time.deltaTime;
+            yield return null;
+        }
     }
 
     private void SubirNivel()
     {
-        int nivelActual = DifficultyManager.Instance?.nivelActual ?? 1;
-        if (nivelActual < 10)
+        int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
+        if (nivel < 10)
         {
-            DifficultyManager.Instance.nivelActual = nivelActual + 1;
-            OnNivelActualizado?.Invoke(DifficultyManager.Instance.nivelActual);
+            DifficultyManager.Instance.nivelActual = nivel + 1;
+            OnNivel?.Invoke(nivel + 1);
         }
     }
 
-    private void ResetearNivelPorFallo()
+    private void Update()
     {
-        if (DifficultyManager.Instance != null && DifficultyManager.Instance.nivelActual > 1)
+        if (!activo || mostrandoObjetivo || feedbackVisible || enPausa) return;
+
+        float tiempoRestante = GameManager.Instance.tiempoRestante;
+        OnTiempoPartida?.Invoke(tiempoRestante);
+
+        if (tiempoRestante <= 0)
         {
-            DifficultyManager.Instance.nivelActual = 1;
-            OnNivelActualizado?.Invoke(1);
+            OnGameFinished();
         }
     }
 
-    private void ActualizarUI()
-    {
-        OnRacha?.Invoke(rachaActual, mejorRacha);
-        OnEstadisticas?.Invoke(aciertos, omisiones, errores);
-    }
-
-    private void TerminarJuego()
-    {
-        juegoActivo = false;
-        OnGameFinished();
-    }
-
-    public override void OnGameStart()
-    {
-        ResetGame();
-    }
+    public override void OnGameStart() => ResetGame();
 
     public override void OnGameFinished()
     {
-        juegoActivo = false;
-
-        CognitiveMetrics m = CalcularCognicion();
-        CognitiveMetrics p = AplicarPesos(m);
-        WebExporter.EnviarSesion(nombre, p);
+        activo = false;
+        if (rutinaActual != null) StopCoroutine(rutinaActual);
+        WebExporter.EnviarSesion(nombre, AplicarPesos(CalcularCognicion()));
     }
 
     public override CognitiveMetrics CalcularCognicion()
     {
         CognitiveMetrics m = new CognitiveMetrics();
-
-        int total = aciertos + errores + omisiones;
+        int total = aciertos + fallosComision + omisiones;
         if (total == 0) return m;
-
-        m.atencionSostenida = 1f - ((float)omisiones / total);
-        m.controlInhibitorio = 1f - ((float)errores / total);
-
-        int oportunidadesObjetivo = aciertos + omisiones;
-        m.atencionSelectiva = oportunidadesObjetivo > 0 ? (float)aciertos / oportunidadesObjetivo : 0;
-
+        int opsObj = aciertos + omisiones;
+        m.atencionSostenida = opsObj > 0 ? (float)aciertos / opsObj : 0;
+        int distractores = fallosComision + (total - opsObj);
+        m.controlInhibitorio = distractores > 0 ? 1f - ((float)fallosComision / distractores) : 1f;
+        m.atencionSelectiva = (float)aciertos / total;
         m.memoriaTrabajo = Mathf.Clamp01((float)mejorRacha / 20f);
-
         return m;
     }
 
     public override CognitiveMetrics AplicarPesos(CognitiveMetrics m)
     {
         CognitiveMetrics p = new CognitiveMetrics();
-
         p.atencionSostenida = m.atencionSostenida * 0.50f;
         p.controlInhibitorio = m.controlInhibitorio * 0.30f;
         p.atencionSelectiva = m.atencionSelectiva * 0.15f;
         p.memoriaTrabajo = m.memoriaTrabajo * 0.05f;
-
         return p;
     }
 
     public override void PausarJuego(bool pausar)
     {
         base.PausarJuego(pausar);
-        juegoActivo = !pausar;
-    }
-}
+        enPausa = pausar;
 
-public class SpriteData
-{
-    public int id;
-    public string nombre;
-    public Texture2D textura;
-    public Color color;
-    public string colorNombre;
-    public string forma;
-    public string tamanio;
-    public float tiempoAparicion;
+        Debug.Log($"⏸️ SilencioMental - Pausa: {pausar}, activo: {activo}");
+
+        if (!pausar && activo && !mostrandoObjetivo && !feedbackVisible && !esperandoRespuesta)
+        {
+            // Al reanudar, si no hay estímulo activo, generar uno
+            GenerarSiguienteEstimulo();
+        }
+    }
 }
