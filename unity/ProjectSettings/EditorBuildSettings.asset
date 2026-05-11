@@ -11,7 +11,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Juegos/SilencioMental/Scenes/SilencioMental_SampleScene.unity
     guid: 47222f1f64a49214c926270f2cb6e1f1
-  - enabled: 1
+  - enabled: 0
     path: Assets/Framework/Juegos/OperacionesEncadenadas/OperacionesEncadenadas_SampleScene.unity
     guid: 304a8c822b7834947a903f874e717638
   - enabled: 0
@@ -23,6 +23,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Framework/Juegos/MisionOrbital/MisionOrbital_SampleScene.unity
     guid: 4181590a9d7b6064a85be41203388ec5
+  - enabled: 1
+    path: Assets/Framework/Juegos/SilencioMental/SilencioMental_SampleScene.unity
+    guid: f4daf99b127ca504189379256b8096c0
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
