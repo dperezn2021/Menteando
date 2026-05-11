@@ -150,7 +150,7 @@ const CATALOGO_JUEGOS = [
         "heroEyebrow": "Gestión controlada",
         "destacado": false,
         "skills": ["atencion_sostenida", "atencion_selectiva", "memoria_trabajo", "control_inhibitorio"],
-        "disponible": "No disponible"
+        "disponible": "Disponible"
     },
 
     {
