@@ -377,6 +377,28 @@ html.dark {
     margin-bottom: 1rem;
 }
 
+/* Estilos base (móvil vertical) - COLUMNA */
+header .max-w-7xl > div {
+    flex-direction: column;
+    text-align: center;
+}
+
+/* Para tablets y móviles horizontales */
+@media (min-width: 640px) and (orientation: landscape) {
+    header .max-w-7xl > div {
+        flex-direction: row;
+        text-align: left;
+    }
+}
+
+/* Para PC y tablets grandes (ancho mínimo 768px) */
+@media (min-width: 768px) {
+    header .max-w-7xl > div {
+        flex-direction: row;
+        text-align: left;
+    }
+}
+
 /* =========================
     FOOTER
 ========================= */
