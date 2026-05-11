@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using TMPro;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class UICalculadora : MonoBehaviour
@@ -7,72 +7,138 @@ public class UICalculadora : MonoBehaviour
     [Header("Elementos UI (TMP)")]
     public TextMeshProUGUI textoOperacion;
     public TMP_InputField inputRespuesta;
+    public TextMeshProUGUI textoRachaActual;
+    public TextMeshProUGUI textoTiempoRestante;
+    public TextMeshProUGUI textoNivel;
 
     [Header("Botones")]
-    public Button[] botonesNumeros;  // 0-9
-    public Button botonClear;        // C
-    public Button botonDelete;       // ⌫
-    public Button botonIgual;        // =
-    public Button botonMenos;        // -
+    public Button[] botonesNumeros;
+    public Button botonClear;
+    public Button botonDelete;
+    public Button botonIgual;
+    public Button botonMenos;
 
     private OperacionesEncadenadasGame gameLogic;
+    private bool botonesConfigurados = false;
+    private float ultimoTiempoTecla = 0f;
 
-    void Start()
+    private void Start()
     {
-        // BOTONES NUMÉRICOS
-        for (int i = 0; i < botonesNumeros.Length; i++)
+        Debug.Log($"UICalculadora activa en: {gameObject.name}", this);
+        // 🔥 FORZAR BÚSQUEDA DE textoOperacion SI NO ESTÁ ASIGNADO
+        if (textoOperacion == null)
+            textoOperacion = GetComponentInChildren<TextMeshProUGUI>();
+
+        if (textoOperacion == null)
+            Debug.LogError("❌ textoOperacion no asignado - Créalo y asígnalo manualmente en el Inspector");
+        else
+            textoOperacion.gameObject.SetActive(true);
+
+        ConfigurarInput();
+        ConfigurarBotones();
+
+        if (gameLogic == null)
         {
-            int num = i;
-            botonesNumeros[i].onClick.AddListener(() =>
-            {
-                AudioManager.Instance?.Click();
-                AgregarNumero(num);
-            });
+            OperacionesEncadenadasGame juego = FindFirstObjectByType<OperacionesEncadenadasGame>();
+            if (juego != null)
+                Inicializar(juego);
         }
-
-        // BOTONES ESPECIALES
-        botonClear.onClick.AddListener(() =>
-        {
-            AudioManager.Instance?.Click();
-            LimpiarInput();
-        });
-
-        botonDelete.onClick.AddListener(() =>
-        {
-            AudioManager.Instance?.Click();
-            BorrarUltimoDigito();
-        });
-
-        botonIgual.onClick.AddListener(() =>
-        {
-            AudioManager.Instance?.Click();
-            EnviarRespuesta();
-        });
-
-        botonMenos.onClick.AddListener(() =>
-        {
-            AudioManager.Instance?.Click();
-            AgregarSignoMenos();
-        });
-
-        // INPUT
-        inputRespuesta.contentType = TMP_InputField.ContentType.IntegerNumber;
-        inputRespuesta.characterLimit = 6;
-        inputRespuesta.text = "0";
-        inputRespuesta.DeactivateInputField();
     }
 
     public void Inicializar(OperacionesEncadenadasGame logic)
     {
         gameLogic = logic;
+        ConfigurarInput();
+        ConfigurarBotones();
         LimpiarInput();
+        ActualizarHUD();
     }
 
-    // ============================
-    // INPUT NUMÉRICO
-    // ============================
+    private void ConfigurarInput()
+    {
+        if (inputRespuesta != null)
+        {
+            inputRespuesta.contentType = TMP_InputField.ContentType.IntegerNumber;
+            inputRespuesta.characterLimit = 6;
+            inputRespuesta.readOnly = true;
+            inputRespuesta.interactable = false;
+            inputRespuesta.shouldHideMobileInput = true;
+            inputRespuesta.enabled = false;
+            if (string.IsNullOrEmpty(inputRespuesta.text))
+                inputRespuesta.text = "0";
+        }
+
+        if (textoOperacion != null)
+            textoOperacion.gameObject.SetActive(true);
+    }
+
+    private void ConfigurarBotones()
+    {
+        if (botonesConfigurados) return;
+
+        if (botonesNumeros != null)
+        {
+            for (int i = 0; i < botonesNumeros.Length; i++)
+            {
+                int num = i;
+                if (botonesNumeros[i] == null) continue;
+
+                botonesNumeros[i].onClick.RemoveAllListeners();
+                botonesNumeros[i].onClick.AddListener(() =>
+                {
+                    AudioManager.Instance?.Click();
+                    AgregarNumero(num);
+                });
+            }
+        }
+
+        if (botonClear != null)
+        {
+            botonClear.onClick.RemoveAllListeners();
+            botonClear.onClick.AddListener(() =>
+            {
+                AudioManager.Instance?.Click();
+                LimpiarInput();
+            });
+        }
+
+        if (botonDelete != null)
+        {
+            botonDelete.onClick.RemoveAllListeners();
+            botonDelete.onClick.AddListener(() =>
+            {
+                AudioManager.Instance?.Click();
+                BorrarUltimoDigito();
+            });
+        }
+
+        if (botonIgual != null)
+        {
+            botonIgual.onClick.RemoveAllListeners();
+            botonIgual.onClick.AddListener(() =>
+            {
+                AudioManager.Instance?.Click();
+                EnviarRespuesta();
+            });
+        }
+
+        if (botonMenos != null)
+        {
+            botonMenos.onClick.RemoveAllListeners();
+            botonMenos.onClick.AddListener(() =>
+            {
+                AudioManager.Instance?.Click();
+                AgregarSignoMenos();
+            });
+        }
+
+        botonesConfigurados = true;
+    }
+
     public void AgregarNumero(int num)
     {
+        if (inputRespuesta == null) return;
+
         string current = inputRespuesta.text;
         bool negativo = current.StartsWith("-");
 
@@ -83,93 +149,129 @@ public class UICalculadora : MonoBehaviour
         if (current.Length > 5) current = current.Substring(0, 5);
 
         inputRespuesta.text = negativo ? "-" + current : current;
-        inputRespuesta.DeactivateInputField();
     }
 
     public void AgregarSignoMenos()
     {
+        if (inputRespuesta == null) return;
+
         string current = inputRespuesta.text;
+        if (current.StartsWith("-")) return;
 
-        if (!current.StartsWith("-"))
-            inputRespuesta.text = current == "0" ? "-" : "-" + current;
-
-        inputRespuesta.DeactivateInputField();
+        inputRespuesta.text = string.IsNullOrEmpty(current) || current == "0" ? "-" : "-" + current;
     }
 
     public void BorrarUltimoDigito()
     {
+        if (inputRespuesta == null) return;
+
         string current = inputRespuesta.text;
+        if (string.IsNullOrEmpty(current) || current == "0")
+            return;
 
-        if (current == "-" || current.Length <= 1)
-            inputRespuesta.text = "0";
-        else
-            inputRespuesta.text = current.Substring(0, current.Length - 1);
-
-        inputRespuesta.DeactivateInputField();
+        current = current.Substring(0, current.Length - 1);
+        inputRespuesta.text = string.IsNullOrEmpty(current) || current == "-" ? "0" : current;
     }
 
     public void LimpiarInput()
     {
-        inputRespuesta.text = "0";
-        inputRespuesta.DeactivateInputField();
+        if (inputRespuesta != null)
+            inputRespuesta.text = "0";
     }
 
-    // ============================
-    // ENVÍO DE RESPUESTA
-    // ============================
     public void EnviarRespuesta()
     {
-        inputRespuesta.DeactivateInputField();
+        if (inputRespuesta == null) return;
 
-        if (int.TryParse(inputRespuesta.text, out int r))
+        if (int.TryParse(inputRespuesta.text, out int respuesta))
         {
-            gameLogic?.EnviarRespuesta(r);
+            gameLogic?.EnviarRespuesta(respuesta);
             LimpiarInput();
         }
     }
 
-    // ============================
-    // OPERACIÓN Y MEMORIZACIÓN
-    // ============================
     public void MostrarOperacion(string operacion)
     {
+        if (textoOperacion == null) return;
         textoOperacion.text = operacion;
     }
 
-    public void MostrarMemorizacion(string msg)
+    public void MostrarMemorizacion(string mensaje)
     {
-        textoOperacion.text = msg;
+        if (textoOperacion == null)
+        {
+            Debug.LogError("textoOperacion es NULL");
+            return;
+        }
+        textoOperacion.text = mensaje;
+        Debug.Log("MostrarMemorizacion: " + mensaje);
     }
 
     public void OcultarMemorizacion()
     {
-        textoOperacion.text = "";
+        if (textoOperacion != null)
+            textoOperacion.text = "";
     }
 
-    // ============================
-    // TECLADO
-    // ============================
     private void Update()
     {
         if (gameLogic == null) return;
 
+        // Prevenir doble procesamiento
+        if (Time.unscaledTime - ultimoTiempoTecla < 0.05f) return;
+
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            ultimoTiempoTecla = Time.unscaledTime;
             EnviarRespuesta();
+        }
 
         for (int i = 0; i <= 9; i++)
         {
-            if (Input.GetKeyDown(KeyCode.Alpha0 + i) ||
-                Input.GetKeyDown(KeyCode.Keypad0 + i))
+            bool pressed =
+                Input.GetKeyDown(KeyCode.Alpha0 + i) ||
+                Input.GetKeyDown(KeyCode.Keypad0 + i);
+
+            if (pressed)
+            {
                 AgregarNumero(i);
+                break;
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus))
+        {
+            ultimoTiempoTecla = Time.unscaledTime;
             AgregarSignoMenos();
+        }
 
         if (Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Delete))
+        {
+            ultimoTiempoTecla = Time.unscaledTime;
             BorrarUltimoDigito();
+        }
 
         if (Input.GetKeyDown(KeyCode.C))
+        {
+            ultimoTiempoTecla = Time.unscaledTime;
             LimpiarInput();
+        }
+
+        ActualizarHUD();
+    }
+
+    private void ActualizarHUD()
+    {
+        if (textoRachaActual != null && gameLogic != null)
+            textoRachaActual.text = $"RACHA: {gameLogic.rachaActual}";
+
+        if (textoTiempoRestante != null && GameManager.Instance != null)
+        {
+            int segundos = Mathf.Max(0, Mathf.CeilToInt(GameManager.Instance.tiempoRestante));
+            textoTiempoRestante.text = $"TIEMPO: {segundos:00}";
+        }
+
+        if (textoNivel != null && DifficultyManager.Instance != null)
+            textoNivel.text = $"NIVEL: {DifficultyManager.Instance.nivelActual}/10";
     }
 }

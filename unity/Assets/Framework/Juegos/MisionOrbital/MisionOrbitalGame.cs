@@ -34,6 +34,7 @@ public class MisionOrbitalGame : BaseGame
     private float velocidadRotacion;
     private bool jugando = false;
     private bool girando = false;
+    private bool finalizado = false;
     private GameObject[] asteroides;
     private int direccion;
     private Coroutine rutinaGiro;
@@ -59,6 +60,8 @@ public class MisionOrbitalGame : BaseGame
         aciertos = 0;
         sumaRT = 0f;
         sumaRT2 = 0f;
+        finalizado = false;
+        DifficultyManager.Instance?.ResetDifficulty(1);
 
         sistemaOrbital.SetActive(true);
         GenerarEstimulos();
@@ -71,6 +74,9 @@ public class MisionOrbitalGame : BaseGame
 
     public override void OnGameFinished()
     {
+        if (finalizado) return;
+
+        finalizado = true;
         sistemaOrbital.SetActive(false);
         if (rutinaGiro != null) StopCoroutine(rutinaGiro);
         EnviarResultados();

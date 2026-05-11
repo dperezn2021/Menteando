@@ -52,6 +52,7 @@ public class DobleCanalGame : BaseGame
     private bool activo = false;
     private bool esperandoRespuesta = false;
     private bool feedbackVisible = false;
+    private bool finalizado = false;
 
     // Estímulos
     private string objetivoIcono;
@@ -163,6 +164,8 @@ public class DobleCanalGame : BaseGame
         activo = false;
         esperandoRespuesta = false;
         feedbackVisible = false;
+        finalizado = false;
+        DifficultyManager.Instance?.ResetDifficulty(1);
 
         // Elegir objetivo
         objetivoIcono = iconosDisponibles[Random.Range(0, iconosDisponibles.Count)];
@@ -387,6 +390,9 @@ public class DobleCanalGame : BaseGame
 
     public override void OnGameFinished()
     {
+        if (finalizado) return;
+
+        finalizado = true;
         activo = false;
         foreach (GameObject obs in obstaculosActivos)
             if (obs != null) Destroy(obs);

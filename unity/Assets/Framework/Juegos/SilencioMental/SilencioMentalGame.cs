@@ -5,6 +5,8 @@ using System.Linq;
 
 public class SilencioMentalGame : BaseGame
 {
+    private enum TamanioEstimulo { Pequeno, Mediano, Grande }
+
     [Header("Tiempos")]
     public float tiempoRecordar = 2.5f;
     public float tiempoFeedback = 1f;
@@ -13,8 +15,11 @@ public class SilencioMentalGame : BaseGame
     [Header("Curvas (nivel 1 a 10)")]
     public AnimationCurve duracionEstimulo;
     public AnimationCurve probObjetivo;
-    public AnimationCurve tamanioMin;
-    public AnimationCurve tamanioMax;
+
+    [Header("Tamanios fijos")]
+    public int tamanioPequeno = 52;
+    public int tamanioMediano = 82;
+    public int tamanioGrande = 116;
 
     [Header("Íconos")]
     public List<string> letras = new List<string> { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
@@ -41,24 +46,33 @@ public class SilencioMentalGame : BaseGame
     private bool mostrandoObjetivo = false;
     private bool esperandoRespuesta = false;
     private bool feedbackVisible = false;
+    private bool finalizado = false;
     private float inicioPartida;
 
     private string objIcono;
     private Color objColor;
     private int objTam;
+    private TamanioEstimulo objTamanio;
 
     private string estIcono;
     private Color estColor;
     private int estTam;
+    private TamanioEstimulo estTamanio;
+    private bool estEsObjetivo;
     private float inicioEstimulo;
     private float duracionEst;
 
     private int aciertos = 0;
+    private int aciertosObjetivo = 0;
+    private int rechazosCorrectos = 0;
+    private int objetivosMostrados = 0;
+    private int distractoresMostrados = 0;
     private int fallosComision = 0;
     private int omisiones = 0;
     private float puntos = 0f;
     private int racha = 0;
     private int mejorRacha = 0;
+    private List<float> tiemposReaccion = new List<float>();
 
     // Control de pausa
     private bool enPausa = false;
@@ -100,18 +114,6 @@ public class SilencioMentalGame : BaseGame
             probObjetivo.AddKey(5, 0.30f);
             probObjetivo.AddKey(10, 0.20f);
         }
-        if (tamanioMin == null || tamanioMin.keys.Length == 0)
-        {
-            tamanioMin = new AnimationCurve();
-            tamanioMin.AddKey(1, 60);
-            tamanioMin.AddKey(10, 40);
-        }
-        if (tamanioMax == null || tamanioMax.keys.Length == 0)
-        {
-            tamanioMax = new AnimationCurve();
-            tamanioMax.AddKey(1, 120);
-            tamanioMax.AddKey(10, 80);
-        }
     }
 
     public override void ResetGame()
@@ -121,30 +123,36 @@ public class SilencioMentalGame : BaseGame
 
         if (ui == null) ui = FindFirstObjectByType<UISilencioMental>();
 
-        OnRacha -= ui.ActualizarRacha;
-        OnTiempoPartida -= ui.ActualizarTiempo;
-        OnNivel -= ui.ActualizarNivel;
-        OnMostrarIcono -= ui.MostrarIcono;
-        OnOcultarTodo -= ui.OcultarTodo;
+        if (ui != null)
+        {
+            OnRacha -= ui.ActualizarRacha;
+            OnTiempoPartida -= ui.ActualizarTiempo;
+            OnNivel -= ui.ActualizarNivel;
+            OnMostrarIcono -= ui.MostrarIcono;
+            OnOcultarTodo -= ui.OcultarTodo;
 
-        OnRacha += ui.ActualizarRacha;
-        OnTiempoPartida += ui.ActualizarTiempo;
-        OnNivel += ui.ActualizarNivel;
-        OnMostrarIcono += ui.MostrarIcono;
-        OnOcultarTodo += ui.OcultarTodo;
+            OnRacha += ui.ActualizarRacha;
+            OnTiempoPartida += ui.ActualizarTiempo;
+            OnNivel += ui.ActualizarNivel;
+            OnMostrarIcono += ui.MostrarIcono;
+            OnOcultarTodo += ui.OcultarTodo;
+        }
 
         activo = false;
         mostrandoObjetivo = false;
         esperandoRespuesta = false;
         feedbackVisible = false;
         enPausa = false;
+        finalizado = false;
 
         aciertos = fallosComision = omisiones = 0;
+        aciertosObjetivo = rechazosCorrectos = objetivosMostrados = distractoresMostrados = 0;
+        tiemposReaccion.Clear();
         puntos = 0f;
         racha = 0;
         mejorRacha = 0;
 
-        if (DifficultyManager.Instance != null) DifficultyManager.Instance.nivelActual = 1;
+        DifficultyManager.Instance?.ResetDifficulty(1);
         OnNivel?.Invoke(1);
         OnRacha?.Invoke(0);
 
@@ -156,10 +164,8 @@ public class SilencioMentalGame : BaseGame
     {
         objIcono = todosIconos[Random.Range(0, todosIconos.Count)];
         objColor = colores[Random.Range(0, colores.Count)];
-        int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
-        int min = Mathf.RoundToInt(tamanioMin.Evaluate(nivel));
-        int max = Mathf.RoundToInt(tamanioMax.Evaluate(nivel));
-        objTam = Random.Range(min, max + 1);
+        objTamanio = TamanioAleatorio();
+        objTam = ObtenerFontSize(objTamanio);
     }
 
     // CORUTINA PRINCIPAL CON PAUSA MANUAL
@@ -168,7 +174,7 @@ public class SilencioMentalGame : BaseGame
         activo = false;
         mostrandoObjetivo = true;
 
-        ui.MostrarMensaje("Recuerda tu lección:", Color.white);
+        ui?.MostrarMensaje("Recuerda tu lección:", Color.white);
         OnMostrarIcono?.Invoke(objIcono, objColor, objTam);
 
         yield return EsperarSegundos(tiempoRecordar);
@@ -191,24 +197,20 @@ public class SilencioMentalGame : BaseGame
         duracionEst = duracionEstimulo.Evaluate(nivel);
         float prob = probObjetivo.Evaluate(nivel);
         bool esObjetivo = Random.value < prob;
+        estEsObjetivo = esObjetivo;
 
         if (esObjetivo)
         {
+            objetivosMostrados++;
             estIcono = objIcono;
             estColor = objColor;
-            estTam = objTam;
+            estTamanio = objTamanio;
+            estTam = ObtenerFontSize(estTamanio);
         }
         else
         {
-            char c = objIcono[0];
-            string cat = categoria.ContainsKey(c) ? categoria[c] : "letra";
-            var candidatos = todosIconos.Where(i => i != objIcono && categoria.ContainsKey(i[0]) && categoria[i[0]] == cat).ToList();
-            if (candidatos.Count == 0) candidatos = todosIconos.Where(i => i != objIcono).ToList();
-            estIcono = candidatos[Random.Range(0, candidatos.Count)];
-            estColor = colores[Random.Range(0, colores.Count)];
-            int min = Mathf.RoundToInt(tamanioMin.Evaluate(nivel));
-            int max = Mathf.RoundToInt(tamanioMax.Evaluate(nivel));
-            estTam = Random.Range(min, max + 1);
+            distractoresMostrados++;
+            GenerarDistractorParecido();
         }
 
         OnMostrarIcono?.Invoke(estIcono, estColor, estTam);
@@ -224,13 +226,11 @@ public class SilencioMentalGame : BaseGame
         if (esperandoRespuesta && activo && !mostrandoObjetivo && !feedbackVisible && !enPausa)
         {
             esperandoRespuesta = false;
-            bool eraObjetivo = (estIcono == objIcono);
-
-            if (eraObjetivo)
+            if (estEsObjetivo)
             {
                 omisiones++;
                 racha = 0;
-                StartCoroutine(ui.MostrarFeedbackTemporal("ERROR", Color.red));
+                if (ui != null) StartCoroutine(ui.MostrarFeedbackTemporal("ERROR", Color.red));
                 feedbackVisible = true;
                 OnOcultarTodo?.Invoke();
                 rutinaActual = StartCoroutine(ReiniciarPorFallo());
@@ -238,11 +238,12 @@ public class SilencioMentalGame : BaseGame
             else
             {
                 aciertos++;
+                rechazosCorrectos++;
                 puntos += 0.25f;
                 racha++;
                 if (racha > mejorRacha) mejorRacha = racha;
                 OnRacha?.Invoke(racha);
-                StartCoroutine(ui.MostrarFeedbackTemporal("CORRECTO", Color.green));
+                if (ui != null) StartCoroutine(ui.MostrarFeedbackTemporal("CORRECTO", Color.green));
                 feedbackVisible = true;
                 OnOcultarTodo?.Invoke();
                 if (racha % 5 == 0) SubirNivel();
@@ -258,18 +259,21 @@ public class SilencioMentalGame : BaseGame
         if (rutinaActual != null) StopCoroutine(rutinaActual);
         esperandoRespuesta = false;
 
-        bool fueObjetivo = (estIcono == objIcono);
+        bool fueObjetivo = estEsObjetivo;
+        float tiempoRespuesta = Time.time - inicioEstimulo;
+        tiemposReaccion.Add(tiempoRespuesta);
 
         if (fueObjetivo)
         {
             aciertos++;
+            aciertosObjetivo++;
             puntos += 1f;
             racha++;
             if (racha > mejorRacha) mejorRacha = racha;
             OnRacha?.Invoke(racha);
-            StartCoroutine(ui.MostrarFeedbackTemporal("CORRECTO", Color.green));
-            float rendimiento = Mathf.Clamp01(1f - ((Time.time - inicioEstimulo) / duracionEst));
-            DifficultyManager.Instance?.ActualizarDificultad(rendimiento, true, Time.time - inicioEstimulo);
+            if (ui != null) StartCoroutine(ui.MostrarFeedbackTemporal("CORRECTO", Color.green));
+            float rendimiento = Mathf.Clamp01(1f - (tiempoRespuesta / duracionEst));
+            DifficultyManager.Instance?.ActualizarDificultad(rendimiento, true, tiempoRespuesta);
             if (racha % 5 == 0) SubirNivel();
         }
         else
@@ -278,8 +282,8 @@ public class SilencioMentalGame : BaseGame
             racha = 0;
             puntos = Mathf.Max(0, puntos - 1f);
             OnRacha?.Invoke(0);
-            StartCoroutine(ui.MostrarFeedbackTemporal("ERROR", Color.red));
-            DifficultyManager.Instance?.ActualizarDificultad(0f, false, Time.time - inicioEstimulo);
+            if (ui != null) StartCoroutine(ui.MostrarFeedbackTemporal("ERROR", Color.red));
+            DifficultyManager.Instance?.ActualizarDificultad(0f, false, tiempoRespuesta);
         }
 
         feedbackVisible = true;
@@ -300,12 +304,12 @@ public class SilencioMentalGame : BaseGame
         activo = false;
         yield return EsperarSegundos(tiempoFeedback);
 
-        if (DifficultyManager.Instance != null) DifficultyManager.Instance.nivelActual = 1;
+        DifficultyManager.Instance?.ResetDifficulty(1);
         OnNivel?.Invoke(1);
         ElegirNuevoObjetivo();
 
         mostrandoObjetivo = true;
-        ui.MostrarMensaje("Recuerda tu lección:", Color.white);
+        ui?.MostrarMensaje("Recuerda tu lección:", Color.white);
         OnMostrarIcono?.Invoke(objIcono, objColor, objTam);
 
         yield return EsperarSegundos(tiempoRecordar);
@@ -323,12 +327,95 @@ public class SilencioMentalGame : BaseGame
     // 🔥 ESPERA QUE RESPETA LA PAUSA
     private IEnumerator EsperarSegundos(float segundos)
     {
-        float tiempoPasado = 0f;
-        while (tiempoPasado < segundos)
+        yield return GamePause.WaitWhileNotPaused(segundos, () => enPausa || finalizado);
+    }
+
+    private void GenerarDistractorParecido()
+    {
+        float r = Random.value;
+
+        if (r < 0.30f)
         {
-            if (!enPausa)
-                tiempoPasado += Time.deltaTime;
-            yield return null;
+            estIcono = IconoMismaCategoriaDistinto();
+            estColor = objColor;
+            estTamanio = TamanioAleatorio();
+        }
+        else if (r < 0.60f)
+        {
+            estIcono = objIcono;
+            estColor = ColorDistinto();
+            estTamanio = TamanioAleatorio();
+        }
+        else if (r < 0.85f)
+        {
+            estIcono = objIcono;
+            estColor = objColor;
+            estTamanio = TamanioDistinto(objTamanio);
+        }
+        else
+        {
+            estIcono = todosIconos[Random.Range(0, todosIconos.Count)];
+            estColor = colores[Random.Range(0, colores.Count)];
+            estTamanio = TamanioAleatorio();
+        }
+
+        if (estIcono == objIcono && estColor == objColor && estTamanio == objTamanio)
+            estTamanio = TamanioDistinto(objTamanio);
+
+        estTam = ObtenerFontSize(estTamanio);
+    }
+
+    private string IconoMismaCategoriaDistinto()
+    {
+        char c = objIcono[0];
+        string cat = categoria.ContainsKey(c) ? categoria[c] : "letra";
+        var candidatos = todosIconos.Where(i => i != objIcono && categoria.ContainsKey(i[0]) && categoria[i[0]] == cat).ToList();
+        if (candidatos.Count == 0)
+            candidatos = todosIconos.Where(i => i != objIcono).ToList();
+
+        return candidatos[Random.Range(0, candidatos.Count)];
+    }
+
+    private Color ColorDistinto()
+    {
+        if (colores.Count <= 1)
+            return objColor;
+
+        Color color;
+        do
+        {
+            color = colores[Random.Range(0, colores.Count)];
+        }
+        while (color == objColor);
+
+        return color;
+    }
+
+    private TamanioEstimulo TamanioAleatorio()
+    {
+        return (TamanioEstimulo)Random.Range(0, 3);
+    }
+
+    private TamanioEstimulo TamanioDistinto(TamanioEstimulo actual)
+    {
+        TamanioEstimulo nuevo;
+        do
+        {
+            nuevo = TamanioAleatorio();
+        }
+        while (nuevo == actual);
+
+        return nuevo;
+    }
+
+    private int ObtenerFontSize(TamanioEstimulo tamanio)
+    {
+        switch (tamanio)
+        {
+            case TamanioEstimulo.Pequeno: return tamanioPequeno;
+            case TamanioEstimulo.Mediano: return tamanioMediano;
+            case TamanioEstimulo.Grande: return tamanioGrande;
+            default: return tamanioMediano;
         }
     }
 
@@ -344,22 +431,22 @@ public class SilencioMentalGame : BaseGame
 
     private void Update()
     {
-        if (!activo || mostrandoObjetivo || feedbackVisible || enPausa) return;
+        if (!activo || mostrandoObjetivo || feedbackVisible || enPausa || finalizado) return;
 
-        float tiempoRestante = GameManager.Instance.tiempoRestante;
-        OnTiempoPartida?.Invoke(tiempoRestante);
-
-        if (tiempoRestante <= 0)
-        {
-            OnGameFinished();
-        }
+        if (GameManager.Instance != null)
+            OnTiempoPartida?.Invoke(GameManager.Instance.tiempoRestante);
     }
 
     public override void OnGameStart() => ResetGame();
 
     public override void OnGameFinished()
     {
+        if (finalizado) return;
+
+        finalizado = true;
         activo = false;
+        esperandoRespuesta = false;
+        feedbackVisible = false;
         if (rutinaActual != null) StopCoroutine(rutinaActual);
         WebExporter.EnviarSesion(nombre, AplicarPesos(CalcularCognicion()));
     }
@@ -367,13 +454,12 @@ public class SilencioMentalGame : BaseGame
     public override CognitiveMetrics CalcularCognicion()
     {
         CognitiveMetrics m = new CognitiveMetrics();
-        int total = aciertos + fallosComision + omisiones;
+        int total = objetivosMostrados + distractoresMostrados;
         if (total == 0) return m;
-        int opsObj = aciertos + omisiones;
-        m.atencionSostenida = opsObj > 0 ? (float)aciertos / opsObj : 0;
-        int distractores = fallosComision + (total - opsObj);
-        m.controlInhibitorio = distractores > 0 ? 1f - ((float)fallosComision / distractores) : 1f;
-        m.atencionSelectiva = (float)aciertos / total;
+
+        m.atencionSostenida = objetivosMostrados > 0 ? (float)aciertosObjetivo / objetivosMostrados : 0.5f;
+        m.controlInhibitorio = distractoresMostrados > 0 ? (float)rechazosCorrectos / distractoresMostrados : 1f;
+        m.atencionSelectiva = (float)(aciertosObjetivo + rechazosCorrectos) / total;
         m.memoriaTrabajo = Mathf.Clamp01((float)mejorRacha / 20f);
         return m;
     }

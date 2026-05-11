@@ -74,7 +74,7 @@ public class UISilencioMental : MonoBehaviour
             textoFeedback.gameObject.SetActive(true);
         }
 
-        yield return new WaitForSeconds(1f);
+        yield return GamePause.WaitWhileNotPaused(1f, () => GameManager.Instance != null && GameManager.Instance.EstaPausado());
 
         if (textoFeedback != null)
         {

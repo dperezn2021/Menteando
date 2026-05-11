@@ -8,6 +8,7 @@ public class UIDetectorIntrusos : MonoBehaviour
     [Header("Referencias al Juego")]
     public DetectorDeIntrusosGame juego;
     public GridLayoutGroup gridLayout;
+    public ResponsiveGridController responsiveGrid;
     public LupaFlotante lupaScript;
 
     [Header("Textos UI")]
@@ -74,15 +75,27 @@ public class UIDetectorIntrusos : MonoBehaviour
     {
         if (gridLayout == null) return;
 
-        gridLayout.cellSize = new Vector2(anchoCelda, altoCelda);
-        gridLayout.spacing = new Vector2(espaciado, espaciado);
-        gridLayout.startAxis = GridLayoutGroup.Axis.Horizontal;
-        gridLayout.childAlignment = TextAnchor.MiddleCenter;
+        if (responsiveGrid == null)
+            responsiveGrid = gridLayout.GetComponent<ResponsiveGridController>();
+
+        if (responsiveGrid == null)
+            responsiveGrid = gridLayout.gameObject.AddComponent<ResponsiveGridController>();
+
+        responsiveGrid.grid = gridLayout;
+        responsiveGrid.minCellSize = Mathf.Min(anchoCelda, altoCelda) * 0.55f;
+        responsiveGrid.maxCellSize = Mathf.Max(anchoCelda, altoCelda);
+        responsiveGrid.minSpacing = Mathf.Max(4f, espaciado * 0.4f);
+        responsiveGrid.maxSpacing = espaciado;
+        responsiveGrid.Apply(3, 4);
     }
 
     private void ActualizarGridSize(int filas, int columnas)
     {
-        if (gridLayout != null)
+        if (responsiveGrid != null)
+        {
+            responsiveGrid.Apply(filas, columnas);
+        }
+        else if (gridLayout != null)
         {
             gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             gridLayout.constraintCount = columnas;

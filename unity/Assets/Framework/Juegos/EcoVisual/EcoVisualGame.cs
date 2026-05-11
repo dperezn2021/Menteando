@@ -29,6 +29,7 @@ public class EcoVisualGame : BaseGame, IBeginDragHandler, IDragHandler, IEndDrag
     private List<ObjetoMemoria> objetos = new List<ObjetoMemoria>();
     private bool faseMemorizacion = true;
     private bool juegoActivo = false;
+    private bool juegoFinalizado = false;
     private int puntuacion = 0;
     private int totalColocados = 0;
 
@@ -61,8 +62,10 @@ public class EcoVisualGame : BaseGame, IBeginDragHandler, IDragHandler, IEndDrag
 
         faseMemorizacion = true;
         juegoActivo = true;
+        juegoFinalizado = false;
         puntuacion = 0;
         totalColocados = 0;
+        DifficultyManager.Instance?.ResetDifficulty(1);
 
         if (textoInstruccion != null)
             textoInstruccion.text = "MEMORIZA LAS POSICIONES...";
@@ -276,6 +279,10 @@ public class EcoVisualGame : BaseGame, IBeginDragHandler, IDragHandler, IEndDrag
 
     public override void OnGameFinished()
     {
+        if (juegoFinalizado) return;
+
+        juegoFinalizado = true;
+        juegoActivo = false;
         CognitiveMetrics m = CalcularCognicion();
         WebExporter.EnviarSesion(nombre, AplicarPesos(m));
     }

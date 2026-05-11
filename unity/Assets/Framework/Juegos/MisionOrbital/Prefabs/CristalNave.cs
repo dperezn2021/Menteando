@@ -56,6 +56,7 @@ public class CristalNave : MonoBehaviour
         CrearBrujula();
         CrearCruceta();
         CrearBarras();
+        CrearBotonDisparo();
     }
 
     void CrearFondo()
@@ -162,11 +163,7 @@ public class CristalNave : MonoBehaviour
         img.color = new Color(0.0f, 0.0f, 0.0f, 0.0f);
 
         Button btn = centro.AddComponent<Button>();
-        btn.onClick.AddListener(() =>
-        {
-            var juego = FindAnyObjectByType<MisionOrbitalGame>(FindObjectsInactive.Include);
-            if (juego != null) juego.Disparar();
-        });
+        btn.onClick.AddListener(DispararMisionOrbital);
     }
 
     void CrearLineaCentro(Vector2 offset, Vector2 size)
@@ -179,6 +176,50 @@ public class CristalNave : MonoBehaviour
         rect.sizeDelta = size;
 
         linea.AddComponent<Image>().color = colorAlerta;
+    }
+
+    void CrearBotonDisparo()
+    {
+        GameObject botonObj = Crear("BotonDisparo", transform);
+        RectTransform rect = botonObj.AddComponent<RectTransform>();
+        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0f);
+        rect.pivot = new Vector2(0.5f, 0f);
+        rect.anchoredPosition = new Vector2(0f, 34f);
+        rect.sizeDelta = new Vector2(132f, 54f);
+
+        Image fondo = botonObj.AddComponent<Image>();
+        fondo.color = new Color(colorAlerta.r, colorAlerta.g, colorAlerta.b, 0.32f);
+
+        Button btn = botonObj.AddComponent<Button>();
+        btn.targetGraphic = fondo;
+        btn.onClick.AddListener(DispararMisionOrbital);
+
+        ColorBlock colors = btn.colors;
+        colors.normalColor = fondo.color;
+        colors.highlightedColor = new Color(colorAlerta.r, colorAlerta.g, colorAlerta.b, 0.46f);
+        colors.pressedColor = new Color(colorAlerta.r, colorAlerta.g, colorAlerta.b, 0.70f);
+        colors.selectedColor = colors.highlightedColor;
+        btn.colors = colors;
+
+        GameObject textoObj = Crear("Texto", botonObj.transform);
+        RectTransform textoRect = textoObj.AddComponent<RectTransform>();
+        textoRect.anchorMin = Vector2.zero;
+        textoRect.anchorMax = Vector2.one;
+        textoRect.offsetMin = Vector2.zero;
+        textoRect.offsetMax = Vector2.zero;
+
+        TextMeshProUGUI texto = textoObj.AddComponent<TextMeshProUGUI>();
+        texto.text = "DISPARAR";
+        texto.fontSize = 18;
+        texto.color = Color.white;
+        texto.alignment = TextAlignmentOptions.Center;
+        texto.raycastTarget = false;
+    }
+
+    void DispararMisionOrbital()
+    {
+        var juego = FindAnyObjectByType<MisionOrbitalGame>(FindObjectsInactive.Include);
+        if (juego != null) juego.Disparar();
     }
 
     // ============================================================

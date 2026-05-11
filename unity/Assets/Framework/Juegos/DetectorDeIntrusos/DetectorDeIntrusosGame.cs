@@ -106,6 +106,7 @@ public class DetectorDeIntrusosGame : BaseGame
 
         tiemposReaccion.Clear();
         aciertosLista.Clear();
+        DifficultyManager.Instance?.ResetDifficulty(1);
 
         rondaActiva = false;
 

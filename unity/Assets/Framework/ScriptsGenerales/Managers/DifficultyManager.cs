@@ -21,6 +21,14 @@ public class DifficultyManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    public void ResetDifficulty(int nivelInicial = 1)
+    {
+        nivelActual = Mathf.Clamp(nivelInicial, NIVEL_MIN, NIVEL_MAX);
+        ventanaRendimiento.Clear();
+        ventanaAciertos.Clear();
+        ventanaTiempos.Clear();
+    }
+
     // rendimiento = 0–1
     public void ActualizarDificultad(float rendimiento, bool acierto, float tiempo)
     {

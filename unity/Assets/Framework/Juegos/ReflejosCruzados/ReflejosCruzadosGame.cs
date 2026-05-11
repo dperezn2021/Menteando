@@ -38,6 +38,7 @@ public class ReflejosCruzadosGame : BaseGame
     // Estado interno
     private bool activo = false;
     private bool reglasInvertidas = false;   // a partir de cierto nivel
+    private bool finalizado = false;
     private List<AlienReflejo> aliensVivos = new List<AlienReflejo>();
 
     // Métricas
@@ -60,6 +61,7 @@ public class ReflejosCruzadosGame : BaseGame
         // Reset estado
         activo = true;
         reglasInvertidas = false;
+        finalizado = false;
         toquesCorrectos = toquesIncorrectos = 0;
         omitidosCorrectos = omitidosIncorrectos = 0;
         totalAliens = 0;
@@ -68,8 +70,7 @@ public class ReflejosCruzadosGame : BaseGame
         LimpiarAliens();
 
         // Nivel inicial
-        if (DifficultyManager.Instance != null)
-            DifficultyManager.Instance.nivelActual = 1;
+        DifficultyManager.Instance?.ResetDifficulty(1);
 
         // Empezar spawn
         if (rutinaSpawn != null) StopCoroutine(rutinaSpawn);
@@ -83,6 +84,9 @@ public class ReflejosCruzadosGame : BaseGame
 
     public override void OnGameFinished()
     {
+        if (finalizado) return;
+
+        finalizado = true;
         activo = false;
         LimpiarAliens();
         WebExporter.EnviarSesion(nombre, AplicarPesos(CalcularCognicion()));

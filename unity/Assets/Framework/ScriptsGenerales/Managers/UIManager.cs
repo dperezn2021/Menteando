@@ -44,6 +44,7 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
+        ConfigurarSafeArea();
         ConfigurarBotones();
         MostrarSolo(pantallaInicio);
         AudioManager.Instance.MusicaMenu();
@@ -56,6 +57,24 @@ public class UIManager : MonoBehaviour
             cristalCanvas.SetActive(false);
 
         }
+    }
+
+    private void ConfigurarSafeArea()
+    {
+        AplicarSafeAreaSiProcede(pantallaInicio);
+        AplicarSafeAreaSiProcede(UIPartida);
+        AplicarSafeAreaSiProcede(pantallaPausa);
+        AplicarSafeAreaSiProcede(pantallaAjustes);
+        AplicarSafeAreaSiProcede(pantallaFinPartida);
+    }
+
+    private void AplicarSafeAreaSiProcede(GameObject pantalla)
+    {
+        if (pantalla == null || pantalla.GetComponent<RectTransform>() == null)
+            return;
+
+        if (pantalla.GetComponent<SafeAreaFitter>() == null)
+            pantalla.AddComponent<SafeAreaFitter>();
     }
 
     void Update()
@@ -182,32 +201,30 @@ public class UIManager : MonoBehaviour
             Debug.LogError("❌ No se encontró DetectorDeIntrusosGame");
         }
     }
-    
+
     void IniciarPartida()
     {
         Debug.Log("🎮 IniciarPartida");
-        
+
         Time.timeScale = 1f;
         MostrarSolo(UIPartida);
-        
+
         if (cristalCanvas != null)
             cristalCanvas.SetActive(true);
 
         var juego = FindAnyObjectByType<BaseGame>(FindObjectsInactive.Include);
-        
+
         if (juego == null)
         {
             Debug.LogError("❌ No se encontró ningún juego");
             return;
         }
-        
+
         Debug.Log($"✅ Juego encontrado: {juego.nombre}");
-        
-        // 🔥 Asegurar que el juego se resetea antes de empezar
-        juego.ResetGame();
+
+        // 🔥 NO llamar a ResetGame aquí (GameManager.EmpezarJuego lo hará)
         GameManager.Instance.EmpezarJuego(juego);
     }
-
 
     void VolverAlMenu()
     {
