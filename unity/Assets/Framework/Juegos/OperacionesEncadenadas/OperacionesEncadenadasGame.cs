@@ -34,7 +34,7 @@ public class OperacionesEncadenadasGame : BaseGame
     private void Awake()
     {
         Instance = this;
-        nombre = "operaciones-encadenadas";
+        nombre = "operaciones encadenadas";
 
         if (ui == null)
             ui = FindFirstObjectByType<UICalculadora>();
@@ -304,11 +304,7 @@ public class OperacionesEncadenadasGame : BaseGame
             ReiniciarConMemorizacion();
         }
 
-        // Al final del método, añade:
-        Debug.Log($"📊 Nivel actual: {DifficultyManager.Instance?.nivelActual}, " +
-                  $"Totales: {totalOperaciones}, " +
-                  $"Acertó: {esCorrecto}, " +
-                  $"Especial: {eraEspecial}");
+    
 
     }
 
@@ -367,10 +363,6 @@ public class OperacionesEncadenadasGame : BaseGame
         float precisionFacil = totalFaciles > 0 ? aciertosFaciles / totalFaciles : 0.5f;
         float precisionDificil = totalDificiles > 0 ? aciertosDificiles / totalDificiles : 0f;
         float atencionSelectiva = (precisionFacil + precisionDificil) / 2f;
-
-        Debug.Log($"📊 Tiempo medio: {tiempoMedio:F2}s | Velocidad: {velocidadCognitiva:P0}");
-        Debug.Log($"📊 Memoria: {memoriaTrabajo:P0} | Planificación: {planificacion:P0} | Atención: {atencionSelectiva:P0}");
-        Debug.Log($"📊 Niveles: Fáciles={precisionFacil:P0} ({aciertosFaciles}/{totalFaciles}) | Difíciles={precisionDificil:P0} ({aciertosDificiles}/{totalDificiles})");
 
         return new CognitiveMetrics
         {
