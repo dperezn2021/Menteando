@@ -3128,3 +3128,228 @@ Memory consumption went from 148.1 MB to 144.1 MB.
 Total: 7.073000 ms (FindLiveObjects: 0.837000 ms CreateObjectMapping: 0.314000 ms MarkObjects: 3.962400 ms  DeleteObjects: 1.958500 ms)
 
 Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 4391.753913 seconds.
+  path: Assets/Framework/Juegos
+  artifactKey: Guid(a244772605e21bc45967d94e77c50a5c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Framework/Juegos using Guid(a244772605e21bc45967d94e77c50a5c) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'c6990bf8f4f453b883b6fb37060fd2aa') in 3.4763194 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000029 seconds.
+  path: Assets/Framework/Juegos/DetectorDeIntrusos/muñecoAbajo.png
+  artifactKey: Guid(5b30f64de9096e54fb70129d0db70d07) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Framework/Juegos/DetectorDeIntrusos/muñecoAbajo.png using Guid(5b30f64de9096e54fb70129d0db70d07) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '370dc2523831d3be5a77090bd40e5ae1') in 0.1525755 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 3
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000038 seconds.
+  path: Assets/Framework/Juegos/DetectorDeIntrusos/logo.png
+  artifactKey: Guid(3d7cf0ca4cd3096408bbf8977b520df0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Framework/Juegos/DetectorDeIntrusos/logo.png using Guid(3d7cf0ca4cd3096408bbf8977b520df0) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'c94be0a513d36912b4e72c4b2b20c6d4') in 0.0442215 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 3
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000020 seconds.
+  path: Assets/Framework/Juegos/DetectorDeIntrusos/DetectorDeIntrusos_SampleScene.unity
+  artifactKey: Guid(870f46d583ee90b4581b22df28d8a2a3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Framework/Juegos/DetectorDeIntrusos/DetectorDeIntrusos_SampleScene.unity using Guid(870f46d583ee90b4581b22df28d8a2a3) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '52e99a01c23ebdf7f9ab54b05bee7084') in 0.0005481 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000019 seconds.
+  path: Assets/Framework/Juegos/DetectorDeIntrusos/impostor.png
+  artifactKey: Guid(63cddbee7fae2fa489fee40d46d0a99d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Framework/Juegos/DetectorDeIntrusos/impostor.png using Guid(63cddbee7fae2fa489fee40d46d0a99d) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'f60b3f3defd5c36ddcec8d0e3ab791b2') in 0.0347819 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 3
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000018 seconds.
+  path: Assets/Framework/Juegos/DetectorDeIntrusos/lupa.png
+  artifactKey: Guid(6308c6201b5e27048b0c30765ef3adf5) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Framework/Juegos/DetectorDeIntrusos/lupa.png using Guid(6308c6201b5e27048b0c30765ef3adf5) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '6936b3deea29082a58feaccfb73f48aa') in 0.0192366 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 3
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000032 seconds.
+  path: Assets/Framework/Juegos/DetectorDeIntrusos/muñeco.png
+  artifactKey: Guid(40c07b3466dfc5a47a38a62c1fb73163) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Framework/Juegos/DetectorDeIntrusos/muñeco.png using Guid(40c07b3466dfc5a47a38a62c1fb73163) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '5fddfbc05c5eed87bc0d6de403be486c') in 0.0176078 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 3
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000019 seconds.
+  path: Assets/Framework/Juegos/DetectorDeIntrusos/Intruder.ttf
+  artifactKey: Guid(d6bbc7716971c1a41af8caae9f2bc3ff) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Framework/Juegos/DetectorDeIntrusos/Intruder.ttf using Guid(d6bbc7716971c1a41af8caae9f2bc3ff) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '1d1aa09bdf298dd5dac67c89ef3ae611') in 0.6006698 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 4
+
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.790 seconds
+Refreshing native plugins compatible for Editor in 0.91 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.727 seconds
+Domain Reload Profiling: 1520ms
+	BeginReloadAssembly (260ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (25ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (76ms)
+	RebuildCommonClasses (43ms)
+	RebuildNativeTypeToScriptingClass (16ms)
+	initialDomainReloadingComplete (28ms)
+	LoadAllAssembliesAndSetupDomain (444ms)
+		LoadAssemblies (332ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (208ms)
+			TypeCache.Refresh (8ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (182ms)
+			ResolveRequiredComponents (13ms)
+	FinalizeReload (728ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (566ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (11ms)
+			SetLoadedEditorAssemblies (5ms)
+			BeforeProcessingInitializeOnLoad (123ms)
+			ProcessInitializeOnLoadAttributes (368ms)
+			ProcessInitializeOnLoadMethodAttributes (53ms)
+			AfterProcessingInitializeOnLoad (5ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (15ms)
+Refreshing native plugins compatible for Editor in 0.98 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 13 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6193 unused Assets / (4.0 MB). Loaded Objects now: 7165.
+Memory consumption went from 150.0 MB to 146.0 MB.
+Total: 9.370400 ms (FindLiveObjects: 1.247100 ms CreateObjectMapping: 0.813500 ms MarkObjects: 4.800200 ms  DeleteObjects: 2.507900 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 99.259042 seconds.
+  path: Assets/Framework/Juegos/DetectorDeIntrusos/UIDetectorIntrusos.cs
+  artifactKey: Guid(d7da7075ea1ca974f84ca0624e866e8f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Framework/Juegos/DetectorDeIntrusos/UIDetectorIntrusos.cs using Guid(d7da7075ea1ca974f84ca0624e866e8f) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '6649a768aa8c529aa71547051d5c2c46') in 0.0128222 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.760 seconds
+Refreshing native plugins compatible for Editor in 0.80 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.710 seconds
+Domain Reload Profiling: 1471ms
+	BeginReloadAssembly (230ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (7ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (52ms)
+	RebuildCommonClasses (44ms)
+	RebuildNativeTypeToScriptingClass (16ms)
+	initialDomainReloadingComplete (35ms)
+	LoadAllAssembliesAndSetupDomain (434ms)
+		LoadAssemblies (348ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (196ms)
+			TypeCache.Refresh (7ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (174ms)
+			ResolveRequiredComponents (11ms)
+	FinalizeReload (711ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (548ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (13ms)
+			SetLoadedEditorAssemblies (5ms)
+			BeforeProcessingInitializeOnLoad (117ms)
+			ProcessInitializeOnLoadAttributes (357ms)
+			ProcessInitializeOnLoadMethodAttributes (51ms)
+			AfterProcessingInitializeOnLoad (5ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (18ms)
+Refreshing native plugins compatible for Editor in 1.14 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 13 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6193 unused Assets / (4.5 MB). Loaded Objects now: 7168.
+Memory consumption went from 149.9 MB to 145.4 MB.
+Total: 9.275400 ms (FindLiveObjects: 0.929800 ms CreateObjectMapping: 0.336200 ms MarkObjects: 4.657200 ms  DeleteObjects: 3.351000 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.735 seconds
+Refreshing native plugins compatible for Editor in 0.93 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.719 seconds
+Domain Reload Profiling: 1457ms
+	BeginReloadAssembly (204ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (6ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (47ms)
+	RebuildCommonClasses (40ms)
+	RebuildNativeTypeToScriptingClass (14ms)
+	initialDomainReloadingComplete (30ms)
+	LoadAllAssembliesAndSetupDomain (450ms)
+		LoadAssemblies (336ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (206ms)
+			TypeCache.Refresh (7ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (182ms)
+			ResolveRequiredComponents (13ms)
+	FinalizeReload (720ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (555ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (13ms)
+			SetLoadedEditorAssemblies (5ms)
+			BeforeProcessingInitializeOnLoad (116ms)
+			ProcessInitializeOnLoadAttributes (362ms)
+			ProcessInitializeOnLoadMethodAttributes (53ms)
+			AfterProcessingInitializeOnLoad (5ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (13ms)
+Refreshing native plugins compatible for Editor in 0.90 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 13 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6193 unused Assets / (4.0 MB). Loaded Objects now: 7171.
+Memory consumption went from 149.9 MB to 145.9 MB.
+Total: 7.989500 ms (FindLiveObjects: 0.928900 ms CreateObjectMapping: 0.373200 ms MarkObjects: 4.498300 ms  DeleteObjects: 2.188000 ms)
+
+Prepare: number of updated asset objects reloaded= 0
