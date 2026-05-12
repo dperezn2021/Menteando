@@ -860,13 +860,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   musicaSource: {fileID: 525448253}
   sfxSource: {fileID: 767368088}
-  clickUI: {fileID: 8300000, guid: 215331e493e1c6a4fb796068bfae2a7f, type: 3}
-  acierto: {fileID: 8300000, guid: 5350a76739166ac4593394423e11f946, type: 3}
-  error: {fileID: 8300000, guid: eeb9dcf10a4b62245a3543a76f6bb4ee, type: 3}
+  clickUI: {fileID: 0}
+  acierto: {fileID: 0}
+  error: {fileID: 0}
   nivelUp: {fileID: 0}
-  musicaMenu: {fileID: 8300000, guid: 127ed8d8b9f8a4b4186e1a6ae4589ad8, type: 3}
-  musicaJuego: {fileID: 8300000, guid: 6b3391f66a2870d41abac6a8f97ab009, type: 3}
-  musicaVictoria: {fileID: 8300000, guid: d9721ec14879a4b4fa1e57e8cacde8ea, type: 3}
+  musicaMenu: {fileID: 0}
+  musicaJuego: {fileID: 0}
+  musicaVictoria: {fileID: 0}
   musicaVolumen: 0.5
   sfxVolumen: 0.5
 --- !u!4 &185593264
@@ -916,8 +916,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nombre: 
-  tiempoPorRonda: 4
-  rondaActiva: 0
+  tiempoPorRonda: 3
+  tiempoEntreRondas: 0.35
+  colorWheel: {fileID: 1556844500}
 --- !u!4 &206959583
 Transform:
   m_ObjectHideFlags: 0
@@ -948,7 +949,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &217038179
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3688,14 +3689,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0006f8d82e1dbb241a94ffa81d153e55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  juego: {fileID: 206959582}
-  roscoContainer: {fileID: 1556844499}
-  botonPrefab: {fileID: 2009070946915139838, guid: 093062d5cafa8d24d8504b6584b56e70, type: 3}
-  textoPalabra: {fileID: 1915072206}
+  colorWheel: {fileID: 1556844500}
+  colorGame: {fileID: 206959582}
+  textoRacha: {fileID: 1308794032}
   textoTiempo: {fileID: 1284249914}
   textoNivel: {fileID: 318801500}
-  textoRacha: {fileID: 1308794032}
-  radioFactor: 0.35
 --- !u!1 &1182593783
 GameObject:
   m_ObjectHideFlags: 0
@@ -4986,6 +4984,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1556844499}
+  - component: {fileID: 1556844500}
   m_Layer: 0
   m_Name: Botones
   m_TagString: Untagged
@@ -5012,6 +5011,33 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 600, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1556844500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1556844498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9270569fd41885f4a86391961d35718f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wheelContainer: {fileID: 1556844499}
+  radioExterno: 500
+  radioInterno: 300
+  coloresBase:
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - {r: 1, g: 0.5, b: 0, a: 1}
+  - {r: 0, g: 1, b: 1, a: 1}
+  - {r: 1, g: 0, b: 1, a: 1}
+  - {r: 0.6, g: 0.2, b: 0.8, a: 1}
+  centerText: {fileID: 1915072206}
+  duracionFlash: 0.15
+  coloresEnRoscoActual: []
 --- !u!1 &1580617292
 GameObject:
   m_ObjectHideFlags: 0
@@ -7042,8 +7068,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1741465624}
   - {fileID: 1556844499}
+  - {fileID: 1741465624}
   m_Father: {fileID: 1146378472}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
