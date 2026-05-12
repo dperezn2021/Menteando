@@ -12,9 +12,9 @@
     const isPortrait = () =>
         window.matchMedia('(orientation: portrait)').matches;
 
-    // Cambiar sticky → fixed SOLO en móvil real
+    // Sticky en escritorio, fixed en móvil real (para que el paddingTop compense)
     function updateHeaderPosition() {
-        if (isMobileDevice()) {
+        if (window.innerWidth < 1024) {
             header.style.position = "fixed";
             header.style.top = "0";
             document.body.style.paddingTop = header.offsetHeight + "px";
@@ -34,8 +34,11 @@
         const nav = header.querySelector('nav');
         if (!nav) return;
 
-        // Páginas de juego/test: nav con un solo enlace (volver) → sin hamburguesa
-        if (nav.querySelectorAll('a').length <= 1) return;
+        // Páginas de juego/test: un solo enlace → sin hamburguesa, marcar header como simple
+        if (nav.querySelectorAll('a').length <= 1) {
+            header.classList.add('header-simple');
+            return;
+        }
 
         const hamburger = document.createElement('button');
         hamburger.className = 'menu-hamburguesa';
@@ -93,9 +96,10 @@
 
     /* ============================
        AUTO-OCULTACIÓN DEL HEADER
+       Funciona en cualquier dispositivo con viewport < 1024px
     ============================ */
     function handleScroll() {
-        if (!isMobileDevice()) {
+        if (window.innerWidth >= 1024) {
             header.classList.remove('header-hidden');
             return;
         }

@@ -161,6 +161,29 @@ window.initTestDetailPage = function initTestDetailPage(testId) {
 
     syncThemeButton();
     renderTestDetailPage(testId);
+
+    // After rendering, set header subtitle to the test category and attach fullscreen behavior to start button so tests open full-screen on any device
+    setTimeout(() => {
+        // set header subtitle to category from catalog
+        try {
+            const test = window.getTestById?.(testId) || null;
+            const subtitleEl = document.getElementById('game-subtitle');
+            if (test && subtitleEl) {
+                const categoriaDisplay = { atencion: 'Atención', memoria: 'Memoria', control: 'Control', reflejos: 'Reflejos' };
+                subtitleEl.textContent = categoriaDisplay[test.categoria] || (test.categoria.charAt(0).toUpperCase() + test.categoria.slice(1));
+            }
+        } catch (e) { /* ignore */ }
+
+        const startBtn = document.getElementById('start-btn');
+        if (startBtn) {
+            // ensure existing handlers still run: wrap click to first call our fullscreen helper then allow default
+            startBtn.addEventListener('click', (ev) => {
+                // call fullscreen helper (non-blocking)
+                try { enterTestFullscreen(); } catch (e) { /* ignore */ }
+                // allow other handlers attached by specific test logic to run
+            }, { passive: true });
+        }
+    }, 80);
 };
 
 
@@ -3341,4 +3364,90 @@ function initGoNoGoLogic(testId, callback) {
         mostrarSiguiente();
         if (status) status.textContent = "Go/No-Go: Pulsa el botón solo cuando veas la letra X";
     };
+}
+
+// Pone el área del test en pantalla completa con botón de salida siempre visible
+function enterTestFullscreen() {
+    const container = document.getElementById('container');
+    if (!container) return;
+
+    // Evitar doble llamada
+    if (document.querySelector('.test-exit-fullscreen')) return;
+
+    const orig = {
+        position: container.style.position || '',
+        top: container.style.top || '',
+        left: container.style.left || '',
+        width: container.style.width || '',
+        height: container.style.height || '',
+        zIndex: container.style.zIndex || ''
+    };
+
+    function restaurar() {
+        container.style.position = orig.position;
+        container.style.top = orig.top;
+        container.style.left = orig.left;
+        container.style.width = orig.width;
+        container.style.height = orig.height;
+        container.style.zIndex = orig.zIndex;
+        document.querySelector('.test-fullscreen-overlay')?.remove();
+        document.querySelector('.test-exit-fullscreen')?.remove();
+    }
+
+    function aplicarOverlay() {
+        const overlay = document.createElement('div');
+        overlay.className = 'test-fullscreen-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:9998;';
+        document.body.appendChild(overlay);
+        container.style.position = 'fixed';
+        container.style.top = '0';
+        container.style.left = '0';
+        container.style.width = '100vw';
+        container.style.height = '100vh';
+        container.style.zIndex = '9999';
+    }
+
+    function crearBotonSalir() {
+        const exit = document.createElement('button');
+        exit.textContent = '✕ Salir';
+        exit.className = 'test-exit-fullscreen';
+        exit.style.cssText = [
+            'position:fixed', 'top:16px', 'right:16px', 'z-index:10000',
+            'padding:10px 14px', 'border-radius:999px',
+            'background:rgba(0,0,0,0.75)', 'color:#fff', 'border:0',
+            'font-weight:700', 'cursor:pointer', 'font-size:1rem',
+            'touch-action:manipulation'
+        ].join(';');
+        exit.addEventListener('click', () => {
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch(e) {}
+            }
+            restaurar();
+        });
+        document.body.appendChild(exit);
+    }
+
+    // Intentar fullscreen nativo
+    try {
+        if (container.requestFullscreen) {
+            container.requestFullscreen()
+                .then(crearBotonSalir)
+                .catch(() => { aplicarOverlay(); crearBotonSalir(); });
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement) restaurar();
+            }, { once: true });
+            return;
+        } else if (container.webkitRequestFullscreen) {
+            container.webkitRequestFullscreen();
+            crearBotonSalir();
+            document.addEventListener('webkitfullscreenchange', () => {
+                if (!document.webkitFullscreenElement) restaurar();
+            }, { once: true });
+            return;
+        }
+    } catch (e) { /* ignorar */ }
+
+    // Fallback: overlay manual
+    aplicarOverlay();
+    crearBotonSalir();
 }

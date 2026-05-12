@@ -122,8 +122,8 @@ html.dark {
 
 @media (max-width: 695px) and (orientation: portrait) {
 
-    /* Ocultar subtítulo para ahorrar espacio */
-    header > div > :first-child p {
+    /* Ocultar subtítulo en páginas raíz para ahorrar espacio */
+    header:not(.header-simple) > div > :first-child p {
         display: none;
     }
 
@@ -148,26 +148,26 @@ html.dark {
 
 @media (min-width: 696px) and (max-width: 1023px) and (orientation: portrait) {
 
-    /* Cabecera en una fila */
-    header > div {
+    /* Cabecera en una fila para páginas raíz */
+    header:not(.header-simple) > div {
         flex-direction: row !important;
         flex-wrap: nowrap;
         overflow: hidden;
     }
 
     /* La sección del logo puede comprimirse */
-    header > div > :first-child {
+    header:not(.header-simple) > div > :first-child {
         flex-shrink: 1;
         min-width: 0;
     }
 
-    /* Ocultar subtítulo */
-    header > div > :first-child p {
+    /* Ocultar subtítulo en páginas raíz */
+    header:not(.header-simple) > div > :first-child p {
         display: none;
     }
 
     /* Truncar el título si es demasiado largo */
-    header > div > :first-child h1 {
+    header:not(.header-simple) > div > :first-child h1 {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -185,6 +185,45 @@ html.dark {
 
     body {
         padding-top: 0;
+    }
+}
+
+/* =========================
+    HEADER SIMPLE (juegos/tests) — portrait: 2 filas
+    Fila 1: logo + título + subtítulo
+    Fila 2: botón volver | avatar + tema
+========================= */
+
+@media (max-width: 1023px) and (orientation: portrait) {
+
+    .header-simple > div {
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        align-items: center;
+        row-gap: 0.4rem !important;
+        overflow: visible;
+    }
+
+    /* Fila 1: logo + título + subtítulo ocupan todo el ancho */
+    .header-simple > div > :first-child {
+        flex: 0 0 100%;
+        min-width: 0;
+    }
+
+    /* Mostrar el subtítulo (categoría / eyebrow) */
+    .header-simple > div > :first-child p {
+        display: block !important;
+    }
+
+    /* Fila 2: botón volver crece hacia la izquierda */
+    .header-simple > div > nav {
+        flex: 1;
+        justify-content: flex-start !important;
+    }
+
+    /* Fila 2: avatar + tema se quedan a la derecha */
+    .header-simple > div > :last-child {
+        flex-shrink: 0;
     }
 }
 
@@ -208,6 +247,51 @@ html.dark {
     .menu-hamburguesa {
         display: none !important;
     }
+
+    /* Reducir fuentes del header para que quepan en pantallas estrechas en horizontal */
+    header > div > :first-child h1 {
+        font-size: 1.1rem;
+    }
+
+    header nav a {
+        font-size: 0.95rem !important;
+        padding-left: 0.4rem !important;
+        padding-right: 0.4rem !important;
+    }
+
+    header > div > :last-child .text-md,
+    header > div > :last-child .text-xl {
+        font-size: 0.75rem;
+    }
+}
+
+/* Make test and game cards more compact on small mobile screens so multiple cards fit */
+@media (max-width: 420px) {
+    /* Tests: reduce image block height and padding */
+    #tests-grid article .h-40, #tests-grid article a.block.h-40 {
+        min-height: 8rem !important;
+        height: 8rem !important;
+    }
+
+    #tests-grid article .p-5 {
+        padding: 0.75rem !important;
+    }
+
+    #tests-grid article h3 { font-size: 1rem !important; }
+    #tests-grid article p { font-size: 0.75rem !important; }
+
+    /* Games compact cards */
+    #games-grid article a.h-48, #games-grid article .h-48 {
+        min-height: 9rem !important;
+        height: 9rem !important;
+    }
+
+    #games-grid article .p-6 {
+        padding: 0.75rem !important;
+    }
+
+    /* Reduce large hero card heights on small screens */
+    .createLargeCard, .large-card, article.bg-white.relative { max-height: none !important; }
 }
 
 /* =========================
@@ -238,7 +322,36 @@ html:not(.dark) .menu-container {
 /* Modo oscuro: usar variables del tema oscuro */
 html.dark .menu-container {
     background: var(--card-bg);
-    color: var(--text);
+
+}
+
+/* =========================
+   MOBILE LANDSCAPE TWEAKS
+   Reduce header nav text and tighten spacing so links + profile fit on small landscape screens
+========================= */
+
+@media (max-width: 736px) and (orientation: landscape) {
+    header nav a {
+        font-size: 0.85rem; /* smaller nav text */
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+
+    header .flex.items-center.gap-3, header .flex.items-center.gap-2 {
+        gap: 6px;
+    }
+
+    /* Slightly smaller avatar */
+    header img#perfil-avatar-header, header img#perfil-avatar {
+        width: 34px !important;
+        height: 34px !important;
+    }
+
+    /* Ensure the header uses a single row */
+    header > div {
+        flex-direction: row !important;
+        align-items: center;
+    }
 }
 
 /* =========================
