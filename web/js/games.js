@@ -90,22 +90,20 @@ function createCompactCard(juego) {
 
     return `
         <article class="bg-white dark:bg-slate-800 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col group">
-            <a href="${juego.url}" class="h-48 overflow-hidden bg-slate-200 dark:bg-slate-700 block">
+            <a href="${juego.url}" class="h-28 sm:h-48 overflow-hidden bg-slate-200 dark:bg-slate-700 block">
                 <img src="${juego.imagen}" alt="${juego.nombre}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
             </a>
 
-            <div class="p-6 flex flex-col gap-3 grow">
-                <span class="px-3 py-1 text-sm font-bold uppercase rounded-full w-fit ${getBadgeClasses(skillSlug)}">
-                    ${getSkillLabel(skillSlug)} 
+            <div class="p-3 sm:p-6 flex flex-col gap-2 sm:gap-3 grow">
+                <span class="px-2 py-0.5 sm:px-3 sm:py-1 text-xs sm:text-sm font-bold uppercase rounded-full w-fit ${getBadgeClasses(skillSlug)}">
+                    ${getSkillLabel(skillSlug)}
                 </span>
-                   <div class="flex flex-row gap-2 grow">
-                    ${juego.logo ? `<img src="${juego.logo}" alt="${juego.nombre}" class="w-10 h-10 object-cover">` : ""}
-                <h3 class="text-2xl font-bold text-slate-900 dark:text-white">${juego.nombre}</h3>
-                   </div>
-               
-                <p class="text-slate-600 dark:text-slate-300 text-base">${juego.descripcion}</p>
-
-                <a href="${juego.url}" class="mt-auto w-full py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white font-bold text-center hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors">
+                <div class="flex flex-row gap-2 grow">
+                    ${juego.logo ? `<img src="${juego.logo}" alt="${juego.nombre}" class="w-8 h-8 sm:w-10 sm:h-10 object-cover">` : ""}
+                    <h3 class="text-base sm:text-2xl font-bold text-slate-900 dark:text-white">${juego.nombre}</h3>
+                </div>
+                <p class="hidden sm:block text-slate-600 dark:text-slate-300 text-base">${juego.descripcion}</p>
+                <a href="${juego.url}" class="mt-auto w-full py-2 sm:py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white text-xs sm:text-base font-bold text-center hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors">
                     Entrenar
                 </a>
             </div>
@@ -173,7 +171,7 @@ function renderFeaturedGames(destacados) {
                 ${createCompactCard(lateral)}
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div class="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-8">
                 ${inferiores.map(createCompactCard).join("")}
             </div>
         `;
@@ -186,7 +184,7 @@ function renderFeaturedGames(destacados) {
                 ${createLargeCard(principal)}
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div class="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-8">
                 ${inferiores.map(createCompactCard).join("")}
             </div>
         `;
@@ -194,7 +192,7 @@ function renderFeaturedGames(destacados) {
 
     if (layoutMode === 2) {
         return `
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 my-8">
+        <div class="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-8 my-8">
             ${inferiores.map(createCompactCard).join("")}
         </div>
 
@@ -207,7 +205,7 @@ function renderFeaturedGames(destacados) {
 
     // MODO 3 — Todas pequeñas → grandes al final
     return `
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 my-8">
+        <div class="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-8 my-8">
             ${inferiores.map(createCompactCard).join("")}
         </div>
 
@@ -261,7 +259,7 @@ function renderGamesPage(options = {}) {
     const restoGrid = resto.length
         ? `
             <div class="${expanded ? "block" : "hidden"}" id="games-resto-grid">
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-8">
+                <div class="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-8 mt-8">
                     ${resto.map(createCompactCard).join("")}
                 </div>
             </div>

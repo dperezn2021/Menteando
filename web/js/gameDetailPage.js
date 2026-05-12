@@ -33,7 +33,7 @@ function renderGameDetailPage(gameId) {
     }
 
     if (title) title.textContent = juego.nombre;
-    if (subtitle) subtitle.textContent = juego.subtitulo || "Ficha del juego";
+    if (subtitle) subtitle.textContent = juego.heroEyebrow || juego.subtitulo || "Ficha del juego";
 
     const skillChips = juego.skills.map((skillSlug) => {
         const label = window.getSkillDefinition?.(skillSlug)?.label || skillSlug;
