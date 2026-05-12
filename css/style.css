@@ -24,6 +24,7 @@ body {
     font-family: "Inter", system-ui, sans-serif;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
 }
 
 h1, h2, h3, h4 {
@@ -114,37 +115,130 @@ html.dark {
     right: 0;
 }
 
-.menu-close-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: currentColor;
-}
 
 /* =========================
-    MÓVIL (solo estilos visuales)
+    MÓVIL PORTRAIT PEQUEÑO (< 696px) — columna natural
 ========================= */
 
-@media (max-width: 768px) {
+@media (max-width: 695px) and (orientation: portrait) {
 
-    /* Mostrar hamburguesa */
+    /* Ocultar subtítulo para ahorrar espacio */
+    header > div > :first-child p {
+        display: none;
+    }
+
+    /* Ocultar apodo en cabecera estrecha */
+    #perfil-apodo-header {
+        display: none;
+    }
+
+    /* Mostrar hamburguesa (solo en páginas raíz; el JS la crea) */
     .menu-hamburguesa {
         display: block;
     }
 
-    /* Ocultar nav original */
-    header nav {
-        display: none;
-    }
-
-    /* El padding-top REAL lo pone el JS */
     body {
         padding-top: 0;
     }
+}
+
+/* =========================
+    MÓVIL PORTRAIT GRANDE (696px–1023px) — fila compacta
+========================= */
+
+@media (min-width: 696px) and (max-width: 1023px) and (orientation: portrait) {
+
+    /* Cabecera en una fila */
+    header > div {
+        flex-direction: row !important;
+        flex-wrap: nowrap;
+        overflow: hidden;
+    }
+
+    /* La sección del logo puede comprimirse */
+    header > div > :first-child {
+        flex-shrink: 1;
+        min-width: 0;
+    }
+
+    /* Ocultar subtítulo */
+    header > div > :first-child p {
+        display: none;
+    }
+
+    /* Truncar el título si es demasiado largo */
+    header > div > :first-child h1 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Ocultar apodo */
+    #perfil-apodo-header {
+        display: none;
+    }
+
+    /* Mostrar hamburguesa (solo en páginas raíz; el JS la crea) */
+    .menu-hamburguesa {
+        display: block;
+    }
+
+    body {
+        padding-top: 0;
+    }
+}
+
+/* =========================
+    MÓVIL LANDSCAPE — como escritorio
+========================= */
+
+@media (max-width: 1023px) and (orientation: landscape) {
+
+    /* Disposición en fila */
+    header > div {
+        flex-direction: row !important;
+    }
+
+    /* Mostrar nav completa */
+    header nav {
+        display: flex !important;
+    }
+
+    /* Ocultar hamburguesa */
+    .menu-hamburguesa {
+        display: none !important;
+    }
+}
+
+/* =========================
+    MENÚ HAMBURGUESA — contenido del panel lateral
+========================= */
+
+/* Nav en columna dentro del menú lateral */
+.menu-container nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.menu-container nav a {
+    display: block;
+    padding: 0.4rem 0;
+    width: 100%;
+}
+
+/* Modo claro: fondo blanco, texto oscuro */
+html:not(.dark) .menu-container {
+    background: #ffffff;
+    color: #1e293b;
+}
+
+/* Modo oscuro: usar variables del tema oscuro */
+html.dark .menu-container {
+    background: var(--card-bg);
+    color: var(--text);
 }
 
 /* =========================
@@ -377,27 +471,6 @@ html.dark {
     margin-bottom: 1rem;
 }
 
-/* Estilos base (móvil vertical) - COLUMNA */
-header .max-w-7xl > div {
-    flex-direction: column;
-    text-align: center;
-}
-
-/* Para tablets y móviles horizontales */
-@media (min-width: 640px) and (orientation: landscape) {
-    header .max-w-7xl > div {
-        flex-direction: row;
-        text-align: left;
-    }
-}
-
-/* Para PC y tablets grandes (ancho mínimo 768px) */
-@media (min-width: 768px) {
-    header .max-w-7xl > div {
-        flex-direction: row;
-        text-align: left;
-    }
-}
 
 /* =========================
     FOOTER

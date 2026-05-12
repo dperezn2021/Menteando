@@ -77,7 +77,7 @@ function renderGameDetailPage(gameId) {
     let color = juego.disponible === "Disponible" ? 'bg-green-500' : 'bg-red-500';
 
     content.innerHTML = `
-        <section class="max-w-7xl mx-auto py-8 lg:py-10">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 py-8 lg:py-10">
             <div class="items-stretch grid grid-cols-1 xl:grid-cols-[1.35fr_0.85fr] gap-8 ">
                 <article class="flex flex-col h-full rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
                     <div class="relative flex-1 aspect-video bg-slate-950">

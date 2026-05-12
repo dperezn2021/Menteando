@@ -238,6 +238,7 @@ window.setTestCategory = function setTestCategory(category) {
         button.classList.toggle("bg-slate-100", !isActive);
         button.classList.toggle("dark:bg-slate-800", !isActive);
         button.classList.toggle("text-slate-700", !isActive);
+        button.classList.toggle("dark:text-slate-200", !isActive);
     });
     window.__testCategoryFilter = category;
     window.__syncTestsPage?.();

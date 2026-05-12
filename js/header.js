@@ -6,9 +6,11 @@
     let ticking = false;
     let menuOpen = false;
 
-    // Detectar móvil REAL
     const isMobileDevice = () =>
         /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+
+    const isPortrait = () =>
+        window.matchMedia('(orientation: portrait)').matches;
 
     // Cambiar sticky → fixed SOLO en móvil real
     function updateHeaderPosition() {
@@ -32,6 +34,9 @@
         const nav = header.querySelector('nav');
         if (!nav) return;
 
+        // Páginas de juego/test: nav con un solo enlace (volver) → sin hamburguesa
+        if (nav.querySelectorAll('a').length <= 1) return;
+
         const hamburger = document.createElement('button');
         hamburger.className = 'menu-hamburguesa';
         hamburger.innerHTML = '☰';
@@ -43,11 +48,6 @@
         const navContainer = document.createElement('div');
         navContainer.className = 'menu-container';
         navContainer.appendChild(navClone);
-
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'menu-close-btn';
-        closeBtn.innerHTML = '✕';
-        navContainer.appendChild(closeBtn);
 
         document.body.appendChild(overlay);
         document.body.appendChild(navContainer);
@@ -65,14 +65,18 @@
         }
 
         hamburger.onclick = openMenu;
-        closeBtn.onclick = closeMenu;
         overlay.onclick = closeMenu;
+
+        // Cerrar el menú al pulsar cualquier enlace del panel
+        navClone.querySelectorAll('a').forEach(a => {
+            a.addEventListener('click', closeMenu);
+        });
 
         const rightSection = header.querySelector('.flex.items-center.gap-3:last-child');
         if (rightSection) rightSection.insertBefore(hamburger, rightSection.firstChild);
 
         function updateMenu() {
-            if (isMobileDevice()) {
+            if (isMobileDevice() && isPortrait()) {
                 hamburger.style.display = 'block';
                 nav.style.display = 'none';
             } else {
@@ -84,6 +88,7 @@
 
         updateMenu();
         window.addEventListener('resize', updateMenu);
+        window.addEventListener('orientationchange', updateMenu);
     }
 
     /* ============================
@@ -125,6 +130,10 @@
     });
 
     window.addEventListener('resize', updateHeaderPosition);
+    window.addEventListener('orientationchange', () => {
+        updateHeaderPosition();
+        crearMenuHamburguesa();
+    });
 
     crearMenuHamburguesa();
     updateHeaderPosition();
