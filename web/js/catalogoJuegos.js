@@ -120,7 +120,7 @@ const CATALOGO_JUEGOS = [
         "heroEyebrow": "Atención dual",
         "destacado": false,
         "skills": ["atencion_dividida", "atencion_sostenida", "flexibilidad_cognitiva", "planificacion", "velocidad_cognitiva", "coordinacion_visomotora"],
-        "disponible": "No disponible"
+        "disponible": "Disponible"
     },
 
     {
@@ -242,7 +242,7 @@ const CATALOGO_JUEGOS = [
         "heroEyebrow": "Control inhibitorio",
         "destacado": false,
         "skills": ["control_inhibitorio", "velocidad_cognitiva", "atencion_dividida", "memoria_trabajo"],
-        "disponible": "No disponible"
+        "disponible": "Disponible"
     },
 
     {

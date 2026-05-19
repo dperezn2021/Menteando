@@ -102,16 +102,15 @@ function recalcularPerfilGlobal(perfil, metrics, gameId) {
 
         perfil.detalle[skill] = previousValue * 0.9 + incomingValue * 0.1;
     });
-
     perfil.atencion =
-        0.6 * (Number(perfil.detalle.atencionSostenida) || 0) +
-        0.2 * (Number(perfil.detalle.atencionSelectiva) || 0) +
-        0.2 * (Number(perfil.detalle.atencionDividida) || 0);
+        0.5 * (Number(perfil.detalle.atencionSostenida) || 0) +
+        0.25 * (Number(perfil.detalle.atencionSelectiva) || 0) +
+        0.25 * (Number(perfil.detalle.atencionDividida) || 0);
     perfil.atencion = Math.max(0, Math.min(1, perfil.atencion));
 
     perfil.memoria =
-        0.7 * (Number(perfil.detalle.memoriaTrabajo) || 0) +
-        0.3 * (Number(perfil.detalle.memoriaEspacial) || 0);
+        0.6 * (Number(perfil.detalle.memoriaTrabajo) || 0) +
+        0.4 * (Number(perfil.detalle.memoriaEspacial) || 0);
     perfil.memoria = Math.max(0, Math.min(1, perfil.memoria));
 
     perfil.control =
@@ -122,8 +121,7 @@ function recalcularPerfilGlobal(perfil, metrics, gameId) {
 
     perfil.reflejos =
         0.5 * (Number(perfil.detalle.velocidadCognitiva) || 0) +
-        0.4 * (Number(perfil.detalle.coordinacionVisomotora) || 0) -
-        0.1 * (Number(perfil.detalle.controlInhibitorio) || 0);
+        0.5 * (Number(perfil.detalle.coordinacionVisomotora) || 0);
     perfil.reflejos = Math.max(0, Math.min(1, perfil.reflejos));
 
     perfil.juegoMasJugado = getJuegoMasJugado(perfil);
@@ -172,40 +170,48 @@ function getTiempo(perfil) {
 function actualizarRachaPorSesionCompletada(perfil) {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-    
+
     const ultimoDiaJugadoStr = localStorage.getItem("ultimo_dia_jugado");
-    
+
     let nuevaRacha = 1;
-    
+
     if (ultimoDiaJugadoStr) {
         const ultimoDia = new Date(ultimoDiaJugadoStr);
         ultimoDia.setHours(0, 0, 0, 0);
-        
+
         const diferenciaDias = Math.floor((hoy - ultimoDia) / 86400000);
-        
+
         console.log(`📅 Diferencia de días: ${diferenciaDias} | Último día: ${ultimoDia.toLocaleDateString()} | Hoy: ${hoy.toLocaleDateString()}`);
-        
+
         if (diferenciaDias === 0) {
+            // Same day: keep existing racha (user may have multiple sessions today)
             nuevaRacha = perfil.racha || 1;
         } else if (diferenciaDias === 1) {
+            // Played yesterday: increment racha
             nuevaRacha = (perfil.racha || 0) + 1;
+        } else if (diferenciaDias > 1) {
+            // Missed yesterday (or more): reset racha to 0 as requested
+            nuevaRacha = 0;
         } else {
+            // Fallback: start at 1
             nuevaRacha = 1;
         }
     }
-    
+
     perfil.racha = nuevaRacha;
-    
+
     if (nuevaRacha > (perfil.rachaMaxima || 0)) {
         perfil.rachaMaxima = nuevaRacha;
         perfil.nuevaRachaMaxima = true;
     }
-    
+
+
+
     // Guardar el día actual
     localStorage.setItem("ultimo_dia_jugado", hoy.toISOString());
-    
+
     console.log(`🔥 Racha actualizada: ${nuevaRacha} días | Máxima: ${perfil.rachaMaxima}`);
-    
+
     return perfil;
 }
 

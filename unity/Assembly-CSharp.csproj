@@ -67,7 +67,6 @@
     <Compile Include="Assets\Framework\ScriptsGenerales\Managers\GameManager.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\BotonCentralController.cs" />
     <Compile Include="Assets\Framework\Juegos\RoscoExpress\RoscoExpress.cs" />
-    <Compile Include="Assets\Framework\Juegos\Doble Canal\DobleCanalUIManager.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Utils\GamePause.cs" />
     <Compile Include="Assets\Framework\Juegos\ColorMatch\UIColorMatch.cs" />
     <Compile Include="Assets\Framework\Juegos\SilencioMental\SilencioMentalGame.cs" />
@@ -101,6 +100,7 @@
     <Compile Include="Assets\Juegos\ScriptsGenerales\SesionJuego.cs" />
     <Compile Include="Assets\Framework\Juegos\ReflejosCruzados\ReflejosCruzadosGame.cs" />
     <Compile Include="Assets\Framework\Juegos\Doble Canal\DobleCanalGame.cs" />
+    <Compile Include="Assets\Framework\Juegos\Doble Canal\DobleCanalUI.cs" />
     <Compile Include="Assets\Framework\Juegos\SilencioMental\IconGenerator.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Base\WebExporter.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\ReglaAntigua.cs" />

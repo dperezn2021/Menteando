@@ -37,11 +37,19 @@ public static class MetricUtils
         return Mathf.Clamp01((1f / Mathf.Max(0.01f, seconds + offset)) / divisor);
     }
 
-    public static float VelocidadNormalizada(float segundos, float tiempoIdeal = 0.7f)
+    public static float VelocidadNormalizada(float segundos, float tiempoIdeal = 0.8f)
     {
-        // Si respondes en tiempo ideal (0.7s) → 1.0
-        // Si respondes más lento → menor
-        // Si respondes más rápido → máximo 1.0
-        return Mathf.Clamp01(tiempoIdeal / Mathf.Max(0.3f, segundos));
+        // 🔥 NUEVA FÓRMULA MÁS BENÉVOLA
+        // Si respondes en tiempo ideal (0.8s) → 1.0 (100%)
+        // Si respondes en 1.5s → ~0.70 (70%)
+        // Si respondes en 2.0s → ~0.55 (55%)
+        // Si respondes en 3.0s → ~0.35 (35%)
+
+        if (segundos <= 0) return 1f;
+
+        // Curva de decaimiento más suave
+        float resultado = Mathf.Pow(tiempoIdeal / segundos, 0.5f);
+
+        return Mathf.Clamp01(resultado);
     }
 }

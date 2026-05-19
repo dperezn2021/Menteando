@@ -23,9 +23,15 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Framework/Juegos/MisionOrbital/MisionOrbital_SampleScene.unity
     guid: 4181590a9d7b6064a85be41203388ec5
-  - enabled: 1
+  - enabled: 0
     path: Assets/Framework/Juegos/SilencioMental/SilencioMental_SampleScene.unity
     guid: f4daf99b127ca504189379256b8096c0
+  - enabled: 0
+    path: Assets/Framework/Juegos/ColorMatch/ColorMatch_SampleScene.unity
+    guid: 2d3500b3a0277b041a839e7d35e2cbf5
+  - enabled: 1
+    path: Assets/Framework/Juegos/Doble Canal/DobleCanal_SampleScene.unity
+    guid: bd595611821830d43aca705ef37370c0
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
