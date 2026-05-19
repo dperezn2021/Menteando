@@ -44,9 +44,12 @@ function renderTestDetailPage(testId) {
                     <div class="relative flex-1 bg-slate-900 min-h-[400px] flex items-center justify-center">
                         <div id="container" class="w-full h-full flex items-center justify-center"></div>
                     </div>
-                    <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                        <button id="start-btn" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all duration-200 shadow-md">
+                    <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex gap-2">
+                        <button id="start-btn" class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all duration-200 shadow-md">
                             Iniciar ${test.nombre}
+                        </button>
+                        <button id="fullscreen-btn" class="hidden px-4 py-3 rounded-xl bg-slate-600 hover:bg-slate-500 text-white font-bold transition-all duration-200 shadow-md" title="Pantalla completa" style="touch-action:manipulation">
+                            ⛶
                         </button>
                     </div>
                 </div>
@@ -167,21 +170,33 @@ window.initTestDetailPage = function initTestDetailPage(testId) {
         // set header subtitle to category from catalog
         try {
             const test = window.getTestById?.(testId) || null;
-            const subtitleEl = document.getElementById('game-subtitle');
-            if (test && subtitleEl) {
+            if (test) {
                 const categoriaDisplay = { atencion: 'Atención', memoria: 'Memoria', control: 'Control', reflejos: 'Reflejos' };
-                subtitleEl.textContent = categoriaDisplay[test.categoria] || (test.categoria.charAt(0).toUpperCase() + test.categoria.slice(1));
+                const catLabel = categoriaDisplay[test.categoria] || (test.categoria.charAt(0).toUpperCase() + test.categoria.slice(1));
+                // Update nav header: title → test name, subtitle → category
+                const headerH1 = document.querySelector('header h1');
+                if (headerH1) headerH1.textContent = test.nombre;
+                if(headerH1.textContent === "TAVEC – Test de Aprendizaje Verbal España-Complutense") headerH1.textContent = "Test TAVEC";
+                const headerSubtitle = document.querySelector('header .flex-col.leading-tight p');
+                if (headerSubtitle) headerSubtitle.textContent = catLabel;
             }
         } catch (e) { /* ignore */ }
 
         const startBtn = document.getElementById('start-btn');
-        if (startBtn) {
-            // ensure existing handlers still run: wrap click to first call our fullscreen helper then allow default
-            startBtn.addEventListener('click', (ev) => {
-                // call fullscreen helper (non-blocking)
+        const fsBtn = document.getElementById('fullscreen-btn');
+        if (startBtn && fsBtn) {
+            fsBtn.addEventListener('click', () => {
                 try { enterTestFullscreen(); } catch (e) { /* ignore */ }
-                // allow other handlers attached by specific test logic to run
-            }, { passive: true });
+            });
+            // Show fullscreen button while test is running (start-btn hidden), hide when test ends
+            const fsObserver = new MutationObserver(() => {
+                if (startBtn.classList.contains('hidden')) {
+                    fsBtn.classList.remove('hidden');
+                } else {
+                    fsBtn.classList.add('hidden');
+                }
+            });
+            fsObserver.observe(startBtn, { attributes: true, attributeFilter: ['class'] });
         }
     }, 80);
 };
@@ -366,11 +381,34 @@ function procesarResultadosTest(resultado) {
         );
         resultBox.classList.remove("hidden");
 
-        // Scroll suave a resultados
+        // Exit fullscreen first if active, then scroll to results
+        const isOverlayFullscreen = !!document.querySelector('.test-fullscreen-overlay');
+        const isNativeFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+        const scrollDelay = (isOverlayFullscreen || isNativeFullscreen) ? 400 : 100;
+        if (isOverlayFullscreen || isNativeFullscreen) {
+            const exitBtn = document.querySelector('.test-exit-fullscreen');
+            if (exitBtn) exitBtn.click();
+        }
         setTimeout(() => {
             resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+        }, scrollDelay);
     }
+
+    // Lock the start button after test ends (runs after test's finalizarTest shows it)
+    setTimeout(() => {
+        const startBtn = document.getElementById('start-btn');
+        const fsBtn = document.getElementById('fullscreen-btn');
+        if (startBtn) {
+            startBtn.disabled = true;
+            startBtn.textContent = '🔒 Test completado';
+            startBtn.className = startBtn.className
+                .replace(/bg-blue-\d+/g, 'bg-slate-500')
+                .replace(/hover:bg-blue-\d+/g, 'cursor-not-allowed');
+            startBtn.classList.add('opacity-70', 'cursor-not-allowed');
+            startBtn.onclick = null;
+        }
+        if (fsBtn) fsBtn.classList.add('hidden');
+    }, 80);
 
     const perfil = window.getperfil();
     if (!perfil.tests) perfil.tests = {};
@@ -616,10 +654,10 @@ function initD2Logic(testId, callback) {
         const alturaArriba = seleccion.arriba === 0 ? 'invisible' : '';
 
         return `
-            <div class="d2-estimulo flex flex-col items-center justify-center min-w-[48px]">
-                <div class="rayas-arriba text-lg leading-none h-6 ${alturaArriba} text-slate-600 dark:text-slate-400">${comillasArriba || "'"}</div>
-                <div class="letra text-xl font-bold text-slate-900 dark:text-white">${letra}</div>
-                <div class="rayas-abajo text-lg leading-none mt-1 text-slate-600 dark:text-slate-400">${comillasAbajo}</div>
+            <div class="d2-estimulo flex flex-col items-center justify-center min-w-[32px] sm:min-w-[48px]">
+                <div class="rayas-arriba text-xs sm:text-lg leading-none h-4 sm:h-6 ${alturaArriba} text-slate-600 dark:text-slate-400">${comillasArriba || "'"}</div>
+                <div class="letra text-sm sm:text-xl font-bold text-slate-900 dark:text-white">${letra}</div>
+                <div class="rayas-abajo text-xs sm:text-lg leading-none mt-0.5 sm:mt-1 text-slate-600 dark:text-slate-400">${comillasAbajo}</div>
             </div>
         `;
     }
@@ -635,18 +673,21 @@ function initD2Logic(testId, callback) {
     }
 
     function renderLinea(linea) {
-        container.innerHTML = makeResponsiveContainer(`
-            <div class="flex flex-wrap gap-3 sm:gap-4 w-full justify-center p-2">
-                ${linea.map((stim, idx) => `
-                    <div data-idx="${idx}" 
-                         data-letra="${stim.letra}" 
-                         data-rayas="${stim.rayas}"
-                         class="estimulo cursor-pointer rounded-lg transition-all duration-150 p-2 flex justify-center items-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700">
-                        ${formatearConComillas(stim.letra, stim.rayas)}
-                    </div>
-                `).join('')}
+        container.innerHTML = `
+            <div class="w-full h-full overflow-y-auto p-2" style="max-height:100%;">
+                <div class="flex flex-wrap gap-1 sm:gap-3 w-full justify-center">
+                    ${linea.map((stim, idx) => `
+                        <div data-idx="${idx}"
+                             data-letra="${stim.letra}"
+                             data-rayas="${stim.rayas}"
+                             class="estimulo cursor-pointer rounded-lg transition-all duration-150 p-1 sm:p-2 flex justify-center items-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
+                             style="touch-action:manipulation">
+                            ${formatearConComillas(stim.letra, stim.rayas)}
+                        </div>
+                    `).join('')}
+                </div>
             </div>
-        `);
+        `;
     }
 
     function procesarLinea(linea, marcados, lineaIndex) {
@@ -2501,16 +2542,30 @@ function initTMTLogic(testId, callback) {
     }
 
     function mostrarFeedbackError(elementoDiv) {
-        if (errorTimeout) clearTimeout(errorTimeout);
+        if (errorTimeout) clearInterval(errorTimeout);
+        elementoDiv.classList.remove('bg-blue-500', 'hover:bg-blue-600');
         elementoDiv.classList.add('bg-red-500', 'scale-95', 'ring-4', 'ring-red-300');
-        errorTimeout = setTimeout(() => {
-            elementoDiv.classList.remove('bg-red-500', 'scale-95', 'ring-4', 'ring-red-300');
-            elementoDiv.classList.add('bg-blue-500');
-            errorTimeout = null;
-        }, 400);
+        let flashCount = 0;
+        errorTimeout = setInterval(() => {
+            flashCount++;
+            if (flashCount % 2 === 0) {
+                elementoDiv.classList.remove('bg-red-500');
+                elementoDiv.classList.add('bg-blue-500');
+            } else {
+                elementoDiv.classList.remove('bg-blue-500');
+                elementoDiv.classList.add('bg-red-500');
+            }
+            if (flashCount >= 3) {
+                clearInterval(errorTimeout);
+                errorTimeout = null;
+                elementoDiv.classList.remove('bg-red-500', 'scale-95', 'ring-4', 'ring-red-300');
+                elementoDiv.classList.add('bg-blue-500');
+            }
+        }, 150);
     }
 
     function mostrarFeedbackAcierto(elementoDiv) {
+        elementoDiv.classList.remove('bg-blue-500', 'hover:bg-blue-600');
         elementoDiv.classList.add('bg-green-500', 'ring-4', 'ring-green-300');
         setTimeout(() => {
             elementoDiv.classList.remove('ring-4', 'ring-green-300');
@@ -2548,29 +2603,27 @@ function initTMTLogic(testId, callback) {
         }, 1000);
     }
     function renderFase() {
-        const progreso = `${siguienteIndex}/${ordenCorrectoTotal.length}`;
-
-        container.innerHTML = makeResponsiveContainer(`
-            <div class="flex flex-col h-full">
-                <div class="flex justify-between items-center mb-3 px-2">
+        container.innerHTML = `
+            <div class="w-full h-full flex flex-col p-2">
+                <div class="flex justify-between items-center mb-2 px-1">
                     <div class="text-sm font-bold ${fase === 'A' ? 'text-blue-500' : 'text-green-500'}">
                         Fase ${fase}
                     </div>
-                    <div class="text-sm text-slate-500 dark:text-slate-400">
-                        Progreso: ${progreso}
+                    <div id="tmt-progreso" class="text-sm text-slate-500 dark:text-slate-400">
+                        Progreso: ${siguienteIndex}/${ordenCorrectoTotal.length}
                     </div>
                 </div>
-                <div class="relative w-full h-96 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden" style="min-height: 350px;">
-                    <canvas id="tmt-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="z-index: 1;"></canvas>
-                    <div class="relative w-full h-full" style="z-index: 2;">
+                <div id="tmt-play-area" class="relative flex-1 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden" style="min-height:260px;">
+                    <canvas id="tmt-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="z-index:1;"></canvas>
+                    <div class="relative w-full h-full" style="z-index:2;">
                         ${elementos.map(el => {
             const esCompletado = el.completado === true;
             return `
-                                <div data-valor="${el.valor}" 
+                                <div data-valor="${el.valor}"
                                      data-x="${el.x}" data-y="${el.y}"
-                                     class="absolute w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all text-sm font-bold shadow-md
+                                     class="absolute w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-colors text-xs sm:text-sm font-bold shadow-md
                                             ${esCompletado ? 'bg-green-500 text-white opacity-80 cursor-default' : 'bg-blue-500 text-white hover:bg-blue-600'}"
-                                    style="left: ${el.x}%; top: ${el.y}%; transform: translate(-50%, -50%); z-index: 3;">
+                                     style="left:${el.x}%;top:${el.y}%;transform:translate(-50%,-50%);z-index:3;touch-action:manipulation;">
                                     ${el.valor}
                                 </div>
                             `;
@@ -2578,10 +2631,26 @@ function initTMTLogic(testId, callback) {
                     </div>
                 </div>
             </div>
-        `);
+        `;
 
         setTimeout(() => dibujarLineas(), 50);
         asignarEventos();
+
+        // Single outside-click listener per render (tracks precision metric)
+        const playArea = document.getElementById('tmt-play-area');
+        if (playArea) {
+            playArea.addEventListener('click', (e) => {
+                if (!e.target.closest('[data-valor]')) {
+                    if (fase === 'A') clicsFueraA++;
+                    else clicsFueraB++;
+                    const msg = document.createElement('div');
+                    msg.className = 'absolute bottom-4 left-1/2 -translate-x-1/2 z-20';
+                    msg.innerHTML = `<div class="px-4 py-2 rounded-full text-white text-sm font-bold bg-yellow-500 animate-pulse">¡Haz clic en los círculos!</div>`;
+                    playArea.appendChild(msg);
+                    setTimeout(() => msg.remove(), 800);
+                }
+            });
+        }
     }
 
     function asignarEventos() {
@@ -2592,33 +2661,6 @@ function initTMTLogic(testId, callback) {
                 const valorEsperadoActual = getValorEsperado();
                 const valorClickeado = el.dataset.valor;
                 const elemento = elementos.find(e => e.valor === valorClickeado);
-                // En asignarEventos, añadir evento general en el canvas
-                const canvasContainer = document.querySelector('.relative.w-full.h-96');
-                if (canvasContainer) {
-                    canvasContainer.addEventListener('click', (e) => {
-                        // Si el clic NO fue en un círculo
-                        if (!e.target.closest('[data-valor]')) {
-                            const msgDiv = document.createElement('div');
-                            msgDiv.className = `absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex gap-2`;
-                            msgDiv.innerHTML = `
-                                <div class="px-4 py-2 rounded-full text-white text-sm font-bold animate-pulse bg-yellow-500">
-                                    ¡Haz click en los circulos!
-                                </div>
-                            `;
-                            const canvasContainer = document.querySelector('#container .relative');
-                            if (canvasContainer) {
-                                canvasContainer.appendChild(msgDiv);
-                                setTimeout(() => msgDiv.remove(), 800);
-                            }
-                            // Registrar métrica (sin afectar habilidades)
-                            if (fase === 'A') {
-                                clicsFueraA = (clicsFueraA || 0) + 1;
-                            } else {
-                                clicsFueraB = (clicsFueraB || 0) + 1;
-                            }
-                        }
-                    });
-                }
                 if (!elemento || elemento.completado) return;
 
                 if (valorClickeado === valorEsperadoActual) {
@@ -2627,11 +2669,16 @@ function initTMTLogic(testId, callback) {
                     mostrarFeedbackAcierto(el);
                     siguienteIndex++;
 
+                    // Update progress counter live
+                    const progresoEl = document.getElementById('tmt-progreso');
+                    if (progresoEl) progresoEl.textContent = `Progreso: ${siguienteIndex}/${ordenCorrectoTotal.length}`;
+                    // Redraw connecting lines after each correct click
+                    setTimeout(() => dibujarLineas(), 10);
+
                     if (siguienteIndex >= ordenCorrectoTotal.length) {
                         tiempos[fase] = performance.now() - inicioFase;
                         if (fase === 'A') {
                             fase = 'B';
-                            // Letra de inicio B: puede ser cualquier letra de la secuencia ['1','A','2','B','3','C','4','D']
                             const secuenciaCompleta = ['1', 'A', '2', 'B', '3', 'C', '4', 'D'];
                             letraInicio = secuenciaCompleta[Math.floor(Math.random() * secuenciaCompleta.length)];
                             elementos = generarElementosFaseB();
@@ -2646,11 +2693,8 @@ function initTMTLogic(testId, callback) {
                     }
                 } else {
                     mostrarFeedbackError(el);
-                    if (fase === 'A') {
-                        erroresFaseA++;
-                    } else {
-                        erroresFaseB++;
-                    }
+                    if (fase === 'A') erroresFaseA++;
+                    else erroresFaseB++;
                 }
             };
         });

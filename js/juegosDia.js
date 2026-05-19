@@ -1,6 +1,7 @@
-const juegosBase = typeof window.getCatalogoJuegos === "function"
+const juegosBase = (typeof window.getCatalogoJuegos === "function"
     ? window.getCatalogoJuegos()
-    : [];
+    : []
+).filter(j => j.disponible === "Disponible");
 
 function randomSeeded(seed) {
     const x = Math.sin(seed) * 10000;
@@ -94,7 +95,7 @@ function generarJuegoDelDia(juego) {
 
                 <div class="flex items-center gap-2">
                     <span class="px-3 py-1 bg-blue-500 text-white text-xs font-bold uppercase tracking-wider rounded-full">
-                        Recomendado hoy
+                        Recomendado para ti
                     </span>
                 </div>
 
@@ -138,12 +139,36 @@ function generarJuegoDelDia(juego) {
 }
 
 
-function renderJuegoRecomendado(cantidad = 1) {
+function juegoRecomendadoPersonalizado() {
+    const perfil = window.getperfil?.();
+    if (perfil) {
+        const categorias = {
+            atencion: perfil.atencion || 0,
+            memoria: perfil.memoria || 0,
+            control: perfil.control || 0,
+            reflejos: perfil.reflejos || 0
+        };
+        const totalScore = Object.values(categorias).reduce((a, b) => a + b, 0);
+        if (totalScore > 0) {
+            const categoriaFloja = Object.entries(categorias).sort((a, b) => a[1] - b[1])[0][0];
+            const juegosFiltrados = juegosBase.filter(j => j.categoria === categoriaFloja);
+            if (juegosFiltrados.length > 0) {
+                const hoy = new Date();
+                const seed = hoy.getFullYear() * 10000 + (hoy.getMonth() + 1) * 100 + hoy.getDate();
+                const idx = Math.floor(randomSeeded(seed) * juegosFiltrados.length);
+                return juegosFiltrados[idx];
+            }
+        }
+    }
+    return juegosDelDia(1)[0];
+}
+
+function renderJuegoRecomendado() {
     const contenedor = document.getElementById("juego-recomendado");
     if (!contenedor) return;
 
-    const seleccion = juegosDelDia(cantidad);
-    contenedor.innerHTML = seleccion.map(generarJuegoDelDia).join("");
+    const juego = juegoRecomendadoPersonalizado();
+    contenedor.innerHTML = generarJuegoDelDia(juego);
 }
 
 window.juegosDelDia = juegosDelDia;

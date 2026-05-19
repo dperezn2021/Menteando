@@ -55,72 +55,143 @@ async function cargarComentarios() {
 function mostrarComentarios(comentarios) {
     const container = document.getElementById("comentarios-container");
     if (!container) return;
-    
+
     const usuarioActual = getUsuarioActual();
     const admin = esAdmin();
-    
+
+    container.innerHTML = '';
+
     if (!comentarios || comentarios.length === 0) {
-        container.innerHTML = `
-            <div class="text-center py-8 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <p class="text-slate-500">No hay comentarios. ¡Sé el primero!</p>
-            </div>
-        `;
+        const empty = document.createElement('div');
+        empty.className = 'text-center py-8 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700';
+        empty.textContent = 'No hay comentarios. ¡Sé el primero!';
+        container.appendChild(empty);
         return;
     }
 
-    container.innerHTML = comentarios.map(com => {
-        const usuarioDioLike = com.usuariosLikes?.includes(usuarioActual);
-        const likeIcon = usuarioDioLike ? '❤️' : '🤍';
-        const esAutor = com.usuario === usuarioActual;
+    comentarios.forEach(com => {
+        const card = document.createElement('div');
+        card.className = 'bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all';
+        card.id = `comentario-${com.id}`;
+
+        const row = document.createElement('div');
+        row.className = 'flex items-start gap-3';
+
+        const avatar = document.createElement('img');
+        avatar.src = com.avatar || '/assets/icon/usuario.webp';
+        avatar.alt = 'Avatar';
+        avatar.className = 'w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-600';
+
+        const body = document.createElement('div');
+        body.className = 'flex-1';
+
+        const header = document.createElement('div');
+        header.className = 'flex flex-wrap items-center justify-between gap-2 mb-1';
+
+        const left = document.createElement('div');
+        left.className = 'flex items-center gap-2 flex-wrap';
+
+        const name = document.createElement('span');
+        name.className = `font-bold ${com.usuario === 'admin' ? 'text-red-500' : 'text-slate-900 dark:text-white'}`;
+        name.textContent = com.usuario + (com.usuario === 'admin' ? ' 👑' : '');
+
+        const dateSpan = document.createElement('span');
+        dateSpan.className = 'text-xs text-slate-500';
+        dateSpan.textContent = formatearFecha(com.fecha);
+
         const categoriaInfo = CATEGORIAS[com.categoria] || CATEGORIAS.general;
-        
-        return `
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all" id="comentario-${com.id}">
-                <div class="flex items-start gap-3">
-                    <img src="${com.avatar || '/assets/icon/usuario.webp'}" alt="Avatar" class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-600">
-                    <div class="flex-1">
-                        <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="font-bold ${com.usuario === 'admin' ? 'text-red-500' : 'text-slate-900 dark:text-white'}">
-                                    ${escapeHtml(com.usuario)} ${com.usuario === 'admin' ? '👑' : ''}
-                                </span>
-                                <span class="text-xs text-slate-500">${formatearFecha(com.fecha)}</span>
-                                <span class="px-2 py-0.5 rounded-full text-xs ${categoriaInfo.color}">${categoriaInfo.nombre}</span>
-                                ${com.editado ? '<span class="text-xs text-slate-400">(editado)</span>' : ''}
-                                ${com.reportes > 0 && admin ? '<span class="text-xs text-red-500">⚠️ ' + com.reportes + ' reportes</span>' : ''}
-                            </div>
-                            <div class="flex gap-2">
-                                ${esAutor ? `
-                                    <button onclick="editarComentario(${com.id})" class="text-xs text-blue-500 hover:text-blue-700 transition" title="Editar">
-                                        ✏️
-                                    </button>
-                                ` : ''}
-                                ${!esAutor ? `
-                                    <button onclick="reportarComentario(${com.id})" class="text-xs text-yellow-500 hover:text-yellow-700 transition" title="Reportar">
-                                        🚩
-                                    </button>
-                                ` : ''}
-                                ${admin ? `
-                                    <button onclick="borrarComentarioPrompt(${com.id})" class="text-xs text-red-500 hover:text-red-700 transition" title="Eliminar">
-                                        🗑️
-                                    </button>
-                                ` : ''}
-                            </div>
-                        </div>
-                        <div id="texto-${com.id}">
-                            <p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">${escapeHtml(com.texto)}</p>
-                        </div>
-                        <div class="flex items-center gap-4 mt-3">
-                            <button onclick="darLike(${com.id})" class="flex items-center gap-1 text-xs text-slate-500 hover:text-red-500 transition">
-                                <span id="like-icon-${com.id}">${likeIcon}</span>
-                                <span id="likes-${com.id}">${com.likes || 0}</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
+        const catBadge = document.createElement('span');
+        catBadge.className = `px-2 py-0.5 rounded-full text-xs ${categoriaInfo.color}`;
+        catBadge.textContent = categoriaInfo.nombre;
+
+        left.appendChild(name);
+        left.appendChild(dateSpan);
+        left.appendChild(catBadge);
+        if (com.editado) {
+            const editLabel = document.createElement('span');
+            editLabel.className = 'text-xs text-slate-400';
+            editLabel.textContent = '(editado)';
+            left.appendChild(editLabel);
+        }
+        if (com.reportes > 0 && admin) {
+            const rep = document.createElement('span');
+            rep.className = 'text-xs text-red-500';
+            rep.textContent = `⚠️ ${com.reportes} reportes`;
+            left.appendChild(rep);
+        }
+
+        const right = document.createElement('div');
+        right.className = 'flex gap-2 comentario-controls';
+
+        const esAutor = com.usuario === usuarioActual;
+
+        if (esAutor) {
+            const editBtn = document.createElement('button');
+            editBtn.className = 'text-xs text-blue-500 hover:text-blue-700 transition';
+            editBtn.title = 'Editar';
+            editBtn.textContent = '✏️';
+            editBtn.addEventListener('click', () => editarComentario(com.id));
+            right.appendChild(editBtn);
+        }
+
+        if (!esAutor) {
+            const reportBtn = document.createElement('button');
+            reportBtn.className = 'text-xs text-yellow-500 hover:text-yellow-700 transition';
+            reportBtn.title = 'Reportar';
+            reportBtn.textContent = '🚩';
+            reportBtn.addEventListener('click', () => reportarComentario(com.id));
+            right.appendChild(reportBtn);
+        }
+
+        if (admin) {
+            const delBtn = document.createElement('button');
+            delBtn.className = 'text-xs text-red-500 hover:text-red-700 transition';
+            delBtn.title = 'Eliminar';
+            delBtn.textContent = '🗑️';
+            delBtn.addEventListener('click', () => borrarComentarioPrompt(com.id));
+            right.appendChild(delBtn);
+        }
+
+        header.appendChild(left);
+        header.appendChild(right);
+
+        const textoDiv = document.createElement('div');
+        textoDiv.id = `texto-${com.id}`;
+
+    const textoP = document.createElement('p');
+    textoP.className = 'comentario-texto text-slate-700 dark:text-slate-300 text-sm leading-relaxed';
+    // Use escaped HTML and convert newlines to <br> so line breaks are visible
+    textoP.innerHTML = escapeHtml(com.texto || '').replace(/\r?\n/g, '<br>');
+    textoDiv.appendChild(textoP);
+
+    // Store raw text on the card so edit/cancel can access original newlines
+    card.dataset.raw = com.texto || '';
+
+        const actions = document.createElement('div');
+        actions.className = 'flex items-center gap-4 mt-3';
+
+        const likeBtn = document.createElement('button');
+        likeBtn.className = 'flex items-center gap-1 text-xs text-slate-500 hover:text-red-500 transition';
+        likeBtn.addEventListener('click', () => darLike(com.id));
+        const likeIcon = document.createElement('span');
+        likeIcon.id = `like-icon-${com.id}`;
+        likeIcon.textContent = (com.usuariosLikes?.includes(usuarioActual)) ? '❤️' : '🤍';
+        const likeCount = document.createElement('span');
+        likeCount.id = `likes-${com.id}`;
+        likeCount.textContent = com.likes || 0;
+        likeBtn.appendChild(likeIcon);
+        likeBtn.appendChild(likeCount);
+        actions.appendChild(likeBtn);
+
+        body.appendChild(header);
+        body.appendChild(textoDiv);
+        body.appendChild(actions);
+
+        row.appendChild(avatar);
+        row.appendChild(body);
+        card.appendChild(row);
+        container.appendChild(card);
+    });
 }
 
 // ========== PUBLICAR COMENTARIO ==========
@@ -193,7 +264,9 @@ async function darLike(id) {
 
 function editarComentario(id) {
     const divTexto = document.getElementById(`texto-${id}`);
-    const textoActual = divTexto.innerText;
+    // Read raw text stored on the card (preserves newlines)
+    const card = document.getElementById(`comentario-${id}`);
+    const textoActual = (card && card.dataset.raw) ? card.dataset.raw : (divTexto.innerText || '');
     
     const categoriaSelect = document.createElement('select');
     categoriaSelect.id = `edit-categoria-${id}`;
@@ -207,14 +280,58 @@ function editarComentario(id) {
         <option value="juego">🎮 Juego</option>
     `;
     
-    divTexto.innerHTML = `
-        <textarea id="edit-texto-${id}" class="w-full p-2 rounded-lg border text-sm dark:bg-slate-700 dark:border-slate-600" rows="3">${escapeHtml(textoActual)}</textarea>
-        ${categoriaSelect.outerHTML}
-        <div class="flex gap-2 mt-2">
-            <button onclick="guardarEdicion(${id})" class="px-3 py-1 bg-green-500 text-white rounded-lg text-xs hover:bg-green-600 transition">Guardar</button>
-            <button onclick="cancelarEdicion(${id}, '${escapeHtml(textoActual)}')" class="px-3 py-1 bg-gray-500 text-white rounded-lg text-xs hover:bg-gray-600 transition">Cancelar</button>
-        </div>
-    `;
+    // Build edit UI with DOM to avoid string interpolation issues
+    divTexto.innerHTML = '';
+    const textarea = document.createElement('textarea');
+    textarea.id = `edit-texto-${id}`;
+    textarea.className = 'w-full p-2 rounded-lg border text-sm dark:bg-slate-700 dark:border-slate-600';
+    textarea.rows = 3;
+    textarea.value = textoActual;
+
+    const wrapper = document.createElement('div');
+    wrapper.appendChild(textarea);
+
+    // insert categoria select
+    const tempSelect = document.createElement('div');
+    tempSelect.innerHTML = categoriaSelect.outerHTML;
+    const selectEl = tempSelect.querySelector('select');
+    selectEl.id = `edit-categoria-${id}`;
+    selectEl.className = 'mt-2 px-3 py-1 rounded-lg border text-sm w-full dark:bg-slate-700';
+    wrapper.appendChild(selectEl);
+
+    const btnRow = document.createElement('div');
+    btnRow.className = 'flex gap-2 mt-2';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'px-3 py-1 bg-green-500 text-white rounded-lg text-xs hover:bg-green-600 transition';
+    saveBtn.textContent = 'Guardar';
+    saveBtn.addEventListener('click', () => guardarEdicion(id));
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'px-3 py-1 bg-gray-500 text-white rounded-lg text-xs hover:bg-gray-600 transition';
+    cancelBtn.textContent = 'Cancelar';
+    cancelBtn.addEventListener('click', () => cancelarEdicion(id, textoActual));
+
+    btnRow.appendChild(saveBtn);
+    btnRow.appendChild(cancelBtn);
+
+    // Delete button for author/admin
+    const usuarioActual = getUsuarioActual();
+    const admin = esAdmin();
+    // We allow the delete button if the current user is admin or author (handled earlier by edit button call)
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'ml-auto px-3 py-1 bg-red-500 text-white rounded-lg text-xs hover:bg-red-600 transition';
+    deleteBtn.textContent = 'Borrar';
+    deleteBtn.addEventListener('click', () => {
+        if (confirm('¿Eliminar este comentario?')) {
+            borrarComentario(id);
+        }
+    });
+
+    btnRow.appendChild(deleteBtn);
+    wrapper.appendChild(btnRow);
+
+    divTexto.appendChild(wrapper);
 }
 
 async function guardarEdicion(id) {
@@ -254,7 +371,10 @@ async function guardarEdicion(id) {
 
 function cancelarEdicion(id, textoOriginal) {
     const divTexto = document.getElementById(`texto-${id}`);
-    divTexto.innerHTML = `<p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">${textoOriginal}</p>`;
+    // Restore original raw text (preserves newlines)
+    const card = document.getElementById(`comentario-${id}`);
+    const raw = (card && card.dataset.raw) ? card.dataset.raw : textoOriginal;
+    divTexto.innerHTML = `<p class="comentario-texto text-slate-700 dark:text-slate-300 text-sm leading-relaxed">${escapeHtml(raw).replace(/\r?\n/g, '<br>')}</p>`;
 }
 
 // ========== REPORTAR COMENTARIO ==========
@@ -290,10 +410,9 @@ async function reportarComentario(id) {
 
 async function borrarComentario(id) {
     const usuario = getUsuarioActual();
-    if (usuario !== "admin") {
-        mostrarMensajeTemporal("❌ Solo administradores pueden eliminar", "error");
-        return;
-    }
+    // Allow deletion if admin or the original author
+    // To check author ownership we will attempt deletion and rely on the server-side author check.
+    // If your Worker enforces authorization, it should validate that the requesting user can delete.
     
     try {
         const response = await fetch(API_URL, {

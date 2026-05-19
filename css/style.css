@@ -398,6 +398,17 @@ html.dark .menu-container {
 .skills-grid {
     max-width: 1400px;
     margin: 3rem auto;
+
+/* Comentarios: respetar saltos de línea y ajustarse al contenedor */
+.comentario-texto {
+    white-space: pre-wrap;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+.comentario-controls button {
+    font-size: 0.8rem;
+}
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1.5rem;
