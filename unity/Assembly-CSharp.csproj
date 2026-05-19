@@ -67,12 +67,15 @@
     <Compile Include="Assets\Framework\ScriptsGenerales\Managers\GameManager.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\BotonCentralController.cs" />
     <Compile Include="Assets\Framework\Juegos\RoscoExpress\RoscoExpress.cs" />
+    <Compile Include="Assets\Framework\Juegos\CambioDeReglas\CambioDeReglasGame.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Utils\GamePause.cs" />
     <Compile Include="Assets\Framework\Juegos\ColorMatch\UIColorMatch.cs" />
     <Compile Include="Assets\Framework\Juegos\SilencioMental\SilencioMentalGame.cs" />
     <Compile Include="Assets\Framework\Juegos\MisionOrbital\Prefabs\AsteroideGiratorio.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\Intento.cs" />
+    <Compile Include="Assets\Framework\Juegos\TrayectoriasMentales\TrayectoriasMentalesGame.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\Sesion.cs" />
+    <Compile Include="Assets\Framework\Juegos\EcoVisual\UIEcoVisual.cs" />
     <Compile Include="Assets\Framework\Juegos\DetectorDeIntrusos\UIDetectorIntrusos.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Managers\AudioManager.cs" />
     <Compile Include="Assets\Framework\Juegos\DetectorDeIntrusos\LupaFlotante.cs" />
@@ -95,7 +98,9 @@
     <Compile Include="Assets\Framework\Juegos\ColorMatch\ColorMatchGame.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Utils\MetricUtils.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Managers\DifficultyManager.cs" />
+    <Compile Include="Assets\Framework\Juegos\EcoVisual\EcoVisualDraggable.cs" />
     <Compile Include="Assets\Juegos\ScriptsGenerales\Metricas.cs" />
+    <Compile Include="Assets\Framework\ScriptsGenerales\Utils\SimpleShapeGraphic.cs" />
     <Compile Include="Assets\Framework\Juegos\OperacionesEncadenadas\UICalculadora.cs" />
     <Compile Include="Assets\Juegos\ScriptsGenerales\SesionJuego.cs" />
     <Compile Include="Assets\Framework\Juegos\ReflejosCruzados\ReflejosCruzadosGame.cs" />

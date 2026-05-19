@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7252654884434805165}
   - component: {fileID: 8247618031594821600}
   m_Layer: 0
-  m_Name: ObjetiPrefab
+  m_Name: pelota
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 095fdc4703a697345aea7d42fe28739c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b99f7b795e7440c4c87af92dc4648c14, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

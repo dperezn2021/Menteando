@@ -1,80 +1,87 @@
-﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
-/// <summary>
-/// Juego: Reflejos Cruzados
-/// - Caen aliens (verde/rojo/dorado)
-/// - Según la regla actual, el jugador debe tocarlos o evitarlos
-/// - Integra DifficultyManager, GameManager, AudioManager y WebExporter
-/// </summary>
 public class ReflejosCruzadosGame : BaseGame
 {
-    [Header("Prefabs de aliens")]
-    public AlienReflejo prefabAlienVerde;
-    public AlienReflejo prefabAlienRojo;
-    public AlienReflejo prefabAlienDorado;
+    private enum FallingKind
+    {
+        Green,
+        Red,
+        Switch
+    }
 
-    [Header("Zona de spawn")]
-    public Transform spawnTop;          // punto superior (y)
-    public float minX = -7f;
-    public float maxX = 7f;
+    private class FallingItem
+    {
+        public RectTransform rect;
+        public SimpleShapeGraphic shape;
+        public Button button;
+        public TMP_Text label;
+        public FallingKind kind;
+        public float speed;
+        public bool resolved;
+        public float age;
+    }
 
-    [Header("Parámetros de caída")]
-    public float velocidadBase = 3f;
-    public float velocidadMax = 9f;
+    private RectTransform root;
+    private RectTransform laneArea;
+    private TextMeshProUGUI ruleText;
+    private TextMeshProUGUI scoreText;
+    private TextMeshProUGUI levelText;
+    private TextMeshProUGUI feedbackText;
 
-    [Header("Tiempos de spawn")]
-    public float spawnIntervalMin = 0.8f;
-    public float spawnIntervalMax = 1.6f;
+    private readonly List<FallingItem> items = new List<FallingItem>();
 
-    [Header("Partículas")]
-    public ParticleSystem particulasAcierto;
-    public ParticleSystem particulasError;
+    private bool gameActive;
+    private bool gameFinished;
+    private bool invertedRule;
+    private float invertedTimeLeft;
+    private float spawnTimer;
+    private int maxLevelReached = 1;
 
-    [Header("Fondo parallax (opcional)")]
-    public ParallaxFondo parallaxFondo;
-
-    // Estado interno
-    private bool activo = false;
-    private bool reglasInvertidas = false;   // a partir de cierto nivel
-    private bool finalizado = false;
-    private List<AlienReflejo> aliensVivos = new List<AlienReflejo>();
-
-    // Métricas
-    private int toquesCorrectos = 0;
-    private int toquesIncorrectos = 0;
-    private int omitidosCorrectos = 0;   // no tocar cuando había que evitar
-    private int omitidosIncorrectos = 0; // no tocar cuando había que tocar
-
-    private int totalAliens = 0;
-
-    private Coroutine rutinaSpawn;
+    private int totalEvents;
+    private int touchedCorrect;
+    private int touchedIncorrect;
+    private int avoidedCorrect;
+    private int missedTargets;
+    private int switchHits;
+    private int currentStreak;
+    private int bestStreak;
 
     private void Awake()
     {
         nombre = "reflejos-cruzados";
     }
 
+    private void Start()
+    {
+        RuntimeMiniGameUI.PrepareStaticScreens("Reflejos Cruzados", "Toca verdes y evita rojos");
+    }
+
     public override void ResetGame()
     {
-        // Reset estado
-        activo = true;
-        reglasInvertidas = false;
-        finalizado = false;
-        toquesCorrectos = toquesIncorrectos = 0;
-        omitidosCorrectos = omitidosIncorrectos = 0;
-        totalAliens = 0;
+        gameActive = true;
+        gameFinished = false;
+        juegoPausado = false;
+        invertedRule = false;
+        invertedTimeLeft = 0f;
+        spawnTimer = 0.35f;
+        maxLevelReached = 1;
 
-        // Limpiar aliens vivos
-        LimpiarAliens();
+        totalEvents = 0;
+        touchedCorrect = 0;
+        touchedIncorrect = 0;
+        avoidedCorrect = 0;
+        missedTargets = 0;
+        switchHits = 0;
+        currentStreak = 0;
+        bestStreak = 0;
 
-        // Nivel inicial
         DifficultyManager.Instance?.ResetDifficulty(1);
-
-        // Empezar spawn
-        if (rutinaSpawn != null) StopCoroutine(rutinaSpawn);
-        rutinaSpawn = StartCoroutine(RutinaSpawn());
+        BuildUI();
+        ClearItems();
+        UpdateHud();
     }
 
     public override void OnGameStart()
@@ -82,324 +89,353 @@ public class ReflejosCruzadosGame : BaseGame
         ResetGame();
     }
 
-    public override void OnGameFinished()
+    private void Update()
     {
-        if (finalizado) return;
+        if (!gameActive || gameFinished || juegoPausado)
+            return;
 
-        finalizado = true;
-        activo = false;
-        LimpiarAliens();
-        WebExporter.EnviarSesion(nombre, AplicarPesos(CalcularCognicion()));
+        float delta = Time.deltaTime;
+
+        if (invertedTimeLeft > 0f)
+        {
+            invertedTimeLeft -= delta;
+            if (invertedTimeLeft <= 0f)
+            {
+                invertedRule = false;
+                feedbackText.text = "Regla normal";
+                feedbackText.color = RuntimeMiniGameUI.MutedText;
+                UpdateHud();
+            }
+        }
+
+        spawnTimer -= delta;
+        if (spawnTimer <= 0f)
+        {
+            SpawnItem();
+            spawnTimer = CurrentSpawnInterval();
+        }
+
+        float bottomLimit = -LaneHeight() * 0.5f - 70f;
+        for (int i = items.Count - 1; i >= 0; i--)
+        {
+            FallingItem item = items[i];
+            if (item == null || item.resolved)
+                continue;
+
+            item.age += delta;
+            item.rect.anchoredPosition += Vector2.down * item.speed * delta;
+
+            if (item.rect.anchoredPosition.y < bottomLimit)
+                ResolveMiss(item);
+        }
     }
 
-    private void LimpiarAliens()
+    private void BuildUI()
     {
-        foreach (var a in aliensVivos)
+        root = RuntimeMiniGameUI.CreateGameplayRoot(
+            "ReflejosCruzadosRuntimeUI",
+            "Reflejos Cruzados",
+            "Verde: tocar. Rojo: evitar. Azul: cambia la regla");
+
+        if (root == null)
+            return;
+
+        RectTransform statusPanel = RuntimeMiniGameUI.CreatePanel("StatusPanel", root, RuntimeMiniGameUI.Panel);
+        RuntimeMiniGameUI.SetRect(statusPanel, new Vector2(0.06f, 0.78f), new Vector2(0.94f, 0.91f), Vector2.zero, Vector2.zero);
+
+        ruleText = RuntimeMiniGameUI.CreateText("RuleText", statusPanel, "", 30f, RuntimeMiniGameUI.Text, TextAlignmentOptions.Left);
+        RuntimeMiniGameUI.SetRect(ruleText.rectTransform, Vector2.zero, Vector2.one, new Vector2(28f, 38f), new Vector2(-370f, -8f));
+
+        scoreText = RuntimeMiniGameUI.CreateText("ScoreText", statusPanel, "", 22f, RuntimeMiniGameUI.MutedText, TextAlignmentOptions.Left);
+        RuntimeMiniGameUI.SetRect(scoreText.rectTransform, Vector2.zero, Vector2.one, new Vector2(28f, 10f), new Vector2(-370f, -56f));
+
+        levelText = RuntimeMiniGameUI.CreateText("LevelText", statusPanel, "", 22f, RuntimeMiniGameUI.Accent, TextAlignmentOptions.Right);
+        RuntimeMiniGameUI.SetRect(levelText.rectTransform, Vector2.zero, Vector2.one, new Vector2(0f, 26f), new Vector2(-28f, -26f));
+
+        laneArea = RuntimeMiniGameUI.CreatePanel("LaneArea", root, RuntimeMiniGameUI.PanelSoft);
+        RuntimeMiniGameUI.SetRect(laneArea, new Vector2(0.12f, 0.12f), new Vector2(0.88f, 0.75f), Vector2.zero, Vector2.zero);
+
+        for (int i = 0; i < 3; i++)
         {
-            if (a != null) Destroy(a.gameObject);
+            RectTransform lane = RuntimeMiniGameUI.CreatePanel("Lane_" + i, laneArea, i % 2 == 0 ? new Color(1f, 1f, 1f, 0.045f) : new Color(1f, 1f, 1f, 0.075f));
+            RuntimeMiniGameUI.SetRect(lane, new Vector2(i / 3f, 0f), new Vector2((i + 1f) / 3f, 1f), new Vector2(8f, 10f), new Vector2(-8f, -10f));
         }
-        aliensVivos.Clear();
+
+        feedbackText = RuntimeMiniGameUI.CreateText("FeedbackText", root, "", 26f, RuntimeMiniGameUI.Text, TextAlignmentOptions.Center);
+        RuntimeMiniGameUI.SetRect(feedbackText.rectTransform, new Vector2(0.08f, 0.05f), new Vector2(0.92f, 0.11f), Vector2.zero, Vector2.zero);
     }
 
-    private IEnumerator RutinaSpawn()
+    private void SpawnItem()
     {
-        while (activo)
+        if (laneArea == null)
+            return;
+
+        int level = Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? 1, 1, 10);
+        maxLevelReached = Mathf.Max(maxLevelReached, level);
+
+        FallingKind kind = ChooseKind(level);
+        int lane = Random.Range(0, 3);
+
+        GameObject itemObject = new GameObject("Falling_" + kind, typeof(RectTransform), typeof(CanvasRenderer), typeof(SimpleShapeGraphic), typeof(Button));
+        itemObject.transform.SetParent(laneArea, false);
+
+        FallingItem item = new FallingItem
         {
-            // Esperar si el juego está pausado
-            while (juegoPausado) yield return null;
+            rect = itemObject.GetComponent<RectTransform>(),
+            shape = itemObject.GetComponent<SimpleShapeGraphic>(),
+            button = itemObject.GetComponent<Button>(),
+            kind = kind,
+            speed = CurrentSpeed(level)
+        };
 
-            int nivel = DifficultyManager.Instance != null ? DifficultyManager.Instance.nivelActual : 1;
+        item.rect.anchorMin = new Vector2(0.5f, 0.5f);
+        item.rect.anchorMax = new Vector2(0.5f, 0.5f);
+        item.rect.pivot = new Vector2(0.5f, 0.5f);
+        item.rect.sizeDelta = new Vector2(CurrentSize(level), CurrentSize(level));
+        item.rect.anchoredPosition = new Vector2(LaneX(lane), LaneHeight() * 0.5f + 72f);
 
-            // Ajustar dificultad según nivel
-            float tMin = Mathf.Lerp(spawnIntervalMax, spawnIntervalMin, (nivel - 1) / 9f);
-            float tMax = Mathf.Lerp(spawnIntervalMax + 0.4f, spawnIntervalMin + 0.2f, (nivel - 1) / 9f);
-            float espera = Random.Range(tMin, tMax);
+        item.shape.SetShape(kind == FallingKind.Switch ? SimpleShapeKind.Diamond : SimpleShapeKind.Circle, ColorForKind(kind));
+        item.button.targetGraphic = item.shape;
+        item.button.onClick.AddListener(() => TouchItem(item));
 
-            // Reglas invertidas a partir de nivel 5
-            reglasInvertidas = nivel >= 5;
+        if (kind == FallingKind.Switch)
+        {
+            item.label = RuntimeMiniGameUI.CreateText("Label", itemObject.transform, "!", 34f, RuntimeMiniGameUI.Text, TextAlignmentOptions.Center);
+            RuntimeMiniGameUI.SetRect(item.label.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+        }
 
-            // Crear alien
-            SpawnAlien(nivel);
+        items.Add(item);
+    }
 
-            yield return new WaitForSeconds(espera);
+    private FallingKind ChooseKind(int level)
+    {
+        float levelT = (level - 1f) / 9f;
+        float switchChance = level >= 4 ? Mathf.Lerp(0.06f, 0.18f, levelT) : 0f;
+
+        if (Random.value < switchChance)
+            return FallingKind.Switch;
+
+        return Random.value < Mathf.Lerp(0.58f, 0.46f, levelT) ? FallingKind.Green : FallingKind.Red;
+    }
+
+    private float CurrentSpawnInterval()
+    {
+        int level = Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? 1, 1, 10);
+        return Mathf.Lerp(1.05f, 0.42f, (level - 1f) / 9f);
+    }
+
+    private float CurrentSpeed(int level)
+    {
+        return Mathf.Lerp(210f, 470f, (level - 1f) / 9f);
+    }
+
+    private float CurrentSize(int level)
+    {
+        return Mathf.Lerp(100f, 74f, (level - 1f) / 9f);
+    }
+
+    private Color ColorForKind(FallingKind kind)
+    {
+        switch (kind)
+        {
+            case FallingKind.Green:
+                return new Color(0.18f, 0.82f, 0.38f, 1f);
+            case FallingKind.Red:
+                return new Color(0.95f, 0.23f, 0.22f, 1f);
+            default:
+                return new Color(0.2f, 0.52f, 1f, 1f);
         }
     }
 
-    private void SpawnAlien(int nivel)
+    private bool ShouldTouch(FallingKind kind)
     {
-        if (!activo) return;
+        if (kind == FallingKind.Switch)
+            return true;
 
-        // Elegir tipo según nivel
-        AlienTipo tipo = ElegirTipoAlien(nivel);
+        if (invertedRule)
+            return kind == FallingKind.Red;
 
-        float x = Random.Range(minX, maxX);
-        Vector3 pos = new Vector3(x, spawnTop.position.y, 0f);
-
-        AlienReflejo prefab = null;
-        switch (tipo)
-        {
-            case AlienTipo.Verde: prefab = prefabAlienVerde; break;
-            case AlienTipo.Rojo: prefab = prefabAlienRojo; break;
-            case AlienTipo.Dorado: prefab = prefabAlienDorado; break;
-        }
-        if (prefab == null) return;
-
-        AlienReflejo alien = Instantiate(prefab, pos, Quaternion.identity);
-        alien.Inicializar(this, tipo, CalcularVelocidadCaida(nivel));
-        aliensVivos.Add(alien);
-        totalAliens++;
+        return kind == FallingKind.Green;
     }
 
-    private float CalcularVelocidadCaida(int nivel)
+    private void TouchItem(FallingItem item)
     {
-        float t = (nivel - 1) / 9f;
-        return Mathf.Lerp(velocidadBase, velocidadMax, t);
-    }
+        if (item == null || item.resolved || gameFinished || juegoPausado)
+            return;
 
-    private AlienTipo ElegirTipoAlien(int nivel)
-    {
-        // Distribución básica:
-        // Niveles bajos: más verdes
-        // Medios: mezcla
-        // Altos: más rojos y dorados
-        float pVerde, pRojo, pDorado;
+        bool correct = ShouldTouch(item.kind);
+        item.resolved = true;
+        totalEvents++;
 
-        if (nivel <= 2)
+        if (correct)
         {
-            pVerde = 0.7f; pRojo = 0.3f; pDorado = 0f;
-        }
-        else if (nivel <= 4)
-        {
-            pVerde = 0.5f; pRojo = 0.5f; pDorado = 0f;
-        }
-        else if (nivel <= 6)
-        {
-            pVerde = 0.3f; pRojo = 0.6f; pDorado = 0.1f;
-        }
-        else if (nivel <= 8)
-        {
-            pVerde = 0.25f; pRojo = 0.5f; pDorado = 0.25f;
-        }
-        else
-        {
-            pVerde = 0.2f; pRojo = 0.5f; pDorado = 0.3f;
-        }
-
-        float r = Random.value;
-        if (r < pVerde) return AlienTipo.Verde;
-        if (r < pVerde + pRojo) return AlienTipo.Rojo;
-        return AlienTipo.Dorado;
-    }
-
-    /// <summary>
-    /// Llamado por AlienReflejo cuando el jugador toca un alien.
-    /// </summary>
-    public void NotificarToque(AlienReflejo alien)
-    {
-        if (!activo) return;
-
-        bool deberiaTocarse = DebeTocarse(alien.tipo);
-        if (deberiaTocarse)
-        {
-            toquesCorrectos++;
+            touchedCorrect++;
+            currentStreak++;
+            bestStreak = Mathf.Max(bestStreak, currentStreak);
+            feedbackText.text = item.kind == FallingKind.Switch ? "Cambio de regla" : "Toque correcto";
+            feedbackText.color = RuntimeMiniGameUI.Good;
             AudioManager.Instance?.Acierto();
-            if (particulasAcierto != null)
-                Instantiate(particulasAcierto, alien.transform.position, Quaternion.identity);
+
+            if (item.kind == FallingKind.Switch)
+                ActivateRuleSwitch();
         }
         else
         {
-            toquesIncorrectos++;
+            touchedIncorrect++;
+            currentStreak = 0;
+            feedbackText.text = "Habia que esquivar";
+            feedbackText.color = RuntimeMiniGameUI.Bad;
             AudioManager.Instance?.Error();
-            if (particulasError != null)
-                Instantiate(particulasError, alien.transform.position, Quaternion.identity);
         }
 
-        // Feedback visual del alien
-        alien.ReproducirHit(deberiaTocarse);
-
-        // Actualizar dificultad
-        float rendimiento = CalcularRendimientoInstantaneo();
-        DifficultyManager.Instance?.ActualizarDificultad(rendimiento, deberiaTocarse, 0f);
+        DifficultyManager.Instance?.ActualizarDificultad(CalcularRendimientoInstantaneo(), correct, item.age);
+        RemoveItem(item);
+        UpdateHud();
     }
 
-    /// <summary>
-    /// Llamado por AlienReflejo cuando sale de pantalla sin ser tocado.
-    /// </summary>
-    public void NotificarSalida(AlienReflejo alien)
+    private void ResolveMiss(FallingItem item)
     {
-        if (!activo) return;
+        if (item == null || item.resolved)
+            return;
 
-        bool deberiaTocarse = DebeTocarse(alien.tipo);
-        if (deberiaTocarse)
+        bool shouldTouch = ShouldTouch(item.kind);
+        item.resolved = true;
+        totalEvents++;
+
+        if (shouldTouch)
         {
-            // Debería haberlo tocado y no lo hizo
-            omitidosIncorrectos++;
+            missedTargets++;
+            currentStreak = 0;
+            feedbackText.text = item.kind == FallingKind.Switch ? "Cambio perdido" : "Objetivo perdido";
+            feedbackText.color = RuntimeMiniGameUI.Bad;
+            AudioManager.Instance?.Error();
         }
         else
         {
-            // Correcto: no tocar algo que había que evitar
-            omitidosCorrectos++;
+            avoidedCorrect++;
+            currentStreak++;
+            bestStreak = Mathf.Max(bestStreak, currentStreak);
+            feedbackText.text = "Esquiva correcta";
+            feedbackText.color = RuntimeMiniGameUI.Good;
         }
+
+        DifficultyManager.Instance?.ActualizarDificultad(CalcularRendimientoInstantaneo(), !shouldTouch, item.age);
+        RemoveItem(item);
+        UpdateHud();
     }
 
-    private bool DebeTocarse(AlienTipo tipo)
+    private void ActivateRuleSwitch()
     {
-        // Reglas:
-        // - Normal: tocar verdes (y dorados si nivel alto), evitar rojos
-        // - Invertidas: tocar rojos, evitar verdes; dorados siempre se tocan
-        if (tipo == AlienTipo.Dorado) return true;
-
-        if (!reglasInvertidas)
-        {
-            return tipo == AlienTipo.Verde;
-        }
-        else
-        {
-            return tipo == AlienTipo.Rojo;
-        }
+        int level = Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? 1, 1, 10);
+        invertedRule = !invertedRule;
+        invertedTimeLeft = Mathf.Lerp(3.8f, 2.3f, (level - 1f) / 9f);
+        switchHits++;
+        UpdateHud();
     }
 
     private float CalcularRendimientoInstantaneo()
     {
-        int totalAcciones = toquesCorrectos + toquesIncorrectos + omitidosCorrectos + omitidosIncorrectos;
-        if (totalAcciones == 0) return 0.5f;
-        float correctos = toquesCorrectos + omitidosCorrectos;
-        return correctos / Mathf.Max(1f, totalAcciones);
+        if (totalEvents <= 0)
+            return 0.5f;
+
+        return Mathf.Clamp01((float)(touchedCorrect + avoidedCorrect) / totalEvents);
     }
 
-    private void Update()
+    private void RemoveItem(FallingItem item)
     {
-        if (!activo) return;
+        items.Remove(item);
+        if (item.rect != null)
+            Destroy(item.rect.gameObject);
+    }
 
-        // Parallax opcional
-        if (parallaxFondo != null && !juegoPausado)
-            parallaxFondo.Mover();
+    private void ClearItems()
+    {
+        for (int i = items.Count - 1; i >= 0; i--)
+            if (items[i] != null && items[i].rect != null)
+                Destroy(items[i].rect.gameObject);
+
+        items.Clear();
+    }
+
+    private void UpdateHud()
+    {
+        int level = Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? 1, 1, 10);
+        maxLevelReached = Mathf.Max(maxLevelReached, level);
+
+        if (ruleText != null)
+        {
+            ruleText.text = invertedRule
+                ? "Regla invertida: rojo toca, verde evita"
+                : "Regla normal: verde toca, rojo evita";
+        }
+
+        if (scoreText != null)
+            scoreText.text = "Correctos " + (touchedCorrect + avoidedCorrect) + "/" + Mathf.Max(1, totalEvents) + "  Racha " + currentStreak;
+
+        if (levelText != null)
+            levelText.text = "Nivel " + level + (invertedRule ? "  Cambio " + Mathf.CeilToInt(invertedTimeLeft) + "s" : "");
+    }
+
+    private float LaneWidth()
+    {
+        return laneArea != null ? Mathf.Max(600f, laneArea.rect.width) / 3f : 260f;
+    }
+
+    private float LaneHeight()
+    {
+        return laneArea != null ? Mathf.Max(560f, laneArea.rect.height) : 620f;
+    }
+
+    private float LaneX(int lane)
+    {
+        float width = LaneWidth();
+        return width * (lane - 1);
     }
 
     public override void PausarJuego(bool pausar)
     {
         base.PausarJuego(pausar);
-        // No hace falta parar corutinas si dentro de ellas respetamos juegoPausado
-        // pero sí podemos congelar movimiento de aliens
-        foreach (var alien in aliensVivos)
-        {
-            if (alien != null)
-                alien.SetPausado(pausar);
-        }
     }
 
-    // ============================
-    // MÉTRICAS COGNITIVAS
-    // ============================
+    public override void OnGameFinished()
+    {
+        if (gameFinished)
+            return;
+
+        gameFinished = true;
+        gameActive = false;
+        ClearItems();
+        WebExporter.EnviarSesion(nombre, AplicarPesos(CalcularCognicion()));
+    }
+
     public override CognitiveMetrics CalcularCognicion()
     {
-        CognitiveMetrics m = new CognitiveMetrics();
+        CognitiveMetrics metrics = new CognitiveMetrics();
+        if (totalEvents <= 0)
+            return metrics;
 
-        int totalAcciones = toquesCorrectos + toquesIncorrectos + omitidosCorrectos + omitidosIncorrectos;
-        if (totalAcciones == 0) return m;
+        float precision = (float)(touchedCorrect + avoidedCorrect) / totalEvents;
+        float visomotor = (float)touchedCorrect / Mathf.Max(1, touchedCorrect + touchedIncorrect + missedTargets);
+        float inhibition = (float)avoidedCorrect / Mathf.Max(1, avoidedCorrect + touchedIncorrect);
+        float spatialMemory = Mathf.Clamp01(precision * (1f - (float)missedTargets / totalEvents));
+        float switchBonus = Mathf.Clamp01(switchHits / 3f) * 0.1f;
+        float planning = Mathf.Clamp01(precision * 0.65f + Mathf.Clamp01(bestStreak / 8f) * 0.25f + switchBonus);
+        float levelFactor = Mathf.Lerp(0.75f, 1f, Mathf.Clamp01(maxLevelReached / 10f));
 
-        float precision = (float)(toquesCorrectos + omitidosCorrectos) / totalAcciones;
-        float inhibicion = (float)omitidosCorrectos / Mathf.Max(1, omitidosCorrectos + toquesIncorrectos);
-        float visomotora = (float)toquesCorrectos / Mathf.Max(1, toquesCorrectos + toquesIncorrectos);
-        float planif = Mathf.Clamp01((float)toquesCorrectos / Mathf.Max(1, totalAliens));
-
-        m.coordinacionVisomotora = visomotora;
-        m.controlInhibitorio = inhibicion;
-        m.memoriaEspacial = precision;   // aquí lo usamos como proxy de consistencia
-        m.planificacion = planif;
-
-        return m;
+        metrics.coordinacionVisomotora = Mathf.Clamp01(visomotor * levelFactor);
+        metrics.controlInhibitorio = Mathf.Clamp01(inhibition * levelFactor);
+        metrics.memoriaEspacial = Mathf.Clamp01(spatialMemory * levelFactor);
+        metrics.planificacion = Mathf.Clamp01(planning * levelFactor);
+        return metrics;
     }
 
-    public override CognitiveMetrics AplicarPesos(CognitiveMetrics m)
+    public override CognitiveMetrics AplicarPesos(CognitiveMetrics metrics)
     {
-        CognitiveMetrics p = new CognitiveMetrics();
-        p.coordinacionVisomotora = m.coordinacionVisomotora * 0.50f;
-        p.controlInhibitorio = m.controlInhibitorio * 0.25f;
-        p.memoriaEspacial = m.memoriaEspacial * 0.15f;
-        p.planificacion = m.planificacion * 0.10f;
-        return p;
-    }
-}
-
-/// <summary>
-/// Tipo de alien
-/// </summary>
-public enum AlienTipo { Verde, Rojo, Dorado }
-
-/// <summary>
-/// Script que va en cada prefab de alien.
-/// Se encarga de caer, detectar clic y notificar al juego.
-/// </summary>
-public class AlienReflejo : MonoBehaviour
-{
-    public AlienTipo tipo;
-    public float velocidadCaida = 3f;
-    public SpriteRenderer spriteRenderer;
-
-    private ReflejosCruzadosGame juego;
-    private bool pausado = false;
-    private bool destruido = false;
-
-    public void Inicializar(ReflejosCruzadosGame juego, AlienTipo tipo, float velocidad)
-    {
-        this.juego = juego;
-        this.tipo = tipo;
-        this.velocidadCaida = velocidad;
-    }
-
-    private void Update()
-    {
-        if (pausado || destruido) return;
-
-        transform.position += Vector3.down * velocidadCaida * Time.deltaTime;
-
-        // Si sale de pantalla por abajo
-        if (transform.position.y < -6f)
-        {
-            destruido = true;
-            juego.NotificarSalida(this);
-            Destroy(gameObject);
-        }
-    }
-
-    private void OnMouseDown()
-    {
-        if (pausado || destruido) return;
-
-        destruido = true;
-        juego.NotificarToque(this);
-        Destroy(gameObject);
-    }
-
-    public void SetPausado(bool p)
-    {
-        pausado = p;
-    }
-
-    public void ReproducirHit(bool acierto)
-    {
-        if (spriteRenderer == null) return;
-        // Pequeño flash de color
-        Color original = spriteRenderer.color;
-        spriteRenderer.color = acierto ? Color.green : Color.red;
-        // Podrías añadir aquí una pequeña corrutina de fade si quieres
-    }
-}
-
-/// <summary>
-/// Parallax simple para fondo de estrellas (opcional).
-/// </summary>
-public class ParallaxFondo : MonoBehaviour
-{
-    public float velocidad = 0.1f;
-    public Renderer rend;
-
-    public void Mover()
-    {
-        if (rend == null) return;
-        Vector2 offset = rend.material.mainTextureOffset;
-        offset.y -= velocidad * Time.deltaTime;
-        rend.material.mainTextureOffset = offset;
+        CognitiveMetrics weighted = new CognitiveMetrics();
+        weighted.coordinacionVisomotora = metrics.coordinacionVisomotora * 0.50f;
+        weighted.controlInhibitorio = metrics.controlInhibitorio * 0.25f;
+        weighted.memoriaEspacial = metrics.memoriaEspacial * 0.15f;
+        weighted.planificacion = metrics.planificacion * 0.10f;
+        return weighted;
     }
 }

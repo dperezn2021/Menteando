@@ -1,4 +1,4 @@
-%YAML 1.1
+﻿%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!29 &1
 OcclusionCullingSettings:
@@ -2292,19 +2292,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nombre: 
-  prefabAlienVerde: {fileID: 8655279231990537646, guid: 9c0510457f0b69a48be50de40cd66a18, type: 3}
-  prefabAlienRojo: {fileID: 4854705310563851350, guid: d9ec4fb52118c124f822f3daa70f6a90, type: 3}
-  prefabAlienDorado: {fileID: 8655279231990537646, guid: 17fdc3b12fe0ada41afde7d6c6b82fa6, type: 3}
-  spawnTop: {fileID: 0}
-  minX: -7
-  maxX: 7
-  velocidadBase: 3
-  velocidadMax: 9
-  spawnIntervalMin: 0.8
-  spawnIntervalMax: 1.6
-  particulasAcierto: {fileID: 0}
-  particulasError: {fileID: 0}
-  parallaxFondo: {fileID: 0}
 --- !u!4 &638485020
 Transform:
   m_ObjectHideFlags: 0
@@ -16865,3 +16852,4 @@ SceneRoots:
   - {fileID: 2109894645}
   - {fileID: 730277602}
   - {fileID: 638485020}
+
