@@ -1,42 +1,64 @@
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ReflejosCruzadosGame : BaseGame
 {
+    private const float ValorAciertoDiana = 1f;
+    private const float PesoAciertoDiana = 1f;
+    private const float ValorInhibicionCorrecta = 0.55f;
+    private const float PesoInhibicionCorrecta = 0.25f;
+    private const float PesoErrorComision = 1.25f;
+    private const float PesoErrorOmision = 1.15f;
+
     private enum FallingKind
     {
         Green,
-        Red,
-        Switch
+        Red
     }
 
     private class FallingItem
     {
         public RectTransform rect;
-        public SimpleShapeGraphic shape;
         public Button button;
-        public TMP_Text label;
         public FallingKind kind;
         public float speed;
-        public bool resolved;
         public float age;
+        public bool resolved;
     }
 
-    private RectTransform root;
-    private RectTransform laneArea;
-    private TextMeshProUGUI ruleText;
-    private TextMeshProUGUI scoreText;
-    private TextMeshProUGUI levelText;
-    private TextMeshProUGUI feedbackText;
+    [Header("UI")]
+    public UIReflejosCruzados uiReflejosCruzados;
+
+    [Header("Dificultad")]
+    public int nivelInicial = 1;
+    public float intervaloSpawnNivel1 = 1.0f;
+    public float intervaloSpawnNivel10 = 0.42f;
+    public float velocidadNivel1 = 210f;
+    public float velocidadNivel10 = 480f;
+    public Vector2 tamanoDianaNivel1 = new Vector2(108f, 108f);
+    public Vector2 tamanoDianaNivel10 = new Vector2(76f, 76f);
+
+    [Header("Estilo dianas")]
+    public Color colorDianaVerde = new Color(0.372549f, 0.4980392f, 0.227451f, 1f);
+    public Color colorDianaRoja = new Color(0.5254902f, 0.1843137f, 0.2039216f, 1f);
+    public Color colorCentroDiana = new Color(1f, 0.9137255f, 0.7215686f, 1f);
+
+    [Header("Regla invertida")]
+    public float primerCambioReglaSegundos = 5f;
+    public float intervaloCambioReglaNivel1 = 10f;
+    public float intervaloCambioReglaNivel10 = 4.5f;
+    public int cambiosReglaMaximosNivel1 = 1;
+    public int cambiosReglaMaximosNivel10 = 5;
 
     private readonly List<FallingItem> items = new List<FallingItem>();
 
+    private RectTransform zonaJuego;
     private bool gameActive;
     private bool gameFinished;
     private bool invertedRule;
-    private float invertedTimeLeft;
+    private int ruleSwitchCount;
+    private float ruleSwitchAt;
     private float spawnTimer;
     private int maxLevelReached = 1;
 
@@ -45,18 +67,33 @@ public class ReflejosCruzadosGame : BaseGame
     private int touchedIncorrect;
     private int avoidedCorrect;
     private int missedTargets;
-    private int switchHits;
     private int currentStreak;
     private int bestStreak;
+    private float weightedPerformance;
+    private float weightedPerformanceWeight;
+
+    public System.Action OnEstadoActualizado;
+    public System.Action<string> OnReglaActualizada;
+    public System.Action<string, bool> OnFeedback;
+    public System.Action<string> OnReglaInvertida;
+
+    public int Aciertos => touchedCorrect;
+    public int Fallos => touchedIncorrect + missedTargets;
+    public int RachaActual => currentStreak;
+    public int NivelActual => Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? nivelInicial, 1, 10);
+    public float TiempoRestante => GameManager.Instance != null ? GameManager.Instance.tiempoRestante : 0f;
+    public bool ReglaInvertida => invertedRule;
+    public string TextoRegla => invertedRule ? "NORMA: TOCA ROJOS" : "NORMA: TOCA VERDES";
 
     private void Awake()
     {
-        nombre = "reflejos-cruzados";
+        nombre = "reflejos cruzados";
+        CachearUI();
     }
 
     private void Start()
     {
-        RuntimeMiniGameUI.PrepareStaticScreens("Reflejos Cruzados", "Toca verdes y evita rojos");
+        CachearUI();
     }
 
     public override void ResetGame()
@@ -65,7 +102,7 @@ public class ReflejosCruzadosGame : BaseGame
         gameFinished = false;
         juegoPausado = false;
         invertedRule = false;
-        invertedTimeLeft = 0f;
+        ruleSwitchCount = 0;
         spawnTimer = 0.35f;
         maxLevelReached = 1;
 
@@ -74,14 +111,16 @@ public class ReflejosCruzadosGame : BaseGame
         touchedIncorrect = 0;
         avoidedCorrect = 0;
         missedTargets = 0;
-        switchHits = 0;
         currentStreak = 0;
         bestStreak = 0;
+        weightedPerformance = 0f;
+        weightedPerformanceWeight = 0f;
 
-        DifficultyManager.Instance?.ResetDifficulty(1);
-        BuildUI();
+        DifficultyManager.Instance?.ResetDifficulty(Mathf.Clamp(nivelInicial, 1, 10));
+        PrepararUI();
         ClearItems();
-        UpdateHud();
+        ScheduleRuleSwitch();
+        EmitirEstado();
     }
 
     public override void OnGameStart()
@@ -96,17 +135,8 @@ public class ReflejosCruzadosGame : BaseGame
 
         float delta = Time.deltaTime;
 
-        if (invertedTimeLeft > 0f)
-        {
-            invertedTimeLeft -= delta;
-            if (invertedTimeLeft <= 0f)
-            {
-                invertedRule = false;
-                feedbackText.text = "Regla normal";
-                feedbackText.color = RuntimeMiniGameUI.MutedText;
-                UpdateHud();
-            }
-        }
+        if (CurrentElapsedTime() >= ruleSwitchAt)
+            TryActivateRuleSwitch();
 
         spawnTimer -= delta;
         if (spawnTimer <= 0f)
@@ -115,7 +145,7 @@ public class ReflejosCruzadosGame : BaseGame
             spawnTimer = CurrentSpawnInterval();
         }
 
-        float bottomLimit = -LaneHeight() * 0.5f - 70f;
+        float bottomLimit = -PlayHeight() * 0.5f - 80f;
         for (int i = items.Count - 1; i >= 0; i--)
         {
             FallingItem item = items[i];
@@ -128,61 +158,27 @@ public class ReflejosCruzadosGame : BaseGame
             if (item.rect.anchoredPosition.y < bottomLimit)
                 ResolveMiss(item);
         }
-    }
 
-    private void BuildUI()
-    {
-        root = RuntimeMiniGameUI.CreateGameplayRoot(
-            "ReflejosCruzadosRuntimeUI",
-            "Reflejos Cruzados",
-            "Verde: tocar. Rojo: evitar. Azul: cambia la regla");
-
-        if (root == null)
-            return;
-
-        RectTransform statusPanel = RuntimeMiniGameUI.CreatePanel("StatusPanel", root, RuntimeMiniGameUI.Panel);
-        RuntimeMiniGameUI.SetRect(statusPanel, new Vector2(0.06f, 0.78f), new Vector2(0.94f, 0.91f), Vector2.zero, Vector2.zero);
-
-        ruleText = RuntimeMiniGameUI.CreateText("RuleText", statusPanel, "", 30f, RuntimeMiniGameUI.Text, TextAlignmentOptions.Left);
-        RuntimeMiniGameUI.SetRect(ruleText.rectTransform, Vector2.zero, Vector2.one, new Vector2(28f, 38f), new Vector2(-370f, -8f));
-
-        scoreText = RuntimeMiniGameUI.CreateText("ScoreText", statusPanel, "", 22f, RuntimeMiniGameUI.MutedText, TextAlignmentOptions.Left);
-        RuntimeMiniGameUI.SetRect(scoreText.rectTransform, Vector2.zero, Vector2.one, new Vector2(28f, 10f), new Vector2(-370f, -56f));
-
-        levelText = RuntimeMiniGameUI.CreateText("LevelText", statusPanel, "", 22f, RuntimeMiniGameUI.Accent, TextAlignmentOptions.Right);
-        RuntimeMiniGameUI.SetRect(levelText.rectTransform, Vector2.zero, Vector2.one, new Vector2(0f, 26f), new Vector2(-28f, -26f));
-
-        laneArea = RuntimeMiniGameUI.CreatePanel("LaneArea", root, RuntimeMiniGameUI.PanelSoft);
-        RuntimeMiniGameUI.SetRect(laneArea, new Vector2(0.12f, 0.12f), new Vector2(0.88f, 0.75f), Vector2.zero, Vector2.zero);
-
-        for (int i = 0; i < 3; i++)
-        {
-            RectTransform lane = RuntimeMiniGameUI.CreatePanel("Lane_" + i, laneArea, i % 2 == 0 ? new Color(1f, 1f, 1f, 0.045f) : new Color(1f, 1f, 1f, 0.075f));
-            RuntimeMiniGameUI.SetRect(lane, new Vector2(i / 3f, 0f), new Vector2((i + 1f) / 3f, 1f), new Vector2(8f, 10f), new Vector2(-8f, -10f));
-        }
-
-        feedbackText = RuntimeMiniGameUI.CreateText("FeedbackText", root, "", 26f, RuntimeMiniGameUI.Text, TextAlignmentOptions.Center);
-        RuntimeMiniGameUI.SetRect(feedbackText.rectTransform, new Vector2(0.08f, 0.05f), new Vector2(0.92f, 0.11f), Vector2.zero, Vector2.zero);
+        EmitirEstado();
     }
 
     private void SpawnItem()
     {
-        if (laneArea == null)
+        if (zonaJuego == null)
             return;
 
-        int level = Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? 1, 1, 10);
+        int level = NivelActual;
         maxLevelReached = Mathf.Max(maxLevelReached, level);
 
-        FallingKind kind = ChooseKind(level);
-        int lane = Random.Range(0, 3);
+        FallingKind kind = Random.value < Mathf.Lerp(0.62f, 0.50f, (level - 1f) / 9f) ? FallingKind.Green : FallingKind.Red;
+        Vector2 size = CurrentSize(level);
 
-        GameObject itemObject = new GameObject("Falling_" + kind, typeof(RectTransform), typeof(CanvasRenderer), typeof(SimpleShapeGraphic), typeof(Button));
-        itemObject.transform.SetParent(laneArea, false);
+        GameObject itemObject = new GameObject("Diana_" + kind, typeof(RectTransform), typeof(CanvasRenderer), typeof(SimpleShapeGraphic), typeof(Button));
+        itemObject.transform.SetParent(zonaJuego, false);
 
         FallingItem item = new FallingItem
         {
             rect = itemObject.GetComponent<RectTransform>(),
-            shape = itemObject.GetComponent<SimpleShapeGraphic>(),
             button = itemObject.GetComponent<Button>(),
             kind = kind,
             speed = CurrentSpeed(level)
@@ -191,71 +187,50 @@ public class ReflejosCruzadosGame : BaseGame
         item.rect.anchorMin = new Vector2(0.5f, 0.5f);
         item.rect.anchorMax = new Vector2(0.5f, 0.5f);
         item.rect.pivot = new Vector2(0.5f, 0.5f);
-        item.rect.sizeDelta = new Vector2(CurrentSize(level), CurrentSize(level));
-        item.rect.anchoredPosition = new Vector2(LaneX(lane), LaneHeight() * 0.5f + 72f);
+        item.rect.sizeDelta = size;
+        item.rect.anchoredPosition = new Vector2(RandomX(size.x), PlayHeight() * 0.5f + size.y);
 
-        item.shape.SetShape(kind == FallingKind.Switch ? SimpleShapeKind.Diamond : SimpleShapeKind.Circle, ColorForKind(kind));
-        item.button.targetGraphic = item.shape;
+        SimpleShapeGraphic outer = itemObject.GetComponent<SimpleShapeGraphic>();
+        outer.SetShape(SimpleShapeKind.Circle, ColorForKind(kind));
+
+        SimpleShapeGraphic middle = RuntimeMiniGameUI.CreateShape("Ring", itemObject.transform, SimpleShapeKind.Circle, colorCentroDiana);
+        middle.raycastTarget = false;
+        RuntimeMiniGameUI.SetRect(middle.rectTransform, new Vector2(0.16f, 0.16f), new Vector2(0.84f, 0.84f), Vector2.zero, Vector2.zero);
+
+        SimpleShapeGraphic center = RuntimeMiniGameUI.CreateShape("Center", itemObject.transform, SimpleShapeKind.Circle, ColorForKind(kind));
+        center.raycastTarget = false;
+        RuntimeMiniGameUI.SetRect(center.rectTransform, new Vector2(0.34f, 0.34f), new Vector2(0.66f, 0.66f), Vector2.zero, Vector2.zero);
+
+        item.button.targetGraphic = outer;
         item.button.onClick.AddListener(() => TouchItem(item));
-
-        if (kind == FallingKind.Switch)
-        {
-            item.label = RuntimeMiniGameUI.CreateText("Label", itemObject.transform, "!", 34f, RuntimeMiniGameUI.Text, TextAlignmentOptions.Center);
-            RuntimeMiniGameUI.SetRect(item.label.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-        }
-
         items.Add(item);
-    }
-
-    private FallingKind ChooseKind(int level)
-    {
-        float levelT = (level - 1f) / 9f;
-        float switchChance = level >= 4 ? Mathf.Lerp(0.06f, 0.18f, levelT) : 0f;
-
-        if (Random.value < switchChance)
-            return FallingKind.Switch;
-
-        return Random.value < Mathf.Lerp(0.58f, 0.46f, levelT) ? FallingKind.Green : FallingKind.Red;
     }
 
     private float CurrentSpawnInterval()
     {
-        int level = Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? 1, 1, 10);
-        return Mathf.Lerp(1.05f, 0.42f, (level - 1f) / 9f);
+        return Mathf.Lerp(intervaloSpawnNivel1, intervaloSpawnNivel10, (NivelActual - 1f) / 9f);
     }
 
     private float CurrentSpeed(int level)
     {
-        return Mathf.Lerp(210f, 470f, (level - 1f) / 9f);
+        return Mathf.Lerp(velocidadNivel1, velocidadNivel10, (level - 1f) / 9f);
     }
 
-    private float CurrentSize(int level)
+    private Vector2 CurrentSize(int level)
     {
-        return Mathf.Lerp(100f, 74f, (level - 1f) / 9f);
+        return Vector2.Lerp(tamanoDianaNivel1, tamanoDianaNivel10, (level - 1f) / 9f);
     }
 
     private Color ColorForKind(FallingKind kind)
     {
-        switch (kind)
-        {
-            case FallingKind.Green:
-                return new Color(0.18f, 0.82f, 0.38f, 1f);
-            case FallingKind.Red:
-                return new Color(0.95f, 0.23f, 0.22f, 1f);
-            default:
-                return new Color(0.2f, 0.52f, 1f, 1f);
-        }
+        return kind == FallingKind.Green
+            ? colorDianaVerde
+            : colorDianaRoja;
     }
 
     private bool ShouldTouch(FallingKind kind)
     {
-        if (kind == FallingKind.Switch)
-            return true;
-
-        if (invertedRule)
-            return kind == FallingKind.Red;
-
-        return kind == FallingKind.Green;
+        return invertedRule ? kind == FallingKind.Red : kind == FallingKind.Green;
     }
 
     private void TouchItem(FallingItem item)
@@ -272,25 +247,23 @@ public class ReflejosCruzadosGame : BaseGame
             touchedCorrect++;
             currentStreak++;
             bestStreak = Mathf.Max(bestStreak, currentStreak);
-            feedbackText.text = item.kind == FallingKind.Switch ? "Cambio de regla" : "Toque correcto";
-            feedbackText.color = RuntimeMiniGameUI.Good;
+            AudioManager.Instance?.Disparo();
             AudioManager.Instance?.Acierto();
-
-            if (item.kind == FallingKind.Switch)
-                ActivateRuleSwitch();
+            OnFeedback?.Invoke("Diana correcta", true);
+            RegisterDifficultyResult(ValorAciertoDiana, PesoAciertoDiana, true, true, item.age);
         }
         else
         {
             touchedIncorrect++;
             currentStreak = 0;
-            feedbackText.text = "Habia que esquivar";
-            feedbackText.color = RuntimeMiniGameUI.Bad;
+            AudioManager.Instance?.Disparo();
             AudioManager.Instance?.Error();
+            OnFeedback?.Invoke("Diana equivocada", false);
+            RegisterDifficultyResult(0f, PesoErrorComision, true, false, item.age);
         }
 
-        DifficultyManager.Instance?.ActualizarDificultad(CalcularRendimientoInstantaneo(), correct, item.age);
         RemoveItem(item);
-        UpdateHud();
+        EmitirEstado();
     }
 
     private void ResolveMiss(FallingItem item)
@@ -306,39 +279,81 @@ public class ReflejosCruzadosGame : BaseGame
         {
             missedTargets++;
             currentStreak = 0;
-            feedbackText.text = item.kind == FallingKind.Switch ? "Cambio perdido" : "Objetivo perdido";
-            feedbackText.color = RuntimeMiniGameUI.Bad;
-            AudioManager.Instance?.Error();
+            OnFeedback?.Invoke("Se escapo una diana", false);
+            RegisterDifficultyResult(0f, PesoErrorOmision, true, false, Mathf.Max(item.age, 4.5f));
         }
         else
         {
             avoidedCorrect++;
-            currentStreak++;
-            bestStreak = Mathf.Max(bestStreak, currentStreak);
-            feedbackText.text = "Esquiva correcta";
-            feedbackText.color = RuntimeMiniGameUI.Good;
+            RegisterDifficultyResult(ValorInhibicionCorrecta, PesoInhibicionCorrecta, false, true, item.age);
         }
 
-        DifficultyManager.Instance?.ActualizarDificultad(CalcularRendimientoInstantaneo(), !shouldTouch, item.age);
         RemoveItem(item);
-        UpdateHud();
+        EmitirEstado();
+    }
+
+    private void ScheduleRuleSwitch()
+    {
+        float duration = GameManager.Instance != null ? GameManager.Instance.duracionPartida : 45f;
+        float elapsed = CurrentElapsedTime();
+        if (duration - elapsed <= 2f)
+        {
+            ruleSwitchAt = float.PositiveInfinity;
+            return;
+        }
+
+        float firstDelay = primerCambioReglaSegundos;
+        float interval = ruleSwitchCount == 0 ? firstDelay : CurrentRuleSwitchInterval();
+        float jitter = Random.Range(-0.85f, 1.15f);
+        float nextTime = elapsed + Mathf.Max(2.5f, interval + jitter);
+        ruleSwitchAt = Mathf.Min(nextTime, duration - 1.5f);
+    }
+
+    private void TryActivateRuleSwitch()
+    {
+        if (ruleSwitchCount < CurrentRuleSwitchLimit())
+            ActivateRuleSwitch();
+
+        ScheduleRuleSwitch();
     }
 
     private void ActivateRuleSwitch()
     {
-        int level = Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? 1, 1, 10);
+        ruleSwitchCount++;
         invertedRule = !invertedRule;
-        invertedTimeLeft = Mathf.Lerp(3.8f, 2.3f, (level - 1f) / 9f);
-        switchHits++;
-        UpdateHud();
+        AudioManager.Instance?.NivelUp();
+        OnFeedback?.Invoke("Regla cambiada", false);
+        OnReglaActualizada?.Invoke(TextoRegla);
+        OnReglaInvertida?.Invoke(invertedRule ? "REGLA INVERTIDA\nTOCA ROJOS" : "REGLA CAMBIADA\nTOCA VERDES");
+        EmitirEstado();
+    }
+
+    private int CurrentRuleSwitchLimit()
+    {
+        float t = (NivelActual - 1f) / 9f;
+        return Mathf.Clamp(Mathf.RoundToInt(Mathf.Lerp(cambiosReglaMaximosNivel1, cambiosReglaMaximosNivel10, t)), 1, 10);
+    }
+
+    private float CurrentRuleSwitchInterval()
+    {
+        return Mathf.Lerp(intervaloCambioReglaNivel1, intervaloCambioReglaNivel10, (NivelActual - 1f) / 9f);
+    }
+
+    private void RegisterDifficultyResult(float value, float weight, bool updateDifficulty, bool difficultyHit, float reactionTime)
+    {
+        weightedPerformance += Mathf.Clamp01(value) * Mathf.Max(0.01f, weight);
+        weightedPerformanceWeight += Mathf.Max(0.01f, weight);
+
+        if (updateDifficulty)
+            DifficultyManager.Instance?.ActualizarDificultad(CalcularRendimientoInstantaneo(), difficultyHit, reactionTime);
     }
 
     private float CalcularRendimientoInstantaneo()
     {
-        if (totalEvents <= 0)
+        if (weightedPerformanceWeight <= 0f)
             return 0.5f;
 
-        return Mathf.Clamp01((float)(touchedCorrect + avoidedCorrect) / totalEvents);
+        return Mathf.Clamp01(weightedPerformance / weightedPerformanceWeight);
     }
 
     private void RemoveItem(FallingItem item)
@@ -357,39 +372,54 @@ public class ReflejosCruzadosGame : BaseGame
         items.Clear();
     }
 
-    private void UpdateHud()
+    private void CachearUI()
     {
-        int level = Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? 1, 1, 10);
-        maxLevelReached = Mathf.Max(maxLevelReached, level);
+        if (uiReflejosCruzados == null)
+            uiReflejosCruzados = GetComponent<UIReflejosCruzados>();
 
-        if (ruleText != null)
-        {
-            ruleText.text = invertedRule
-                ? "Regla invertida: rojo toca, verde evita"
-                : "Regla normal: verde toca, rojo evita";
-        }
+        if (uiReflejosCruzados == null)
+            uiReflejosCruzados = FindFirstObjectByType<UIReflejosCruzados>(FindObjectsInactive.Include);
 
-        if (scoreText != null)
-            scoreText.text = "Correctos " + (touchedCorrect + avoidedCorrect) + "/" + Mathf.Max(1, totalEvents) + "  Racha " + currentStreak;
-
-        if (levelText != null)
-            levelText.text = "Nivel " + level + (invertedRule ? "  Cambio " + Mathf.CeilToInt(invertedTimeLeft) + "s" : "");
+        if (uiReflejosCruzados == null)
+            uiReflejosCruzados = gameObject.AddComponent<UIReflejosCruzados>();
     }
 
-    private float LaneWidth()
+    private void PrepararUI()
     {
-        return laneArea != null ? Mathf.Max(600f, laneArea.rect.width) / 3f : 260f;
+        CachearUI();
+        uiReflejosCruzados.Preparar(this);
+        zonaJuego = uiReflejosCruzados.ZonaJuego;
+        OnReglaActualizada?.Invoke(TextoRegla);
     }
 
-    private float LaneHeight()
+    private void EmitirEstado()
     {
-        return laneArea != null ? Mathf.Max(560f, laneArea.rect.height) : 620f;
+        OnEstadoActualizado?.Invoke();
     }
 
-    private float LaneX(int lane)
+    private float CurrentElapsedTime()
     {
-        float width = LaneWidth();
-        return width * (lane - 1);
+        if (GameManager.Instance == null)
+            return Time.timeSinceLevelLoad;
+
+        return Mathf.Max(0f, GameManager.Instance.duracionPartida - GameManager.Instance.tiempoRestante);
+    }
+
+    private float PlayWidth()
+    {
+        return zonaJuego != null ? Mathf.Max(760f, zonaJuego.rect.width) : 900f;
+    }
+
+    private float PlayHeight()
+    {
+        return zonaJuego != null ? Mathf.Max(520f, zonaJuego.rect.height) : 620f;
+    }
+
+    private float RandomX(float itemSize)
+    {
+        float margin = itemSize * 0.65f;
+        float halfWidth = PlayWidth() * 0.5f;
+        return Random.Range(-halfWidth + margin, halfWidth - margin);
     }
 
     public override void PausarJuego(bool pausar)
@@ -414,11 +444,11 @@ public class ReflejosCruzadosGame : BaseGame
         if (totalEvents <= 0)
             return metrics;
 
-        float precision = (float)(touchedCorrect + avoidedCorrect) / totalEvents;
+        float precision = CalcularRendimientoInstantaneo();
         float visomotor = (float)touchedCorrect / Mathf.Max(1, touchedCorrect + touchedIncorrect + missedTargets);
         float inhibition = (float)avoidedCorrect / Mathf.Max(1, avoidedCorrect + touchedIncorrect);
         float spatialMemory = Mathf.Clamp01(precision * (1f - (float)missedTargets / totalEvents));
-        float switchBonus = Mathf.Clamp01(switchHits / 3f) * 0.1f;
+        float switchBonus = ruleSwitchCount > 0 ? Mathf.Clamp01(ruleSwitchCount / 5f) * 0.1f : 0f;
         float planning = Mathf.Clamp01(precision * 0.65f + Mathf.Clamp01(bestStreak / 8f) * 0.25f + switchBonus);
         float levelFactor = Mathf.Lerp(0.75f, 1f, Mathf.Clamp01(maxLevelReached / 10f));
 

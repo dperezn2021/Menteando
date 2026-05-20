@@ -103,6 +103,7 @@
     <Compile Include="Assets\Framework\ScriptsGenerales\Utils\SimpleShapeGraphic.cs" />
     <Compile Include="Assets\Framework\Juegos\OperacionesEncadenadas\UICalculadora.cs" />
     <Compile Include="Assets\Juegos\ScriptsGenerales\SesionJuego.cs" />
+    <Compile Include="Assets\Framework\Juegos\ReflejosCruzados\UIReflejosCruzados.cs" />
     <Compile Include="Assets\Framework\Juegos\ReflejosCruzados\ReflejosCruzadosGame.cs" />
     <Compile Include="Assets\Framework\Juegos\Doble Canal\DobleCanalGame.cs" />
     <Compile Include="Assets\Framework\Juegos\Doble Canal\DobleCanalUI.cs" />

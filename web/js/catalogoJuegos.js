@@ -212,7 +212,7 @@ const CATALOGO_JUEGOS = [
         "heroEyebrow": "Memoria espacial",
         "destacado": false,
         "skills": ["memoria_espacial", "atencion_selectiva", "atencion_sostenida", "flexibilidad_cognitiva"],
-        "disponible": "No disponible"
+        "disponible": "Disponible"
     },
 
     {
@@ -363,7 +363,7 @@ const CATALOGO_JUEGOS = [
         "heroEyebrow": "Reflejos y precisión",
         "destacado": false,
         "skills": ["coordinacion_visomotora", "atencion_dividida", "memoria_espacial", "control_inhibitorio", "flexibilidad_cognitiva"],
-        "disponible": "No disponible"
+        "disponible": "Disponible"
     }
 ];
 

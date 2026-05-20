@@ -10,6 +10,7 @@ public class AudioManager : MonoBehaviour
 
     [Header("Clips Globales")]
     public AudioClip clickUI;
+    public AudioClip disparo;
     public AudioClip acierto;
     public AudioClip error;
     public AudioClip nivelUp;
@@ -107,6 +108,7 @@ public class AudioManager : MonoBehaviour
     }
 
     public void Click() => ReproducirSFX(clickUI);
+    public void Disparo() => ReproducirSFX(disparo);
     public void Acierto() => ReproducirSFX(acierto);
     public void Error() => ReproducirSFX(error);
     public void NivelUp() => ReproducirSFX(nivelUp);
