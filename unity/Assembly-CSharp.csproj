@@ -80,6 +80,7 @@
     <Compile Include="Assets\Framework\ScriptsGenerales\Managers\AudioManager.cs" />
     <Compile Include="Assets\Framework\Juegos\DetectorDeIntrusos\LupaFlotante.cs" />
     <Compile Include="Assets\Framework\Juegos\EcoVisual\EcoVisualGame.cs" />
+    <Compile Include="Assets\Framework\Juegos\TrayectoriasMentales\UITrayectoriasMentales.cs" />
     <Compile Include="Assets\Framework\Juegos\SilencioMental\UISilencioMental.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Base\BaseGame.cs" />
     <Compile Include="Assets\Framework\Juegos\MisionOrbital\Prefabs\StarsEffect.cs" />
