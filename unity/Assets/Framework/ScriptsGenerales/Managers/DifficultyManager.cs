@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
 
 public class DifficultyManager : MonoBehaviour
 {
@@ -83,4 +85,5 @@ public class DifficultyManager : MonoBehaviour
         ventanaAciertos.Clear();
         ventanaTiempos.Clear();
     }
+
 }

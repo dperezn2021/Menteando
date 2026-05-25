@@ -10,7 +10,9 @@ public class AudioManager : MonoBehaviour
 
     [Header("Clips Globales")]
     public AudioClip clickUI;
-    public AudioClip disparo;
+    public AudioClip reboteRata;
+    public AudioClip disparo;   
+    public AudioClip PU;
     public AudioClip acierto;
     public AudioClip error;
     public AudioClip nivelUp;
@@ -36,12 +38,9 @@ public class AudioManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // Siempre empezar en 0.5
-            musicaVolumen = 0.5f;
-            sfxVolumen = 0.5f;
-
-            PlayerPrefs.SetFloat("MusicVolume", musicaVolumen);
-            PlayerPrefs.SetFloat("SFXVolume", sfxVolumen);
+            // CARGAR preferencias guardadas (o usar 0.5 por defecto)
+            musicaVolumen = PlayerPrefs.GetFloat("MusicVolume", 0.5f);
+            sfxVolumen = PlayerPrefs.GetFloat("SFXVolume", 0.5f);
 
             PrepararClipsFallback();
         }
@@ -49,6 +48,12 @@ public class AudioManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+    private void OnApplicationQuit()
+    {
+        PlayerPrefs.SetFloat("MusicVolume", musicaVolumen);
+        PlayerPrefs.SetFloat("SFXVolume", sfxVolumen);
+        PlayerPrefs.Save();
     }
 
     private void Start()
@@ -107,9 +112,19 @@ public class AudioManager : MonoBehaviour
         sfxSource.PlayOneShot(clip, sfxVolumen);
     }
 
+    // ============================================================
+    // EFECTOS DE SONIDO
+    // ============================================================
+
+  
     public void Click() => ReproducirSFX(clickUI);
     public void Disparo() => ReproducirSFX(disparo);
     public void Acierto() => ReproducirSFX(acierto);
+
+    public void Rebote() => ReproducirSFX(reboteRata);
+
+    public void PowerUp()=> ReproducirSFX(PU);
+
     public void Error() => ReproducirSFX(error);
     public void NivelUp() => ReproducirSFX(nivelUp);
     public void MusicaMenu() => ReproducirMusica(musicaMenu);

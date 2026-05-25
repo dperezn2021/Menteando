@@ -15,6 +15,10 @@ const CATEGORIAS = {
 };
 
 let filtroActual = "todos";
+// Toggle to fetch all comments from the Worker (server-side) instead of the default limited set
+let mostrarTodos = false;
+// Sort order: true = newest first (desc), false = oldest first (asc)
+let sortDesc = true;
 
 // ========== FUNCIONES DE USUARIO ==========
 
@@ -26,22 +30,119 @@ function getUsuarioActual() {
     return null;
 }
 
+// Admin replies: send PUT with reply payload { id, reply: { usuario, texto, fecha } }
+async function responderComentario(id) {
+    const usuario = getUsuarioActual();
+    if (!usuario) {
+        mostrarModal('No autorizado', 'error');
+        return;
+    }
+    const ta = document.getElementById(`reply-text-${id}`);
+    if (!ta) return;
+    const texto = ta.value.trim();
+    if (!texto) {
+        mostrarModal('Escribe una respuesta', 'info');
+        return;
+    }
+
+    try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (window.ADMIN_BEARER) headers['Authorization'] = `Bearer ${window.ADMIN_BEARER}`;
+        const response = await fetch(API_URL, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify({ id, reply: { usuario, texto, fecha: new Date().toISOString() } })
+        });
+        if (response.ok) {
+            ta.value = '';
+            cargarComentarios();
+            mostrarModal('Respuesta publicada', 'success');
+        } else {
+            mostrarModal('Error al publicar respuesta', 'error');
+        }
+    } catch (e) {
+        console.error(e);
+        mostrarModal('Error de conexión', 'error');
+    }
+}
+
+// MODIFICADO: Ahora valida activamente si el admin introdujo su contraseña
 function esAdmin() {
     const usuario = getUsuarioActual();
-    return usuario === "admin";
+    const tieneToken = !!window.ADMIN_BEARER;
+    
+    // Si el usuario se llama admin pero no se ha autenticado todavía
+    if (usuario === "admin" && !tieneToken) {
+        // Ejecutamos la autenticación de forma asíncrona sin bloquear el renderizado
+        verificarContrasenaAdmin();
+    }
+    
+    return usuario === "admin" && tieneToken;
+}
+
+// NUEVA FUNCIÓN: Maneja el login contra el endpoint /verify de tu Worker
+async function verificarContrasenaAdmin() {
+    // Evitar bucles si ya se está pidiendo la contraseña
+    if (window.VERIFICANDO_ADMIN) return;
+    window.VERIFICANDO_ADMIN = true;
+
+    // Usamos el inputModal que ya tienes programado en tus utilidades
+    const password = await inputModal('Introduce la contraseña de administrador para activar los privilegios:', 'Contraseña');
+    
+    if (!password) {
+        window.VERIFICANDO_ADMIN = false;
+        return;
+    }
+
+    try {
+        // Hacemos la petición al endpoint /verify del Worker
+        const response = await fetch(`${API_URL}verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.ok) {
+            // Guardamos la clave en la variable global que tus funciones fetch (DELETE, PUT) ya leen
+            window.ADMIN_BEARER = password;
+            mostrarModal('Autenticación de administrador correcta 👑', 'success');
+            cargarComentarios(); // Recargamos para que aparezcan los botones de borrar (🗑️)
+        } else {
+            mostrarModal('Contraseña de administrador incorrecta', 'error');
+        }
+    } catch (e) {
+        console.error("Error al verificar admin:", e);
+        mostrarModal('Error de conexión con el servicio de verificación', 'error');
+    } finally {
+        window.VERIFICANDO_ADMIN = false;
+    }
 }
 
 // ========== CRUD COMENTARIOS ==========
 
 async function cargarComentarios() {
     try {
-        const response = await fetch(API_URL);
+        // Build query params: category and optionally all=true to request full list from Worker
+        const params = [];
+        if (filtroActual && filtroActual !== 'todos') params.push(`categoria=${encodeURIComponent(filtroActual)}`);
+        if (mostrarTodos) params.push('all=true');
+        const url = API_URL + (params.length ? `?${params.join('&')}` : '');
+
+        const response = await fetch(url);
         let comentarios = await response.json();
-        
+
+        // Fallback: if server doesn't support category filtering, apply client-side filter
         if (filtroActual !== "todos") {
             comentarios = comentarios.filter(c => c.categoria === filtroActual);
         }
-        
+
+        // Apply client-side sorting: by fecha
+        comentarios = (comentarios || []).slice();
+        comentarios.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+        if (sortDesc) comentarios.reverse();
+
         mostrarComentarios(comentarios);
     } catch (error) {
         console.error("Error al cargar comentarios:", error);
@@ -71,14 +172,25 @@ function mostrarComentarios(comentarios) {
 
     comentarios.forEach(com => {
         const card = document.createElement('div');
-        card.className = 'bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all';
+        
+        // --- LOGICA DE REPORTES (3 O MÁS REPORTES) ---
+        const totalReportes = com.reportes || 0;
+        const esComentarioReportado = totalReportes >= 3;
+
+        // Estilos base o estilos rojos si está reportado
+        if (esComentarioReportado) {
+            card.className = 'bg-red-50/90 dark:bg-red-950/20 rounded-2xl shadow-sm p-5 border border-red-400 dark:border-red-900/60 hover:shadow-md transition-all';
+        } else {
+            card.className = 'bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all';
+        }
+        
         card.id = `comentario-${com.id}`;
 
         const row = document.createElement('div');
         row.className = 'flex items-start gap-3';
 
         const avatar = document.createElement('img');
-        avatar.src = com.avatar || '/assets/icon/usuario.webp';
+        avatar.src = normalizeAvatarPath(com.avatar);
         avatar.alt = 'Avatar';
         avatar.className = 'w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-600';
 
@@ -92,7 +204,7 @@ function mostrarComentarios(comentarios) {
         left.className = 'flex items-center gap-2 flex-wrap';
 
         const name = document.createElement('span');
-        name.className = `font-bold ${com.usuario === 'admin' ? 'text-red-500' : 'text-slate-900 dark:text-white'}`;
+        name.className = `font-bold ${com.usuario === 'admin' ? 'text-blue-600 dark:text-blue-300' : 'text-slate-900 dark:text-white'}`;
         name.textContent = com.usuario + (com.usuario === 'admin' ? ' 👑' : '');
 
         const dateSpan = document.createElement('span');
@@ -107,16 +219,25 @@ function mostrarComentarios(comentarios) {
         left.appendChild(name);
         left.appendChild(dateSpan);
         left.appendChild(catBadge);
+        
         if (com.editado) {
             const editLabel = document.createElement('span');
             editLabel.className = 'text-xs text-slate-400';
             editLabel.textContent = '(editado)';
             left.appendChild(editLabel);
         }
-        if (com.reportes > 0 && admin) {
+
+        // Si está reportado, añadimos la etiqueta de alerta visible para todos (o con el contador si es admin)
+        if (esComentarioReportado) {
             const rep = document.createElement('span');
-            rep.className = 'text-xs text-red-500';
-            rep.textContent = `⚠️ ${com.reportes} reportes`;
+            rep.className = 'text-xs font-semibold text-red-600 dark:text-red-400';
+            rep.textContent = admin ? `⚠️ ${totalReportes} reportes` : '⚠️ Comentario Reportado';
+            left.appendChild(rep);
+        } else if (totalReportes > 0 && admin) {
+            // Si tiene menos de 3 reportes, solo el admin ve el aviso normal sin rojo
+            const rep = document.createElement('span');
+            rep.className = 'text-xs text-amber-500';
+            rep.textContent = `⚠️ ${totalReportes} reportes`;
             left.appendChild(rep);
         }
 
@@ -145,7 +266,7 @@ function mostrarComentarios(comentarios) {
 
         if (admin) {
             const delBtn = document.createElement('button');
-            delBtn.className = 'text-xs text-red-500 hover:text-red-700 transition';
+            delBtn.className = 'text-xs text-blue-500 hover:text-blue-700 transition';
             delBtn.title = 'Eliminar';
             delBtn.textContent = '🗑️';
             delBtn.addEventListener('click', () => borrarComentarioPrompt(com.id));
@@ -158,14 +279,25 @@ function mostrarComentarios(comentarios) {
         const textoDiv = document.createElement('div');
         textoDiv.id = `texto-${com.id}`;
 
-    const textoP = document.createElement('p');
-    textoP.className = 'comentario-texto text-slate-700 dark:text-slate-300 text-sm leading-relaxed';
-    // Use escaped HTML and convert newlines to <br> so line breaks are visible
-    textoP.innerHTML = escapeHtml(com.texto || '').replace(/\r?\n/g, '<br>');
-    textoDiv.appendChild(textoP);
+        const textoP = document.createElement('p');
+        
+        // Renderizado del texto según si está reportado y el rol del usuario
+        if (esComentarioReportado) {
+            textoP.className = 'comentario-texto text-red-600 dark:text-red-400 text-sm font-medium leading-relaxed';
+            if (!admin) {
+                textoP.textContent = 'Comentario Reportado';
+            } else {
+                // El admin ve el texto real pero coloreado en rojo
+                textoP.innerHTML = escapeHtml(com.texto || '').replace(/\r?\n/g, '<br>');
+            }
+        } else {
+            textoP.className = 'comentario-texto text-slate-700 dark:text-slate-300 text-sm leading-relaxed';
+            textoP.innerHTML = escapeHtml(com.texto || '').replace(/\r?\n/g, '<br>');
+        }
+        textoDiv.appendChild(textoP);
 
-    // Store raw text on the card so edit/cancel can access original newlines
-    card.dataset.raw = com.texto || '';
+        // Guardamos el texto original
+        card.dataset.raw = com.texto || '';
 
         const actions = document.createElement('div');
         actions.className = 'flex items-center gap-4 mt-3';
@@ -187,13 +319,58 @@ function mostrarComentarios(comentarios) {
         body.appendChild(textoDiv);
         body.appendChild(actions);
 
+        // Respuestas
+        const repliesContainer = document.createElement('div');
+        repliesContainer.className = 'mt-3';
+        
+        if (Array.isArray(com.replies) && com.replies.length) {
+            const list = document.createElement('div');
+            list.className = 'pl-12 space-y-3';
+            com.replies.forEach(r => {
+                // Ocultar respuestas a usuarios normales si el comentario principal está reportado
+                if (esComentarioReportado && !admin) return;
+
+                const rc = document.createElement('div');
+                rc.className = 'rounded-lg p-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700';
+                const who = document.createElement('div');
+                who.className = `text-xs mb-1 ${r.usuario === 'admin' ? 'text-blue-600 font-bold' : 'text-slate-500'}`;
+                who.textContent = `${r.usuario === 'admin' ? 'admin 👑' : r.usuario} · ${formatearFecha(r.fecha)}`;
+                const rtext = document.createElement('div');
+                rtext.className = `comentario-texto text-sm ${r.usuario === 'admin' ? 'text-blue-600' : 'text-slate-700'} dark:${r.usuario === 'admin' ? 'text-blue-400' : 'text-slate-300'}`;
+                rtext.innerHTML = escapeHtml(r.texto || '').replace(/\r?\n/g, '<br>');
+                rc.appendChild(who);
+                rc.appendChild(rtext);
+                list.appendChild(rc);
+            });
+            repliesContainer.appendChild(list);
+        }
+
+        // Caja de respuesta para el administrador
+        if (esAdmin()) {
+            const replyBox = document.createElement('div');
+            replyBox.className = 'mt-2 pl-12';
+            const ta = document.createElement('textarea');
+            ta.id = `reply-text-${com.id}`;
+            ta.rows = 2;
+            ta.className = 'w-full p-2 rounded-lg border text-sm dark:bg-slate-700 dark:border-slate-600';
+            ta.placeholder = 'Responder públicamente...';
+            const replyBtn = document.createElement('button');
+            replyBtn.className = 'mt-2 px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition';
+            replyBtn.textContent = 'Responder';
+            replyBtn.addEventListener('click', () => responderComentario(com.id));
+            replyBox.appendChild(ta);
+            replyBox.appendChild(replyBtn);
+            repliesContainer.appendChild(replyBox);
+        }
+
+        body.appendChild(repliesContainer);
+
         row.appendChild(avatar);
         row.appendChild(body);
         card.appendChild(row);
         container.appendChild(card);
     });
 }
-
 // ========== PUBLICAR COMENTARIO ==========
 
 async function publicarComentario() {
@@ -202,11 +379,11 @@ async function publicarComentario() {
     const categoria = document.getElementById("comentario-categoria")?.value || "general";
     
     if (!usuario) {
-        mostrarMensajeTemporal("❌ Debes tener un nombre de perfil para comentar", "error");
+        mostrarModal("Debes tener un nombre de perfil para comentar", "info");
         return;
     }
     if (!texto) {
-        mostrarMensajeTemporal("❌ Escribe un comentario", "error");
+        mostrarModal("Escribe un comentario", "info");
         return;
     }
 
@@ -226,13 +403,13 @@ async function publicarComentario() {
         if (response.ok) {
             document.getElementById("comentario-texto").value = "";
             cargarComentarios();
-            mostrarMensajeTemporal("✅ Comentario publicado", "success");
+            mostrarModal("Comentario publicado", "success");
         } else {
-            mostrarMensajeTemporal("❌ Error al publicar", "error");
+            mostrarModal("Error al publicar", "error");
         }
     } catch (error) {
         console.error("Error:", error);
-        mostrarMensajeTemporal("❌ Error de conexión", "error");
+        mostrarModal("Error de conexión", "error");
     }
 }
 
@@ -241,7 +418,7 @@ async function publicarComentario() {
 async function darLike(id) {
     const usuario = getUsuarioActual();
     if (!usuario) {
-        mostrarMensajeTemporal("❌ Inicia sesión para dar like", "error");
+        mostrarModal("Inicia sesión para dar like", "info");
         return;
     }
     
@@ -323,9 +500,7 @@ function editarComentario(id) {
     deleteBtn.className = 'ml-auto px-3 py-1 bg-red-500 text-white rounded-lg text-xs hover:bg-red-600 transition';
     deleteBtn.textContent = 'Borrar';
     deleteBtn.addEventListener('click', () => {
-        if (confirm('¿Eliminar este comentario?')) {
-            borrarComentario(id);
-        }
+        confirmModal('¿Eliminar este comentario?', 'Eliminar').then(ok => { if (ok) borrarComentario(id); });
     });
 
     btnRow.appendChild(deleteBtn);
@@ -340,7 +515,7 @@ async function guardarEdicion(id) {
     const usuario = getUsuarioActual();
     
     if (!usuario) {
-        mostrarMensajeTemporal("❌ No se pudo identificar al usuario", "error");
+        mostrarModal("No se pudo identificar al usuario", "error");
         return;
     }
     
@@ -358,14 +533,14 @@ async function guardarEdicion(id) {
         
         if (response.ok) {
             cargarComentarios();
-            mostrarMensajeTemporal("✅ Comentario editado", "success");
+            mostrarModal("Comentario editado", "success");
         } else {
             const error = await response.json();
-            mostrarMensajeTemporal(error.error || "❌ Error al editar", "error");
+            mostrarModal(error.error || "Error al editar", "error");
         }
     } catch (error) {
         console.error("Error:", error);
-        mostrarMensajeTemporal("❌ Error de conexión", "error");
+        mostrarModal("Error de conexión", "error");
     }
 }
 
@@ -380,29 +555,40 @@ function cancelarEdicion(id, textoOriginal) {
 // ========== REPORTAR COMENTARIO ==========
 
 async function reportarComentario(id) {
-    const motivo = prompt("¿Por qué reportas este comentario? (Opcional)");
     const usuario = getUsuarioActual();
-    
     if (!usuario) {
-        mostrarMensajeTemporal("❌ Inicia sesión para reportar", "error");
+        mostrarModal('Debes iniciar sesión para reportar.', 'info');
         return;
     }
-    
+
+    const motivo = await inputModal('Opcional: añade un motivo para el reporte', 'Descripción (opcional)');
+    if (motivo === null) return; // cancel
+
     try {
-        const response = await fetch(`${API_URL}/reportar`, {
-            method: "POST",
+        const response = await fetch(API_URL, {
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id, motivo: motivo || "Sin motivo", usuario })
         });
-        
-        if (response.ok) {
-            mostrarMensajeTemporal("✅ Reportado. Gracias por ayudar.", "success");
-        } else {
-            mostrarMensajeTemporal("❌ Error al reportar", "error");
+
+        const data = await response.json().catch(() => null);
+        if (!response.ok) {
+            const err = data?.error || 'Error al reportar';
+            mostrarModal(err, 'error');
+            return;
         }
+
+        if (data && data.deleted) {
+            mostrarModal('Comentario eliminado por alcanzar el límite de reportes.', 'info');
+        } else if (data && typeof data.reportes !== 'undefined') {
+            mostrarModal(`Comentario reportado (reportes: ${data.reportes})`, 'success');
+        } else {
+            mostrarModal('Reportado. Gracias por ayudar.', 'success');
+        }
+        cargarComentarios();
     } catch (error) {
         console.error("Error:", error);
-        mostrarMensajeTemporal("❌ Error de conexión", "error");
+        mostrarModal('Error de conexión', 'error');
     }
 }
 
@@ -415,26 +601,26 @@ async function borrarComentario(id) {
     // If your Worker enforces authorization, it should validate that the requesting user can delete.
     
     try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (window.ADMIN_BEARER) headers['Authorization'] = `Bearer ${window.ADMIN_BEARER}`;
         const response = await fetch(API_URL, {
             method: "DELETE",
-            headers: { "Content-Type": "application/json" },
+            headers,
             body: JSON.stringify({ id })
         });
         
         if (response.ok) {
             cargarComentarios();
-            mostrarMensajeTemporal("✅ Comentario eliminado", "success");
+            mostrarModal("Comentario eliminado", "success");
         }
     } catch (error) {
         console.error("Error:", error);
-        mostrarMensajeTemporal("❌ Error al eliminar", "error");
+        mostrarModal("Error al eliminar", "error");
     }
 }
 
 function borrarComentarioPrompt(id) {
-    if (confirm("¿Eliminar este comentario?")) {
-        borrarComentario(id);
-    }
+    confirmModal('¿Eliminar este comentario?', 'Eliminar').then(ok => { if (ok) borrarComentario(id); });
 }
 
 // ========== FILTROS ==========
@@ -481,6 +667,86 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
+// Modal confirm that returns a Promise<boolean>
+function confirmModal(mensaje, title = '') {
+    return new Promise((resolve) => {
+        const modalExistente = document.getElementById("menteando-modal");
+        if (modalExistente) modalExistente.remove();
+        const modal = document.createElement("div");
+        modal.id = "menteando-modal";
+        modal.style.cssText = `position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:10000;`;
+        modal.innerHTML = `
+            <div style="background: white; border-radius: 12px; max-width:420px; width:90%; box-shadow: 0 10px 30px rgba(0,0,0,0.12);">
+                <div style="padding:18px 20px; border-bottom:1px solid #eee;">
+                    <h3 style="margin:0; font-size:16px; color:#0f172a">${title || 'Confirmar'}</h3>
+                </div>
+                <div style="padding:18px 20px;">
+                    <p style="margin:0 0 12px; color:#334155;">${mensaje}</p>
+                    <div style="display:flex; gap:8px; justify-content:flex-end;">
+                        <button id="modal-cancel-btn" style="background:#e5e7eb;border:none;padding:8px 12px;border-radius:8px;">Cancelar</button>
+                        <button id="modal-ok-btn" style="background:#3b82f6;color:#fff;border:none;padding:8px 12px;border-radius:8px;">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.onclick = (e) => { if (e.target === modal) { modal.remove(); resolve(false); } };
+        document.getElementById('modal-cancel-btn').onclick = () => { modal.remove(); resolve(false); };
+        document.getElementById('modal-ok-btn').onclick = () => { modal.remove(); resolve(true); };
+    });
+}
+
+// Modal input that returns a Promise<string|null>
+function inputModal(mensaje, placeholder = '') {
+    return new Promise((resolve) => {
+        const modalExistente = document.getElementById("menteando-modal");
+        if (modalExistente) modalExistente.remove();
+        const modal = document.createElement("div");
+        modal.id = "menteando-modal";
+        modal.style.cssText = `position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:10000;`;
+        modal.innerHTML = `
+            <div style="background: white; border-radius: 12px; max-width:520px; width:92%; box-shadow: 0 10px 30px rgba(0,0,0,0.12);">
+                <div style="padding:18px 20px; border-bottom:1px solid #eee;">
+                    <h3 style="margin:0; font-size:16px; color:#0f172a">¿Por qué reportas?</h3>
+                </div>
+                <div style="padding:18px 20px;">
+                    <p style="margin:0 0 8px; color:#334155;">${mensaje}</p>
+                    <textarea id="modal-input" placeholder="${placeholder}" style="width:100%; min-height:80px; padding:8px; border-radius:8px; border:1px solid #e5e7eb; resize:vertical;"></textarea>
+                    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+                        <button id="modal-cancel-btn" style="background:#e5e7eb;border:none;padding:8px 12px;border-radius:8px;">Cancelar</button>
+                        <button id="modal-ok-btn" style="background:#3b82f6;color:#fff;border:none;padding:8px 12px;border-radius:8px;">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.onclick = (e) => { if (e.target === modal) { modal.remove(); resolve(null); } };
+        document.getElementById('modal-cancel-btn').onclick = () => { modal.remove(); resolve(null); };
+        document.getElementById('modal-ok-btn').onclick = () => { const v = document.getElementById('modal-input').value.trim(); modal.remove(); resolve(v || null); };
+        // focus
+        setTimeout(() => document.getElementById('modal-input').focus(), 50);
+    });
+}
+
+// Normalize avatar path: return absolute path or full URL; fall back to default
+function normalizeAvatarPath(path) {
+    const fallback = '/assets/icon/usuario.webp';
+    if (!path) return fallback;
+    path = String(path).trim();
+    if (!path) return fallback;
+    if (/^https?:\/\//i.test(path)) return path; // full URL
+    if (path.startsWith('/')) return path; // already absolute
+    // Attempt to find assets/ in path and produce /assets/... otherwise fallback
+    const m = path.match(/(assets[\\/].*)$/i);
+    if (m && m[1]) return '/' + m[1].replace(/\\/g, '/');
+    // If path contains 'img' or 'icon', try to append to /assets
+    if (/icon|img|avatar/i.test(path)) {
+        const cleaned = path.replace(/^[\.\/]+/, '');
+        return '/' + cleaned.replace(/\\/g, '/');
+    }
+    return fallback;
+}
+
 function actualizarAvatar() {
     const avatarImg = document.getElementById("comentario-avatar");
     const nombreInput = document.getElementById("comentario-usuario");
@@ -488,7 +754,7 @@ function actualizarAvatar() {
     if (typeof getperfil === 'function') {
         const perfil = getperfil();
         if (perfil?.avatar && avatarImg) {
-            avatarImg.src = perfil.avatar;
+            avatarImg.src = normalizeAvatarPath(perfil.avatar);
         }
         if (perfil?.nombre && nombreInput) {
             nombreInput.value = perfil.nombre;
@@ -517,6 +783,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 publicarComentario();
             }
         });
+    }
+
+    // Insert 'Mostrar todos los comentarios' toggle button above the comments container
+    const comentariosContainer = document.getElementById('comentarios-container');
+    if (comentariosContainer) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flex items-center justify-end mb-3 gap-2';
+        const toggleBtn = document.createElement('button');
+        toggleBtn.id = 'toggle-mostrar-todos';
+        toggleBtn.className = 'px-3 py-1 text-xs rounded-lg bg-slate-200 dark:bg-slate-700';
+        toggleBtn.textContent = 'Mostrar todos los comentarios';
+        toggleBtn.addEventListener('click', () => {
+            mostrarTodos = !mostrarTodos;
+            toggleBtn.textContent = mostrarTodos ? 'Mostrar solo recientes' : 'Mostrar todos los comentarios';
+            cargarComentarios();
+        });
+        const sortBtn = document.createElement('button');
+        sortBtn.id = 'toggle-sort-order';
+        sortBtn.className = 'px-3 py-1 text-xs rounded-lg bg-slate-200 dark:bg-slate-700';
+        sortBtn.textContent = sortDesc ? 'Orden: recientes' : 'Orden: antiguos';
+        sortBtn.addEventListener('click', () => {
+            sortDesc = !sortDesc;
+            sortBtn.textContent = sortDesc ? 'Orden: recientes' : 'Orden: antiguos';
+            cargarComentarios();
+        });
+        wrapper.appendChild(toggleBtn);
+        wrapper.appendChild(sortBtn);
+        comentariosContainer.parentNode.insertBefore(wrapper, comentariosContainer);
     }
 });
 

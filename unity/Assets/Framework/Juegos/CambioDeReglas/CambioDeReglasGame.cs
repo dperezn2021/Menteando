@@ -1,561 +1,1217 @@
+﻿// Archivo: CambioDeReglasGame.cs
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class CambioDeReglasGame : BaseGame
 {
     private enum RuleKind
     {
-        Color,
-        Shape,
-        Size,
-        AvoidColor
+        MatchTag,
+        AvoidTag
+    }
+
+    private enum PowerUpType
+    {
+        None,
+        Reloj,      // +5 segundos a la ronda
+        Estrella,   // Siguiente acierto vale ×3
+        Escudo,     // Siguiente error no penaliza
+        Congelar    // Detiene el tiempo de ronda 2 segundos
     }
 
     private struct RuleData
     {
         public RuleKind kind;
-        public int colorIndex;
-        public SimpleShapeKind shape;
-        public bool large;
+        public FoodTags targetTag;
         public string description;
     }
 
-    private struct StimulusData
+    private class Stimulus
     {
-        public int colorIndex;
-        public SimpleShapeKind shape;
-        public bool large;
-        public int positionIndex;
+        public RectTransform rect;
+        public Image image;
+        public Image glowImage;
+        public Button button;
+        public FoodItem food;
+        public PowerUpType powerUp;
+        public float age;
+        public bool resolved;
     }
 
-    private readonly Color[] stimulusColors =
-    {
-        new Color(0.18f, 0.78f, 0.42f, 1f),
-        new Color(0.9f, 0.22f, 0.22f, 1f),
-        new Color(0.22f, 0.48f, 0.95f, 1f),
-        new Color(0.96f, 0.76f, 0.22f, 1f)
-    };
+    [Header("UI")]
+    public UICambioDeReglas uiCambioDeReglas;
 
-    private readonly string[] colorNames = { "verde", "rojo", "azul", "amarillo" };
-    private readonly SimpleShapeKind[] shapes =
-    {
-        SimpleShapeKind.Circle,
-        SimpleShapeKind.Square,
-        SimpleShapeKind.Triangle,
-        SimpleShapeKind.Diamond
-    };
+    [Header("Temática")]
+    public FoodDatabase foodDatabase;
+    public Sprite powerUpReloj;
+    public Sprite powerUpEstrella;
+    public Sprite powerUpEscudo;
+    public Sprite powerUpCongelar;
+    public Color powerUpGlowColor = new Color(1f, 0.84f, 0f, 0.6f);
 
-    private readonly string[] shapeNames = { "circulo", "cuadrado", "triangulo", "rombo" };
+    [Header("Dificultad - Progresion mas lenta")]
+    public int nivelInicial = 1;
+    public int estimulosNivel1 = 3;      // Menos estímulos al inicio
+    public int estimulosNivel10 = 8;      // Máximo 8 en nivel 10
+    public float tiempoRondaNivel1 = 8f;  // Más tiempo (8 segundos)
+    public float tiempoRondaNivel10 = 4f;  // Mínimo 4 segundos
+    public float tiempoReglaNivel1 = 15f;  // Regla más larga (15 segundos)
+    public float tiempoReglaNivel10 = 8f;  // Regla mínima 8 segundos
+                                           
+    public Vector2 tamanoEstimuloNivel1 = new Vector2(158f, 158f);
+    public Vector2 tamanoEstimuloNivel10 = new Vector2(108f, 108f);
+    public int rondasPorPowerUp = 3;
 
-    private RectTransform root;
-    private RectTransform stimulusArea;
-    private TextMeshProUGUI ruleText;
-    private TextMeshProUGUI scoreText;
-    private TextMeshProUGUI levelText;
-    private TextMeshProUGUI feedbackText;
-    private Image ruleBar;
-    private Image stimulusBar;
-    private SimpleShapeGraphic currentShape;
-    private Button currentButton;
+    public GameDifficulty currentDifficulty = GameDifficulty.Medium; // Seleccionable en inspector
 
+    [Header("Animación de corte")]
+    public GameObject sliceEffectPrefab; // Opcional: prefab con partículas
+    public float sliceAnimationDuration = 0.2f;
+    // Añade esta variable al principio de la clase CambioDeReglasGame
+    private List<GameObject> feedbacksActivos = new List<GameObject>();
+    private int maxFeedbacksSimultaneos = 3;
+
+
+    [Header("Modo Aleatorio")]
+    public bool modoAleatorioActivo = true; // Si true, elige dificultad aleatoria cada partida
+    public TextMeshProUGUI textoIndicadorDificultad; // Referencia al texto que mostrará la dificultad
+    public float duracionIndicadorDificultad = 3f; // Cuánto tiempo se muestra
+    private float tiempoParaProximoCambioDificultad = 15f; // Cambiar cada 15 segundos
+    private float temporizadorCambioDificultad;
+
+
+    private readonly List<Stimulus> stimuli = new List<Stimulus>();
+    private RectTransform zonaJuego;
     private RuleData currentRule;
-    private StimulusData currentStimulus;
-    private bool currentShouldTouch;
-    private bool gameActive;
-    private bool gameFinished;
-    private bool stimulusActive;
-
-    private float ruleTimeTotal;
-    private float ruleTimeLeft;
-    private float stimulusTimeTotal;
-    private float stimulusTimeLeft;
-    private float nextStimulusDelay;
+    private RuleData previousRule;
+    private bool hasPreviousRule;
+    private bool gameActive, gameFinished;
+    private float ruleTimer, ruleDuration;
+    private float roundTimer, roundDuration;
     private float lastRuleChangeTime;
-
-    private int totalTrials;
-    private int correctTrials;
-    private int omissions;
-    private int inhibitTrials;
-    private int inhibitCorrect;
-    private int postChangeTrials;
-    private int postChangeCorrect;
-    private int streak;
-    private int bestStreak;
     private int maxLevelReached = 1;
+    private int rondasDesdePowerUp = 0;
+    private PowerUpType activePowerUp = PowerUpType.None;
+    private int comboMultiplier = 1;
+    private float freezeTimer = 0f;
+
+    private int totalDecisions, correctDecisions, wrongTouches, omissions;
+    private int inhibitionOpportunities, inhibitionCorrect;
+    private int postChangeDecisions, postChangeCorrect;
+    private int perseverationErrors, ruleChanges;
+    private int currentStreak, bestStreak;
+    private float reactionSum;
+    private float weightedPerformance, weightedPerformanceWeight;
+
+    public System.Action OnEstadoActualizado;
+    public System.Action<string> OnReglaActualizada;
+    public System.Action<string, bool> OnFeedback;
+    public System.Action<string> OnCambioRegla;
+
+    public int NivelActual => Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? nivelInicial, 1, 10);
+    public int Aciertos => correctDecisions;
+    public int Fallos => wrongTouches + omissions;
+    public int RachaActual => currentStreak;
+    public int CambiosRegla => ruleChanges;
+    public float TiempoReglaRestante => ruleTimer;
+    public float TiempoReglaTotal => ruleDuration;
+    public float TiempoRondaRestante => roundTimer;
+    public float TiempoRondaTotal => roundDuration;
+    public float TiempoPartidaRestante => GameManager.Instance != null ? GameManager.Instance.tiempoRestante : 0f;
+    public string TextoRegla => currentRule.description;
 
     private void Awake()
     {
-        nombre = "cambio-de-reglas";
+        nombre = "Cambio de Reglas";
+        CachearUI();
     }
 
     private void Start()
     {
-        RuntimeMiniGameUI.PrepareStaticScreens("Cambio de Reglas", "Clasifica segun la norma activa");
+        RuntimeMiniGameUI.PrepareStaticScreens("Cambio de Reglas", "Adapta tu seleccion a la norma activa");
+        CachearUI();
     }
 
     public override void ResetGame()
     {
         gameActive = true;
         gameFinished = false;
-        stimulusActive = false;
         juegoPausado = false;
+        hasPreviousRule = false;
 
-        totalTrials = 0;
-        correctTrials = 0;
-        omissions = 0;
-        inhibitTrials = 0;
-        inhibitCorrect = 0;
-        postChangeTrials = 0;
-        postChangeCorrect = 0;
-        streak = 0;
-        bestStreak = 0;
-        maxLevelReached = 1;
+        // 🎲 ELEGIR DIFICULTAD ALEATORIA si modoAleatorioActivo está true
+        if (modoAleatorioActivo)
+        {
+            Array difficulties = Enum.GetValues(typeof(GameDifficulty));
+            currentDifficulty = (GameDifficulty)difficulties.GetValue(Random.Range(0, difficulties.Length));
+            Debug.Log($"🎲 Dificultad aleatoria seleccionada: {currentDifficulty}");
+        }
 
-        DifficultyManager.Instance?.ResetDifficulty(1);
-        BuildUI();
+        // Mostrar al jugador qué dificultad tocó
+        MostrarDificultadElegida();
+
+        maxLevelReached = Mathf.Clamp(nivelInicial, 1, 10);
+        rondasDesdePowerUp = 0;
+        activePowerUp = PowerUpType.None;
+        comboMultiplier = 1;
+        freezeTimer = 0f;
+
+        totalDecisions = correctDecisions = wrongTouches = omissions = 0;
+        inhibitionOpportunities = inhibitionCorrect = 0;
+        postChangeDecisions = postChangeCorrect = 0;
+        perseverationErrors = ruleChanges = 0;
+        currentStreak = bestStreak = 0;
+        reactionSum = 0f;
+        weightedPerformance = 0f;
+        weightedPerformanceWeight = 0f;
+
+        DifficultyManager.Instance?.ResetDifficulty(Mathf.Clamp(nivelInicial, 1, 10));
+        PrepararUI();
         ChangeRule(true);
-        ScheduleNextStimulus(0.25f);
-        UpdateHud();
+        GenerateRound();
+        EmitirEstado();
     }
 
-    public override void OnGameStart()
-    {
-        ResetGame();
-    }
+    public override void OnGameStart() => ResetGame();
 
     private void Update()
     {
-        if (!gameActive || gameFinished || juegoPausado)
-            return;
+        if (!gameActive || gameFinished || juegoPausado) return;
 
         float delta = Time.deltaTime;
+        ruleTimer -= delta;
 
-        ruleTimeLeft -= delta;
-        if (ruleTimeLeft <= 0f)
-            ChangeRule(false);
+        if (freezeTimer > 0f)
+            freezeTimer -= delta;
+        else
+            roundTimer -= delta;
 
-        if (ruleBar != null)
-            ruleBar.fillAmount = Mathf.Clamp01(ruleTimeLeft / Mathf.Max(0.01f, ruleTimeTotal));
-
-        if (stimulusActive)
+        // 🔥 CAMBIO ALEATORIO DE DIFICULTAD CADA CIERTO TIEMPO
+        temporizadorCambioDificultad += delta;
+        if (temporizadorCambioDificultad >= tiempoParaProximoCambioDificultad && !gameFinished)
         {
-            stimulusTimeLeft -= delta;
-            if (stimulusBar != null)
-                stimulusBar.fillAmount = Mathf.Clamp01(stimulusTimeLeft / Mathf.Max(0.01f, stimulusTimeTotal));
+            temporizadorCambioDificultad = 0f;
+            // Entre 10 y 20 segundos para el próximo cambio
+            tiempoParaProximoCambioDificultad = Random.Range(10f, 20f);
+            CambiarDificultadAleatoria();
+        }
 
-            if (stimulusTimeLeft <= 0f)
-                RegisterResponse(false, stimulusTimeTotal);
-        }
-        else if (nextStimulusDelay > 0f)
-        {
-            nextStimulusDelay -= delta;
-            if (nextStimulusDelay <= 0f)
-                SpawnStimulus();
-        }
+        for (int i = 0; i < stimuli.Count; i++)
+            if (stimuli[i] != null && !stimuli[i].resolved)
+                stimuli[i].age += delta;
+
+        if (ruleTimer <= 0f) ChangeRule(false);
+        if (roundTimer <= 0f && freezeTimer <= 0f) ResolveRoundTimeout();
+
+        EmitirEstado();
     }
 
-    private void BuildUI()
+    private void CambiarDificultadAleatoria()
     {
-        root = RuntimeMiniGameUI.CreateGameplayRoot(
-            "CambioDeReglasRuntimeUI",
-            "Cambio de Reglas",
-            "Toca solo cuando el estimulo cumpla la norma actual");
+        GameDifficulty nuevaDificultad;
+        do
+        {
+            Array difficulties = Enum.GetValues(typeof(GameDifficulty));
+            nuevaDificultad = (GameDifficulty)difficulties.GetValue(Random.Range(0, difficulties.Length));
+        } while (nuevaDificultad == currentDifficulty); // Evitar repetir la misma
 
-        if (root == null)
-            return;
+        GameDifficulty anterior = currentDifficulty;
+        currentDifficulty = nuevaDificultad;
 
-        RectTransform hud = RuntimeMiniGameUI.CreatePanel("RulePanel", root, RuntimeMiniGameUI.Panel);
-        RuntimeMiniGameUI.SetRect(hud, new Vector2(0.05f, 0.78f), new Vector2(0.95f, 0.91f), Vector2.zero, Vector2.zero);
+        // Limpiar y regenerar con nueva dificultad
+        ClearStimuli();
+        ChangeRule(true);
+        GenerateRound();
 
-        ruleText = RuntimeMiniGameUI.CreateText("RuleText", hud, "", 32f, RuntimeMiniGameUI.Text, TextAlignmentOptions.Left);
-        RuntimeMiniGameUI.SetRect(ruleText.rectTransform, Vector2.zero, Vector2.one, new Vector2(28f, 32f), new Vector2(-360f, -10f));
+        // Mostrar notificación
+        OnCambioRegla?.Invoke($"¡MODO {GetDifficultyName(nuevaDificultad).ToUpper()}!");
+        OnFeedback?.Invoke($"Dificultad cambiada a {GetDifficultyName(nuevaDificultad)}", true);
 
-        levelText = RuntimeMiniGameUI.CreateText("LevelText", hud, "", 22f, RuntimeMiniGameUI.Accent, TextAlignmentOptions.Right);
-        RuntimeMiniGameUI.SetRect(levelText.rectTransform, Vector2.zero, Vector2.one, new Vector2(0f, 56f), new Vector2(-28f, -12f));
+        // Mostrar en el indicador flotante
+        if (textoIndicadorDificultad != null)
+        {
+            textoIndicadorDificultad.text = $"¡MODO {GetDifficultyName(nuevaDificultad).ToUpper()}!";
+            textoIndicadorDificultad.color = Color.cyan;
+            textoIndicadorDificultad.gameObject.SetActive(true);
+            StartCoroutine(DesvanecerIndicador(textoIndicadorDificultad.gameObject));
+        }
 
-        scoreText = RuntimeMiniGameUI.CreateText("ScoreText", hud, "", 22f, RuntimeMiniGameUI.MutedText, TextAlignmentOptions.Right);
-        RuntimeMiniGameUI.SetRect(scoreText.rectTransform, Vector2.zero, Vector2.one, new Vector2(0f, 18f), new Vector2(-28f, -48f));
-
-        Image ruleTrack = RuntimeMiniGameUI.CreateImage("RuleBarTrack", hud, new Color(1f, 1f, 1f, 0.08f));
-        RuntimeMiniGameUI.SetRect(ruleTrack.rectTransform, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(28f, 10f), new Vector2(-28f, 20f));
-
-        ruleBar = RuntimeMiniGameUI.CreateImage("RuleBarFill", ruleTrack.transform, RuntimeMiniGameUI.Accent);
-        ruleBar.type = Image.Type.Filled;
-        ruleBar.fillMethod = Image.FillMethod.Horizontal;
-        RuntimeMiniGameUI.SetRect(ruleBar.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-
-        stimulusArea = RuntimeMiniGameUI.CreatePanel("StimulusArea", root, RuntimeMiniGameUI.PanelSoft);
-        RuntimeMiniGameUI.SetRect(stimulusArea, new Vector2(0.08f, 0.16f), new Vector2(0.92f, 0.74f), Vector2.zero, Vector2.zero);
-
-        Image stimulusTrack = RuntimeMiniGameUI.CreateImage("StimulusBarTrack", stimulusArea, new Color(1f, 1f, 1f, 0.08f));
-        RuntimeMiniGameUI.SetRect(stimulusTrack.rectTransform, new Vector2(0.12f, 0f), new Vector2(0.88f, 0f), new Vector2(0f, 24f), new Vector2(0f, 36f));
-
-        stimulusBar = RuntimeMiniGameUI.CreateImage("StimulusBarFill", stimulusTrack.transform, RuntimeMiniGameUI.Good);
-        stimulusBar.type = Image.Type.Filled;
-        stimulusBar.fillMethod = Image.FillMethod.Horizontal;
-        RuntimeMiniGameUI.SetRect(stimulusBar.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-
-        currentShape = RuntimeMiniGameUI.CreateShape("StimulusShape", stimulusArea, SimpleShapeKind.Circle, stimulusColors[0]);
-        currentButton = currentShape.gameObject.AddComponent<Button>();
-        currentButton.targetGraphic = currentShape;
-        currentButton.onClick.AddListener(OnStimulusPressed);
-        currentShape.gameObject.SetActive(false);
-
-        feedbackText = RuntimeMiniGameUI.CreateText("FeedbackText", root, "", 28f, RuntimeMiniGameUI.Text, TextAlignmentOptions.Center);
-        RuntimeMiniGameUI.SetRect(feedbackText.rectTransform, new Vector2(0.1f, 0.07f), new Vector2(0.9f, 0.14f), Vector2.zero, Vector2.zero);
+        Debug.Log($"🎲 Dificultad cambiada: {anterior} → {nuevaDificultad}");
     }
+
+    // ============================================================
+    // REGLAS
+    // ============================================================
 
     private void ChangeRule(bool firstRule)
     {
-        int level = Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? 1, 1, 10);
+        int level = NivelActual;
         maxLevelReached = Mathf.Max(maxLevelReached, level);
 
-        RuleData nextRule = CreateRuleForLevel(level);
         if (!firstRule)
         {
-            int guard = 0;
-            while (nextRule.description == currentRule.description && guard < 8)
-            {
-                nextRule = CreateRuleForLevel(level);
-                guard++;
-            }
+            previousRule = currentRule;
+            hasPreviousRule = true;
+        }
+
+        RuleData nextRule = CreateRuleForLevel(level);
+        int guard = 0;
+        while (!firstRule && nextRule.description == currentRule.description && guard < 20)
+        {
+            nextRule = CreateRuleForLevel(level);
+            guard++;
         }
 
         currentRule = nextRule;
-        ruleTimeTotal = Mathf.Lerp(6.5f, 2.8f, (level - 1f) / 9f);
-        ruleTimeLeft = ruleTimeTotal;
+        // Duración de regla: 12s nivel1, 6s nivel10
+        ruleDuration = Mathf.Lerp(12f, 6f, LevelT(level));
+        ruleTimer = ruleDuration;
         lastRuleChangeTime = Time.time;
+        if (!firstRule)
+        {
+            ruleChanges++;
+            AudioManager.Instance?.NivelUp();
+            OnCambioRegla?.Invoke("¡NUEVA NORMA!");
+            OnFeedback?.Invoke("La regla ha cambiado", true);
 
-        if (ruleText != null)
-            ruleText.text = currentRule.description;
+            // 🔥 NUEVO: Animar el cambio de regla
+            StartCoroutine(AnunciarCambioRegla(TextoRegla));
+        }
 
-        if (stimulusActive)
-            currentShouldTouch = ShouldTouch(currentStimulus);
-
-        feedbackText.text = firstRule ? "Prepara la nueva norma" : "Norma cambiada";
-        feedbackText.color = RuntimeMiniGameUI.Accent;
-        UpdateHud();
+        OnReglaActualizada?.Invoke(TextoRegla);
+        EmitirEstado();
     }
 
     private RuleData CreateRuleForLevel(int level)
     {
-        RuleKind kind;
-        int pool = level < 4 ? 2 : level < 7 ? 3 : 4;
-        int roll = Random.Range(0, pool);
+        List<FoodTags> availableTags = GetAvailableTagsForLevel(level);
 
-        if (roll == 0) kind = RuleKind.Color;
-        else if (roll == 1) kind = RuleKind.Shape;
-        else if (roll == 2) kind = RuleKind.Size;
-        else kind = RuleKind.AvoidColor;
+        // Elegir entre "TOCA" o "EVITA"
+        RuleKind kind = level >= 5 && Random.value > 0.5f ? RuleKind.AvoidTag : RuleKind.MatchTag;
 
-        RuleData rule = new RuleData
+        for (int attempt = 0; attempt < 30; attempt++)
         {
-            kind = kind,
-            colorIndex = Random.Range(0, stimulusColors.Length),
-            shape = shapes[Random.Range(0, shapes.Length)],
-            large = Random.value > 0.5f
-        };
+            FoodTags tag = availableTags[Random.Range(0, availableTags.Count)];
+            int count = kind == RuleKind.MatchTag ? foodDatabase.CountByTag(tag) : foodDatabase.CountWithoutTag(tag);
 
-        switch (kind)
-        {
-            case RuleKind.Color:
-                rule.description = "Toca los " + colorNames[rule.colorIndex];
-                break;
-            case RuleKind.Shape:
-                rule.description = "Toca " + ShapeName(rule.shape);
-                break;
-            case RuleKind.Size:
-                rule.description = rule.large ? "Toca figuras grandes" : "Toca figuras pequenas";
-                break;
-            case RuleKind.AvoidColor:
-                rule.description = "No toques los " + colorNames[rule.colorIndex];
-                break;
-        }
-
-        return rule;
-    }
-
-    private void SpawnStimulus()
-    {
-        if (currentShape == null)
-            return;
-
-        int level = Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? 1, 1, 10);
-        stimulusTimeTotal = Mathf.Lerp(2.35f, 0.9f, (level - 1f) / 9f);
-        stimulusTimeLeft = stimulusTimeTotal;
-
-        bool shouldCreateTarget = Random.value < 0.55f;
-        currentStimulus = CreateStimulusMatchingRule(shouldCreateTarget);
-        currentShouldTouch = ShouldTouch(currentStimulus);
-
-        RectTransform rect = currentShape.rectTransform;
-        rect.anchorMin = new Vector2(0.5f, 0.5f);
-        rect.anchorMax = new Vector2(0.5f, 0.5f);
-        rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta = currentStimulus.large ? new Vector2(190f, 190f) : new Vector2(128f, 128f);
-        rect.anchoredPosition = PositionForIndex(currentStimulus.positionIndex);
-
-        currentShape.SetShape(currentStimulus.shape, stimulusColors[currentStimulus.colorIndex]);
-        currentShape.gameObject.SetActive(true);
-
-        if (stimulusBar != null)
-            stimulusBar.fillAmount = 1f;
-
-        stimulusActive = true;
-        feedbackText.text = currentShouldTouch ? "Pulsa" : "Espera";
-        feedbackText.color = currentShouldTouch ? RuntimeMiniGameUI.Good : RuntimeMiniGameUI.MutedText;
-    }
-
-    private StimulusData CreateStimulusMatchingRule(bool shouldMatch)
-    {
-        StimulusData stimulus = RandomStimulus();
-
-        if (shouldMatch)
-            ForceMatch(ref stimulus);
-        else
-            ForceMismatch(ref stimulus);
-
-        stimulus.positionIndex = Random.Range(0, 6);
-        return stimulus;
-    }
-
-    private StimulusData RandomStimulus()
-    {
-        return new StimulusData
-        {
-            colorIndex = Random.Range(0, stimulusColors.Length),
-            shape = shapes[Random.Range(0, shapes.Length)],
-            large = Random.value > 0.5f,
-            positionIndex = Random.Range(0, 6)
-        };
-    }
-
-    private void ForceMatch(ref StimulusData stimulus)
-    {
-        switch (currentRule.kind)
-        {
-            case RuleKind.Color:
-                stimulus.colorIndex = currentRule.colorIndex;
-                break;
-            case RuleKind.Shape:
-                stimulus.shape = currentRule.shape;
-                break;
-            case RuleKind.Size:
-                stimulus.large = currentRule.large;
-                break;
-            case RuleKind.AvoidColor:
-                stimulus.colorIndex = DifferentColor(currentRule.colorIndex);
-                break;
-        }
-    }
-
-    private void ForceMismatch(ref StimulusData stimulus)
-    {
-        switch (currentRule.kind)
-        {
-            case RuleKind.Color:
-                stimulus.colorIndex = DifferentColor(currentRule.colorIndex);
-                break;
-            case RuleKind.Shape:
-                stimulus.shape = DifferentShape(currentRule.shape);
-                break;
-            case RuleKind.Size:
-                stimulus.large = !currentRule.large;
-                break;
-            case RuleKind.AvoidColor:
-                stimulus.colorIndex = currentRule.colorIndex;
-                break;
-        }
-    }
-
-    private bool ShouldTouch(StimulusData stimulus)
-    {
-        switch (currentRule.kind)
-        {
-            case RuleKind.Color:
-                return stimulus.colorIndex == currentRule.colorIndex;
-            case RuleKind.Shape:
-                return stimulus.shape == currentRule.shape;
-            case RuleKind.Size:
-                return stimulus.large == currentRule.large;
-            case RuleKind.AvoidColor:
-                return stimulus.colorIndex != currentRule.colorIndex;
-            default:
-                return false;
-        }
-    }
-
-    private void OnStimulusPressed()
-    {
-        if (!stimulusActive || gameFinished || juegoPausado)
-            return;
-
-        float reactionTime = Mathf.Clamp(stimulusTimeTotal - stimulusTimeLeft, 0f, stimulusTimeTotal);
-        RegisterResponse(true, reactionTime);
-    }
-
-    private void RegisterResponse(bool pressed, float reactionTime)
-    {
-        if (!stimulusActive)
-            return;
-
-        stimulusActive = false;
-        currentShape.gameObject.SetActive(false);
-
-        bool correct = pressed == currentShouldTouch;
-        totalTrials++;
-
-        if (!currentShouldTouch)
-        {
-            inhibitTrials++;
-            if (!pressed)
-                inhibitCorrect++;
-        }
-
-        bool closeToRuleChange = Time.time - lastRuleChangeTime <= 1.4f;
-        if (closeToRuleChange)
-        {
-            postChangeTrials++;
-            if (correct)
-                postChangeCorrect++;
-        }
-
-        if (correct)
-        {
-            correctTrials++;
-            streak++;
-            bestStreak = Mathf.Max(bestStreak, streak);
-            feedbackText.text = pressed ? "Correcto" : "Inhibicion correcta";
-            feedbackText.color = RuntimeMiniGameUI.Good;
-            AudioManager.Instance?.Acierto();
-        }
-        else
-        {
-            streak = 0;
-            if (!pressed && currentShouldTouch)
-                omissions++;
-
-            feedbackText.text = pressed ? "Era mejor esperar" : "Se escapo el objetivo";
-            feedbackText.color = RuntimeMiniGameUI.Bad;
-            AudioManager.Instance?.Error();
-        }
-
-        float precision = MetricUtils.Precision(correctTrials, totalTrials);
-        float speedReward = correct ? Mathf.Clamp01(1f - reactionTime / Mathf.Max(0.1f, stimulusTimeTotal)) : 0f;
-        DifficultyManager.Instance?.ActualizarDificultad(Mathf.Lerp(precision, speedReward, 0.35f), correct, reactionTime);
-
-        UpdateHud();
-        ScheduleNextStimulus(0.28f);
-    }
-
-    private void ScheduleNextStimulus(float delay)
-    {
-        nextStimulusDelay = delay;
-    }
-
-    private void UpdateHud()
-    {
-        int level = Mathf.Clamp(DifficultyManager.Instance?.nivelActual ?? 1, 1, 10);
-        maxLevelReached = Mathf.Max(maxLevelReached, level);
-
-        if (levelText != null)
-            levelText.text = "Nivel " + level;
-
-        if (scoreText != null)
-            scoreText.text = correctTrials + "/" + Mathf.Max(1, totalTrials) + "  Racha " + streak;
-    }
-
-    private Vector2 PositionForIndex(int index)
-    {
-        Vector2[] positions =
-        {
-            new Vector2(-330f, 120f),
-            new Vector2(0f, 150f),
-            new Vector2(330f, 110f),
-            new Vector2(-250f, -95f),
-            new Vector2(80f, -120f),
-            new Vector2(340f, -75f)
-        };
-
-        return positions[Mathf.Abs(index) % positions.Length];
-    }
-
-    private int DifferentColor(int colorIndex)
-    {
-        int next = Random.Range(0, stimulusColors.Length - 1);
-        return next >= colorIndex ? next + 1 : next;
-    }
-
-    private SimpleShapeKind DifferentShape(SimpleShapeKind shape)
-    {
-        int current = 0;
-        for (int i = 0; i < shapes.Length; i++)
-        {
-            if (shapes[i] == shape)
+            if (count >= 3)
             {
-                current = i;
-                break;
+                string prefix = kind == RuleKind.MatchTag ? "TOCA" : "EVITA";
+                return new RuleData
+                {
+                    kind = kind,
+                    targetTag = tag,
+                    description = $"{prefix} {TagName(tag)}"
+                };
             }
         }
 
-        int next = Random.Range(0, shapes.Length - 1);
-        return shapes[next >= current ? next + 1 : next];
+        // Fallback: color o forma básica
+        FoodTags fallbackTag = FoodTags.Rojo;
+        return new RuleData { kind = RuleKind.MatchTag, targetTag = fallbackTag, description = "TOCA ROJOS" };
     }
 
-    private string ShapeName(SimpleShapeKind shape)
+    private List<FoodTags> GetAvailableTagsForLevel(int level)
     {
-        for (int i = 0; i < shapes.Length; i++)
-            if (shapes[i] == shape)
-                return shapeNames[i];
+        List<FoodTags> tags = new List<FoodTags>();
 
-        return "figura";
+        // Siempre presentes
+        tags.Add(FoodTags.Rojo);
+        tags.Add(FoodTags.Verde);
+        tags.Add(FoodTags.Amarillo);
+        tags.Add(FoodTags.Redondo);
+        tags.Add(FoodTags.Alargado);
+
+        if (currentDifficulty != GameDifficulty.Easy)
+        {
+            tags.Add(FoodTags.Naranja);
+            tags.Add(FoodTags.Marron);
+            tags.Add(FoodTags.Blanco);
+            tags.Add(FoodTags.Cuadrado);
+            tags.Add(FoodTags.Irregular);
+        }
+
+        if (currentDifficulty == GameDifficulty.Medium || currentDifficulty == GameDifficulty.Hard)
+        {
+            if (level >= 3) tags.Add(FoodTags.Fruta);
+            if (level >= 3) tags.Add(FoodTags.Verdura);
+            if (level >= 3) tags.Add(FoodTags.Carne);
+            if (level >= 3) tags.Add(FoodTags.Lacteo);
+            if (level >= 4) { tags.Add(FoodTags.Pequeno); tags.Add(FoodTags.Mediano); tags.Add(FoodTags.Grande); }
+            if (level >= 6) { tags.Add(FoodTags.Dulce); tags.Add(FoodTags.Salado); }
+        }
+
+        if (currentDifficulty == GameDifficulty.Hard)
+        {
+            if (level >= 5) tags.Add(FoodTags.Bebida); // Aunque no usaremos bebidas, se puede
+            if (level >= 7) { tags.Add(FoodTags.Frio); tags.Add(FoodTags.Caliente); }
+            if (level >= 8) { tags.Add(FoodTags.Crudo); tags.Add(FoodTags.Cocinado); }
+            if (level >= 8) { tags.Add(FoodTags.Azul); tags.Add(FoodTags.Rosa); }
+        }
+
+        return tags;
     }
 
-    public override void PausarJuego(bool pausar)
+    private string TagName(FoodTags tag)
     {
-        base.PausarJuego(pausar);
+        switch (tag)
+        {
+            case FoodTags.Rojo: return "ROJOS";
+            case FoodTags.Verde: return "VERDES";
+            case FoodTags.Amarillo: return "AMARILLOS";
+            case FoodTags.Naranja: return "NARANJAS";
+            case FoodTags.Marron: return "MARRONES";
+            case FoodTags.Blanco: return "BLANCOS";
+            case FoodTags.Azul: return "AZULES";
+            case FoodTags.Rosa: return "ROSAS";
+            case FoodTags.Redondo: return "REDONDOS";
+            case FoodTags.Alargado: return "ALARGADOS";
+            case FoodTags.Cuadrado: return "CUADRADOS";
+            case FoodTags.Irregular: return "IRREGULARES";
+            case FoodTags.Fruta: return "FRUTAS";
+            case FoodTags.Verdura: return "VERDURAS";
+            case FoodTags.Carne: return "CARNES";
+            case FoodTags.Lacteo: return "LACTEOS";
+            case FoodTags.Bebida: return "BEBIDAS";
+            case FoodTags.Dulce: return "DULCES";
+            case FoodTags.Salado: return "SALADOS";
+            case FoodTags.Crudo: return "CRUDOS";
+            case FoodTags.Cocinado: return "COCINADOS";
+            case FoodTags.Frio: return "FRIOS";
+            case FoodTags.Caliente: return "CALIENTES";
+            case FoodTags.Pequeno: return "PEQUEÑOS";
+            case FoodTags.Mediano: return "MEDIANOS";
+            case FoodTags.Grande: return "GRANDES";
+            default: return tag.ToString().ToUpper();
+        }
     }
+
+    // ============================================================
+    // GENERACIÓN DE RONDA
+    // ============================================================
+
+    private void GenerateRound()
+    {
+        ClearStimuli();
+
+        int level = NivelActual;
+        int count = Mathf.RoundToInt(Mathf.Lerp(estimulosNivel1, estimulosNivel10, LevelT(level)));
+        count = Mathf.Clamp(count, 3, 12);
+
+        roundDuration = Mathf.Lerp(tiempoRondaNivel1, tiempoRondaNivel10, LevelT(level));
+        roundTimer = roundDuration;
+        freezeTimer = 0f;
+
+        if (foodDatabase == null || foodDatabase.allFoods.Count == 0)
+        {
+            Debug.LogError("FoodDatabase no asignado o vacío");
+            return;
+        }
+
+        rondasDesdePowerUp++;
+        bool spawnPowerUp = (rondasDesdePowerUp >= rondasPorPowerUp && level >= 2);
+        if (spawnPowerUp) rondasDesdePowerUp = 0;
+
+        int targets = Mathf.Clamp(Mathf.RoundToInt(count * Random.Range(0.34f, 0.52f)), 1, count - 1);
+        List<Vector2> usedPositions = new List<Vector2>();
+
+        int powerUpIndex = spawnPowerUp ? Random.Range(0, count) : -1;
+
+        for (int i = 0; i < count; i++)
+        {
+            bool shouldMatch = i < targets;
+            FoodItem selectedFood = shouldMatch ? GetFoodMatchingRule() : GetFoodNotMatchingRule();
+
+            Stimulus stimulus = new Stimulus { food = selectedFood };
+
+            if (i == powerUpIndex)
+            {
+                stimulus.powerUp = (PowerUpType)Random.Range(1, 5);
+            }
+
+            SpawnStimulus(stimulus, FindFreePosition(usedPositions, CurrentSize(level)));
+            usedPositions.Add(stimulus.rect.anchoredPosition);
+        }
+
+        ShuffleStimulusPositions();
+        EmitirEstado();
+    }
+
+    // ============================================================
+    // SPAWN DE ESTÍMULOS
+    // ============================================================
+
+    private void SpawnStimulus(Stimulus stimulus, Vector2 position)
+    {
+        if (zonaJuego == null) return;
+
+        GameObject obj = new GameObject("Estimulo", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+        obj.transform.SetParent(zonaJuego, false);
+
+        stimulus.rect = obj.GetComponent<RectTransform>();
+        stimulus.image = obj.GetComponent<Image>();
+        stimulus.button = obj.GetComponent<Button>();
+
+        Vector2 baseSize = CurrentSize(NivelActual);
+
+        // Si es Power‑Up usamos el icono, si no, la comida
+        if (stimulus.powerUp != PowerUpType.None)
+        {
+            stimulus.image.sprite = GetPowerUpSprite(stimulus.powerUp);
+            // El tamaño puede ser un poco mayor para que destaque
+            stimulus.rect.sizeDelta = baseSize * 1.2f;
+        }
+        else
+        {
+            stimulus.image.sprite = stimulus.food.sprite;
+            float sizeMultiplier = stimulus.food.tags.HasFlag(FoodTags.Grande) ? 1.5f :
+                                   stimulus.food.tags.HasFlag(FoodTags.Pequeno) ? 0.65f : 1.0f;
+            stimulus.rect.sizeDelta = baseSize * sizeMultiplier;
+        }
+
+        stimulus.rect.anchorMin = stimulus.rect.anchorMax = stimulus.rect.pivot = new Vector2(0.5f, 0.5f);
+        stimulus.rect.anchoredPosition = position;
+        stimulus.image.preserveAspect = true;
+        stimulus.image.raycastTarget = true;
+
+        // Solo para Power‑Ups mantenemos un glow sutil
+        if (stimulus.powerUp != PowerUpType.None)
+        {
+            GameObject glowObj = new GameObject("Glow", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            glowObj.transform.SetParent(obj.transform, false);
+            stimulus.glowImage = glowObj.GetComponent<Image>();
+            stimulus.glowImage.sprite = stimulus.image.sprite;   // mismo icono
+            stimulus.glowImage.color = powerUpGlowColor;
+            stimulus.glowImage.preserveAspect = true;
+            stimulus.glowImage.raycastTarget = false;
+            RectTransform glowRect = glowObj.GetComponent<RectTransform>();
+            glowRect.anchorMin = glowRect.anchorMax = glowRect.pivot = new Vector2(0.5f, 0.5f);
+            glowRect.sizeDelta = stimulus.rect.sizeDelta * 1.25f;
+            glowRect.anchoredPosition = Vector2.zero;
+        }
+
+        stimulus.button.targetGraphic = stimulus.image;
+        stimulus.button.onClick.AddListener(() => OnStimulusPressed(stimulus));
+
+        stimuli.Add(stimulus);
+    }
+
+    // ============================================================
+    // INTERACCIÓN CON ESTÍMULOS
+    // ============================================================
+
+    private void OnStimulusPressed(Stimulus stimulus)
+    {
+        if (stimulus == null || stimulus.resolved || gameFinished || juegoPausado) return;
+        stimulus.resolved = true; // Esto ya lo tienes, pero asegúrate que esté al PRINCIPIO
+                                  // Desactivar el botón inmediatamente para evitar doble click
+        if (stimulus.button != null) stimulus.button.interactable = false;
+        AudioManager.Instance?.Click();
+        stimulus.resolved = true;
+
+        if (stimulus.powerUp != PowerUpType.None)
+        {
+            ApplyPowerUp(stimulus.powerUp);
+            StartCoroutine(SliceAndDestroy(stimulus.rect.gameObject, true));
+            EmitirEstado();
+            if (AllTargetsResolved()) GenerateRound();
+            return;
+        }
+
+        bool target = currentRule.kind == RuleKind.MatchTag
+            ? stimulus.food.tags.HasFlag(currentRule.targetTag)
+            : !stimulus.food.tags.HasFlag(currentRule.targetTag);
+
+        totalDecisions++;
+        reactionSum += stimulus.age;
+
+        bool postChange = Time.time - lastRuleChangeTime <= 1.65f;
+        if (postChange) postChangeDecisions++;
+
+        // Feedback flotante que sale del alimento y va al centro
+        Vector3 startPos = stimulus.rect.position;
+        Vector3 endPos = zonaJuego.position + Vector3.up * 100f; // hacia centro superior
+        string feedbackMsg = "";
+        bool isCorrect = false;
+
+        if (target)
+        {
+            correctDecisions++;
+            currentStreak++;
+            bestStreak = Mathf.Max(bestStreak, currentStreak);
+            comboMultiplier = (currentStreak >= 10) ? 3 : (currentStreak >= 5) ? 2 : 1;
+            if (activePowerUp == PowerUpType.Estrella)
+            {
+                comboMultiplier = Mathf.Max(comboMultiplier, 3);
+                activePowerUp = PowerUpType.None;
+            }
+            if (postChange) postChangeCorrect++;
+            AudioManager.Instance?.Acierto();
+            feedbackMsg = $"¡Correcto! +{comboMultiplier}";
+            isCorrect = true;
+            RegisterDifficulty(1f, 1f, true, stimulus.age);
+        }
+        else
+        {
+            if (activePowerUp == PowerUpType.Escudo)
+            {
+                activePowerUp = PowerUpType.None;
+                AudioManager.Instance?.Acierto();
+                feedbackMsg = "¡Escudo!";
+                isCorrect = true;
+                StartCoroutine(SliceAndDestroy(stimulus.rect.gameObject, true));
+                EmitirEstado();
+                if (AllTargetsResolved()) GenerateRound();
+                return;
+            }
+
+            wrongTouches++;
+            inhibitionOpportunities++;
+            currentStreak = 0;
+            comboMultiplier = 1;
+            if (hasPreviousRule && MatchesPreviousRule(stimulus)) perseverationErrors++;
+            AudioManager.Instance?.Error();
+            feedbackMsg = hasPreviousRule && MatchesPreviousRule(stimulus) ? "¡Regla anterior!" : "¡Incorrecto!";
+            isCorrect = false;
+            RegisterDifficulty(0f, 1.25f, false, stimulus.age);
+        }
+
+        // Mostrar feedback flotante
+        ShowFloatingFeedback(feedbackMsg, startPos, endPos, isCorrect);
+
+        // Animación de slice y destrucción
+        StartCoroutine(SliceAndDestroy(stimulus.rect.gameObject, target));
+
+        EmitirEstado();
+        if (AllTargetsResolved()) GenerateRound();
+    }
+
+
+    private IEnumerator SliceAndDestroy(GameObject obj, bool success)
+    {
+        if (obj == null) yield break;
+
+        // Guardar referencias y verificar que sigan existiendo durante la animación
+        RectTransform rect = obj.GetComponent<RectTransform>();
+        Image img = obj.GetComponent<Image>();
+
+        if (rect == null || img == null)
+        {
+            if (obj != null) Destroy(obj);
+            yield break;
+        }
+
+        Vector3 originalScale = rect.localScale;
+        Quaternion originalRot = rect.localRotation;
+        float sliceAngle = success ? 30f : -30f;
+        float elapsed = 0f;
+        float duration = sliceAnimationDuration;
+
+        // Efecto de partículas (opcional)
+        if (sliceEffectPrefab != null)
+        {
+            GameObject effect = Instantiate(sliceEffectPrefab, rect.position, Quaternion.identity);
+            ParticleSystem ps = effect.GetComponent<ParticleSystem>();
+            if (ps != null) ps.Play();
+            Destroy(effect, 1f);
+        }
+
+        while (elapsed < duration)
+        {
+            // CRUCIAL: Verificar que el objeto aún existe en cada frame
+            if (obj == null || rect == null || img == null) yield break;
+
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // Escala en X se reduce (como si se partiera)
+            float scaleX = Mathf.Lerp(1f, 0.1f, t);
+            float scaleY = Mathf.Lerp(1f, 1.3f, t);
+            rect.localScale = new Vector3(scaleX, scaleY, 1f);
+
+            // Rotación
+            float angle = Mathf.Lerp(0f, sliceAngle, t);
+            rect.localRotation = originalRot * Quaternion.Euler(0, 0, angle);
+
+            // Fade out
+            Color c = img.color;
+            c.a = Mathf.Lerp(1f, 0f, t);
+            img.color = c;
+
+            yield return null;
+        }
+
+        // Destruir solo si aún existe
+        if (obj != null) Destroy(obj);
+    }
+    private void ShowFloatingFeedback(string message, Vector3 start, Vector3 end, bool isCorrect)
+    {
+        if (zonaJuego == null) return;
+
+        // Limitar feedbacks simultaneos
+        if (feedbacksActivos.Count >= maxFeedbacksSimultaneos)
+        {
+            // Eliminar el feedback mas antiguo
+            if (feedbacksActivos[0] != null)
+                Destroy(feedbacksActivos[0]);
+            feedbacksActivos.RemoveAt(0);
+        }
+
+        // Crear un objeto TextMeshPro temporal
+        GameObject go = new GameObject("FloatingFeedback", typeof(RectTransform));
+        go.transform.SetParent(zonaJuego, false);
+        feedbacksActivos.Add(go);
+
+        TextMeshProUGUI text = go.AddComponent<TextMeshProUGUI>();
+        text.text = message;
+        text.fontSize = 48;
+        if (uiCambioDeReglas != null && uiCambioDeReglas.fuenteTextos != null)
+            text.font = uiCambioDeReglas.fuenteTextos;
+        text.alignment = TextAlignmentOptions.Center;
+        text.color = isCorrect ? Color.green : Color.red;
+        text.outlineWidth = 0.2f;
+        text.outlineColor = Color.black;
+
+        RectTransform rt = go.GetComponent<RectTransform>();
+        rt.position = start; // Empieza donde está el alimento
+        rt.sizeDelta = new Vector2(300, 100);
+
+        // ANIMACION: Sube hacia arriba (no hacia el centro)
+        StartCoroutine(AnimateFeedbackVertical(go, start, isCorrect));
+    }
+
+    private IEnumerator AnimateFeedbackVertical(GameObject go, Vector3 start, bool isCorrect)
+    {
+        if (go == null) yield break;
+
+        float duration = 0.8f;
+        float elapsed = 0f;
+        TextMeshProUGUI text = go.GetComponent<TextMeshProUGUI>();
+        RectTransform rt = go.GetComponent<RectTransform>();
+
+        if (text == null || rt == null)
+        {
+            if (go != null) Destroy(go);
+            yield break;
+        }
+
+        // Posicion inicial (sobre el alimento)
+        Vector3 startPos = start;
+        // Posicion final (mas arriba, sin ir al centro)
+        Vector3 endPos = start + new Vector3(0, 180f, 0); // Sube 180 pixels
+
+        while (elapsed < duration)
+        {
+            if (go == null || text == null || rt == null) yield break;
+
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // Movimiento hacia arriba (curva suave)
+            Vector3 pos = Vector3.Lerp(startPos, endPos, t);
+            if (rt != null) rt.position = pos;
+
+            // Escala: empieza pequeño, crece, luego se desvanece
+            float scale;
+            if (t < 0.3f)
+                scale = Mathf.Lerp(0.8f, 1.3f, t / 0.3f);
+            else if (t < 0.7f)
+                scale = 1.3f;
+            else
+                scale = Mathf.Lerp(1.3f, 0.5f, (t - 0.7f) / 0.3f);
+
+            if (rt != null) rt.localScale = Vector3.one * scale;
+
+            // Fade out al final
+            if (text != null)
+            {
+                Color c = text.color;
+                if (t > 0.5f)
+                    c.a = Mathf.Lerp(1f, 0f, (t - 0.5f) / 0.5f);
+                else
+                    c.a = 1f;
+                text.color = c;
+            }
+
+            yield return null;
+        }
+        // Al final, antes del Destroy, limpiar de la lista
+        if (go != null && feedbacksActivos.Contains(go))
+            feedbacksActivos.Remove(go);
+
+        if (go != null) Destroy(go);
+    }
+    // Añade esta corrutina en CambioDeReglasGame.cs
+    private IEnumerator AnunciarCambioRegla(string nuevaRegla)
+    {
+        if (uiCambioDeReglas == null || uiCambioDeReglas.textoRegla == null) yield break;
+
+        TextMeshProUGUI textoRegla = uiCambioDeReglas.textoRegla;
+        RectTransform rectRegla = textoRegla.rectTransform;
+
+        // Guardar valores originales
+        Vector3 originalScale = rectRegla.localScale;
+        Color originalColor = textoRegla.color;
+
+        // Efecto 1: Escala de pop
+        float elapsed = 0f;
+        float popDuration = 0.3f;
+        while (elapsed < popDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / popDuration;
+            // Escala: 1 → 1.3 → 1
+            float scale = 1f + Mathf.Sin(t * Mathf.PI) * 0.3f;
+            rectRegla.localScale = originalScale * scale;
+            // Color: blanco → amarillo → blanco
+            textoRegla.color = Color.Lerp(originalColor, Color.yellow, Mathf.Sin(t * Mathf.PI));
+            yield return null;
+        }
+
+        rectRegla.localScale = originalScale;
+        textoRegla.color = originalColor;
+
+        // Efecto 2: Texto de anuncio flotante (opcional)
+        if (uiCambioDeReglas.textoCambioRegla != null)
+        {
+            uiCambioDeReglas.textoCambioRegla.gameObject.SetActive(true);
+            uiCambioDeReglas.textoCambioRegla.text = "¡NORMA ACTUALIZADA!";
+            uiCambioDeReglas.textoCambioRegla.color = Color.yellow;
+            yield return new WaitForSeconds(1f);
+            uiCambioDeReglas.textoCambioRegla.gameObject.SetActive(false);
+        }
+    }
+
+    private void ApplyPowerUp(PowerUpType type)
+    {
+        switch (type)
+        {
+            case PowerUpType.Reloj:
+                roundTimer += 5f;
+                OnFeedback?.Invoke("+5 segundos", true);
+                break;
+            case PowerUpType.Estrella:
+                activePowerUp = PowerUpType.Estrella;
+                OnFeedback?.Invoke("¡Proximo acierto ×3!", true);
+                break;
+            case PowerUpType.Escudo:
+                activePowerUp = PowerUpType.Escudo;
+                OnFeedback?.Invoke("¡Escudo activado!", true);
+                break;
+            case PowerUpType.Congelar:
+                freezeTimer = 2f;
+                OnFeedback?.Invoke("¡Tiempo congelado 2s!", true);
+                break;
+        }
+        AudioManager.Instance?.PowerUp();
+    }
+
+    private bool MatchesPreviousRule(Stimulus stimulus)
+    {
+        if (!hasPreviousRule || stimulus?.food == null) return false;
+        return previousRule.kind == RuleKind.MatchTag
+            ? stimulus.food.tags.HasFlag(previousRule.targetTag)
+            : !stimulus.food.tags.HasFlag(previousRule.targetTag);
+    }
+
+    // ============================================================
+    // EFECTOS VISUALES
+    // ============================================================
+
+    private IEnumerator PopAndDestroy(GameObject obj)
+    {
+        if (!obj) yield break;
+
+        Vector3 originalScale = obj.transform.localScale;
+        float t = 0f;
+        while (t < 0.25f)
+        {
+            if (!obj) yield break;   // El objeto fue destruido externamente
+
+            t += Time.deltaTime;
+            float s = Mathf.Lerp(1f, 1.4f, Mathf.Min(t / 0.15f, 1f));
+            float alpha = Mathf.Lerp(1f, 0f, Mathf.Clamp01((t - 0.1f) / 0.15f));
+            obj.transform.localScale = originalScale * s;
+
+            if (obj.TryGetComponent<Image>(out var img))
+            {
+                Color c = img.color;
+                c.a = alpha;
+                img.color = c;
+            }
+            yield return null;
+        }
+        if (obj) Destroy(obj);
+    }
+
+    private IEnumerator ShakeAndDestroy(GameObject obj)
+    {
+        if (!obj) yield break;
+
+        Vector3 originalPos = obj.transform.localPosition;
+        float t = 0f;
+        while (t < 0.35f)
+        {
+            if (!obj) yield break;
+
+            t += Time.deltaTime;
+            float shake = Mathf.Sin(t * 40f) * 8f * (1f - Mathf.Clamp01(t / 0.35f));
+            obj.transform.localPosition = originalPos + new Vector3(shake, 0, 0);
+
+            if (t > 0.2f && obj.TryGetComponent<Image>(out var img))
+            {
+                Color c = img.color;
+                c.a = Mathf.Lerp(1f, 0f, (t - 0.2f) / 0.15f);
+                img.color = c;
+            }
+            yield return null;
+        }
+        if (obj) Destroy(obj);
+    }
+
+    // ============================================================
+    // RESOLUCIÓN DE RONDA
+    // ============================================================
+
+    private void ResolveRoundTimeout()
+    {
+        int avoidedDistractors = 0;
+        float slowestAge = roundDuration;
+
+        for (int i = stimuli.Count - 1; i >= 0; i--)
+        {
+            Stimulus stimulus = stimuli[i];
+            if (stimulus == null || stimulus.resolved) continue;
+
+            bool target = currentRule.kind == RuleKind.MatchTag
+                ? stimulus.food.tags.HasFlag(currentRule.targetTag)
+                : !stimulus.food.tags.HasFlag(currentRule.targetTag);
+
+            stimulus.resolved = true;
+            totalDecisions++;
+            slowestAge = Mathf.Max(slowestAge, stimulus.age);
+
+            // 🔥 SOLO CONTAR DISTRACTORES EVITADOS, NO PENALIZAR TARGETS NO TOCADOS
+            if (!target)
+            {
+                avoidedDistractors++;
+                inhibitionCorrect++;
+                inhibitionOpportunities++;
+            }
+            // Los targets no tocados simplemente se ignoran (no penalizan)
+        }
+
+        if (avoidedDistractors > 0)
+        {
+            correctDecisions += avoidedDistractors;
+            currentStreak += avoidedDistractors > 0 ? 1 : 0;
+            bestStreak = Mathf.Max(bestStreak, currentStreak);
+            comboMultiplier = (currentStreak >= 10) ? 3 : (currentStreak >= 5) ? 2 : 1;
+            OnFeedback?.Invoke($"¡Has evitado {avoidedDistractors} distractores!", true);
+            RegisterDifficulty(0.7f, 0.45f, true, slowestAge);
+        }
+        else
+        {
+            // No hay penalización si no se tocaron objetivos
+            OnFeedback?.Invoke("¡Bien! Nuevos alimentos disponibles", true);
+        }
+
+        GenerateRound();
+    }
+    private bool AllTargetsResolved()
+    {
+        for (int i = 0; i < stimuli.Count; i++)
+        {
+            Stimulus stimulus = stimuli[i];
+            if (stimulus != null && !stimulus.resolved)
+            {
+                bool target = currentRule.kind == RuleKind.MatchTag
+                    ? stimulus.food.tags.HasFlag(currentRule.targetTag)
+                    : !stimulus.food.tags.HasFlag(currentRule.targetTag);
+                if (target) return false;
+            }
+        }
+        return true;
+    }
+
+
+    private void MostrarDificultadElegida()
+    {
+        if (textoIndicadorDificultad == null)
+        {
+            // Crear un texto temporal si no existe
+            GameObject go = new GameObject("IndicadorDificultad", typeof(RectTransform), typeof(TextMeshProUGUI));
+            go.transform.SetParent(uiCambioDeReglas.ZonaJuego, false);
+            textoIndicadorDificultad = go.GetComponent<TextMeshProUGUI>();
+
+            // Configurar posición central
+            RectTransform rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.2f, 0.45f);
+            rt.anchorMax = new Vector2(0.8f, 0.55f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            textoIndicadorDificultad.fontSize = 42;
+            textoIndicadorDificultad.alignment = TextAlignmentOptions.Center;
+            textoIndicadorDificultad.outlineWidth = 0.2f;
+            textoIndicadorDificultad.outlineColor = Color.black;
+
+            if (uiCambioDeReglas != null && uiCambioDeReglas.fuenteTextos != null)
+                textoIndicadorDificultad.font = uiCambioDeReglas.fuenteTextos;
+        }
+
+        string nombreDificultad = "";
+        Color colorDificultad = Color.white;
+
+        switch (currentDifficulty)
+        {
+            case GameDifficulty.Easy:
+                nombreDificultad = "🍎 MODO FACIL 🍎\n(Solo frutas, verduras y carnes)";
+                colorDificultad = Color.green;
+                break;
+            case GameDifficulty.Medium:
+                nombreDificultad = "🍕 MODO MEDIO 🍕\n(Añade tamaños y sabores)";
+                colorDificultad = Color.yellow;
+                break;
+            case GameDifficulty.Hard:
+                nombreDificultad = "🔥 MODO EXPERTO 🔥\n(¡Todo vale! Temperatura, coccion, colores raros...)";
+                colorDificultad = Color.red;
+                break;
+        }
+
+        textoIndicadorDificultad.text = nombreDificultad;
+        textoIndicadorDificultad.color = colorDificultad;
+        textoIndicadorDificultad.gameObject.SetActive(true);
+
+        // Animación de entrada y salida
+        StartCoroutine(DesvanecerIndicador(textoIndicadorDificultad.gameObject));
+    }
+
+    private IEnumerator DesvanecerIndicador(GameObject indicador)
+    {
+        TextMeshProUGUI text = indicador.GetComponent<TextMeshProUGUI>();
+        if (text == null) yield break;
+
+        float elapsed = 0f;
+        Color originalColor = text.color;
+
+        // Mostrar durante duracionIndicadorDificultad segundos
+        yield return new WaitForSeconds(duracionIndicadorDificultad);
+
+        // Desvanecer
+        while (elapsed < 1f)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsed);
+            text.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+            yield return null;
+        }
+
+        indicador.SetActive(false);
+        text.color = originalColor; // Restaurar para la próxima vez
+    }
+
+    public void CambiarDificultadEnMedioPartida(GameDifficulty nuevaDificultad)
+    {
+        if (!gameActive || gameFinished) return;
+
+        // Guardar dificultad anterior
+        GameDifficulty anterior = currentDifficulty;
+        currentDifficulty = nuevaDificultad;
+
+        // 🔥 IMPORTANTE: Forzar la recarga de tags disponibles
+        // Limpiar y regenerar todo con la nueva dificultad
+        ClearStimuli();
+
+        // Resetear nivel para que se adapte a la nueva dificultad
+        DifficultyManager.Instance?.ResetDifficulty(Mathf.Clamp(nivelInicial, 1, 10));
+        maxLevelReached = Mathf.Clamp(nivelInicial, 1, 10);
+
+        // Regenerar regla y ronda
+        ChangeRule(true); // Forzar nueva regla con la dificultad actualizada
+        GenerateRound();
+
+        // Mostrar indicador de cambio
+        if (textoIndicadorDificultad != null)
+        {
+            string mensaje = $"¡DIFICULTAD CAMBIADA!\n{GetDifficultyName(anterior)} → {GetDifficultyName(nuevaDificultad)}";
+            textoIndicadorDificultad.text = mensaje;
+            textoIndicadorDificultad.color = Color.cyan;
+            textoIndicadorDificultad.gameObject.SetActive(true);
+            StartCoroutine(DesvanecerIndicador(textoIndicadorDificultad.gameObject));
+        }
+
+        // Feedback adicional
+        OnFeedback?.Invoke($"Dificultad cambiada a {GetDifficultyName(nuevaDificultad)}", true);
+        AudioManager.Instance?.NivelUp();
+    }
+
+    private string GetDifficultyName(GameDifficulty diff)
+    {
+        switch (diff)
+        {
+            case GameDifficulty.Easy: return "FÁCIL";
+            case GameDifficulty.Medium: return "MEDIO";
+            case GameDifficulty.Hard: return "EXPERTO";
+            default: return diff.ToString();
+        }
+    }
+    // ============================================================
+    // SELECCIÓN DE ALIMENTOS
+    // ============================================================
+
+    private Sprite GetPowerUpSprite(PowerUpType type)
+    {
+        switch (type)
+        {
+            case PowerUpType.Reloj: return powerUpReloj;
+            case PowerUpType.Estrella: return powerUpEstrella;
+            case PowerUpType.Escudo: return powerUpEscudo;
+            case PowerUpType.Congelar: return powerUpCongelar;
+            default: return null;
+        }
+    }
+
+    private FoodItem GetFoodMatchingRule()
+    {
+        List<FoodItem> candidates = currentRule.kind == RuleKind.MatchTag
+            ? foodDatabase.GetFoodsWithTag(currentRule.targetTag)
+            : foodDatabase.GetFoodsWithoutTag(currentRule.targetTag);
+        if (candidates.Count == 0) candidates = foodDatabase.allFoods;
+        return candidates[Random.Range(0, candidates.Count)];
+    }
+
+    private FoodItem GetFoodNotMatchingRule()
+    {
+        List<FoodItem> candidates = currentRule.kind == RuleKind.MatchTag
+            ? foodDatabase.GetFoodsWithoutTag(currentRule.targetTag)
+            : foodDatabase.GetFoodsWithTag(currentRule.targetTag);
+        if (candidates.Count == 0) candidates = foodDatabase.allFoods;
+        return candidates[Random.Range(0, candidates.Count)];
+    }
+
+    // ============================================================
+    // UTILIDADES
+    // ============================================================
+
+    private void RegisterDifficulty(float value, float weight, bool hit, float reactionTime)
+    {
+        weightedPerformance += Mathf.Clamp01(value) * Mathf.Max(0.01f, weight);
+        weightedPerformanceWeight += Mathf.Max(0.01f, weight);
+        DifficultyManager.Instance?.ActualizarDificultad(CurrentPerformance(), hit, reactionTime);
+        maxLevelReached = Mathf.Max(maxLevelReached, NivelActual);
+    }
+
+    private float CurrentPerformance()
+    {
+        if (weightedPerformanceWeight <= 0f) return 0.5f;
+        return Mathf.Clamp01(weightedPerformance / weightedPerformanceWeight);
+    }
+
+    private void CachearUI()
+    {
+        if (uiCambioDeReglas == null) uiCambioDeReglas = GetComponent<UICambioDeReglas>();
+        if (uiCambioDeReglas == null) uiCambioDeReglas = FindFirstObjectByType<UICambioDeReglas>(FindObjectsInactive.Include);
+        if (uiCambioDeReglas == null) uiCambioDeReglas = gameObject.AddComponent<UICambioDeReglas>();
+    }
+
+    private void PrepararUI()
+    {
+        CachearUI();
+        uiCambioDeReglas.Preparar(this);
+        zonaJuego = uiCambioDeReglas.ZonaJuego;
+    }
+
+    private void EmitirEstado() => OnEstadoActualizado?.Invoke();
+
+    private void ClearStimuli()
+    {
+        for (int i = stimuli.Count - 1; i >= 0; i--)
+        {
+            if (stimuli[i] != null && stimuli[i].rect != null && stimuli[i].rect.gameObject != null)
+                Destroy(stimuli[i].rect.gameObject);
+        }
+        stimuli.Clear();
+    }
+
+    private void ShuffleStimulusPositions()
+    {
+        for (int i = 0; i < stimuli.Count; i++)
+        {
+            int other = Random.Range(i, stimuli.Count);
+            Vector2 pos = stimuli[i].rect.anchoredPosition;
+            stimuli[i].rect.anchoredPosition = stimuli[other].rect.anchoredPosition;
+            stimuli[other].rect.anchoredPosition = pos;
+        }
+    }
+
+    private Vector2 FindFreePosition(List<Vector2> usedPositions, Vector2 size)
+    {
+        float width = PlayWidth(), height = PlayHeight();
+        float margin = Mathf.Max(size.x, size.y) * 0.62f;
+        for (int attempt = 0; attempt < 35; attempt++)
+        {
+            Vector2 position = new Vector2(Random.Range(-width * 0.5f + margin, width * 0.5f - margin),
+                                           Random.Range(-height * 0.5f + margin, height * 0.5f - margin));
+            bool free = true;
+            for (int i = 0; i < usedPositions.Count; i++)
+            {
+                if (Vector2.Distance(position, usedPositions[i]) < margin * 1.35f) { free = false; break; }
+            }
+            if (free) return position;
+        }
+        return new Vector2(Random.Range(-width * 0.35f, width * 0.35f), Random.Range(-height * 0.35f, height * 0.35f));
+    }
+
+    private Vector2 CurrentSize(int level) => Vector2.Lerp(tamanoEstimuloNivel1, tamanoEstimuloNivel10, LevelT(level));
+    private float PlayWidth() => zonaJuego != null ? Mathf.Max(780f, zonaJuego.rect.width) : 900f;
+    private float PlayHeight() => zonaJuego != null ? Mathf.Max(520f, zonaJuego.rect.height) : 620f;
+    private float LevelT(int level) => Mathf.Clamp01((level - 1f) / 9f);
+
+    public override void PausarJuego(bool pausar) => base.PausarJuego(pausar);
 
     public override void OnGameFinished()
     {
-        if (gameFinished)
-            return;
-
+        if (gameFinished) return;
         gameFinished = true;
         gameActive = false;
-        stimulusActive = false;
-
+        ClearStimuli();
         WebExporter.EnviarSesion(nombre, AplicarPesos(CalcularCognicion()));
     }
-
+    // Archivo: CambioDeReglasGame.cs (solo se muestra CalcularCognicion y AplicarPesos - el resto queda igual)
     public override CognitiveMetrics CalcularCognicion()
     {
         CognitiveMetrics metrics = new CognitiveMetrics();
-        if (totalTrials <= 0)
-            return metrics;
+        if (totalDecisions <= 0) return metrics;
 
-        float precision = MetricUtils.Precision(correctTrials, totalTrials);
-        float flexibility = postChangeTrials > 0 ? (float)postChangeCorrect / postChangeTrials : precision;
-        float inhibition = inhibitTrials > 0 ? (float)inhibitCorrect / inhibitTrials : precision;
-        float levelFactor = Mathf.Lerp(0.75f, 1f, Mathf.Clamp01(maxLevelReached / 10f));
-        float planning = Mathf.Clamp01(precision * 0.65f + Mathf.Clamp01(bestStreak / 8f) * 0.35f);
-        float spatial = Mathf.Clamp01((1f - (float)omissions / Mathf.Max(1, totalTrials)) * precision);
+        float precision = CurrentPerformance();
+        float flexibility = postChangeDecisions > 0 ? (float)postChangeCorrect / postChangeDecisions : precision;
+        float perseverationPenalty = 1f - (float)perseverationErrors / Mathf.Max(1, wrongTouches + omissions);
+        float inhibition = inhibitionOpportunities > 0 ? (float)inhibitionCorrect / inhibitionOpportunities : precision;
+        float levelFactor = Mathf.Lerp(0.6f, 1f, Mathf.Clamp01(maxLevelReached / 8f));
 
-        metrics.flexibilidadCognitiva = Mathf.Clamp01(flexibility * levelFactor);
-        metrics.controlInhibitorio = Mathf.Clamp01(inhibition * levelFactor);
-        metrics.planificacion = Mathf.Clamp01(planning * levelFactor);
-        metrics.memoriaEspacial = Mathf.Clamp01(spatial * levelFactor);
+        // Métricas más generosas para adultos
+        metrics.flexibilidadCognitiva = Mathf.Clamp01(flexibility * 0.7f + 0.3f) * levelFactor;
+        metrics.controlInhibitorio = Mathf.Clamp01(inhibition * 0.7f + 0.3f) * levelFactor;
+        metrics.atencionSostenida = Mathf.Lerp(0.6f, 1f, Mathf.Clamp01(totalDecisions / 15f)) * levelFactor;
+        metrics.planificacion = Mathf.Clamp01(precision * 0.5f + Mathf.Clamp01(bestStreak / 6f) * 0.5f) * levelFactor;
+        metrics.memoriaEspacial = Mathf.Clamp01(precision * 0.6f + 0.4f) * levelFactor;
         return metrics;
     }
 
     public override CognitiveMetrics AplicarPesos(CognitiveMetrics metrics)
     {
         CognitiveMetrics weighted = new CognitiveMetrics();
-        weighted.flexibilidadCognitiva = metrics.flexibilidadCognitiva * 0.55f;
-        weighted.controlInhibitorio = metrics.controlInhibitorio * 0.20f;
-        weighted.planificacion = metrics.planificacion * 0.15f;
-        weighted.memoriaEspacial = metrics.memoriaEspacial * 0.10f;
+        weighted.flexibilidadCognitiva = metrics.flexibilidadCognitiva * 0.45f;
+        weighted.controlInhibitorio = metrics.controlInhibitorio * 0.30f;
+        weighted.atencionSostenida = metrics.atencionSostenida * 0.15f;
+        weighted.planificacion = metrics.planificacion * 0.10f;
         return weighted;
     }
 }

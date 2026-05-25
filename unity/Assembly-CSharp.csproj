@@ -65,6 +65,7 @@
     <Compile Include="Assets\Framework\Juegos\MisionOrbital\Prefabs\MaterialesNave.cs" />
     <Compile Include="Assets\Framework\Juegos\DetectorDeIntrusos\MenuDetectorIntrusos.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Managers\GameManager.cs" />
+    <Compile Include="Assets\Framework\Juegos\CambioDeReglas\SO Comida\FoodDataBase.cs" />
     <Compile Include="Assets\Juegos\CambioReglas\Scripts\BotonCentralController.cs" />
     <Compile Include="Assets\Framework\Juegos\RoscoExpress\RoscoExpress.cs" />
     <Compile Include="Assets\Framework\Juegos\CambioDeReglas\CambioDeReglasGame.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Assets\Framework\Juegos\DetectorDeIntrusos\UIDetectorIntrusos.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Managers\AudioManager.cs" />
     <Compile Include="Assets\Framework\Juegos\DetectorDeIntrusos\LupaFlotante.cs" />
+    <Compile Include="Assets\Framework\Juegos\CambioDeReglas\UICambioDeReglas.cs" />
     <Compile Include="Assets\Framework\Juegos\EcoVisual\EcoVisualGame.cs" />
     <Compile Include="Assets\Framework\Juegos\TrayectoriasMentales\UITrayectoriasMentales.cs" />
     <Compile Include="Assets\Framework\Juegos\SilencioMental\UISilencioMental.cs" />
@@ -99,12 +101,14 @@
     <Compile Include="Assets\Framework\Juegos\ColorMatch\ColorMatchGame.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Utils\MetricUtils.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Managers\DifficultyManager.cs" />
+    <Compile Include="Assets\LoadingDots.cs" />
     <Compile Include="Assets\Framework\Juegos\EcoVisual\EcoVisualDraggable.cs" />
     <Compile Include="Assets\Juegos\ScriptsGenerales\Metricas.cs" />
     <Compile Include="Assets\Framework\ScriptsGenerales\Utils\SimpleShapeGraphic.cs" />
     <Compile Include="Assets\Framework\Juegos\OperacionesEncadenadas\UICalculadora.cs" />
     <Compile Include="Assets\Juegos\ScriptsGenerales\SesionJuego.cs" />
     <Compile Include="Assets\Framework\Juegos\ReflejosCruzados\UIReflejosCruzados.cs" />
+    <Compile Include="Assets\Framework\Juegos\CambioDeReglas\SO Comida\FoodItem.cs" />
     <Compile Include="Assets\Framework\Juegos\ReflejosCruzados\ReflejosCruzadosGame.cs" />
     <Compile Include="Assets\Framework\Juegos\Doble Canal\DobleCanalGame.cs" />
     <Compile Include="Assets\Framework\Juegos\Doble Canal\DobleCanalUI.cs" />

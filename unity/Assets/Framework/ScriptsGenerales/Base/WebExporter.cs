@@ -9,7 +9,7 @@ public static class WebExporter
 #else
     private static void SaveGameData(string json)
     {
-        Debug.Log("Simulación SaveGameData: " + json);
+        Debug.Log("Simulación SaveGameData: " + json);  
     }
 #endif
 

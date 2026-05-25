@@ -302,7 +302,7 @@ const CATALOGO_JUEGOS = [
         "heroEyebrow": "Planificación estratégica",
         "destacado": false,
         "skills": ["planificacion", "memoria_trabajo", "memoria_espacial", "atencion_sostenida"],
-        "disponible": "No disponible"
+        "disponible": "Disponible"
     },
 
     {

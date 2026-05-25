@@ -9,10 +9,11 @@ public class UITrayectoriasMentales : MonoBehaviour
 
     [Header("Referencias HUD")]
     public TextMeshProUGUI bounceText;
-    public TextMeshProUGUI streakText;
+    public TextMeshProUGUI livesText;
     public TextMeshProUGUI attemptText;
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI feedbackText;
+    public GameObject loadingScreen;
 
     [Header("Iconos Power-Up")]
     public Image bouncePowerUpIcon;
@@ -39,6 +40,7 @@ public class UITrayectoriasMentales : MonoBehaviour
 
     private int extraLives = 0;
     private bool bouncePowerUpActive = false;
+    private int currentStreak = 0;
 
     private void Awake()
     {
@@ -54,6 +56,10 @@ public class UITrayectoriasMentales : MonoBehaviour
             if (lifePowerUpSprite != null)
                 lifePowerUpIcon.sprite = lifePowerUpSprite;
         }
+
+        if (loadingScreen != null)
+            loadingScreen.SetActive(false);
+
         UpdateExtraLivesDisplay();
         ApplyFontToChildren();
     }
@@ -72,26 +78,14 @@ public class UITrayectoriasMentales : MonoBehaviour
 
     public void UpdateLives(int remaining, int max)
     {
-        if (streakText == null) return;
-        string rachaPart = "";
-        if (streakText.text.Contains("RACHA"))
-        {
-            int idx = streakText.text.IndexOf("RACHA");
-            rachaPart = streakText.text.Substring(idx);
-        }
-        streakText.text = $"VIDAS {remaining}/{max}  {rachaPart}";
+        if (livesText == null) return;
+        livesText.text = $"VIDAS {remaining}/{max}";
     }
 
     public void UpdateRacha(int racha)
     {
-        if (streakText == null) return;
-        string livesPart = "";
-        if (streakText.text.Contains("VIDAS"))
-        {
-            int idx = streakText.text.IndexOf("RACHA");
-            livesPart = idx > 0 ? streakText.text.Substring(0, idx).Trim() : streakText.text;
-        }
-        streakText.text = $"{livesPart}  RACHA {racha}";
+        currentStreak = racha;
+        // La racha se muestra junto al nivel en UpdateLevel
     }
 
     public void UpdateAttempt(int current, int max)
@@ -99,10 +93,11 @@ public class UITrayectoriasMentales : MonoBehaviour
         if (attemptText != null)
             attemptText.text = $"PRUEBA {current}/{max}";
     }
+
     public void UpdateLevel(int level)
     {
         if (levelText != null)
-            levelText.text = $"NIVEL {Mathf.Max(1, level)}"; // nunca negativo
+            levelText.text = $"NIVEL {Mathf.Max(1, level)}  |  RACHA {currentStreak}";
     }
 
     public void ShowFeedback(string message, bool isGood)
