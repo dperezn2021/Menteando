@@ -207,6 +207,14 @@ function mostrarComentarios(comentarios) {
         name.className = `font-bold ${com.usuario === 'admin' ? 'text-blue-600 dark:text-blue-300' : 'text-slate-900 dark:text-white'}`;
         name.textContent = com.usuario + (com.usuario === 'admin' ? ' 👑' : '');
 
+        const esComentarioAdmin = com.usuario === 'admin';
+        if (esComentarioAdmin) {
+            card.className = 'bg-blue-50/90 dark:bg-blue-950/20 rounded-2xl shadow-sm p-5 border border-blue-400 dark:border-blue-900/60 hover:shadow-md transition-all';
+            avatar.src = normalizeAvatarPath('/assets/img/logo_4.png');
+            avatar.className = 'w-10 h-10 rounded-full object-cover';
+
+        }   
+
         const dateSpan = document.createElement('span');
         dateSpan.className = 'text-xs text-slate-500';
         dateSpan.textContent = formatearFecha(com.fecha);
@@ -265,6 +273,7 @@ function mostrarComentarios(comentarios) {
         }
 
         if (admin) {
+            
             const delBtn = document.createElement('button');
             delBtn.className = 'text-xs text-blue-500 hover:text-blue-700 transition';
             delBtn.title = 'Eliminar';
