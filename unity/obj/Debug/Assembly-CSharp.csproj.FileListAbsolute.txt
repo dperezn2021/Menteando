@@ -1,6 +1,0 @@
-C:\Users\DanielPerez2\Documents\Universidad\Menteando\unity\Temp\bin\Debug\Assembly-CSharp.dll
-C:\Users\DanielPerez2\Documents\Universidad\Menteando\unity\Temp\bin\Debug\Assembly-CSharp.pdb
-C:\Users\DanielPerez2\Documents\Universidad\Menteando\unity\obj\Debug\Assembly-CSharp.csproj.AssemblyReference.cache
-C:\Users\DanielPerez2\Documents\Universidad\Menteando\unity\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
-C:\Users\DanielPerez2\Documents\Universidad\Menteando\unity\obj\Debug\Assembly-CSharp.dll
-C:\Users\DanielPerez2\Documents\Universidad\Menteando\unity\obj\Debug\Assembly-CSharp.pdb

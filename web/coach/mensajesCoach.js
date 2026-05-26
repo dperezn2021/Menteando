@@ -114,7 +114,7 @@ window.CoachMessages = {
     // ========== CONSTANTE (25-50 sesiones) ==========
     constante: {
         inicio: [
-            "Bienvenido de vuelta, constante. Tu disciplina es admirable.",
+            "Bienvenido de vuelta. Tu disciplina es admirable.",
             "Un día más. Tu cerebro te lo agradece.",
             "La constancia es la clave del éxito cognitivo. Y tú la tienes.",
             "Ya eres un habitual. Eso es lo más difícil de conseguir."
@@ -175,7 +175,7 @@ window.CoachMessages = {
             "Ya dominas lo básico. Ahora toca afinar los detalles.",
             "Tu nivel cognitivo es sólido. Concéntrate en pulir tus puntos débiles.",
             "Cada sesión te acerca más al equilibrio perfecto de habilidades.",
-            "Bienvenido, entrenado. Tu nivel ya está por encima de la media."
+            "Bienvenido. Tu nivel ya está por encima de la media."
         ],
         perfil: [
             "Tu nivel cognitivo es {nivel}. Estás en la media-alta de usuarios.",
@@ -328,7 +328,6 @@ window.CoachMessages = {
 
     // ========== STANDBY ==========
     standby: [
-        "¿Necesitas ayuda? Pregúntame sobre cualquier pantalla o juego.",
         "Si no sabes qué hacer, ve a la sección de juegos y prueba el que te recomiendo.",
         "Recuerda que puedes editar tu perfil y ver tu progreso en cualquier momento.",
         "La clave está en la constancia. Unos minutos al día son suficientes.",

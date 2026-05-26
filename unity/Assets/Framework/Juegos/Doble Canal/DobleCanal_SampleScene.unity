@@ -154,19 +154,20 @@ MonoBehaviour:
   objetivoColor: {r: 0, g: 0, b: 0, a: 0}
   distractorColor: {r: 1, g: 0.28, b: 0.22, a: 1}
   forzarLandscapeEnMovil: 1
-  prefabRobot: {fileID: 0}
-  prefabObstaculoBajo: {fileID: 0}
-  prefabObstaculoAlto: {fileID: 0}
+  prefabRobot: {fileID: 1954612225169923040, guid: 722dbd2b3d86e9340a6c6fa155faa800, type: 3}
+  prefabObstaculoBajo: {fileID: 1860647417394715278, guid: 480e6dfdc3d8d344e9210566fec137b1, type: 3}
+  prefabObstaculoAlto: {fileID: 6088805701370877878, guid: 02f737f54a3dcd94684fc5b3a77aae6f, type: 3}
   suelo: {fileID: 0}
   fuerzaSalto: 8
   gravedad: 20
   alturaSuelo: 0
   posicionRunnerX: -2.45
   offsetSpawnObstaculo: 5.8
-  distanciaEntreObstaculos: 3
-  distanciaEntreObstaculosMinima: 2.2
+  distanciaEntreObstaculos: 3.98
+  distanciaEntreObstaculosMinima: 3.87
   intervaloMinimoObstaculos: 1.25
   intervaloMinimoObstaculosNivelAlto: 0.85
+  randomExtraDistancia: 3
   radioHorizontalColision: 0.58
   tiempoMaximoSaltoSostenido: 0.34
   multiplicadorGravedadSaltoSostenido: 0.35
@@ -3740,15 +3741,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   musicaSource: {fileID: 812267651}
   sfxSource: {fileID: 13359859}
-  clickUI: {fileID: 8300000, guid: c58ab9d974c5a604e9bb45ee7072cbdc, type: 3}
-  acierto: {fileID: 8300000, guid: b5dab51da5506dc42845d0e61b5baf8c, type: 3}
+  clickUI: {fileID: 8300000, guid: cf3913b5a1d217245af562007fa4c548, type: 3}
+  reboteRata: {fileID: 0}
+  disparo: {fileID: 0}
+  PU: {fileID: 0}
+  acierto: {fileID: 8300000, guid: fad4751cdca1e5e4499eb4bf7eb837b2, type: 3}
   error: {fileID: 0}
   nivelUp: {fileID: 0}
-  musicaMenu: {fileID: 8300000, guid: f3da89c34f73248409802f4916db9a7d, type: 3}
-  musicaJuego: {fileID: 8300000, guid: f3da89c34f73248409802f4916db9a7d, type: 3}
-  musicaVictoria: {fileID: 8300000, guid: f3da89c34f73248409802f4916db9a7d, type: 3}
+  musicaMenu: {fileID: 8300000, guid: 521b32775fe3617428ac92cd0803b4dd, type: 3}
+  musicaJuego: {fileID: 8300000, guid: 1988e40aaf38f3649acda77a63225976, type: 3}
+  musicaVictoria: {fileID: 8300000, guid: 521b32775fe3617428ac92cd0803b4dd, type: 3}
+  coheteSalto: {fileID: 8300000, guid: 389f217016ba1f2418ae142eaee619be, type: 3}
+  escudoAcierto: {fileID: 8300000, guid: fad4751cdca1e5e4499eb4bf7eb837b2, type: 3}
+  peligroError: {fileID: 8300000, guid: 0f8dfd625e2d10f4ea85d13545139451, type: 3}
+  choqueCaja: {fileID: 8300000, guid: 06af7ed503f1f934e9d65f8a4b6e0444, type: 3}
   musicaVolumen: 0.5
   sfxVolumen: 0.5
+  generarClipsFallback: 1
+  reemplazarMusicasDuplicadasConFallback: 1
+  volumenMusicaFallback: 0.28
 --- !u!4 &892815049
 Transform:
   m_ObjectHideFlags: 0

@@ -20,6 +20,12 @@ public class AudioManager : MonoBehaviour
     public AudioClip musicaJuego;
     public AudioClip musicaVictoria;
 
+    [Header("SFX Gameplay")]
+    public AudioClip coheteSalto;
+    public AudioClip escudoAcierto;
+    public AudioClip peligroError;
+    public AudioClip choqueCaja;
+
     [Header("Volumen")]
     [Range(0f, 1f)] public float musicaVolumen = 0.5f;
     [Range(0f, 1f)] public float sfxVolumen = 0.5f;
@@ -48,6 +54,8 @@ public class AudioManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+      
     }
     private void OnApplicationQuit()
     {
@@ -104,23 +112,25 @@ public class AudioManager : MonoBehaviour
         musicaSource.Play();
     }
 
-    public void ReproducirSFX(AudioClip clip)
+    public void ReproducirSFX(AudioClip clip, float volumen = 1f)
     {
         if (sfxSource == null || clip == null)
             return;
 
-        sfxSource.PlayOneShot(clip, sfxVolumen);
+        sfxSource.PlayOneShot(clip, sfxVolumen * volumen);
     }
 
     // ============================================================
     // EFECTOS DE SONIDO
     // ============================================================
 
-  
+
     public void Click() => ReproducirSFX(clickUI);
     public void Disparo() => ReproducirSFX(disparo);
     public void Acierto() => ReproducirSFX(acierto);
-
+    public void CoheteSalto() => ReproducirSFX(coheteSalto, 0.38f);
+    public void PeligroError() => ReproducirSFX(peligroError);
+    public void ChoqueCaja() => ReproducirSFX(choqueCaja);
     public void Rebote() => ReproducirSFX(reboteRata);
 
     public void PowerUp()=> ReproducirSFX(PU);
@@ -155,6 +165,8 @@ public class AudioManager : MonoBehaviour
 
         if (musicaVictoria == null || (reemplazarMusicasDuplicadasConFallback && (musicaVictoria == musicaMenu || musicaVictoria == musicaJuego)))
             musicaVictoria = CrearSFXVictoriaLarga();
+
+
     }
 
     private AudioClip CrearSFXClick()

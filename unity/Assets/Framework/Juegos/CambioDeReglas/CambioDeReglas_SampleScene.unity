@@ -1007,10 +1007,10 @@ RectTransform:
   - {fileID: 1737801684}
   m_Father: {fileID: 53034342}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -30.105}
-  m_SizeDelta: {x: 356, y: 60.21}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &186846370
 MonoBehaviour:
@@ -2084,8 +2084,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 348894130}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 17.11}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2225,27 +2225,14 @@ MonoBehaviour:
   nombre: cambio de reglas
   uiCambioDeReglas: {fileID: 1657536005}
   foodDatabase: {fileID: 11400000, guid: ea187abafb0e71347a21e32ae49deb03, type: 2}
-  powerUpReloj: {fileID: 21300000, guid: fc9f3018e8a46de45a2b2419585dd13f, type: 3}
-  powerUpEstrella: {fileID: 21300000, guid: e3bd44e69b233ca44b9dabf8a0178100, type: 3}
-  powerUpEscudo: {fileID: 21300000, guid: 76e2b494b73eb844c8bd27186db3ee5b, type: 3}
-  powerUpCongelar: {fileID: 21300000, guid: 195132ecfb50ea246b2b28760f38251b, type: 3}
-  powerUpGlowColor: {r: 1, g: 0.84, b: 0, a: 0.6}
-  nivelInicial: 1
-  estimulosNivel1: 4
-  estimulosNivel10: 9
-  tiempoRondaNivel1: 4.2
-  tiempoRondaNivel10: 2.1
-  tiempoReglaNivel1: 7
-  tiempoReglaNivel10: 3.1
-  tamanoEstimuloNivel1: {x: 158, y: 158}
-  tamanoEstimuloNivel10: {x: 108, y: 108}
-  rondasPorPowerUp: 3
   currentDifficulty: 0
-  sliceEffectPrefab: {fileID: 3969997933684647396, guid: 5fe41a9df04d941499644d226e8e04eb, type: 3}
-  sliceAnimationDuration: 0.2
-  modoAleatorioActivo: 1
-  textoIndicadorDificultad: {fileID: 0}
-  duracionIndicadorDificultad: 3
+  duracionReglaInicial: 74
+  duracionReglaFinal: 7
+  duracionRondaInicial: 10
+  duracionRondaFinal: 5
+  tamanioInicial: {x: 130, y: 30}
+  tamanioFinal: {x: 90, y: 90}
+  aciertosPorNivel: 6
 --- !u!4 &638485020
 Transform:
   m_ObjectHideFlags: 0
@@ -2293,9 +2280,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 835388489}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 82.1, y: -30.105}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 164.2, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &647155605
@@ -2433,8 +2420,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 763.4, y: 460.3}
-  m_SizeDelta: {x: 330.9, y: 94.3}
+  m_AnchoredPosition: {x: 694.1, y: 460.3}
+  m_SizeDelta: {x: 393.64, y: 124.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &653135804
 MonoBehaviour:
@@ -2533,7 +2520,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &674690653
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2592,9 +2579,9 @@ RectTransform:
   - {fileID: 348894130}
   m_Father: {fileID: 835388489}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 276, y: -30.105}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &679640891
@@ -2845,10 +2832,10 @@ RectTransform:
   - {fileID: 679640890}
   m_Father: {fileID: 53034342}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -69.895004}
-  m_SizeDelta: {x: 356, y: 60.21}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &835388490
 MonoBehaviour:
@@ -2909,7 +2896,7 @@ RectTransform:
   m_Father: {fileID: 1513471032}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3260,8 +3247,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 57388773}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 17.11}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3857,7 +3844,7 @@ RectTransform:
   m_Father: {fileID: 558289177}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4051,16 +4038,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   musicaSource: {fileID: 270861320}
   sfxSource: {fileID: 1538006878}
-  clickUI: {fileID: 8300000, guid: c58ab9d974c5a604e9bb45ee7072cbdc, type: 3}
+  clickUI: {fileID: 8300000, guid: 0c54d0cace039064b8703f6a78456ea0, type: 3}
   reboteRata: {fileID: 0}
   disparo: {fileID: 0}
   PU: {fileID: 0}
-  acierto: {fileID: 8300000, guid: b5dab51da5506dc42845d0e61b5baf8c, type: 3}
+  acierto: {fileID: 8300000, guid: 8d9924009bec4e045ad8a0a99c9c0ab4, type: 3}
   error: {fileID: 0}
-  nivelUp: {fileID: 0}
-  musicaMenu: {fileID: 8300000, guid: f3da89c34f73248409802f4916db9a7d, type: 3}
-  musicaJuego: {fileID: 8300000, guid: f3da89c34f73248409802f4916db9a7d, type: 3}
-  musicaVictoria: {fileID: 8300000, guid: f3da89c34f73248409802f4916db9a7d, type: 3}
+  nivelUp: {fileID: 8300000, guid: b6f16a28eb2746e43a02e9b12bd791a5, type: 3}
+  musicaMenu: {fileID: 8300000, guid: 68a76fb1ec5e71647b86eb6c8845b5eb, type: 3}
+  musicaJuego: {fileID: 8300000, guid: 645fcbb968874ea45b6ac46497e424a2, type: 3}
+  musicaVictoria: {fileID: 8300000, guid: 68a76fb1ec5e71647b86eb6c8845b5eb, type: 3}
   musicaVolumen: 0.5
   sfxVolumen: 0.5
   generarClipsFallback: 1
@@ -5499,25 +5486,6 @@ MonoBehaviour:
   colorHeader: {r: 0.04, g: 0.06, b: 0.08, a: 0.92}
   colorHUDFallback: {r: 0.08, g: 0.13, b: 0.16, a: 0.88}
   colorZonaJuego: {r: 0.23018861, g: 0.23018861, b: 0.23018861, a: 0.87058824}
-  colorFeedbackAcierto: {r: 0.22, g: 0.78, b: 0.45, a: 1}
-  colorFeedbackError: {r: 0.9, g: 0.28, b: 0.28, a: 1}
-  raizLayout: {fileID: 0}
-  headerRegla: {fileID: 0}
-  panelHUD: {fileID: 0}
-  zonaJuego: {fileID: 0}
-  imagenFondo: {fileID: 0}
-  imagenHUD: {fileID: 0}
-  barraRegla: {fileID: 0}
-  barraRonda: {fileID: 0}
-  textoRegla: {fileID: 0}
-  textoNivel: {fileID: 0}
-  textoTiempo: {fileID: 0}
-  textoAciertos: {fileID: 0}
-  textoFallos: {fileID: 0}
-  textoRacha: {fileID: 0}
-  textoCambios: {fileID: 0}
-  textoFeedback: {fileID: 0}
-  textoCambioRegla: {fileID: 0}
 --- !u!1 &1695475628
 GameObject:
   m_ObjectHideFlags: 0
@@ -5735,9 +5703,9 @@ RectTransform:
   - {fileID: 57388773}
   m_Father: {fileID: 186846369}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 276, y: -30.105}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1737801685
@@ -6453,9 +6421,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 186846369}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 82.1, y: -30.105}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 164.2, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2080428821
@@ -6478,7 +6446,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Muwsica
+  m_text: Musica
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9fe591ae372e49a4b82e02ef8aec0644, type: 2}
   m_sharedMaterial: {fileID: 3557228271088949297, guid: 9fe591ae372e49a4b82e02ef8aec0644, type: 2}

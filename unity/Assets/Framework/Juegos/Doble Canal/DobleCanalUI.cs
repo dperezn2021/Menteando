@@ -306,8 +306,8 @@ public class DobleCanalUI : MonoBehaviour
         RectTransform right = panelDerecho.GetComponent<RectTransform>();
 
         CrearLineaDivisoria();
-        CrearDecoracionCanal(left, "piloto", "espacio / mitad izquierda", TextAlignmentOptions.Left);
-        CrearDecoracionCanal(right, "radar", "enter / mitad derecha", TextAlignmentOptions.Right);
+        CrearDecoracionCanal(left, "heroe", "mitad izquierda", TextAlignmentOptions.Left);
+        CrearDecoracionCanal(right, "radar", "mitad derecha", TextAlignmentOptions.Right);
         CrearHud();
         CrearRadar(right);
         CrearFeedback();
@@ -408,11 +408,11 @@ public class DobleCanalUI : MonoBehaviour
     {
         string nombreTitulo = "Titulo_" + titulo;
         if (parent.Find(nombreTitulo) == null)
-            CrearTexto(nombreTitulo, parent, titulo, 30, alineacion, colorSuave, new Vector2(0.06f, 0.82f), new Vector2(0.94f, 0.88f));
+            CrearTexto(nombreTitulo, parent, titulo, 60, alineacion, colorSuave, new Vector2(0.06f, 0.82f), new Vector2(0.94f, 0.88f));
 
         string nombreAyuda = "Ayuda_" + titulo;
         if (parent.Find(nombreAyuda) == null)
-            CrearTexto(nombreAyuda, parent, ayuda, 22, alineacion, new Color(0.64f, 0.76f, 0.88f, 0.75f), new Vector2(0.08f, 0.76f), new Vector2(0.92f, 0.81f));
+            CrearTexto(nombreAyuda, parent, ayuda, 36, alineacion, new Color(0.64f, 0.76f, 0.88f, 0.75f), new Vector2(0.08f, 0.76f), new Vector2(0.92f, 0.81f));
     }
 
     private void ConectarBotones()
@@ -574,7 +574,7 @@ public class DobleCanalUI : MonoBehaviour
         TextMeshProUGUI label = textoRect.gameObject.GetComponent<TextMeshProUGUI>();
         if (label == null) label = textoRect.gameObject.AddComponent<TextMeshProUGUI>();
 
-        ConfigurarTexto(label, texto, 28, TextAlignmentOptions.Center, Color.white, false);
+        ConfigurarTexto(label, texto, 48, TextAlignmentOptions.Center, Color.white, false);
         label.fontStyle = FontStyles.Bold;
         label.raycastTarget = false;
         return button;

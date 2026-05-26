@@ -104,8 +104,8 @@ public class UIColorMatch : MonoBehaviour
         }
 
         textoRegla.text = responderTexto
-            ? "PULSA EL COLOR QUE DICE LA PALABRA"
-            : "PULSA EL COLOR CON EL QUE ESTA PINTADA";
+            ? "NORMA: COLOR ESCRITO"
+            : "NORMA: COLOR PINTADO";
 
 
         yield return new WaitForSeconds(duracion);

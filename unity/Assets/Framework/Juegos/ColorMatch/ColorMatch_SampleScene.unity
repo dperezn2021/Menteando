@@ -589,14 +589,24 @@ MonoBehaviour:
   musicaSource: {fileID: 525448253}
   sfxSource: {fileID: 767368088}
   clickUI: {fileID: 0}
+  reboteRata: {fileID: 0}
+  disparo: {fileID: 0}
+  PU: {fileID: 0}
   acierto: {fileID: 0}
   error: {fileID: 0}
   nivelUp: {fileID: 0}
-  musicaMenu: {fileID: 0}
-  musicaJuego: {fileID: 0}
-  musicaVictoria: {fileID: 0}
+  musicaMenu: {fileID: 8300000, guid: c3f1159f44f3c7749a1933d5a853e09d, type: 3}
+  musicaJuego: {fileID: 8300000, guid: ace77a38fe69dda4096af07b97fa7474, type: 3}
+  musicaVictoria: {fileID: 8300000, guid: c3f1159f44f3c7749a1933d5a853e09d, type: 3}
+  coheteSalto: {fileID: 0}
+  escudoAcierto: {fileID: 0}
+  peligroError: {fileID: 0}
+  choqueCaja: {fileID: 0}
   musicaVolumen: 0.5
   sfxVolumen: 0.5
+  generarClipsFallback: 1
+  reemplazarMusicasDuplicadasConFallback: 1
+  volumenMusicaFallback: 0.28
 --- !u!4 &185593264
 Transform:
   m_ObjectHideFlags: 0
@@ -3343,7 +3353,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -437}
+  m_AnchoredPosition: {x: -732, y: -437}
   m_SizeDelta: {x: 310.6, y: 96.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1080302697
@@ -5075,8 +5085,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1105, y: 311}
+  m_AnchoredPosition: {x: 0, y: 415}
+  m_SizeDelta: {x: 1774.5, y: 158.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1472128096
 MonoBehaviour:
@@ -5110,12 +5120,12 @@ MonoBehaviour:
     rgba: 4294967295
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 1
-  m_colorMode: 3
+  m_colorMode: 0
   m_fontColorGradient:
-    topLeft: {r: 0, g: 1, b: 0.9900923, a: 1}
-    topRight: {r: 1, g: 0, b: 0, a: 1}
-    bottomLeft: {r: 0.15385306, g: 1, b: 0, a: 1}
-    bottomRight: {r: 1, g: 0.9525152, b: 0, a: 1}
+    topLeft: {r: 0.4039216, g: 0.3803922, b: 0.72156864, a: 1}
+    topRight: {r: 0.4039216, g: 0.3803922, b: 0.72156864, a: 1}
+    bottomLeft: {r: 0.4039216, g: 0.3803922, b: 0.72156864, a: 1}
+    bottomRight: {r: 0.4039216, g: 0.3803922, b: 0.72156864, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
@@ -5125,8 +5135,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 115
-  m_fontSizeBase: 115
+  m_fontSize: 79.18
+  m_fontSizeBase: 79.18
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5226,8 +5236,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   wheelContainer: {fileID: 1556844499}
-  radioExterno: 500
-  radioInterno: 340
+  radioExterno: 400
+  radioInterno: 300
   centerText: {fileID: 1915072206}
   rotacionActiva: 1
   velocidadRotacion: 8
@@ -6954,7 +6964,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 700, y: 124.7}
+  m_SizeDelta: {x: 526, y: 124.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1915072206
 MonoBehaviour:
@@ -7003,10 +7013,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 111.6
-  m_fontSizeBase: 131.1
+  m_fontSize: 73.03
+  m_fontSizeBase: 73.03
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 72
   m_fontSizeMax: 140
   m_fontStyle: 1
@@ -7291,7 +7301,7 @@ RectTransform:
   m_GameObject: {fileID: 2071451148}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 58, y: 58, z: 58}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1146378472}
@@ -7406,7 +7416,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 159.1, y: 441.22}
+  m_AnchoredPosition: {x: 275, y: -438}
   m_SizeDelta: {x: 1780.7, y: 156}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2074666608

@@ -7,103 +7,105 @@ public class StarfieldEffect : MonoBehaviour
     public int cantidadEstrellas = 300;
     public float rangoX = 25f;
     public float rangoY = 15f;
-    public float distanciaCerca = -8f;   // Justo delante de la cámara (cámara en -10)
-    public float distanciaLejos = 30f;    // Lejos
+    public float distanciaCerca = -8f;
+    public float distanciaLejos = 30f;
+
     public float velocidadBase = 15f;
     public float variacionVelocidad = 8f;
+
     public float tamanioMin = 0.03f;
     public float tamanioMax = 0.12f;
 
-    private List<GameObject> estrellas = new List<GameObject>();
-    private List<float> velocidades = new List<float>();
-    private Material estrellaMaterial;
+    private struct Star
+    {
+        public Transform t;
+        public float speed;
+        public Material mat;
+    }
+
+    private List<Star> estrellas = new List<Star>();
+    private Material baseMaterial;
 
     void Start()
     {
-        CrearMaterial();
+        CrearMaterialBase();
         CrearEstrellas();
     }
 
-    void CrearMaterial()
+    void CrearMaterialBase()
     {
-        estrellaMaterial = new Material(Shader.Find("Unlit/Color"));
-        if (estrellaMaterial == null)
-            estrellaMaterial = new Material(Shader.Find("Standard"));
-        estrellaMaterial.color = new Color(0.7f, 0.8f, 1f);
+        Shader shader =
+            Shader.Find("Universal Render Pipeline/Unlit") ??
+            Shader.Find("Unlit/Texture") ??
+            Shader.Find("Sprites/Default");
+
+        baseMaterial = new Material(shader);
+        baseMaterial.color = new Color(0.7f, 0.8f, 1f);
     }
 
     void CrearEstrellas()
     {
+        Mesh sphereMesh = Resources.GetBuiltinResource<Mesh>("Sphere.fbx");
+
         for (int i = 0; i < cantidadEstrellas; i++)
         {
-            // Crear esfera SIN usar CreatePrimitive (que añade collider automáticamente)
-            GameObject estrella = new GameObject("Estrella");
-            estrella.transform.SetParent(transform);
+            GameObject star = new GameObject("Star");
+            star.transform.SetParent(transform);
 
-            // Añadir un MeshFilter con una esfera
-            MeshFilter meshFilter = estrella.AddComponent<MeshFilter>();
-            meshFilter.mesh = Resources.GetBuiltinResource<Mesh>("Sphere.fbx");
+            var mf = star.AddComponent<MeshFilter>();
+            var mr = star.AddComponent<MeshRenderer>();
 
-            // Añadir MeshRenderer
-            MeshRenderer renderer = estrella.AddComponent<MeshRenderer>();
-            renderer.material = estrellaMaterial;
+            mf.mesh = sphereMesh;
+            mr.material = new Material(baseMaterial);
 
-            // Tamaño
-            float tamanio = Random.Range(tamanioMin, tamanioMax);
-            estrella.transform.localScale = Vector3.one * tamanio;
+            float size = Random.Range(tamanioMin, tamanioMax);
+            star.transform.localScale = Vector3.one * size;
 
-            // Posición
-            Vector3 pos = new Vector3(
+            star.transform.localPosition = new Vector3(
                 Random.Range(-rangoX, rangoX),
                 Random.Range(-rangoY, rangoY),
                 Random.Range(distanciaCerca, distanciaLejos)
             );
-            estrella.transform.localPosition = pos;
 
-            // Velocidad
-            float velocidad = velocidadBase + Random.Range(-variacionVelocidad, variacionVelocidad);
-            velocidades.Add(velocidad);
+            float speed = velocidadBase + Random.Range(-variacionVelocidad, variacionVelocidad);
 
-            // Brillo
-            float brillo = Random.Range(0.7f, 1f);
-            renderer.material.color = new Color(0.7f * brillo, 0.8f * brillo, 1f * brillo);
+            Color c = baseMaterial.color * Random.Range(0.7f, 1f);
+            mr.material.color = c;
 
-            estrellas.Add(estrella);
+            estrellas.Add(new Star
+            {
+                t = star.transform,
+                speed = speed,
+                mat = mr.material
+            });
         }
     }
 
     void Update()
     {
-        MoverEstrellas();
-    }
+        float dt = Time.deltaTime;
 
-    void MoverEstrellas()
-    {
         for (int i = 0; i < estrellas.Count; i++)
         {
-            Vector3 pos = estrellas[i].transform.localPosition;
+            var s = estrellas[i];
+            Vector3 pos = s.t.localPosition;
 
-            // Las estrellas se ACERCAN a la cámara (disminuyen Z)
-            // Como la cámara está en -10, al disminuir Z se acercan
-            pos.z -= velocidades[i] * Time.deltaTime;
+            pos.z -= s.speed * dt;
 
-            // Si pasan la cámara (z < -10) o llegan muy cerca, reciclar
-            if (pos.z < -10f)  // Pasaron la cámara
+            if (pos.z < -10f)
             {
-                pos.z = distanciaLejos;  // Reaparecen lejos
+                pos.z = distanciaLejos;
                 pos.x = Random.Range(-rangoX, rangoX);
                 pos.y = Random.Range(-rangoY, rangoY);
 
-                // Nueva velocidad aleatoria
-                velocidades[i] = velocidadBase + Random.Range(-variacionVelocidad, variacionVelocidad);
+                s.speed = velocidadBase + Random.Range(-variacionVelocidad, variacionVelocidad);
 
-                // Nuevo brillo aleatorio
-                float brillo = Random.Range(0.7f, 1f);
-                estrellas[i].GetComponent<Renderer>().material.color =
-                    new Color(0.7f * brillo, 0.8f * brillo, 1f * brillo);
+                Color c = baseMaterial.color * Random.Range(0.7f, 1f);
+                s.mat.color = c;
             }
 
-            estrellas[i].transform.localPosition = pos;
+            s.t.localPosition = pos;
+            estrellas[i] = s;
         }
     }
 }

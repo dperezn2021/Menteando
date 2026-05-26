@@ -21,13 +21,18 @@ public class DobleCanalGame : BaseGame
     [SerializeField] private float alturaSuelo = 0f;
     [SerializeField] private float posicionRunnerX = -3.15f;
     [SerializeField] private float offsetSpawnObstaculo = 6.2f;
-    [SerializeField] private float distanciaEntreObstaculos = 8.4f;
-    [SerializeField] private float distanciaEntreObstaculosMinima = 6.3f;
-    [SerializeField] private float intervaloMinimoObstaculos = 2.00f;
-    [SerializeField] private float intervaloMinimoObstaculosNivelAlto = 1.70f;
-    [SerializeField] private float radioHorizontalColision = 0.85f;
+    [SerializeField] private float distanciaEntreObstaculos = 10.5f;
+    [SerializeField] private float distanciaEntreObstaculosMinima = 8.2f;
+
+    [SerializeField] private float intervaloMinimoObstaculos = 2.6f;
+    [SerializeField] private float intervaloMinimoObstaculosNivelAlto = 2.2f;
+
+    [SerializeField] private float randomExtraDistancia = 4.0f;
+    
+    [SerializeField] private float radioHorizontalColision = 0.28f;
     [SerializeField] private float tiempoMaximoSaltoSostenido = 0.34f;
     [SerializeField] private float multiplicadorGravedadSaltoSostenido = 0.35f;
+
 
     [Header("Estimulos")]
     [SerializeField, Range(0.1f, 0.9f)] private float probabilidadObjetivo = 0.50f;
@@ -86,6 +91,7 @@ public class DobleCanalGame : BaseGame
     private int nivelMaximoAlcanzado;
     private readonly List<float> tiemposReaccion = new List<float>();
 
+    private bool coheteSonando;
     private void Awake()
     {
         nombre = "doble canal";
@@ -146,7 +152,41 @@ public class DobleCanalGame : BaseGame
 
         rutinaInicio = StartCoroutine(IniciarPartida());
     }
+    private bool HayColision(GameObject obstaculo, ObstaculoRuntime datos)
+    {
+        if (personajeActivo == null || obstaculo == null)
+            return false;
 
+        Renderer obsRenderer =
+            obstaculo.GetComponentInChildren<Renderer>();
+
+        Renderer playerRenderer =
+            personajeActivo.GetComponentInChildren<Renderer>();
+
+        Bounds obs =
+            obsRenderer != null
+                ? obsRenderer.bounds
+                : new Bounds(
+                    obstaculo.transform.position,
+                    Vector3.one * 0.5f
+                );
+
+        Bounds player =
+            playerRenderer != null
+                ? playerRenderer.bounds
+                : new Bounds(
+                    personajeActivo.transform.position,
+                    Vector3.one * 0.5f
+                );
+
+        bool solapaX =
+            player.max.x >= obs.min.x;
+
+        bool alturaInsuficiente =
+            player.min.y < obs.min.y + datos.alturaNecesaria;
+
+        return solapaX && alturaInsuficiente;
+    }
     private void ConfigurarCamara()
     {
         Camera cam = Camera.main;
@@ -217,6 +257,12 @@ public class DobleCanalGame : BaseGame
 
             if (jugando && !juegoPausado && !feedbackActivo && !esperandoRespuesta)
                 GenerarEstimulo();
+
+
+            if (nivelActual >= 9)
+                probabilidadObjetivo = 0.45f;
+            else if (nivelActual >= 7)
+                probabilidadObjetivo = 0.50f;
         }
     }
 
@@ -298,6 +344,8 @@ public class DobleCanalGame : BaseGame
         {
             aciertosObjetivo++;
             SumarRacha();
+            AudioManager.Instance?.Acierto();
+
             float rendimiento = Mathf.Clamp01(1f - tiempoRespuesta / Mathf.Max(0.1f, estimuloActual.duracion));
             ActualizarDificultad(rendimiento, true, tiempoRespuesta);
             MostrarFeedbackRadar("¡acertaste!", new Color(0.30f, 1f, 0.40f), 0.35f);
@@ -306,6 +354,7 @@ public class DobleCanalGame : BaseGame
         {
             erroresImpulsivos++;
             rachaActual = 0;
+            AudioManager.Instance?.PeligroError();
             ActualizarDificultad(0f, false, tiempoRespuesta);
             MostrarFeedbackRadar("error", new Color(1f, 0.30f, 0.38f), 0.35f);
         }
@@ -318,6 +367,11 @@ public class DobleCanalGame : BaseGame
         if (!jugando || juegoPausado || !enSuelo || personajeActivo == null)
             return;
 
+        if (!coheteSonando)
+        {
+            AudioManager.Instance?.CoheteSalto();
+            coheteSonando = true;
+        }
         velocidadVertical = fuerzaSalto;
         enSuelo = false;
         tiempoSaltoSostenido = 0f;
@@ -401,14 +455,20 @@ public class DobleCanalGame : BaseGame
         velocidadVertical -= gravedadActual * Time.deltaTime;
         float nuevaY = personajeActivo.transform.position.y + velocidadVertical * Time.deltaTime;
 
-        if (nuevaY <= alturaSuelo)
+        float mitadAltura =
+        ObtenerAltura(personajeActivo) * 0.5f;
+
+        if (nuevaY <= alturaSuelo + mitadAltura)
         {
-            nuevaY = alturaSuelo;
+            nuevaY =
+            alturaSuelo + mitadAltura;
+
             velocidadVertical = 0f;
+            coheteSonando = false;
             enSuelo = true;
+
             tiempoSaltoSostenido = 0f;
         }
-
         Vector3 posicion = personajeActivo.transform.position;
         personajeActivo.transform.position = new Vector3(posicion.x, nuevaY, posicion.z);
 
@@ -434,23 +494,27 @@ public class DobleCanalGame : BaseGame
                 continue;
             }
 
-            float xAnterior = obstaculo.transform.position.x;
-            obstaculo.transform.position += Vector3.left * velocidadActual * Time.deltaTime;
+            float paso =
+                Mathf.Min(
+                    velocidadActual *
+                    Time.deltaTime,
+                    0.08f
+                );
 
-            ObstaculoRuntime datos = ObtenerDatosObstaculo(obstaculo);
-            float runnerX = personajeActivo.transform.position.x;
-            float dx = Mathf.Abs(obstaculo.transform.position.x - runnerX);
-            bool cruzoAlRunner = xAnterior >= runnerX && obstaculo.transform.position.x <= runnerX;
-            bool colisionaEnX = dx < datos.radioHorizontal || cruzoAlRunner;
-            bool noHaSaltadoSuficiente = personajeActivo.transform.position.y < datos.alturaNecesaria;
+            obstaculo.transform.position +=
+                Vector3.left * paso;
 
-            if (colisionaEnX && noHaSaltadoSuficiente)
+            ObstaculoRuntime datos =
+                ObtenerDatosObstaculo(obstaculo);
+
+            if (HayColision(obstaculo))
             {
                 colisiones++;
                 rachaActual = 0;
                 ActualizarDificultad(0f, false, 1f);
                 MostrarFeedbackRunner(datos.esAlto ? "salto corto" : "choque", Color.red, 0.45f);
                 Destroy(obstaculo);
+                AudioManager.Instance?.ChoqueCaja();
                 datosObstaculos.Remove(obstaculo);
                 obstaculosActivos.RemoveAt(i);
             }
@@ -470,7 +534,15 @@ public class DobleCanalGame : BaseGame
             return;
 
         ObstaculoRuntime datos = CrearDatosObstaculo();
-        Vector3 spawnPos = new Vector3(personajeActivo.transform.position.x + offsetSpawnObstaculo, alturaSuelo + datos.centroY, 0f);
+        Vector3 spawnPos =
+        new Vector3(
+        personajeActivo.transform.position.x
+        + offsetSpawnObstaculo,
+        alturaSuelo
+        + (datos.escalaVisual.y * 0.25f),
+        0f
+        );
+        
         GameObject obstaculo;
 
         GameObject prefabSeleccionado = datos.esAlto ? prefabObstaculoAlto : prefabObstaculoBajo;
@@ -482,7 +554,11 @@ public class DobleCanalGame : BaseGame
 
         obstaculo.name = datos.esAlto ? "CajaAlta_DobleCanal" : "CajaBaja_DobleCanal";
         obstaculo.transform.position = spawnPos;
-        obstaculo.transform.localScale = datos.escalaVisual;
+        // REDUCIR OBSTÁCULOS A LA MITAD
+        obstaculo.transform.localScale =
+        datos.escalaVisual * 0.5f;
+        // APOYAR EN EL SUELO
+        AjustarAlSuelo(obstaculo);
         Renderer renderer = obstaculo.GetComponentInChildren<Renderer>();
         if (renderer != null)
             renderer.material.color = datos.esAlto ? new Color(0.78f, 0.30f, 1f) : new Color(1f, 0.70f, 0.22f);
@@ -494,7 +570,8 @@ public class DobleCanalGame : BaseGame
     private ObstaculoRuntime CrearDatosObstaculo()
     {
         float t = Mathf.InverseLerp(3f, 10f, nivelActual);
-        bool puedeSerAlto = nivelActual >= 4;
+        bool puedeSerAlto = nivelActual >= 3;
+        
         bool esAlto = puedeSerAlto && Random.value < Mathf.Lerp(0.15f, 0.65f, t);
         if (ultimoObstaculoFueAlto)
             esAlto = false;
@@ -503,48 +580,71 @@ public class DobleCanalGame : BaseGame
 
         if (esAlto)
         {
-            float alturaVisual = Mathf.Lerp(1.15f, 1.85f, t);
+            // Reducido a la mitad: alturaVisual de 1.15-1.85 a 0.60-0.95
+            float alturaVisual =
+            Mathf.Lerp(
+                0.50f,
+                0.75f,
+                t
+            );
+            
             return new ObstaculoRuntime
             {
                 esAlto = true,
-                alturaNecesaria = Mathf.Lerp(1.05f, 1.55f, t),
-                radioHorizontal = radioHorizontalColision,
+                alturaNecesaria = Mathf.Lerp(0.28f, 0.42f, t),
+                radioHorizontal = radioHorizontalColision * 0.3f,
                 centroY = alturaVisual * 0.45f,
-                escalaVisual = new Vector3(0.62f, alturaVisual, 0.62f)
+                escalaVisual =
+                new Vector3(
+                    0.65f,
+                    alturaVisual-0.05f,
+                    0.40f
+                )
             };
         }
 
+        // Obstáculo bajo también reducido
         return new ObstaculoRuntime
         {
             esAlto = false,
-            alturaNecesaria = 0.42f,
-            radioHorizontal = radioHorizontalColision,
-            centroY = 0.32f,
-            escalaVisual = new Vector3(0.66f, 0.66f, 0.66f)
+            alturaNecesaria = 0.18f,
+            radioHorizontal = radioHorizontalColision * 0.3f,
+            centroY = 0.16f, // Antes 0.32f
+            escalaVisual =
+            new Vector3(
+                0.45f,
+                0.38f,
+                0.35f
+            )
         };
     }
-
     private ObstaculoRuntime ObtenerDatosObstaculo(GameObject obstaculo)
     {
         if (obstaculo != null && datosObstaculos.TryGetValue(obstaculo, out ObstaculoRuntime datos))
             return datos;
 
+        // Valores por defecto actualizados
         return new ObstaculoRuntime
         {
             esAlto = false,
-            alturaNecesaria = 0.42f,
-            radioHorizontal = radioHorizontalColision,
-            centroY = 0.32f,
-            escalaVisual = Vector3.one * 0.66f
+            alturaNecesaria = 0.22f,
+            radioHorizontal = radioHorizontalColision * 0.6f,
+            centroY = 0.16f,
+            escalaVisual = new Vector3(0.45f, 0.35f, 0.45f)
         };
     }
-
     private void ActualizarDificultad(float rendimiento, bool fueCorrecto, float tiempoRespuesta)
     {
+        int anteriorNivel = nivelActual;
+
         if (DifficultyManager.Instance != null)
         {
             DifficultyManager.Instance.ActualizarDificultad(rendimiento, fueCorrecto, tiempoRespuesta);
             nivelActual = ObtenerNivelActual();
+            if (nivelActual > anteriorNivel)
+            {
+                AudioManager.Instance?.NivelUp();
+            }
         }
         else
         {
@@ -621,7 +721,7 @@ public class DobleCanalGame : BaseGame
 
     private IEnumerator AnimarEscala(Transform target, Vector3 escalaBase, float duracion)
     {
-        Vector3 escalaAlta = new Vector3(escalaBase.x * 0.9f, escalaBase.y * 1.18f, escalaBase.z);
+        Vector3 escalaAlta = new Vector3(escalaBase.x * 0.9f, escalaBase.y, escalaBase.z);
         float t = 0f;
 
         while (t < duracion)
@@ -658,23 +758,74 @@ public class DobleCanalGame : BaseGame
         personajeCreadoEnRuntime = false;
         personajeActivo = null;
 
-        Vector3 posicionInicial = new Vector3(posicionRunnerX, alturaSuelo, 0f);
-
+        Vector3 posicionInicial =
+        new Vector3(
+            posicionRunnerX,
+            alturaSuelo,
+            0f
+        );
         if (prefabRobot != null)
         {
-            personajeActivo = Instantiate(prefabRobot, posicionInicial, Quaternion.identity);
+            personajeActivo = Instantiate(prefabRobot);
             personajeActivo.name = "RobotHero_DobleCanal";
-            personajeCreadoEnRuntime = true;
         }
         else
         {
-            personajeActivo = CrearPersonajeRuntime(posicionInicial);
-            personajeCreadoEnRuntime = true;
+            personajeActivo = CrearPersonajeRuntime(Vector3.zero);
         }
 
-        escalaOriginalPersonaje = personajeActivo != null ? personajeActivo.transform.localScale : Vector3.one;
+        // ESCALAR PRIMERO (antes de posicionar)
+        personajeActivo.transform.localScale = personajeActivo.transform.localScale * 0.7f;
+
+        // esperar a bounds estables 1 frame
+        StartCoroutine(ColocarPersonajeEnSuelo());
+        personajeCreadoEnRuntime = true;
+
+        // REDUCIR PERSONAJE 30%
+        personajeActivo.transform.localScale *= 0.7f;
+
+        // APOYAR EN EL SUELO
+        AjustarAlSuelo(personajeActivo);
+
+        escalaOriginalPersonaje =
+            personajeActivo.transform.localScale;
+        escalaOriginalPersonaje =
+        personajeActivo.transform.localScale;
+
+        // reducir 30%
+        personajeActivo.transform.localScale *= 0.7f;
+
+        // apoyar en suelo
+        float altura =
+        ObtenerAltura(personajeActivo);
+
+        personajeActivo.transform.position =
+        new Vector3(
+            posicionRunnerX,
+            alturaSuelo + altura * 0.5f,
+            0f
+        );
+
+        enSuelo = true;
+        velocidadVertical = 0f;
     }
 
+    private IEnumerator ColocarPersonajeEnSuelo()
+    {
+        yield return null; // espera a que Unity calcule bounds
+
+        float altura = ObtenerAltura(personajeActivo);
+
+        personajeActivo.transform.position =
+            new Vector3(
+                posicionRunnerX,
+                alturaSuelo + altura * 0.5f,
+                0f
+            );
+
+        escalaOriginalPersonaje = personajeActivo.transform.localScale;
+        enSuelo = true;
+    }
     private void PrepararSuelo()
     {
         if (suelo != null)
@@ -689,10 +840,22 @@ public class DobleCanalGame : BaseGame
                 renderer.material.color = new Color(0.10f, 0.80f, 0.95f);
         }
 
-        // Suelo mucho más a la izquierda y más ancho
-        sueloVisualRuntime.transform.position = new Vector3(0f, alturaSuelo - 0.38f, 0.15f);
-        sueloVisualRuntime.transform.localScale = new Vector3(8.5f, 0.10f, 0.60f);
+        // SUBIR EL SUELO - cambio: alturaSuelo - 0.25f (antes era -0.38f)
+        sueloVisualRuntime.transform.position =
+        new Vector3(
+            0f,
+            alturaSuelo - 0.05f,
+            0.15f
+        );
+
+        sueloVisualRuntime.transform.localScale =
+        new Vector3(
+            8.5f,
+            0.03f,
+            0.60f
+        );
     }
+
 
     private GameObject CrearPersonajeRuntime(Vector3 posicion)
     {
@@ -789,10 +952,22 @@ public class DobleCanalGame : BaseGame
     private void InicializarCurvas()
     {
         if (curvaVelocidadRunner == null || curvaVelocidadRunner.keys.Length == 0)
-            curvaVelocidadRunner = new AnimationCurve(new Keyframe(1, 3.7f), new Keyframe(7, 5.5f), new Keyframe(10, 6.6f));
-
+            curvaVelocidadRunner =
+            new AnimationCurve(
+                new Keyframe(1, 3.4f),
+                new Keyframe(3, 4.2f),
+                new Keyframe(5, 5.3f),
+                new Keyframe(7, 6.6f),
+                new Keyframe(10, 8.0f)
+            );
         if (curvaDuracionEstimulo == null || curvaDuracionEstimulo.keys.Length == 0)
-            curvaDuracionEstimulo = new AnimationCurve(new Keyframe(1, 1.20f), new Keyframe(10, 0.85f));
+            curvaDuracionEstimulo =
+            new AnimationCurve(
+                new Keyframe(1, 1.25f),
+                new Keyframe(4, 1.05f),
+                new Keyframe(7, 0.80f),
+                new Keyframe(10, 0.55f)
+            );
     }
 
     private Estimulo CrearObjetivo()
@@ -822,22 +997,101 @@ public class DobleCanalGame : BaseGame
 
     private float ObtenerDistanciaEntreObstaculos()
     {
-        float t = Mathf.InverseLerp(1f, 10f, nivelActual);
-        return Mathf.Lerp(distanciaEntreObstaculos, distanciaEntreObstaculosMinima, t);
+        float t = Mathf.Pow(Mathf.InverseLerp(1f, 10f, nivelActual), 1.4f);
+        float baseDistancia = Mathf.Lerp(distanciaEntreObstaculos, distanciaEntreObstaculosMinima, t);
+        // Añadir random entre -randomExtraDistancia/2 y +randomExtraDistancia/2
+        float randomOffset = Random.Range(-randomExtraDistancia * 0.5f, randomExtraDistancia * 0.5f);
+        return Mathf.Max(4f, baseDistancia + randomOffset);
     }
 
     private float ObtenerIntervaloMinimoObstaculos()
     {
         float t = Mathf.InverseLerp(1f, 10f, nivelActual);
-        return Mathf.Lerp(intervaloMinimoObstaculos, intervaloMinimoObstaculosNivelAlto, t);
+        float baseIntervalo = Mathf.Lerp(intervaloMinimoObstaculos, intervaloMinimoObstaculosNivelAlto, t);
+        // Añadir random entre -0.5 y +0.8 segundos
+        float randomOffset = Random.Range(-0.5f, 0.8f);
+        return Mathf.Max(1.2f, baseIntervalo + randomOffset);
     }
-
     private float ObtenerEsperaAleatoriaEstimulo(int nivel)
     {
         float t = Mathf.InverseLerp(1f, 10f, nivel);
         float min = Mathf.Lerp(esperaEstimuloNivel1Min, esperaEstimuloNivel10Min, t);
         float max = Mathf.Lerp(esperaEstimuloNivel1Max, esperaEstimuloNivel10Max, t);
         return Random.Range(min, Mathf.Max(min, max));
+    }
+    private float ObtenerAlturaVisual(GameObject obj)
+    {
+        if (obj == null)
+            return 1f;
+
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+
+        if (renderers.Length == 0)
+            return 1f;
+
+        Bounds bounds = renderers[0].bounds;
+
+        for (int i = 1; i < renderers.Length; i++)
+            bounds.Encapsulate(renderers[i].bounds);
+
+        return bounds.size.y;
+    }
+
+    private void AjustarAlSuelo(GameObject obj)
+    {
+        if (obj == null)
+            return;
+
+        float altura = ObtenerAlturaVisual(obj);
+
+        Vector3 pos = obj.transform.position;
+        pos.y = alturaSuelo + (altura * 0.5f);
+
+        obj.transform.position = pos;
+    }
+
+    private float ObtenerAltura(GameObject obj)
+    {
+        Renderer[] rs = obj.GetComponentsInChildren<Renderer>();
+
+        if (rs.Length == 0)
+            return 1f;
+
+        Bounds b = rs[0].bounds;
+
+        for (int i = 1; i < rs.Length; i++)
+            b.Encapsulate(rs[i].bounds);
+
+        return b.size.y;
+    }
+
+    private float ObtenerBaseY(GameObject obj)
+    {
+        Renderer[] rs = obj.GetComponentsInChildren<Renderer>();
+
+        if (rs.Length == 0)
+            return obj.transform.position.y;
+
+        Bounds b = rs[0].bounds;
+
+        for (int i = 1; i < rs.Length; i++)
+            b.Encapsulate(rs[i].bounds);
+
+        return b.min.y;
+    }
+
+    private bool HayColision(GameObject obstaculo)
+    {
+        Renderer rJugador =
+            personajeActivo.GetComponentInChildren<Renderer>();
+
+        Renderer rCaja =
+            obstaculo.GetComponentInChildren<Renderer>();
+
+        if (rJugador == null || rCaja == null)
+            return false;
+
+        return rJugador.bounds.Intersects(rCaja.bounds);
     }
 
     private int ObtenerNivelActual()
@@ -912,28 +1166,55 @@ public class DobleCanalGame : BaseGame
     {
         CognitiveMetrics m = new CognitiveMetrics();
 
-        int totalGo = aciertosObjetivo + omisionesObjetivo;
-        int totalNoGo = aciertosNoGo + erroresImpulsivos;
-        int totalObstaculos = obstaculosEsquivados + colisiones;
+        int goTotal = aciertosObjetivo + omisionesObjetivo;
+        int noGoTotal = aciertosNoGo + erroresImpulsivos;
+        int runnerTotal = obstaculosEsquivados + colisiones;
 
-        float eficienciaGo = totalGo > 0 ? (float)aciertosObjetivo / totalGo : 1f;
-        float eficienciaNoGo = totalNoGo > 0 ? (float)aciertosNoGo / totalNoGo : 1f;
-        float eficienciaRunner = totalObstaculos > 0 ? (float)obstaculosEsquivados / totalObstaculos : 1f;
-        float eficienciaEstimulos = (eficienciaGo + eficienciaNoGo) * 0.5f;
-        float tiempoMedio = ObtenerTiempoMedioReaccion();
-        float participacionRunner = totalObstaculos > 0 ? Mathf.Clamp01(totalObstaculos / 8f) : 0.4f;
-        float participacionEstimulos = (totalGo + totalNoGo) > 0 ? Mathf.Clamp01((totalGo + totalNoGo) / 12f) : 0.4f;
-        float baseRunner = Mathf.Lerp(0.35f, eficienciaRunner, participacionRunner);
-        float baseEstimulos = Mathf.Lerp(0.35f, eficienciaEstimulos, participacionEstimulos);
-        float castigoErrores = Mathf.Clamp01(1f - (colisiones * 0.035f) - (omisionesObjetivo * 0.025f) - (erroresImpulsivos * 0.025f));
+        // --- GO ---
+        float goAccuracy = goTotal > 0
+            ? (float)aciertosObjetivo / goTotal
+            : 0f;
 
-        m.atencionDividida = Mathf.Clamp01(((baseRunner + baseEstimulos) * 0.5f) * castigoErrores);
-        m.coordinacionVisomotora = Mathf.Clamp01((0.25f + 0.75f * eficienciaRunner) * Mathf.Clamp01(1f / (tiempoMedio + 0.45f)));
-        m.atencionSostenida = Mathf.Clamp01((0.55f + 0.45f * castigoErrores) * Mathf.Lerp(0.75f, 1f, participacionEstimulos));
-        m.velocidadCognitiva = Mathf.Clamp01(1f / (tiempoMedio + 0.35f));
+        float goPenalty = goTotal > 0
+            ? (float)omisionesObjetivo / goTotal
+            : 0f;
+
+        float goScore = Mathf.Clamp01(goAccuracy * (1f - goPenalty));
+
+        // --- NOGO ---
+        float noGoAccuracy = noGoTotal > 0
+            ? (float)aciertosNoGo / noGoTotal
+            : 0f;
+
+        float noGoScore = noGoAccuracy;
+
+        // --- RUNNER ---
+        float runnerScore = runnerTotal > 0
+            ? (float)obstaculosEsquivados / runnerTotal
+            : 0.5f;
+
+        // --- REACTION TIME ---
+        float rt = ObtenerTiempoMedioReaccion();
+
+        // Normalización realista (0.2s rápido, 1.2s lento)
+        float rtScore = Mathf.Clamp01(Mathf.InverseLerp(1.2f, 0.25f, rt));
+
+        // --- COMBINACIÓN FINAL (ponderación clara) ---
+        m.atencionDividida =
+            Mathf.Clamp01((goScore * 0.45f) + (noGoScore * 0.25f) + (runnerScore * 0.30f));
+
+        m.atencionSostenida =
+            Mathf.Clamp01((goScore * 0.7f) + (1f - goPenalty) * 0.3f);
+
+        m.coordinacionVisomotora =
+            Mathf.Clamp01((runnerScore * 0.65f) + (rtScore * 0.35f));
+
+        m.velocidadCognitiva =
+            rtScore;
 
         return m;
     }
+
 
     public override CognitiveMetrics AplicarPesos(CognitiveMetrics m)
     {

@@ -25,6 +25,9 @@ public class MisionOrbitalGame : BaseGame
     private int disparosTotales = 0;
     private int fallos = 0;
     private float sumaTiempos = 0f;
+    private int maxLevelReached = 1;
+    private int cambiosDireccion = 0;
+    private int direccionAnterior = 1;
 
     // Variables internas
     private int totalAsteroides;
@@ -60,6 +63,9 @@ public class MisionOrbitalGame : BaseGame
         aciertos = 0;
         sumaRT = 0f;
         sumaRT2 = 0f;
+        maxLevelReached = 1;
+        cambiosDireccion = 0;
+        direccionAnterior = 1;
         finalizado = false;
         DifficultyManager.Instance?.ResetDifficulty(1);
 
@@ -107,6 +113,11 @@ public class MisionOrbitalGame : BaseGame
             ? (Random.value < 0.5f ? 1 : -1)
             : 1;
 
+        if (totalIntentos > 0 && direccion != direccionAnterior)
+            cambiosDireccion++;
+
+        direccionAnterior = direccion;
+
         if (rutinaGiro != null) StopCoroutine(rutinaGiro);
         rutinaGiro = StartCoroutine(RotarAnillo());
 
@@ -116,6 +127,7 @@ public class MisionOrbitalGame : BaseGame
     private void AplicarDificultad()
     {
         int nivel = DifficultyManager.Instance.nivelActual;
+        maxLevelReached = Mathf.Max(maxLevelReached, nivel);
         totalAsteroides = Mathf.RoundToInt(Mathf.Lerp(6, 22, nivel / 10f));
         velocidadRotacion = Mathf.Lerp(0.22f, 0.015f, nivel / 10f);
         AjustarRoscoACamara();
@@ -346,21 +358,20 @@ public class MisionOrbitalGame : BaseGame
 
         float precision = (float)aciertos / totalIntentos;
         float rtMedio = Mathf.Max(0.01f, sumaRT / totalIntentos);
-        float factorNivel = ObtenerFactorNivel();
+        float factorNivel = Mathf.Lerp(0.75f, 1f, Mathf.Clamp01(maxLevelReached / 10f));
+        float velocidad = Mathf.Clamp01(Mathf.InverseLerp(1.25f, 0.22f, rtMedio));
+        float varianza = Mathf.Max(0f, (sumaRT2 / totalIntentos) - (rtMedio * rtMedio));
+        float consistencia = Mathf.Clamp01(1f - Mathf.Sqrt(varianza) / 0.75f);
+        float retoFlexibilidad = Mathf.Clamp01((maxLevelReached - 5f) / 5f);
+        float adaptacionDireccion = Mathf.Clamp01(cambiosDireccion / Mathf.Max(1f, totalIntentos * 0.35f));
 
-        // ✅ Solo estas dos métricas
-        m.velocidadCognitiva = Mathf.Clamp01((1f / rtMedio) * factorNivel);
-        m.coordinacionVisomotora = Mathf.Clamp01(precision * (1f / rtMedio));
+        m.velocidadCognitiva = Mathf.Clamp01(velocidad * factorNivel);
+        m.coordinacionVisomotora = Mathf.Clamp01((precision * 0.75f + velocidad * 0.25f) * factorNivel);
+        m.flexibilidadCognitiva = Mathf.Clamp01((precision * 0.55f + retoFlexibilidad * 0.25f + adaptacionDireccion * 0.20f) * factorNivel);
+        m.planificacion = Mathf.Clamp01((precision * 0.7f + consistencia * 0.3f) * factorNivel);
 
-        // ❌ Las demás a 0
-        m.flexibilidadCognitiva = 0f;
-        m.planificacion = 0f;
-        m.atencionSelectiva = 0f;
-        m.atencionDividida = 0f;
-        m.atencionSostenida = 0f;
-        m.memoriaTrabajo = 0f;
-        m.memoriaEspacial = 0f;
-        m.controlInhibitorio = 0f;
+        Debug.Log($"📊 Misión Orbital - Intentos:{totalIntentos} Aciertos:{aciertos} Fallos:{fallos} RT:{rtMedio:F2}s NivelMax:{maxLevelReached} CambiosDir:{cambiosDireccion}");
+        Debug.Log($"📊 Métricas - Vel:{m.velocidadCognitiva:F2} Coord:{m.coordinacionVisomotora:F2} Flex:{m.flexibilidadCognitiva:F2} Plan:{m.planificacion:F2}");
 
         return m;
     }
@@ -369,19 +380,10 @@ public class MisionOrbitalGame : BaseGame
     {
         CognitiveMetrics p = new CognitiveMetrics();
 
-        // Pesos ajustados solo para las dos métricas que existen
-        p.velocidadCognitiva = m.velocidadCognitiva * 0.55f;
-        p.coordinacionVisomotora = m.coordinacionVisomotora * 0.45f;
-
-        // El resto a 0
-        p.flexibilidadCognitiva = 0f;
-        p.planificacion = 0f;
-        p.atencionSelectiva = 0f;
-        p.atencionDividida = 0f;
-        p.atencionSostenida = 0f;
-        p.memoriaTrabajo = 0f;
-        p.memoriaEspacial = 0f;
-        p.controlInhibitorio = 0f;
+        p.velocidadCognitiva = m.velocidadCognitiva * 0.45f;
+        p.coordinacionVisomotora = m.coordinacionVisomotora * 0.35f;
+        p.flexibilidadCognitiva = m.flexibilidadCognitiva * 0.15f;
+        p.planificacion = m.planificacion * 0.05f;
 
         return p;
     }
@@ -392,6 +394,6 @@ public class MisionOrbitalGame : BaseGame
         CognitiveMetrics p = AplicarPesos(m);
 
         WebExporter.EnviarSesion(nombre, p);
-        Debug.Log($"📤 Resultados enviados - Velocidad: {p.velocidadCognitiva:F2}, Coordinación: {p.coordinacionVisomotora:F2}");
+        Debug.Log($"📤 Resultados enviados - Velocidad: {p.velocidadCognitiva:F2}, Coordinación: {p.coordinacionVisomotora:F2}, Flexibilidad: {p.flexibilidadCognitiva:F2}, Planificación: {p.planificacion:F2}");
     }
 }
