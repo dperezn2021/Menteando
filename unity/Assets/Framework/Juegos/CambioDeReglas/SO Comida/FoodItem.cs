@@ -7,6 +7,50 @@ public class FoodItem : ScriptableObject
     public string nombre;
     public FoodTags tags;
     public MainCategory mainCategory;
+
+    public FoodTags EffectiveTags => NormalizeTags(tags, mainCategory);
+
+    public bool HasEffectiveTag(FoodTags tag)
+    {
+        return EffectiveTags.HasFlag(tag);
+    }
+
+    private const FoodTags ShapeTags =
+        FoodTags.Redondo |
+        FoodTags.Alargado |
+        FoodTags.Cuadrado |
+        FoodTags.Irregular;
+
+    private static FoodTags NormalizeTags(FoodTags rawTags, MainCategory category)
+    {
+        FoodTags result = rawTags | GetCategoryTag(category);
+
+        if (category == MainCategory.Bebida)
+            result &= ~ShapeTags;
+        else
+            result &= ~FoodTags.Bebida;
+
+        return result;
+    }
+
+    private static FoodTags GetCategoryTag(MainCategory category)
+    {
+        switch (category)
+        {
+            case MainCategory.Fruta:
+                return FoodTags.Fruta;
+            case MainCategory.Verdura:
+                return FoodTags.Verdura;
+            case MainCategory.Carne:
+                return FoodTags.Carne;
+            case MainCategory.Lacteo:
+                return FoodTags.Lacteo;
+            case MainCategory.Bebida:
+                return FoodTags.Bebida;
+            default:
+                return FoodTags.None;
+        }
+    }
 }
 
 public enum MainCategory

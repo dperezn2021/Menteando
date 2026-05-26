@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d811239d2c675b409d796cf84779720, type: 3}
   m_Name: Costillas
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: ecd55e3ed2c8988489ea9ea7e2988166, type: 3}
+  sprite: {fileID: 21300000, guid: 903ce412f01ef214fa55e35e3e1ff93c, type: 3}
   nombre: Costillas
   tags: 34619408
   mainCategory: 2

@@ -9,102 +9,148 @@ public class UICambioDeReglas : MonoBehaviour
     [Header("Referencias")]
     public CambioDeReglasGame juego;
 
-    [Header("Assets")]
+    [Header("Zona de juego")]
+    public RectTransform zonaJuego;
+
+    [Header("Botones")]
+    public Button botonPausa;
+
+    [Header("Textos")]
+    public TextMeshProUGUI textoRegla;
+    public TextMeshProUGUI textoTiempo;
+    public TextMeshProUGUI textoAciertos;
+    public TextMeshProUGUI textoFallos;
+    public TextMeshProUGUI textoRacha;
+    public TextMeshProUGUI textoNivel;
+
+    [Header("Feedback")]
     public TMP_FontAsset fuenteTextos;
-    public Sprite fondoJuego;
-    public Sprite fondoHUD;
-
-    [Header("Colores")]
-    public float altoHeader = 104f;
-    public Color colorHeader = new Color(0.04f, 0.06f, 0.08f, 0.92f);
-    public Color colorHUDFallback = new Color(0.08f, 0.13f, 0.16f, 0.88f);
-    public Color colorZonaJuego = new Color(1f, 1f, 1f, 0.05f);
-
-    // Elementos UI
-    public RectTransform zonaJuego { get; private set; }
-    public TextMeshProUGUI textoRegla { get; private set; }
-    public TextMeshProUGUI textoNivel { get; private set; }
-    public TextMeshProUGUI textoTiempo { get; private set; }
-    public TextMeshProUGUI textoAciertos { get; private set; }
-    public TextMeshProUGUI textoFallos { get; private set; }
-    public TextMeshProUGUI textoRacha { get; private set; }
-    public TextMeshProUGUI textoCambios { get; private set; }
-
-    private CambioDeReglasGame juegoSuscrito;
-    private Coroutine cambioRoutine;
-    private GameObject panelJuego;
-    private Button botonPausa;
-    private List<GameObject> feedbacksActivos = new List<GameObject>();
+    public bool usarFuenteTMPPorDefecto = false;
+    public int maxFeedbacksActivos = 3;
 
     public RectTransform ZonaJuego => zonaJuego;
 
-    private void Awake() => CachearJuego();
-    private void Start() => CachearJuego();
-    private void Update() => ActualizarEstado();
+    private CambioDeReglasGame juegoSuscrito;
+    private Coroutine cambioRoutine;
+    private readonly List<GameObject> feedbacksActivos = new List<GameObject>();
+
+    private void Awake()
+    {
+        CachearJuego();
+    }
 
     public void Preparar(CambioDeReglasGame nuevoJuego)
     {
-        if (nuevoJuego != null) juego = nuevoJuego;
+        if (nuevoJuego != null)
+            juego = nuevoJuego;
+
         CachearJuego();
-        CrearUICompleta();
         SuscribirEventos();
-        ActualizarRegla(juego?.TextoRegla ?? "NORMA: ???");
+        AjustarTextosPizarra();
+        AplicarFuenteSegura(textoRegla);
+
+        ActualizarRegla(juego != null ? juego.TextoRegla : "NORMA: ???");
         ActualizarEstado();
     }
 
-    public void ActualizarRegla(string regla) => SetText(textoRegla, regla);
+    public void ActualizarRegla(string regla)
+    {
+        SetText(textoRegla, string.IsNullOrEmpty(regla) ? "NORMA: ???" : regla);
+    }
 
     public void ActualizarEstado()
     {
         if (juego == null) return;
 
-        SetText(textoNivel, $"NIVEL {juego.NivelActual}");
+        SetText(textoNivel, "NIVEL " + juego.NivelActual);
+
         int segundos = Mathf.Max(0, Mathf.CeilToInt(juego.TiempoPartidaRestante));
-        SetText(textoTiempo, $"TIEMPO {segundos / 60:00}:{segundos % 60:00}");
-        SetText(textoAciertos, $"ACIERTOS {juego.Aciertos}");
-        SetText(textoFallos, $"FALLOS {juego.Fallos}");
-        SetText(textoRacha, $"RACHA {juego.RachaActual}");
-        SetText(textoCambios, $"CAMBIOS {juego.CambiosRegla}");
+        SetText(textoTiempo, string.Format("TIEMPO {0:00}:{1:00}", segundos / 60, segundos % 60));
+
+        SetText(textoAciertos, "ACIERTOS " + juego.Aciertos);
+        SetText(textoFallos, "FALLOS " + juego.Fallos);
+        SetText(textoRacha, "RACHA " + juego.RachaActual);
     }
 
-    public void MostrarFeedbackFlotante(string mensaje, Vector3 posicion, bool esAcierto)
+    public void MostrarFeedbackFlotante(string mensaje, Vector3 posicionMundo, bool esAcierto)
     {
         if (zonaJuego == null) return;
 
-        // Limpiar feedbacks viejos
-        while (feedbacksActivos.Count >= 3)
-        {
-            if (feedbacksActivos[0] != null)
-                Destroy(feedbacksActivos[0]);
-            feedbacksActivos.RemoveAt(0);
-        }
+        LimitarFeedbacksActivos();
 
-        GameObject go = new GameObject("Feedback", typeof(RectTransform));
+        GameObject go = new GameObject("Feedback", typeof(RectTransform), typeof(TextMeshProUGUI));
         go.transform.SetParent(zonaJuego, false);
         feedbacksActivos.Add(go);
 
-        TextMeshProUGUI text = go.AddComponent<TextMeshProUGUI>();
-        text.text = mensaje;
-        text.fontSize = 42;
-        if (fuenteTextos != null) text.font = fuenteTextos;
+        RectTransform rt = go.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(280f, 80f);
+        rt.localScale = Vector3.one;
+
+        if (posicionMundo == Vector3.zero)
+        {
+            rt.anchoredPosition = Vector2.zero;
+        }
+        else
+        {
+            Vector2 localPoint;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                zonaJuego,
+                RectTransformUtility.WorldToScreenPoint(null, posicionMundo),
+                null,
+                out localPoint
+            );
+
+            rt.anchoredPosition = localPoint;
+        }
+
+        TextMeshProUGUI text = go.GetComponent<TextMeshProUGUI>();
+        text.text = NormalizarFeedback(mensaje, esAcierto);
+        AplicarFuenteSegura(text);
+        text.fontSize = 46f;
+        text.enableAutoSizing = false;
         text.alignment = TextAlignmentOptions.Center;
         text.color = esAcierto ? Color.green : Color.red;
-        text.outlineWidth = 0.2f;
+        text.raycastTarget = false;
+        text.outlineWidth = 0.05f;
         text.outlineColor = Color.black;
 
-        RectTransform rt = go.GetComponent<RectTransform>();
-        rt.position = posicion;
-        rt.sizeDelta = new Vector2(200, 70);
-
         StartCoroutine(AnimarFeedback(go));
+    }
+
+    public void MostrarPowerUp(Sprite sprite, string mensaje)
+    {
+        if (zonaJuego == null)
+            return;
+
+        if (sprite == null)
+        {
+            MostrarFeedbackFlotante(mensaje, Vector3.zero, true);
+            return;
+        }
+
+        GameObject go = new GameObject("PowerUp", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        go.transform.SetParent(zonaJuego, false);
+
+        RectTransform rt = go.GetComponent<RectTransform>();
+        rt.anchorMin = new Vector2(0.5f, 0.5f);
+        rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = Vector2.zero;
+        rt.sizeDelta = new Vector2(130f, 130f);
+        rt.localScale = Vector3.one * 0.75f;
+
+        Image image = go.GetComponent<Image>();
+        image.sprite = sprite;
+        image.preserveAspect = true;
+        image.raycastTarget = false;
+
+        StartCoroutine(AnimarPowerUp(go));
     }
 
     private IEnumerator AnimarFeedback(GameObject go)
     {
         if (go == null) yield break;
 
-        float duracion = 0.7f;
-        float tiempo = 0f;
         TextMeshProUGUI text = go.GetComponent<TextMeshProUGUI>();
         RectTransform rt = go.GetComponent<RectTransform>();
 
@@ -114,217 +160,142 @@ public class UICambioDeReglas : MonoBehaviour
             yield break;
         }
 
-        Vector3 posInicial = rt.position;
-        Vector3 posFinal = posInicial + new Vector3(0, 100f, 0);
+        float duracion = 0.65f;
+        float tiempo = 0f;
+
+        Vector2 posInicial = rt.anchoredPosition;
+        Vector2 posFinal = posInicial + new Vector2(0f, 90f);
+        Color colorInicial = text.color;
 
         while (tiempo < duracion)
         {
+            if (go == null || rt == null || text == null)
+                yield break;
+
             tiempo += Time.deltaTime;
-            float t = tiempo / duracion;
+            float t = Mathf.Clamp01(tiempo / duracion);
 
-            rt.position = Vector3.Lerp(posInicial, posFinal, t);
+            rt.anchoredPosition = Vector2.Lerp(posInicial, posFinal, t);
 
-            float escala = 1f + Mathf.Sin(t * Mathf.PI) * 0.5f;
+            float escala = 1f + Mathf.Sin(t * Mathf.PI) * 0.3f;
             rt.localScale = Vector3.one * escala;
 
-            Color c = text.color;
-            c.a = Mathf.Lerp(1f, 0f, t);
+            Color c = colorInicial;
+            c.a = Mathf.Lerp(colorInicial.a, 0f, t);
             text.color = c;
 
             yield return null;
         }
 
         feedbacksActivos.Remove(go);
-        Destroy(go);
+
+        if (go != null)
+            Destroy(go);
+    }
+
+    private IEnumerator AnimarPowerUp(GameObject go)
+    {
+        if (go == null) yield break;
+
+        RectTransform rt = go.GetComponent<RectTransform>();
+        Image image = go.GetComponent<Image>();
+
+        if (rt == null || image == null)
+        {
+            if (go != null) Destroy(go);
+            yield break;
+        }
+
+        float duracion = 0.8f;
+        float tiempo = 0f;
+        Color colorInicial = image.color;
+
+        while (tiempo < duracion)
+        {
+            if (go == null || rt == null || image == null)
+                yield break;
+
+            tiempo += Time.deltaTime;
+            float t = Mathf.Clamp01(tiempo / duracion);
+
+            float escala = 0.75f + Mathf.Sin(t * Mathf.PI) * 0.5f;
+            rt.localScale = Vector3.one * escala;
+
+            Color c = colorInicial;
+            c.a = Mathf.Lerp(colorInicial.a, 0f, Mathf.Clamp01((t - 0.45f) / 0.55f));
+            image.color = c;
+
+            yield return null;
+        }
+
+        if (go != null)
+            Destroy(go);
     }
 
     public void MostrarCambioRegla(string mensaje)
     {
-        if (cambioRoutine != null) StopCoroutine(cambioRoutine);
-        cambioRoutine = StartCoroutine(CambioReglaRoutine(mensaje));
+        if (textoRegla == null) return;
+
+        if (cambioRoutine != null)
+            StopCoroutine(cambioRoutine);
+
+        cambioRoutine = StartCoroutine(CambioReglaRoutine());
     }
 
-    private IEnumerator CambioReglaRoutine(string mensaje)
+    private IEnumerator CambioReglaRoutine()
     {
         if (textoRegla == null) yield break;
 
-        Color originalColor = textoRegla.color;
-        textoRegla.color = Color.yellow;
-
-        // Animar el texto de la regla
         RectTransform rt = textoRegla.rectTransform;
+        if (rt == null) yield break;
+
+        Color colorOriginal = textoRegla.color;
         Vector3 escalaOriginal = rt.localScale;
 
-        float duracion = 0.3f;
+        textoRegla.color = Color.yellow;
+
+        float duracion = 0.35f;
         float tiempo = 0f;
 
         while (tiempo < duracion)
         {
+            if (textoRegla == null || rt == null)
+                yield break;
+
             tiempo += Time.deltaTime;
-            float t = tiempo / duracion;
-            float escala = 1f + Mathf.Sin(t * Mathf.PI) * 0.2f;
+            float t = Mathf.Clamp01(tiempo / duracion);
+
+            float escala = 1f + Mathf.Sin(t * Mathf.PI) * 0.25f;
             rt.localScale = escalaOriginal * escala;
+
             yield return null;
         }
 
-        rt.localScale = escalaOriginal;
-        textoRegla.color = originalColor;
+        if (textoRegla != null)
+            textoRegla.color = colorOriginal;
+
+        if (rt != null)
+            rt.localScale = escalaOriginal;
+
         cambioRoutine = null;
-    }
-
-    private void CrearUICompleta()
-    {
-        Transform parent = ObtenerCanvasPadre();
-        if (parent == null) return;
-
-        if (panelJuego != null) Destroy(panelJuego);
-
-        panelJuego = new GameObject("PanelJuego", typeof(RectTransform));
-        panelJuego.transform.SetParent(parent, false);
-        RectTransform panelRect = panelJuego.GetComponent<RectTransform>();
-        panelRect.anchorMin = Vector2.zero;
-        panelRect.anchorMax = Vector2.one;
-        panelRect.offsetMin = Vector2.zero;
-        panelRect.offsetMax = Vector2.zero;
-
-        // Fondo
-        Image fondo = panelJuego.AddComponent<Image>();
-        fondo.sprite = fondoJuego;
-        fondo.color = fondoJuego != null ? Color.white : new Color(0.08f, 0.08f, 0.12f);
-        fondo.raycastTarget = false;
-
-        // Header
-        GameObject headerObj = new GameObject("Header", typeof(RectTransform));
-        headerObj.transform.SetParent(panelJuego.transform, false);
-        RectTransform headerRect = headerObj.GetComponent<RectTransform>();
-        headerRect.anchorMin = new Vector2(0f, 1f);
-        headerRect.anchorMax = new Vector2(1f, 1f);
-        headerRect.offsetMin = new Vector2(0f, -altoHeader);
-        headerRect.offsetMax = Vector2.zero;
-
-        Image headerBg = headerObj.AddComponent<Image>();
-        headerBg.color = colorHeader;
-        headerBg.raycastTarget = false;
-
-        // Panel HUD izquierdo
-        GameObject hudObj = new GameObject("PanelHUD", typeof(RectTransform));
-        hudObj.transform.SetParent(panelJuego.transform, false);
-        RectTransform hudRect = hudObj.GetComponent<RectTransform>();
-        hudRect.anchorMin = new Vector2(0f, 0f);
-        hudRect.anchorMax = new Vector2(0.24f, 1f);
-        hudRect.offsetMin = new Vector2(12f, 12f);
-        hudRect.offsetMax = new Vector2(-8f, -altoHeader - 12f);
-
-        Image hudBg = hudObj.AddComponent<Image>();
-        hudBg.sprite = fondoHUD;
-        hudBg.color = fondoHUD != null ? Color.white : colorHUDFallback;
-        hudBg.raycastTarget = false;
-
-        // Zona de juego
-        GameObject zonaObj = new GameObject("ZonaJuego", typeof(RectTransform));
-        zonaObj.transform.SetParent(panelJuego.transform, false);
-        zonaJuego = zonaObj.GetComponent<RectTransform>();
-        zonaJuego.anchorMin = new Vector2(0.24f, 0f);
-        zonaJuego.anchorMax = new Vector2(1f, 1f);
-        zonaJuego.offsetMin = new Vector2(8f, 12f);
-        zonaJuego.offsetMax = new Vector2(-12f, -altoHeader - 12f);
-
-        Image zonaBg = zonaObj.AddComponent<Image>();
-        zonaBg.color = colorZonaJuego;
-        zonaBg.raycastTarget = false;
-
-        // Texto regla central
-        GameObject reglaObj = new GameObject("TextoRegla", typeof(RectTransform));
-        reglaObj.transform.SetParent(zonaJuego, false);
-        textoRegla = reglaObj.AddComponent<TextMeshProUGUI>();
-        textoRegla.text = "NORMA: ???";
-        textoRegla.fontSize = 48;
-        textoRegla.alignment = TextAlignmentOptions.Center;
-        textoRegla.color = Color.white;
-
-        RectTransform reglaRect = reglaObj.GetComponent<RectTransform>();
-        reglaRect.anchorMin = new Vector2(0.05f, 0.85f);
-        reglaRect.anchorMax = new Vector2(0.95f, 0.98f);
-        reglaRect.offsetMin = Vector2.zero;
-        reglaRect.offsetMax = Vector2.zero;
-
-        // Texto HUD
-        textoNivel = CrearTextoHUD(hudObj.transform, "NIVEL 1", 0);
-        textoTiempo = CrearTextoHUD(hudObj.transform, "TIEMPO 00:00", 1);
-        textoAciertos = CrearTextoHUD(hudObj.transform, "ACIERTOS 0", 2);
-        textoFallos = CrearTextoHUD(hudObj.transform, "FALLOS 0", 3);
-        textoRacha = CrearTextoHUD(hudObj.transform, "RACHA 0", 4);
-        textoCambios = CrearTextoHUD(hudObj.transform, "CAMBIOS 0", 5);
-
-        // Botón pausa
-        ReubicarBotonPausa(headerObj.transform);
-        AplicarFuente();
-    }
-
-    private TextMeshProUGUI CrearTextoHUD(Transform parent, string texto, int index)
-    {
-        GameObject obj = new GameObject($"Texto{index}", typeof(RectTransform));
-        obj.transform.SetParent(parent, false);
-        TextMeshProUGUI text = obj.AddComponent<TextMeshProUGUI>();
-        text.text = texto;
-        text.fontSize = 32;
-        text.alignment = TextAlignmentOptions.Center;
-        text.color = Color.white;
-
-        RectTransform rect = obj.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0f, 1f);
-        rect.anchorMax = new Vector2(1f, 1f);
-        float top = -120f - index * 55f;
-        rect.offsetMin = new Vector2(10f, top - 45f);
-        rect.offsetMax = new Vector2(-10f, top);
-
-        return text;
-    }
-
-    private void ReubicarBotonPausa(Transform header)
-    {
-        botonPausa = UIManager.Instance?.botonPausa;
-        if (botonPausa == null) return;
-
-        botonPausa.gameObject.SetActive(true);
-        botonPausa.transform.SetParent(header, false);
-
-        RectTransform rect = botonPausa.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(1f, 0.5f);
-        rect.anchorMax = new Vector2(1f, 0.5f);
-        rect.pivot = new Vector2(1f, 0.5f);
-        rect.sizeDelta = new Vector2(220f, 48f);
-        rect.anchoredPosition = new Vector2(-20f, 0f);
-        botonPausa.transform.SetAsLastSibling();
-    }
-
-    private void AplicarFuente()
-    {
-        if (fuenteTextos == null) return;
-        if (panelJuego == null) return;
-
-        TMP_Text[] textos = panelJuego.GetComponentsInChildren<TMP_Text>(true);
-        foreach (var t in textos) t.font = fuenteTextos;
-    }
-
-    private Transform ObtenerCanvasPadre()
-    {
-        if (UIManager.Instance?.UIPartida != null)
-            return UIManager.Instance.UIPartida.transform;
-        Canvas canvas = FindFirstObjectByType<Canvas>();
-        return canvas != null ? canvas.transform : transform;
     }
 
     private void CachearJuego()
     {
-        if (juego == null) juego = GetComponent<CambioDeReglasGame>();
-        if (juego == null) juego = FindFirstObjectByType<CambioDeReglasGame>();
-        if (juego != null && juego.uiCambioDeReglas == null) juego.uiCambioDeReglas = this;
+        if (juego == null)
+            juego = GetComponent<CambioDeReglasGame>();
+
+        if (juego == null)
+            juego = FindFirstObjectByType<CambioDeReglasGame>();
+
+        if (juego != null && juego.uiCambioDeReglas == null)
+            juego.uiCambioDeReglas = this;
     }
 
     private void SuscribirEventos()
     {
         DesuscribirEventos();
+
         juegoSuscrito = juego;
         if (juegoSuscrito == null) return;
 
@@ -336,21 +307,162 @@ public class UICambioDeReglas : MonoBehaviour
     private void DesuscribirEventos()
     {
         if (juegoSuscrito == null) return;
+
         juegoSuscrito.OnEstadoActualizado -= ActualizarEstado;
         juegoSuscrito.OnReglaActualizada -= ActualizarRegla;
         juegoSuscrito.OnCambioRegla -= MostrarCambioRegla;
+
         juegoSuscrito = null;
     }
 
     private void SetText(TextMeshProUGUI text, string value)
     {
-        if (text != null) text.text = value;
+        if (text == null)
+            return;
+
+        AplicarFuenteSegura(text);
+
+        if (text.text != value)
+            text.text = value;
+    }
+
+    private void AplicarFuenteSegura(TextMeshProUGUI text)
+    {
+        if (text == null) return;
+
+        // 🔥 FORZAR a usar TU fuente siempre
+        TMP_FontAsset fuente = fuenteTextos;
+
+        // Solo si no tienes tu fuente, usa la por defecto
+        if (fuente == null && TMP_Settings.defaultFontAsset != null)
+            fuente = TMP_Settings.defaultFontAsset;
+
+        if (fuente != null)
+        {
+            text.font = fuente;
+            if (fuente.material != null)
+                text.fontSharedMaterial = fuente.material;
+        }
+
+        text.richText = false;
+        text.isRightToLeftText = false;
+        text.fontStyle = FontStyles.Normal;
+    }
+    private Transform ObtenerPadrePizarra()
+    {
+        if (textoTiempo != null)
+            return textoTiempo.transform.parent;
+        if (textoNivel != null)
+            return textoNivel.transform.parent;
+        if (textoAciertos != null)
+            return textoAciertos.transform.parent;
+        if (textoFallos != null)
+            return textoFallos.transform.parent;
+        if (textoRacha != null)
+            return textoRacha.transform.parent;
+
+        return null;
+    }
+
+    private void AjustarTextosPizarra()
+    {
+        RectTransform parent = ObtenerPadrePizarra() as RectTransform;
+        if (parent != null)
+        {
+            parent.anchorMin = new Vector2(0.15f, 0.15f);
+            parent.anchorMax = new Vector2(0.85f, 0.47f);
+            parent.anchoredPosition = Vector2.zero;
+            parent.sizeDelta = Vector2.zero;
+
+            VerticalLayoutGroup layout = parent.GetComponent<VerticalLayoutGroup>();
+            if (layout != null)
+                layout.spacing = 0f;
+        }
+
+        TextMeshProUGUI[] textos =
+        {
+            textoTiempo,
+            textoRacha,
+            textoAciertos,
+            textoFallos,
+            textoNivel
+        };
+
+        foreach (TextMeshProUGUI text in textos)
+            AjustarTextoPizarra(text);
+    }
+
+    private void AjustarTextoPizarra(TextMeshProUGUI text)
+    {
+        if (text == null)
+            return;
+
+        RectTransform rect = text.rectTransform;
+        if (rect != null)
+            rect.sizeDelta = new Vector2(340f, 44f);
+
+        AplicarFuenteSegura(text);
+        text.fontSize = 40f;
+        text.enableAutoSizing = true;
+        text.fontSizeMin = 20f;
+        text.fontSizeMax = 40f;
+        text.textWrappingMode = TextWrappingModes.Normal;
+        text.raycastTarget = false;
+    }
+
+    private string NormalizarFeedback(string mensaje, bool esAcierto)
+    {
+        if (string.IsNullOrWhiteSpace(mensaje))
+            return esAcierto ? "BIEN" : "MAL";
+
+        string limpio = mensaje.Trim().ToUpperInvariant();
+
+        if (limpio.Contains("INCORRECTO") || limpio.Contains("ERROR"))
+            return "MAL";
+        if (limpio.Contains("CORRECTO"))
+            return "BIEN";
+        if (limpio.Contains("TIEMPO") && !limpio.Contains("+"))
+            return "TIEMPO";
+
+        return limpio;
+    }
+
+    private void LimitarFeedbacksActivos()
+    {
+        for (int i = feedbacksActivos.Count - 1; i >= 0; i--)
+        {
+            if (feedbacksActivos[i] == null)
+                feedbacksActivos.RemoveAt(i);
+        }
+
+        while (feedbacksActivos.Count >= maxFeedbacksActivos)
+        {
+            GameObject viejo = feedbacksActivos[0];
+            feedbacksActivos.RemoveAt(0);
+
+            if (viejo != null)
+                Destroy(viejo);
+        }
+    }
+
+    private void LimpiarFeedbacks()
+    {
+        foreach (GameObject fb in feedbacksActivos)
+        {
+            if (fb != null)
+                Destroy(fb);
+        }
+
+        feedbacksActivos.Clear();
     }
 
     private void OnDestroy()
     {
         DesuscribirEventos();
-        foreach (var fb in feedbacksActivos)
-            if (fb != null) Destroy(fb);
+
+        if (cambioRoutine != null)
+            StopCoroutine(cambioRoutine);
+
+        LimpiarFeedbacks();
     }
 }

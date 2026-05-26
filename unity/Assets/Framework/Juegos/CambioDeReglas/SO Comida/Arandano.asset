@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 21300000, guid: a68f2dd86d602b24894f2cba58b934a6, type: 3}
   nombre: Arandano
-  tags: 8393024
+  tags: 4416
   mainCategory: 0

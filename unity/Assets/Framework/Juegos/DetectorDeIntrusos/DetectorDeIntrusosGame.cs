@@ -52,7 +52,7 @@ public class DetectorDeIntrusosGame : BaseGame
 
     private void Awake()
     {
-        nombre = "detector-intrusos";
+        nombre = "detector de intrusos";
         InicializarCurvasDificultad();
     }
 

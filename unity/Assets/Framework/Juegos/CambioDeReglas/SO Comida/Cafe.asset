@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 21300000, guid: dd111c22f48ec1442a5140a08049e700, type: 3}
   nombre: Cafe
-  tags: 67272720
+  tags: 12582928
   mainCategory: 4

@@ -81,8 +81,15 @@ function renderGameDetailPage(gameId) {
             <div class="items-stretch grid grid-cols-1 xl:grid-cols-[1.35fr_0.85fr] gap-8 ">
                 <article class="flex flex-col h-full rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
                     <div class="relative flex-1 aspect-video bg-slate-950">
-                        <iframe id="game-iframe" src="${juego.buildUrl.split("/").pop()}" title="Juego ${juego.nombre}" class="absolute inset-0 w-full h-full border-0" allowfullscreen></iframe>
-                    </div>
+                    <iframe 
+                        id="game-iframe" 
+                        src="${juego.buildUrl.split("/").pop()}" 
+                        title="Juego ${juego.nombre}" 
+                        class="absolute inset-0 w-full h-full border-0" 
+                        allowfullscreen
+                        referrerpolicy="no-referrer"
+                        loading="eager">
+                    </iframe>                    </div>
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
                         <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                             <span class="w-2.5 h-2.5 rounded-full ${color} inline-block"></span>

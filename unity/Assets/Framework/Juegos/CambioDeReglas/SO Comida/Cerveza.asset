@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 21300000, guid: 1a716b83d27254249943f6899a7a18aa, type: 3}
   nombre: Cerveza
-  tags: 85983248
+  tags: 10485776
   mainCategory: 4

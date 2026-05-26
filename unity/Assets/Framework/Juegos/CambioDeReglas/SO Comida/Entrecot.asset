@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d811239d2c675b409d796cf84779720, type: 3}
   m_Name: Entrecot
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: 6d6a22bf4b2c077419accdb930eccc0b, type: 3}
+  sprite: {fileID: 21300000, guid: 57f8a22e0838f104d9bd76db572dfd42, type: 3}
   nombre: Entrecot
   tags: 34095105
   mainCategory: 2

@@ -79,7 +79,7 @@ public class SilencioMentalGame : BaseGame
 
     private void Awake()
     {
-        nombre = "silencio-mental";
+        nombre = "silencio mental";
         InicializarListas();
         InicializarCurvas();
     }

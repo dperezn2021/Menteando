@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d811239d2c675b409d796cf84779720, type: 3}
   m_Name: Gofre
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: 0c3572b191bb9b04e9dda97fa4c0358f, type: 3}
+  sprite: {fileID: 21300000, guid: 52ec2114ca14cd9409f7ef927f8f7538, type: 3}
   nombre: Gofre
   tags: 4326416
   mainCategory: 5

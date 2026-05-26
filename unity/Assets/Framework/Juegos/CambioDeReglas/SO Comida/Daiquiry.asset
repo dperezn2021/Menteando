@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 21300000, guid: f9de41afd6f2a964583cc35fd702fc1a, type: 3}
   nombre: Daiquiry
-  tags: 85983240
+  tags: 10485768
   mainCategory: 4

@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 21300000, guid: 3af0585f53f594c4d99b73396bbd64ce, type: 3}
   nombre: Caramelo
-  tags: 8519952
+  tags: 132112
   mainCategory: 5

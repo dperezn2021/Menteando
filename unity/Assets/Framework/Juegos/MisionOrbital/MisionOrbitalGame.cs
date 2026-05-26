@@ -20,6 +20,9 @@ public class MisionOrbitalGame : BaseGame
     private int aciertos = 0;
     private float sumaRT = 0f;
     private float sumaRT2 = 0f;
+    // AÑADE ESTO con las otras variables
+    private int rachaAciertos = 0;
+    private int mejorRacha = 0;
 
     // Estadísticas antiguas (las mantengo)
     private int disparosTotales = 0;
@@ -259,9 +262,16 @@ public class MisionOrbitalGame : BaseGame
         bool impacto = (indiceActivo == indiceObjetivo);
 
         if (impacto)
+        {
             aciertos++;
+            rachaAciertos++;        // 🔥 AÑADE ESTA LÍNEA
+            mejorRacha = Mathf.Max(mejorRacha, rachaAciertos); // 🔥 AÑADE ESTA LÍNEA
+        }
         else
+        {
             fallos++;
+            rachaAciertos = 0;      // 🔥 AÑADE ESTA LÍNEA
+        }
 
         DifficultyManager.Instance.ActualizarDificultad(
             impacto ? 1f : 0f,
@@ -353,24 +363,55 @@ public class MisionOrbitalGame : BaseGame
     {
         CognitiveMetrics m = new CognitiveMetrics();
 
+        // Inicializar todas las métricas en 0
+        m.atencionSelectiva = 0;
+        m.atencionSostenida = 0;
+        m.atencionDividida = 0;
+        m.memoriaTrabajo = 0;
+        m.memoriaEspacial = 0;
+        m.controlInhibitorio = 0;
+
         if (totalIntentos == 0)
             return m;
 
+        // 🔥 1. PRECISIÓN (más generosa)
         float precision = (float)aciertos / totalIntentos;
-        float rtMedio = Mathf.Max(0.01f, sumaRT / totalIntentos);
-        float factorNivel = Mathf.Lerp(0.75f, 1f, Mathf.Clamp01(maxLevelReached / 10f));
-        float velocidad = Mathf.Clamp01(Mathf.InverseLerp(1.25f, 0.22f, rtMedio));
+        // Antes: precision directa. Ahora: mínimo 0.3 incluso si falla
+        precision = Mathf.Lerp(0.3f, 1f, precision);
+
+        // 🔥 2. TIEMPO DE REACCIÓN (más permisivo)
+        float rtMedio = sumaRT / totalIntentos;
+        // Antes: 1.25s a 0.22s → Ahora: 2.0s a 0.35s
+        float velocidadRaw = Mathf.InverseLerp(2.0f, 0.35f, rtMedio);
+        velocidadRaw = Mathf.Clamp01(velocidadRaw);
+
+        // 🔥 3. CONSISTENCIA (menos castigadora)
         float varianza = Mathf.Max(0f, (sumaRT2 / totalIntentos) - (rtMedio * rtMedio));
-        float consistencia = Mathf.Clamp01(1f - Mathf.Sqrt(varianza) / 0.75f);
-        float retoFlexibilidad = Mathf.Clamp01((maxLevelReached - 5f) / 5f);
-        float adaptacionDireccion = Mathf.Clamp01(cambiosDireccion / Mathf.Max(1f, totalIntentos * 0.35f));
+        float desviacion = Mathf.Sqrt(varianza);
+        // Antes: penalizaba mucho. Ahora: más suave
+        float consistencia = 1f - Mathf.Clamp01(desviacion / 1.2f);
 
-        m.velocidadCognitiva = Mathf.Clamp01(velocidad * factorNivel);
-        m.coordinacionVisomotora = Mathf.Clamp01((precision * 0.75f + velocidad * 0.25f) * factorNivel);
-        m.flexibilidadCognitiva = Mathf.Clamp01((precision * 0.55f + retoFlexibilidad * 0.25f + adaptacionDireccion * 0.20f) * factorNivel);
-        m.planificacion = Mathf.Clamp01((precision * 0.7f + consistencia * 0.3f) * factorNivel);
+        // 🔥 4. NIVEL ALCANZADO (bonificador)
+        float factorNivel = Mathf.Lerp(0.7f, 1f, Mathf.Clamp01(maxLevelReached / 12f));
 
-        Debug.Log($"📊 Misión Orbital - Intentos:{totalIntentos} Aciertos:{aciertos} Fallos:{fallos} RT:{rtMedio:F2}s NivelMax:{maxLevelReached} CambiosDir:{cambiosDireccion}");
+        // 🔥 5. RACHA (premia consistencia)
+        float rachaBonus = Mathf.Clamp01(mejorRacha / 8f);
+
+        // 🔥 6. ADAPTACIÓN A CAMBIOS DE DIRECCIÓN
+        float adaptacionDireccion = 0.5f; // valor neutral por defecto
+        if (totalIntentos > 0)
+        {
+            float tasaCambios = (float)cambiosDireccion / Mathf.Max(1, totalIntentos / 5);
+            adaptacionDireccion = Mathf.Clamp01(1f - tasaCambios * 0.5f);
+        }
+
+        // 🔥 7. CÁLCULO DE MÉTRICAS (valores entre 0.2 y 0.95)
+        m.velocidadCognitiva = Mathf.Clamp(velocidadRaw * 0.8f + 0.15f, 0.2f, 0.95f);
+        m.coordinacionVisomotora = Mathf.Clamp((precision * 0.6f + velocidadRaw * 0.3f + rachaBonus * 0.1f) * factorNivel, 0.2f, 0.95f);
+        m.flexibilidadCognitiva = Mathf.Clamp((precision * 0.4f + adaptacionDireccion * 0.4f + rachaBonus * 0.2f) * factorNivel, 0.15f, 0.9f);
+        m.planificacion = Mathf.Clamp((precision * 0.5f + consistencia * 0.3f + rachaBonus * 0.2f) * factorNivel, 0.1f, 0.85f);
+
+        Debug.Log($"📊 Misión Orbital - Aciertos:{aciertos}/{totalIntentos} ({precision:P1}) | RT medio:{rtMedio:F2}s | Nivel:{maxLevelReached} | Racha:{mejorRacha}");
         Debug.Log($"📊 Métricas - Vel:{m.velocidadCognitiva:F2} Coord:{m.coordinacionVisomotora:F2} Flex:{m.flexibilidadCognitiva:F2} Plan:{m.planificacion:F2}");
 
         return m;
@@ -380,10 +421,19 @@ public class MisionOrbitalGame : BaseGame
     {
         CognitiveMetrics p = new CognitiveMetrics();
 
-        p.velocidadCognitiva = m.velocidadCognitiva * 0.45f;
-        p.coordinacionVisomotora = m.coordinacionVisomotora * 0.35f;
-        p.flexibilidadCognitiva = m.flexibilidadCognitiva * 0.15f;
-        p.planificacion = m.planificacion * 0.05f;
+        // Inicializar todas en 0
+        p.atencionSelectiva = 0;
+        p.atencionSostenida = 0;
+        p.atencionDividida = 0;
+        p.memoriaTrabajo = 0;
+        p.memoriaEspacial = 0;
+        p.controlInhibitorio = 0;
+
+        // 🔥 Pesos redistribuidos (totales más altos)
+        p.velocidadCognitiva = m.velocidadCognitiva * 0.40f;      // +5%
+        p.coordinacionVisomotora = m.coordinacionVisomotora * 0.35f; // +5%
+        p.flexibilidadCognitiva = m.flexibilidadCognitiva * 0.15f;    // igual
+        p.planificacion = m.planificacion * 0.10f;                    // +5%
 
         return p;
     }

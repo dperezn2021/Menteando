@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d811239d2c675b409d796cf84779720, type: 3}
   m_Name: Patata
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: 3c6348351e9f0264a8576f3ddc88aff9, type: 3}
+  sprite: {fileID: 21300000, guid: 89bf1338921061b4bba5e6e05fe9c1ab, type: 3}
   nombre: Patata
   tags: 17309712
   mainCategory: 1

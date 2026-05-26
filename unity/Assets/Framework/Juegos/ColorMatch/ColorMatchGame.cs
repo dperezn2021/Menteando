@@ -42,7 +42,7 @@ public class ColorMatchGame : BaseGame
 
     private void Awake()
     {
-        nombre = "color-match";
+        nombre = "color match";
         CachearReferencias(); // 🔥 CAMBIO
     }
 
