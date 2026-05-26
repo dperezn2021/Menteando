@@ -5,7 +5,7 @@ const CATALOGO_TESTS = [
         "categoria": "atencion",
         "habilidades": ["atencion_selectiva", "atencion_sostenida", "control_inhibitorio"],
         "duracion": "8 min",
-        "descripcion": "Tienes 5 líneas llenas de letras 'd' y 'p' con rayas encima y debajo. Tu tarea es marcar solo las 'd' que tengan exactamente dos rayas en total, ignorando todo lo demás. Cada línea dura 10 segundos. Es uno de los tests de atención más utilizados en neuropsicología porque separa con precisión cuánto atinas, cuánto te saltas y cuánto marcas por error.",
+        "descripcion": "Se te presentan 5 líneas llenas de letras 'd' y 'p' con rayas encima y debajo. Tu tarea es marcar solo las 'd' que tengan exactamente dos rayas en total, ignorando todo lo demás. Cada línea dura 10 segundos. Es uno de los tests de atención más utilizados en neuropsicología porque separa con precisión cuánto atinas, cuánto te saltas y cuánto marcas por error.",
         "resumen": "Marca solo las 'd' con exactamente dos rayas antes de que se acabe el tiempo.",
         "imagen": "assets/tests/d2.jpg",
         "url": "tests/d2-page.html",

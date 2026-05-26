@@ -75,7 +75,7 @@ function createLargeCard(juego) {
 
             <a href="${juego.url}" class="relative block bg-slate-950 h-[22rem] md:h-[28rem]">
                 <img src="${juego.imagen}" alt="${juego.nombre}" class="w-full h-full object-cover opacity-20">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/35 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-450 via-slate-450/35 to-transparent"></div>
                 <div class="group absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
                     <p class="text-white text-xl md:text-2xl font-bold">Juega ya a ${juego.nombre}</p>
                     <div class="group-hover:bg-blue-500 w-36 h-16 rounded-2xl bg-white/10 border border-white/20 backdrop-blur  flex items-center justify-center text-white text-sm font-black">JUGAR</div>

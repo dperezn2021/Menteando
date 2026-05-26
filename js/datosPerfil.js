@@ -300,9 +300,10 @@
     }
 
     // Guardar cambios - con verificación de existencia
+    // Guardar cambios - con verificación de existencia y flujo asíncrono corregido
     const formModal = document.getElementById("perfil-form");
     if (formModal) {
-        formModal.addEventListener("submit", (e) => {
+        formModal.addEventListener("submit", async (e) => { // Añadido async aquí
             e.preventDefault();
 
             const perfil = getperfil();
@@ -312,20 +313,114 @@
             const ageInput = document.getElementById("age");
             const emailInput = document.getElementById("email");
 
-            if (nameInput) perfil.nombre = nameInput.value;
-            if (nicknameInput) perfil.apodo = nicknameInput.value;
-            if (ageInput) perfil.edad = parseInt(ageInput.value);
-            if (emailInput) perfil.correo = emailInput.value;
+            if (nameInput) {
+                const newName = nameInput.value.trim();
 
+                // Si intenta convertirse en 'admin' y no lo era antes, requiere contraseña
+                if (newName === 'admin' && perfil.nombre !== 'admin') {
+
+                    const askAdminPassword = () => {
+                        return new Promise((resolve) => {
+                            const existing = document.getElementById('perfil-admin-prompt');
+                            if (existing) existing.remove();
+
+                            const modal = document.createElement('div');
+                            modal.id = 'perfil-admin-prompt';
+                            modal.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:10000;';
+                            modal.innerHTML = `
+                            <div style="background:white;padding:20px;border-radius:12px;max-width:420px;width:90%;box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+                                <h3 style="margin:0 0 8px;font-size:16px;color:#0f172a;">Contraseña de administrador</h3>
+                                <p style="margin:0 0 12px;color:#334155;font-size:13px;">Introduce la contraseña para confirmar el uso del nombre <strong>admin</strong>.</p>
+                                <input id="perfil-admin-input" type="password" placeholder="Contraseña" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:12px;" />
+                                <div style="display:flex;justify-content:flex-end;gap:8px;">
+                                    <button id="perfil-admin-cancel" style="padding:8px 12px;border-radius:8px;background:#e5e7eb;border:none;cursor:pointer;">Cancelar</button>
+                                    <button id="perfil-admin-ok" style="padding:8px 12px;border-radius:8px;background:#3b82f6;color:white;border:none;cursor:pointer;">Aceptar</button>
+                                </div>
+                            </div>
+                        `;
+                            document.body.appendChild(modal);
+
+                            const input = document.getElementById('perfil-admin-input');
+                            setTimeout(() => input.focus(), 50);
+
+                            document.getElementById('perfil-admin-cancel').onclick = () => { modal.remove(); resolve(null); };
+                            document.getElementById('perfil-admin-ok').onclick = () => { const v = input.value.trim(); modal.remove(); resolve(v || null); };
+                            modal.onclick = (e) => { if (e.target === modal) { modal.remove(); resolve(null); } };
+                        });
+                    };
+
+                    // Esperamos activamente la respuesta del modal antes de seguir con el submit
+                    const pass = await askAdminPassword();
+
+                    if (!pass) {
+                        mostrarModal('Contraseña requerida para usar el nombre admin', 'error');
+                        return;
+                    }
+
+                    const knownFallback = 'https://menteando-comentarios.d-perezn-2021.workers.dev/';
+                    const base = (typeof API_URL !== 'undefined' && API_URL) || (window.API_URL) || knownFallback;
+                    const verifyUrl = base.endsWith('/') ? (base + 'verify') : (base + '/verify');
+
+                    try {
+                        console.log('Verificando contraseña admin via POST en', verifyUrl);
+
+                        // CORRECCIÓN: Petición POST unificada e idéntica a la de comentarios.js
+                        const resp = await fetch(verifyUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ password: pass })
+                        });
+
+                        if (resp.status === 401) {
+                            mostrarModal('Contraseña incorrecta', 'error');
+                            return;
+                        }
+
+                        if (!resp.ok) {
+                            let info = '';
+                            try { const j = await resp.json(); info = j.error || JSON.stringify(j); } catch (_) { info = await resp.text().catch(() => ''); }
+                            mostrarModal('Error de verificación: ' + (info || resp.status), 'error');
+                            return;
+                        }
+
+                        const json = await resp.json();
+                        if (json && json.ok) {
+                            // Guardar privilegios tanto en SessionStorage como en Window para consistencia global
+                            sessionStorage.setItem('ADMIN_BEARER', pass);
+                            window.ADMIN_BEARER = pass;
+                            perfil.nombre = 'admin';
+                        } else {
+                            mostrarModal('Contraseña incorrecta', 'error');
+                            return;
+                        }
+                    } catch (e) {
+                        console.error('Error al conectar con el endpoint de verificación', e);
+                        mostrarModal('No se pudo contactar con el servidor de verificación.', 'error');
+                        return;
+                    }
+                } else {
+                    perfil.nombre = newName;
+                }
+            }
+
+            // Mapeo del resto de inputs del perfil
+            if (nicknameInput) perfil.apodo = nicknameInput.value.trim();
+            if (ageInput) perfil.edad = parseInt(ageInput.value) || 0;
+            if (emailInput) perfil.correo = emailInput.value.trim();
+
+            // Ejecución unificada del guardado final
             saveperfil(perfil);
+            const modalEditar = document.getElementById("modal-editar");
+            if (modalEditar) modalEditar.style.display = "none";
 
-            const modal = document.getElementById("modal-editar");
-            if (modal) modal.style.display = "none";
+            mostrarModal('Perfil actualizado correctamente', 'success');
 
-            location.reload();
+            // Recarga para forzar a comentarios.js a leer el nuevo estado de "admin" con su token Bearer activado
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
         });
     }
-
 
     // Cerrar modal si se clica fuera
     if (modal) {

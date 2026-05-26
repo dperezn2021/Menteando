@@ -60,311 +60,306 @@
 
 
 const CATALOGO_JUEGOS = [
-    {
-        "id": "detector-intrusos",
-        "aliases": ["intrusos", "detector", "odd-one-out"],
-        "nombre": "Detector de Intrusos",
-        "categoria": "atencion",
-        "subtitulo": "Encuentra al sospechoso",
-        "descripcion": "Eres un detective que debe encontrar entre los archivos al sospechoso, el cual lleva una camiseta blanca. Cada vez hay más informes y menos tiempo para resolverlo. La lupa puede ayudar... o molestar más de lo que ayuda.",
-        "detalleDescripcion": "Detector de Intrusos entrena tu atención selectiva y velocidad de procesamiento. Actúas como detective: debes localizar al sospechoso (camiseta blanca) entre muchos informes (distractores). Cada nivel añade más archivos y reduce el tiempo disponible. La lupa aparece para ayudarte a enfocar, pero a veces señala al sitio equivocado, obligándote a inhibir esa distracción. La dificultad aumenta progresivamente.",
-        "comoJugar": [
-            "Eres un detective. Examina los archivos en pantalla.",
-            "Busca al sospechoso: el que lleva camiseta BLANCA.",
-            "Haz clic en él antes de que se acabe el tiempo.",
-            "Cada nivel hay MÁS informes y MENOS tiempo.",
-            "La lupa aparece para ayudarte... pero a veces señala al lugar equivocado. No te dejes engañar."
-        ],
-        "habilidadesDetalle": [
-            { "nombre": "Atención selectiva", "descripcion": "Detectas al sospechoso entre muchos distractores visuales." },
-            { "nombre": "Atención dividida", "descripcion": "Gestionas la lupa y los archivos al mismo tiempo." },
-            { "nombre": "Velocidad cognitiva", "descripcion": "Procesas rápido porque el tiempo se reduce." },
-            { "nombre": "Coordinación visomotora", "descripcion": "Transformas lo que ves en un clic preciso." }
-        ],
-        "url": "games/detector-intrusos/detector-intrusos-page.html",
-        "buildUrl": "games/detector-intrusos/detector-intrusos-build.html",
-        "imagen": "assets/juegos/detector-intrusos.png",
-        "logo": "assets/icon/juegos/detector-intrusos.png",
-        "heroEyebrow": "Búsqueda visual bajo presión",
-        "destacado": false,
-        "skills": ["atencion_selectiva", "atencion_dividida", "velocidad_cognitiva", "coordinacion_visomotora"],
-        "disponible": "Disponible"
-    },
-
-    {
-        "id": "doble-canal",
-        "aliases": ["dual-task", "doble tarea"],
-        "nombre": "Doble Canal",
-        "categoria": "atencion",
-        "subtitulo": "Doble tarea simultánea",
-        "descripcion": "Gestiona dos tareas simultáneas: esquivar obstáculos y responder a estímulos.",
-        "detalleDescripcion": "Doble Canal entrena tu capacidad de dividir la atención entre dos flujos de información. Requiere mantener el foco, inhibir errores y coordinar acciones rápidas.",
-        "comoJugar": [
-            "Controla al personaje del lado izquierdo para esquivar obstáculos.",
-            "Responde a los estímulos del lado derecho según la regla.",
-            "Mantén el rendimiento en ambos canales.",
-            "Gestiona la interferencia entre tareas."
-        ],
-        "habilidadesDetalle": [
-            { "nombre": "Atención dividida", "descripcion": "Gestionas dos tareas simultáneas sin perder precisión." },
-            { "nombre": "Atención sostenida", "descripcion": "Mantienes el rendimiento en ambos canales durante toda la partida." },
-            { "nombre": "Flexibilidad cognitiva", "descripcion": "Cambias rápidamente entre estímulos y acciones." },
-            { "nombre": "Planificación", "descripcion": "Anticipas movimientos y respuestas en paralelo." },
-            { "nombre": "Velocidad cognitiva", "descripcion": "Procesas información de dos fuentes a gran velocidad." },
-            { "nombre": "Coordinación visomotora", "descripcion": "Controlas el movimiento del personaje con precisión." }
-        ],
-        "url": "games/doble-canal/doble-canal-page.html",
-        "buildUrl": "games/doble-canal/doble-canal-build.html",
-        "imagen": "assets/juegos/doble-canal.png",
-        "logo": "assets/icon/juegos/doble-canal.png",
-        "heroEyebrow": "Atención dual",
-        "destacado": false,
-        "skills": ["atencion_dividida", "atencion_sostenida", "flexibilidad_cognitiva", "planificacion", "velocidad_cognitiva", "coordinacion_visomotora"],
-        "disponible": "Disponible"
-    },
-
-    {
-        "id": "silencio-mental",
-        "aliases": ["cpt", "go-nogo"],
-        "nombre": "Silencio Mental",
-        "categoria": "atencion",
-        "subtitulo": "Vigilancia e inhibición",
-        "descripcion": "Pulsa solo cuando aparece el estímulo objetivo. Inhibe el resto.",
-        "detalleDescripcion": "Silencio Mental es un CPT/Go-NoGo puro que entrena vigilancia, inhibición y discriminación rápida. Mantener la regla activa exige memoria de trabajo.",
-        "comoJugar": [
-            "Observa los estímulos que aparecen en pantalla.",
-            "Pulsa solo cuando aparezca el objetivo.",
-            "Inhibe la respuesta ante distractores.",
-            "Mantén la precisión durante toda la sesión."
-        ],
-        "habilidadesDetalle": [
-            { "nombre": "Atención selectiva", "descripcion": "Distingues estímulos relevantes de distractores." },
-            { "nombre": "Atención sostenida", "descripcion": "Mantienes la vigilancia durante toda la tarea." },
-            { "nombre": "Memoria de trabajo", "descripcion": "Mantienes activa la regla de respuesta." },
-            { "nombre": "Control inhibitorio", "descripcion": "Evitas pulsar cuando aparece un estímulo no objetivo." }
-        ],
-        "url": "games/silencio-mental/silencio-mental-page.html",
-        "buildUrl": "games/silencio-mental/silencio-mental-build.html",
-        "imagen": "assets/juegos/silencio-mental.png",
-        "logo": "assets/icon/juegos/silencio-mental.png",
-        "heroEyebrow": "Gestión controlada",
-        "destacado": false,
-        "skills": ["atencion_sostenida", "atencion_selectiva", "memoria_trabajo", "control_inhibitorio"],
-        "disponible": "Disponible"
-    },
-
-    {
-        "id": "operaciones-encadenadas",
-        "aliases": ["math-chain", "operaciones"],
-        "nombre": "Operaciones Encadenadas",
-        "categoria": "memoria",
-        "subtitulo": "Memoria y cálculo bajo presión",
-        "descripcion": "Recuerda un número mientras resuelves operaciones. Si fallas, el número se reinicia.",
-        "detalleDescripcion": "Primero memorizas un número que aparece en la calculadora. Luego resuelves operaciones (sumas, restas, multiplicaciones o divisiones). Cuando aparece un signo de interrogación (?) como dígito, debes sustituirlo por el número que memorizaste. Si fallas cualquier operación, el número se reinicia. La dificultad aumenta progresivamente. Entrena memoria de trabajo, atención sostenida y control inhibitorio.",
-        "comoJugar": [
-            "Memoriza el número que aparece en la calculadora.",
-            "Resuelve las operaciones que aparecen (+, -, ×, ÷).",
-            "Cuando veas un signo '?', sustitúyelo por el número que memorizaste.",
-            "Si fallas CUALQUIER operación, el número se reinicia.",
-            "¡Mantén la atención! La dificultad aumenta con cada acierto."
-        ],
-        "habilidadesDetalle": [
-            { "nombre": "Memoria de trabajo", "descripcion": "Mantienes el número activo mientras resuelves operaciones." },
-            { "nombre": "Control inhibitorio", "descripcion": "Evitas respuestas impulsivas antes de verificar." },
-            { "nombre": "Planificación", "descripcion": "Anticipas los pasos para resolver la cadena." },
-            { "nombre": "Velocidad cognitiva", "descripcion": "Procesas operaciones rápidamente bajo presión." },
-            { "nombre": "Atención selectiva", "descripcion": "Distingues el '?' de los demás dígitos." }
-        ],
-        "url": "games/operaciones-encadenadas/operaciones-encadenadas-page.html",
-        "buildUrl": "games/operaciones-encadenadas/operaciones-encadenadas-build.html",
-        "imagen": "assets/juegos/operaciones-encadenadas.png",
-        "logo": "assets/icon/juegos/operaciones-encadenadas.png",
-        "heroEyebrow": "Memoria activa y cálculo",
-        "destacado": false,
-        "skills": ["memoria_trabajo", "control_inhibitorio", "planificacion", "velocidad_cognitiva", "atencion_selectiva"],
-        "disponible": "Disponible"
-    },
-
-    {
-        "id": "eco-visual",
-        "aliases": ["corsi-visual", "memoria-espacial"],
-        "nombre": "Eco Visual",
-        "categoria": "memoria",
-        "subtitulo": "Memoria espacial",
-        "descripcion": "Memoriza la posición de varios objetos y colócalos después en su sitio.",
-        "detalleDescripcion": "Eco Visual es un Corsi adaptado que entrena memoria espacial, atención selectiva y reorganización mental.",
-        "comoJugar": [
-            "Observa la posición de los objetos.",
-            "Memoriza su distribución.",
-            "Arrástralos a su lugar correcto.",
-            "Completa niveles cada vez más complejos."
-        ],
-        "habilidadesDetalle": [
-            { "nombre": "Memoria espacial", "descripcion": "Retienes la ubicación de varios objetos simultáneamente." },
-            { "nombre": "Atención selectiva", "descripcion": "Distingues formas y posiciones relevantes." },
-            { "nombre": "Atención sostenida", "descripcion": "Mantienes el foco durante la reconstrucción." },
-            { "nombre": "Flexibilidad cognitiva", "descripcion": "Reorganizas mentalmente la escena cuando es necesario." }
-        ],
-        "url": "games/eco-visual/eco-visual-page.html",
-        "buildUrl": "games/eco-visual/eco-visual-build.html",
-        "imagen": "assets/juegos/eco-visual.png",
-        "logo": "assets/icon/juegos/eco-visual.png",
-        "heroEyebrow": "Memoria espacial",
-        "destacado": false,
-        "skills": ["memoria_espacial", "atencion_selectiva", "atencion_sostenida", "flexibilidad_cognitiva"],
-        "disponible": "No disponible"
-    },
-
-    {
-        "id": "color-match",
-        "aliases": ["stroop", "colores"],
-        "nombre": "Color Match",
-        "categoria": "control",
-        "subtitulo": "Control inhibitorio",
-        "descripcion": "Pulsa el color correcto ignorando la palabra escrita.",
-        "detalleDescripcion": "Color Match es un Stroop digital que entrena inhibición, velocidad y gestión de interferencias.",
-        "comoJugar": [
-            "Lee la palabra que aparece.",
-            "Ignora su significado.",
-            "Pulsa el color real del texto.",
-            "Evita caer en la interferencia."
-        ],
-        "habilidadesDetalle": [
-            { "nombre": "Control inhibitorio", "descripcion": "Bloqueas la lectura automática de la palabra." },
-            { "nombre": "Velocidad cognitiva", "descripcion": "Procesas el estímulo rápidamente para responder a tiempo." },
-            { "nombre": "Atención dividida", "descripcion": "Gestionas simultáneamente color y palabra." },
-            { "nombre": "Memoria de trabajo", "descripcion": "Mantienes activa la regla de respuesta." }
-        ],
-        "url": "games/color-match/color-match-page.html",
-        "buildUrl": "games/color-match/color-match-build.html",
-        "imagen": "assets/juegos/color-match.png",
-        "logo": "assets/icon/juegos/color-match.png",
-        "heroEyebrow": "Control inhibitorio",
-        "destacado": false,
-        "skills": ["control_inhibitorio", "velocidad_cognitiva", "atencion_dividida", "memoria_trabajo"],
-        "disponible": "Disponible"
-    },
-
-    {
-        "id": "cambio-de-reglas",
-        "aliases": ["wcst-digital", "reglas"],
-        "nombre": "Cambio de Reglas",
-        "categoria": "control",
-        "subtitulo": "Flexibilidad cognitiva",
-        "descripcion": "La regla cambia sin aviso. Adáptate rápidamente.",
-        "detalleDescripcion": "Este juego entrena flexibilidad cognitiva, inhibición y planificación al cambiar criterios de clasificación sin previo aviso.",
-        "comoJugar": [
-            "Lee la regla actual.",
-            "Toca los estímulos que cumplan la norma.",
-            "Adáptate cuando la regla cambie.",
-            "Evita perseverar en la regla anterior."
-        ],
-        "habilidadesDetalle": [
-            { "nombre": "Flexibilidad cognitiva", "descripcion": "Cambias de estrategia cuando la regla se actualiza." },
-            { "nombre": "Control inhibitorio", "descripcion": "Evitas seguir aplicando la regla anterior." },
-            { "nombre": "Planificación", "descripcion": "Decides qué estímulos tocar primero según la norma." },
-            { "nombre": "Memoria espacial", "descripcion": "Recuerdas dónde están los estímulos relevantes." }
-        ],
-        "url": "games/cambio-de-reglas/cambio-de-reglas-page.html",
-        "buildUrl": "games/cambio-de-reglas/cambio-de-reglas-build.html",
-        "imagen": "assets/juegos/cambio-de-reglas.png",
-        "logo": "assets/icon/juegos/cambio-de-reglas.png",
-        "heroEyebrow": "Flexibilidad cognitiva",
-        "destacado": false,
-        "skills": ["flexibilidad_cognitiva", "control_inhibitorio", "planificacion", "memoria_espacial"],
-        "disponible": "No disponible"
-    },
-
-    {
-        "id": "trayectorias-mentales",
-        "aliases": ["tol-digital", "trayectorias"],
-        "nombre": "Trayectorias Mentales",
-        "categoria": "control",
-        "subtitulo": "Planificación estratégica",
-        "descripcion": "Planifica el recorrido antes de mover el punto.",
-        "detalleDescripcion": "Un Tower of London adaptado que entrena planificación, memoria activa y representación espacial.",
-        "comoJugar": [
-            "Observa el mapa.",
-            "Elige dirección, fuerza y rebotes.",
-            "Planifica antes de ejecutar.",
-            "Optimiza tus movimientos."
-        ],
-        "habilidadesDetalle": [
-            { "nombre": "Planificación", "descripcion": "Organizas mentalmente los pasos antes de actuar." },
-            { "nombre": "Memoria de trabajo", "descripcion": "Mantienes el plan activo mientras decides." },
-            { "nombre": "Memoria espacial", "descripcion": "Representas mentalmente el mapa y los rebotes." },
-            { "nombre": "Atención sostenida", "descripcion": "Mantienes el foco durante la planificación." }
-        ],
-        "url": "games/trayectorias-mentales/trayectorias-mentales-page.html",
-        "buildUrl": "games/trayectorias-mentales/trayectorias-mentales-build.html",
-        "imagen": "assets/juegos/trayectorias-mentales.png",
-        "logo": "assets/icon/juegos/trayectorias-mentales.png",
-        "heroEyebrow": "Planificación estratégica",
-        "destacado": false,
-        "skills": ["planificacion", "memoria_trabajo", "memoria_espacial", "atencion_sostenida"],
-        "disponible": "No disponible"
-    },
-
-    {
-        "id": "mision-orbital",
-        "aliases": ["mision", "timing", "orbital"],
-        "nombre": "Misión Orbital",
-        "categoria": "reflejos",
-        "subtitulo": "Reflejos y sincronización",
-        "descripcion": "Eres un piloto con la misión de destruir el asteroide indicado. Tu nave tiene un selector de asteroides.",
-        "detalleDescripcion": "Eres un piloto de una nave con la misión de destruir el asteroide MALO. Tu nave tiene un selector de asteroides: debes pulsar la cruceta cuando el asteroide SELECCIONADO coincida con el asteroide MALO. Cada estación (nivel) es más complicado: más asteroides, más velocidad. Además, la nave se queda sin combustible progresivamente. Consigue destruir el máximo de asteroides malos antes de quedarte sin combustible. Entrena velocidad cognitiva, coordinación visomotora y atención selectiva.",
-        "comoJugar": [
-            "Eres un piloto. Observa el selector de asteroides de tu nave.",
-            "Identifica el asteroide MALO (objetivo a destruir).",
-            "Pulsa la cruceta CUANDO el selector coincida con el asteroide malo.",
-            "Cada nivel (estación) es más complicado: más asteroides y más velocidad.",
-            "¡La nave pierde combustible! Destruye asteroides antes de quedarte sin él."
-        ],
-        "habilidadesDetalle": [
-            { "nombre": "Velocidad cognitiva", "descripcion": "Procesas el movimiento y el selector rápidamente para acertar en el momento exacto." },
-            { "nombre": "Coordinación visomotora", "descripcion": "Sincronizas percepción visual y acción motora con precisión milimétrica." },
-            { "nombre": "Atención selectiva", "descripcion": "Distingues el asteroide malo entre los distractores y el selector." }
-        ],
-        "url": "games/mision-orbital/mision-orbital-page.html",
-        "buildUrl": "games/mision-orbital/mision-orbital-build.html",
-        "imagen": "assets/juegos/mision-orbital.png",
-        "logo": "assets/icon/juegos/mision-orbital.png",
-        "heroEyebrow": "Reflejos y sincronización",
-        "destacado": false,
-        "skills": ["velocidad_cognitiva", "coordinacion_visomotora"],
-        "disponible": "Disponible"
-    },
-
-    {
-        "id": "reflejos-cruzados",
-        "aliases": ["reflejos", "cross-reflex", "cruzados"],
-        "nombre": "Reflejos Cruzados",
-        "categoria": "reflejos",
-        "subtitulo": "Velocidad e inhibición",
-        "descripcion": "Toca los objetos verdes y esquiva los rojos. A veces cambian de comportamiento.",
-        "detalleDescripcion": "Reflejos Cruzados combina velocidad visomotora con control inhibitorio. Exige discriminar estímulos rápidamente, adaptarse a cambios inesperados y mantener precisión bajo presión.",
-        "comoJugar": [
-            "Toca los objetos verdes que caen por la pantalla.",
-            "Evita tocar los objetos rojos.",
-            "Reacciona rápido si un objeto cambia de comportamiento.",
-            "Mantén la precisión mientras aumenta la velocidad."
-        ],
-        "habilidadesDetalle": [
-            { "nombre": "Atención dividida", "descripcion": "Gestionas simultáneamente varios objetos en movimiento." },
-            { "nombre": "Memoria espacial", "descripcion": "Recuerdas la trayectoria y posición de los objetos relevantes." },
-            { "nombre": "Control inhibitorio", "descripcion": "Evitas tocar los estímulos incorrectos incluso bajo presión." },
-            { "nombre": "Flexibilidad cognitiva", "descripcion": "Te adaptas cuando un objeto cambia su comportamiento." },
-            { "nombre": "Coordinación visomotora", "descripcion": "Sincronizas tus movimientos con la caída de los objetos." }
-        ],
-        "url": "games/reflejos-cruzados/reflejos-cruzados-page.html",
-        "buildUrl": "games/reflejos-cruzados/reflejos-cruzados-build.html",
-        "imagen": "assets/juegos/reflejos-cruzados.png",
-        "logo": "assets/icon/juegos/reflejos-cruzados.png",
-        "heroEyebrow": "Reflejos y precisión",
-        "destacado": false,
-        "skills": ["coordinacion_visomotora", "atencion_dividida", "memoria_espacial", "control_inhibitorio", "flexibilidad_cognitiva"],
-        "disponible": "No disponible"
-    }
+  {
+    "id": "detector-intrusos",
+    "aliases": ["intrusos", "detector", "odd-one-out"],
+    "nombre": "Detector de Intrusos",
+    "categoria": "atencion",
+    "subtitulo": "Atención selectiva",
+    "descripcion": "Encuentra al sospechoso con camiseta blanca entre muchos expedientes antes de que se acabe el tiempo.",
+    "detalleDescripcion": "Eres un detective revisando carpetas de criminales. En cada ronda debes localizar al intruso: el sospechoso que lleva camiseta blanca. A medida que avanzas aparecen más personas y tienes menos tiempo, por lo que debes filtrar distractores rápidamente y hacer clic con precisión.",
+    "comoJugar": [
+      "Observa todos los expedientes que aparecen en pantalla.",
+      "Busca al sospechoso que lleva camiseta blanca.",
+      "Haz clic sobre él antes de que termine el tiempo.",
+      "En niveles altos habrá más sospechosos y menos tiempo para responder.",
+      "Si aparece una ayuda visual, úsala con cuidado: puede distraerte."
+    ],
+    "habilidadesDetalle": [
+      { "nombre": "Atención selectiva", "descripcion": "Habilidad principal. Mide tu precisión localizando el objetivo correcto entre muchos distractores." },
+      { "nombre": "Velocidad cognitiva", "descripcion": "Evalúa lo rápido que procesas la escena y respondes dentro del tiempo disponible." },
+      { "nombre": "Coordinación visomotora", "descripcion": "Combina precisión visual y clic correcto sobre el sospechoso." },
+      { "nombre": "Atención dividida", "descripcion": "Valora tu capacidad para manejar una pantalla cada vez más cargada sin perder el objetivo." }
+    ],
+    "url": "games/detector-intrusos/detector-intrusos-page.html",
+    "buildUrl": "games/detector-intrusos/detector-intrusos-build.html",
+    "imagen": "assets/juegos/detector-intrusos.png",
+    "logo": "assets/icon/juegos/detector-intrusos.png",
+    "heroEyebrow": "Búsqueda visual bajo presión",
+    "destacado": false,
+    "skills": ["atencion_selectiva", "velocidad_cognitiva", "coordinacion_visomotora", "atencion_dividida"],
+    "disponible": "Disponible"
+  },
+  {
+    "id": "doble-canal",
+    "aliases": ["dual-task", "doble tarea"],
+    "nombre": "Doble Canal",
+    "categoria": "atencion",
+    "subtitulo": "Atención dividida",
+    "descripcion": "Juega dos tareas a la vez: esquiva obstáculos y responde solo a las señales correctas.",
+    "detalleDescripcion": "Doble Canal divide la pantalla en dos tareas simultáneas. En una controlas a un personaje que debe esquivar obstáculos. En la otra respondes a señales: la azul se pulsa y la roja se inhibe. El reto consiste en mantener buen rendimiento en ambos canales sin descuidar ninguno.",
+    "comoJugar": [
+      "Controla al personaje para esquivar los obstáculos.",
+      "Cuando aparezca una señal azul, pulsa la respuesta.",
+      "Cuando aparezca una señal roja, no pulses.",
+      "Intenta mantener la atención en las dos tareas al mismo tiempo.",
+      "La dificultad aumenta con más velocidad, más obstáculos y menos margen de reacción."
+    ],
+    "habilidadesDetalle": [
+      { "nombre": "Atención dividida", "descripcion": "Habilidad principal. Mide cómo repartes tu atención entre la tarea motora y la tarea de señales." },
+      { "nombre": "Coordinación visomotora", "descripcion": "Evalúa la precisión con la que controlas el personaje y esquivas obstáculos." },
+      { "nombre": "Atención sostenida", "descripcion": "Valora si mantienes el rendimiento durante toda la partida." },
+      { "nombre": "Velocidad cognitiva", "descripcion": "Mide tu rapidez al interpretar señales y responder." }
+    ],
+    "url": "games/doble-canal/doble-canal-page.html",
+    "buildUrl": "games/doble-canal/doble-canal-build.html",
+    "imagen": "assets/juegos/doble-canal.png",
+    "logo": "assets/icon/juegos/doble-canal.png",
+    "heroEyebrow": "Doble tarea simultánea",
+    "destacado": false,
+    "skills": ["atencion_dividida", "coordinacion_visomotora", "atencion_sostenida", "velocidad_cognitiva"],
+    "disponible": "Disponible"
+  },
+  {
+    "id": "silencio-mental",
+    "aliases": ["cpt", "go-nogo"],
+    "nombre": "Silencio Mental",
+    "categoria": "atencion",
+    "subtitulo": "Atención sostenida",
+    "descripcion": "Memoriza la lección y levanta la mano solo cuando vuelva a aparecer el mismo símbolo.",
+    "detalleDescripcion": "Estás en una clase. Al inicio de cada ronda se muestra una lección: un símbolo concreto con un color concreto. Después aparecen varios estímulos. Solo debes responder cuando vuelva a salir exactamente el símbolo aprendido. Si aparece otro, debes esperar.",
+    "comoJugar": [
+      "Memoriza el símbolo y el color que se muestran como lección.",
+      "Observa los estímulos que aparecen después.",
+      "Pulsa para levantar la mano solo si reaparece la misma lección.",
+      "No pulses ante símbolos o colores diferentes.",
+      "Mantén la concentración durante toda la sesión."
+    ],
+    "habilidadesDetalle": [
+      { "nombre": "Atención sostenida", "descripcion": "Habilidad principal. Mide tu capacidad para mantener la vigilancia durante toda la tarea." },
+      { "nombre": "Control inhibitorio", "descripcion": "Evalúa si evitas responder ante estímulos que no son la lección correcta." },
+      { "nombre": "Atención selectiva", "descripcion": "Valora si distingues el objetivo real de los distractores." },
+      { "nombre": "Memoria de trabajo", "descripcion": "Mide si mantienes activa la lección que debes reconocer." }
+    ],
+    "url": "games/silencio-mental/silencio-mental-page.html",
+    "buildUrl": "games/silencio-mental/silencio-mental-build.html",
+    "imagen": "assets/juegos/silencio-mental.png",
+    "logo": "assets/icon/juegos/silencio-mental.png",
+    "heroEyebrow": "Vigilancia e inhibición",
+    "destacado": false,
+    "skills": ["atencion_sostenida", "control_inhibitorio", "atencion_selectiva", "memoria_trabajo"],
+    "disponible": "Disponible"
+  },
+  {
+    "id": "operaciones-encadenadas",
+    "aliases": ["math-chain", "operaciones"],
+    "nombre": "Operaciones Encadenadas",
+    "categoria": "memoria",
+    "subtitulo": "Memoria de trabajo",
+    "descripcion": "Recuerda un número y úsalo cuando aparezca una interrogación dentro de una operación.",
+    "detalleDescripcion": "Trabajas con una calculadora. Primero memorizas un número. Después resuelves operaciones con sumas, restas, multiplicaciones o divisiones. A veces uno de los dígitos aparece como interrogación; en ese caso debes sustituirlo mentalmente por el número recordado.",
+    "comoJugar": [
+      "Memoriza el número que aparece al inicio.",
+      "Resuelve las operaciones que te propone la calculadora.",
+      "Cuando veas una interrogación, sustitúyela por el número memorizado.",
+      "Introduce el resultado final de la operación.",
+      "Si fallas, tendrás que volver a fijar el número en memoria."
+    ],
+    "habilidadesDetalle": [
+      { "nombre": "Memoria de trabajo", "descripcion": "Habilidad principal. Mide si mantienes el número activo mientras haces cálculos." },
+      { "nombre": "Planificación", "descripcion": "Evalúa cómo organizas mentalmente operaciones más largas o complejas." },
+      { "nombre": "Velocidad cognitiva", "descripcion": "Valora la rapidez con la que resuelves las operaciones." },
+      { "nombre": "Atención selectiva", "descripcion": "Mide si detectas correctamente cuándo aparece la interrogación relevante." }
+    ],
+    "url": "games/operaciones-encadenadas/operaciones-encadenadas-page.html",
+    "buildUrl": "games/operaciones-encadenadas/operaciones-encadenadas-build.html",
+    "imagen": "assets/juegos/operaciones-encadenadas.png",
+    "logo": "assets/icon/juegos/operaciones-encadenadas.png",
+    "heroEyebrow": "Memoria activa y cálculo",
+    "destacado": false,
+    "skills": ["memoria_trabajo", "planificacion", "velocidad_cognitiva", "atencion_selectiva"],
+    "disponible": "Disponible"
+  },
+  {
+    "id": "eco-visual",
+    "aliases": ["corsi-visual", "memoria-espacial"],
+    "nombre": "Eco Visual",
+    "categoria": "memoria",
+    "subtitulo": "Memoria espacial",
+    "descripcion": "Observa varios objetos, recuerda dónde estaban y vuelve a colocarlos en su posición.",
+    "detalleDescripcion": "Eco Visual es una tarea de memoria espacial. Primero se muestran objetos colocados en distintas posiciones. Después desaparecen o se desordenan, y debes arrastrarlos al lugar que recuerdas. Al terminar se compara tu colocación con la posición original.",
+    "comoJugar": [
+      "Observa con atención la posición de cada objeto.",
+      "Memoriza la distribución antes de que cambie la pantalla.",
+      "Arrastra cada objeto al lugar donde crees que estaba.",
+      "Cuanto más cerca lo coloques, mejor será tu resultado.",
+      "En niveles superiores aparecen más objetos y posiciones más difíciles."
+    ],
+    "habilidadesDetalle": [
+      { "nombre": "Memoria espacial", "descripcion": "Habilidad principal. Mide la precisión con la que recuerdas ubicaciones." },
+      { "nombre": "Atención selectiva", "descripcion": "Evalúa si atiendes a los objetos y posiciones relevantes." },
+      { "nombre": "Flexibilidad cognitiva", "descripcion": "Valora tu capacidad para reorganizar mentalmente la escena." },
+      { "nombre": "Atención sostenida", "descripcion": "Mide si mantienes el foco durante observación y reconstrucción." }
+    ],
+    "url": "games/eco-visual/eco-visual-page.html",
+    "buildUrl": "games/eco-visual/eco-visual-build.html",
+    "imagen": "assets/juegos/eco-visual.png",
+    "logo": "assets/icon/juegos/eco-visual.png",
+    "heroEyebrow": "Recuerdo de posiciones",
+    "destacado": false,
+    "skills": ["memoria_espacial", "atencion_selectiva", "flexibilidad_cognitiva", "atencion_sostenida"],
+    "disponible": "Disponible"
+  },
+  {
+    "id": "color-match",
+    "aliases": ["stroop", "colores"],
+    "nombre": "Color Match",
+    "categoria": "control",
+    "subtitulo": "Control inhibitorio",
+    "descripcion": "Responde al color correcto aunque la palabra escrita intente confundirte.",
+    "detalleDescripcion": "Color Match es una tarea tipo Stroop. Aparece una palabra de color pintada con otro color. Según la regla activa, debes responder al color de la tinta o al significado de la palabra. El reto es evitar la respuesta automática incorrecta.",
+    "comoJugar": [
+      "Lee la regla activa antes de responder.",
+      "Si la regla pide color real, pulsa el color con el que está pintado el texto.",
+      "Si la regla pide palabra, pulsa el color que la palabra dice.",
+      "Ignora la información que no corresponda a la regla.",
+      "Responde con precisión y rapidez."
+    ],
+    "habilidadesDetalle": [
+      { "nombre": "Control inhibitorio", "descripcion": "Habilidad principal. Mide si bloqueas la respuesta automática que provoca interferencia." },
+      { "nombre": "Velocidad cognitiva", "descripcion": "Evalúa la rapidez con la que procesas la regla y respondes." },
+      { "nombre": "Atención dividida", "descripcion": "Valora cómo gestionas color visual y significado escrito al mismo tiempo." },
+      { "nombre": "Memoria de trabajo", "descripcion": "Mide si mantienes activa la regla de respuesta." }
+    ],
+    "url": "games/color-match/color-match-page.html",
+    "buildUrl": "games/color-match/color-match-build.html",
+    "imagen": "assets/juegos/color-match.png",
+    "logo": "assets/icon/juegos/color-match.png",
+    "heroEyebrow": "Interferencia y respuesta",
+    "destacado": false,
+    "skills": ["control_inhibitorio", "velocidad_cognitiva", "atencion_dividida", "memoria_trabajo"],
+    "disponible": "Disponible"
+  },
+  {
+    "id": "cambio-de-reglas",
+    "aliases": ["wcst-digital", "reglas"],
+    "nombre": "Cambio de Reglas",
+    "categoria": "control",
+    "subtitulo": "Flexibilidad cognitiva",
+    "descripcion": "Clasifica alimentos siguiendo una norma que cambia durante la partida.",
+    "detalleDescripcion": "Estás en una cocina y debes tocar los alimentos que cumplen la norma activa. La regla puede pedir frutas, verduras, carnes, bebidas, alimentos verdes, rojos, dulces, fríos, cocinados u otras categorías. Cuando la norma cambia, debes abandonar la regla anterior y adaptarte rápido.",
+    "comoJugar": [
+      "Lee la norma que aparece en la parte superior.",
+      "Toca solo los alimentos que cumplen esa norma.",
+      "Si la regla dice evitar una categoría, no pulses esos alimentos.",
+      "Cuando aparezca una norma nueva, cambia de estrategia inmediatamente.",
+      "Intenta mantener la racha sin seguir aplicando la regla anterior."
+    ],
+    "habilidadesDetalle": [
+      { "nombre": "Flexibilidad cognitiva", "descripcion": "Habilidad principal. Mide cómo te adaptas cuando cambia la norma de clasificación." },
+      { "nombre": "Control inhibitorio", "descripcion": "Evalúa si evitas pulsar alimentos incorrectos o seguir la regla anterior." },
+      { "nombre": "Planificación", "descripcion": "Valora cómo decides qué alimentos tocar primero para completar la ronda." },
+      { "nombre": "Memoria espacial", "descripcion": "Mide si recuerdas dónde están los alimentos relevantes mientras cambia la regla." }
+    ],
+    "url": "games/cambio-de-reglas/cambio-de-reglas-page.html",
+    "buildUrl": "games/cambio-de-reglas/cambio-de-reglas-build.html",
+    "imagen": "assets/juegos/cambio-de-reglas.png",
+    "logo": "assets/icon/juegos/cambio-de-reglas.png",
+    "heroEyebrow": "Cambio de criterio",
+    "destacado": false,
+    "skills": ["flexibilidad_cognitiva", "control_inhibitorio", "planificacion", "memoria_espacial"],
+    "disponible": "Disponible"
+  },
+  {
+    "id": "trayectorias-mentales",
+    "aliases": ["tol-digital", "trayectorias"],
+    "nombre": "Trayectorias Mentales",
+    "categoria": "control",
+    "subtitulo": "Planificación",
+    "descripcion": "Ayuda a la rata a escapar calculando la trayectoria y el número exacto de rebotes.",
+    "detalleDescripcion": "Eres una rata que debe salir de una cueva siguiendo el olor del queso. Antes de moverte debes apuntar la dirección inicial. La rata avanzará sola, rebotando en paredes. Para superar el nivel debe escapar por la salida cumpliendo exactamente el número de rebotes indicado.",
+    "comoJugar": [
+      "Observa la cueva, la salida y el número de rebotes requerido.",
+      "Mueve el ratón para orientar a la rata.",
+      "Usa la vista previa limitada para imaginar la trayectoria.",
+      "Haz clic para lanzar la rata; después no podrás corregirla.",
+      "Evita trampas y usa power-ups si aparecen: rebote extra o vida extra."
+    ],
+    "habilidadesDetalle": [
+      { "nombre": "Planificación", "descripcion": "Habilidad principal. Mide si anticipas la ruta antes de ejecutar el movimiento." },
+      { "nombre": "Memoria de trabajo", "descripcion": "Evalúa si mantienes activo el número de rebotes y el plan de ruta." },
+      { "nombre": "Memoria espacial", "descripcion": "Valora cómo representas mentalmente paredes, salida, trampas y rebotes." },
+      { "nombre": "Atención sostenida", "descripcion": "Mide si mantienes el foco durante la planificación de cada intento." }
+    ],
+    "url": "games/trayectorias-mentales/trayectorias-mentales-page.html",
+    "buildUrl": "games/trayectorias-mentales/trayectorias-mentales-build.html",
+    "imagen": "assets/juegos/trayectorias-mentales.png",
+    "logo": "assets/icon/juegos/trayectorias-mentales.png",
+    "heroEyebrow": "Ruta antes de actuar",
+    "destacado": false,
+    "skills": ["planificacion", "memoria_trabajo", "memoria_espacial", "atencion_sostenida"],
+    "disponible": "Disponible"
+  },
+  {
+    "id": "mision-orbital",
+    "aliases": ["mision", "timing", "orbital"],
+    "nombre": "Misión Orbital",
+    "categoria": "reflejos",
+    "subtitulo": "Velocidad cognitiva",
+    "descripcion": "Dispara cuando el selector amarillo coincida con el asteroide explosivo marcado en rojo.",
+    "detalleDescripcion": "Estás en una misión espacial. En un anillo de asteroides hay un asteroide explosivo marcado en rojo. El selector amarillo va cambiando de asteroide. Debes disparar justo cuando el selector coincida con el objetivo rojo. En niveles altos hay más asteroides, más velocidad y cambios de dirección.",
+    "comoJugar": [
+      "Localiza el asteroide explosivo marcado en rojo.",
+      "Observa el selector amarillo que va pasando por los asteroides.",
+      "Dispara solo cuando el selector esté sobre el asteroide rojo.",
+      "Anticipa el momento exacto para no disparar tarde ni pronto.",
+      "En niveles altos el movimiento será más rápido y puede cambiar de dirección."
+    ],
+    "habilidadesDetalle": [
+      { "nombre": "Velocidad cognitiva", "descripcion": "Habilidad principal. Mide lo rápido que procesas el movimiento del selector." },
+      { "nombre": "Coordinación visomotora", "descripcion": "Evalúa la precisión temporal entre lo que ves y el disparo." },
+      { "nombre": "Flexibilidad cognitiva", "descripcion": "Valora tu adaptación cuando aumenta la dificultad o cambia la dirección." },
+      { "nombre": "Planificación", "descripcion": "Mide tu capacidad para anticipar el momento correcto de disparo." }
+    ],
+    "url": "games/mision-orbital/mision-orbital-page.html",
+    "buildUrl": "games/mision-orbital/mision-orbital-build.html",
+    "imagen": "assets/juegos/mision-orbital.png",
+    "logo": "assets/icon/juegos/mision-orbital.png",
+    "heroEyebrow": "Timing espacial",
+    "destacado": false,
+    "skills": ["velocidad_cognitiva", "coordinacion_visomotora", "flexibilidad_cognitiva", "planificacion"],
+    "disponible": "Disponible"
+  },
+  {
+    "id": "reflejos-cruzados",
+    "aliases": ["reflejos", "cross-reflex", "cruzados"],
+    "nombre": "Reflejos Cruzados",
+    "categoria": "reflejos",
+    "subtitulo": "Coordinación visomotora",
+    "descripcion": "Eres un sheriff: dispara a las dianas correctas según la norma activa.",
+    "detalleDescripcion": "Reflejos Cruzados te coloca como sheriff ante dianas que caen por la pantalla. Normalmente debes disparar a las verdes y evitar las rojas, pero durante la partida la norma puede invertirse. El reto es reaccionar rápido sin disparar a la diana equivocada.",
+    "comoJugar": [
+      "Lee la norma activa: indica si debes disparar a verdes o rojas.",
+      "Haz clic sobre las dianas correctas antes de que desaparezcan.",
+      "No dispares a las dianas que no correspondan a la norma.",
+      "Cuando la regla se invierta, cambia tu respuesta inmediatamente.",
+      "Mantén la racha mientras aumenta la velocidad."
+    ],
+    "habilidadesDetalle": [
+      { "nombre": "Coordinación visomotora", "descripcion": "Habilidad principal. Mide la precisión con la que conviertes estímulos visuales en disparos." },
+      { "nombre": "Control inhibitorio", "descripcion": "Evalúa si evitas disparar a dianas incorrectas." },
+      { "nombre": "Memoria espacial", "descripcion": "Valora cómo sigues la posición y trayectoria de varias dianas." },
+      { "nombre": "Planificación", "descripcion": "Mide cómo priorizas qué dianas disparar para mantener precisión y racha." }
+    ],
+    "url": "games/reflejos-cruzados/reflejos-cruzados-page.html",
+    "buildUrl": "games/reflejos-cruzados/reflejos-cruzados-build.html",
+    "imagen": "assets/juegos/reflejos-cruzados.png",
+    "logo": "assets/icon/juegos/reflejos-cruzados.png",
+    "heroEyebrow": "Disparo preciso",
+    "destacado": false,
+    "skills": ["coordinacion_visomotora", "control_inhibitorio", "memoria_espacial", "planificacion"],
+    "disponible": "Disponible"
+  }
 ];
 
 function normalizeGameKey(value) {

@@ -27,7 +27,7 @@
         let puntosAAñadir = Number(data.puntos);
         if (isNaN(puntosAAñadir)) puntosAAñadir = 0;
         
-        perfil.puntos += puntosAAñadir;
+        perfil.puntos = Number(perfil.puntos || 0) + puntosAAñadir;
         
         // ACTUALIZAR SESIONES DIARIAS
         if (typeof actualizarSesionesDiarias === 'function') {

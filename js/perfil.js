@@ -54,7 +54,7 @@ function getperfil() {
 
     perfil = Object.assign({}, perfilBase, perfil);
     perfil.detalle = Object.assign({}, perfilBase.detalle, perfil.detalle);
-
+    perfil.puntos = Number(perfil.puntos || 0);
     return perfil;
 }
 
@@ -258,28 +258,61 @@ function getUltimasSesiones(perfil, limite = 3) {
 }
 // ========== SESIONES DIARIAS ==========
 function sincronizarSesionesDiarias(perfil) {
-    const hoyStr = new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
+    const hoy = new Date();
+    const hoyStr = hoy.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
 
-    if (!perfil.ultimaSesionDia) {
-        perfil.sesionesDiarias = [0, 0, 0, 0, 0, 0, 0]; // ← LIMPIA
+    // Inicializar si es la primera vez
+    if (!perfil.sesionesDiarias || !perfil.ultimaSesionDia) {
+        perfil.sesionesDiarias = [0, 0, 0, 0, 0, 0, 0];
+        perfil.sesionesDiarias[6] = 1; // Hoy = 1 sesión
         perfil.ultimaSesionDia = hoyStr;
+        perfil.racha = 1;
+        if (!perfil.rachaMaxima) perfil.rachaMaxima = 1;
         saveperfil(perfil);
         return;
     }
 
+    // Si ya registró hoy, simplemente salir (ya se contó la sesión al inicio del día)
     if (perfil.ultimaSesionDia === hoyStr) return;
 
-    const diasPasados = calcularDiasPasados(perfil.ultimaSesionDia, hoyStr);
-    if (diasPasados <= 0) return;
+    // Calcular días transcurridos desde la última sesión
+    const [d1, m1] = perfil.ultimaSesionDia.split('/').map(Number);
+    const fechaUltima = new Date(hoy.getFullYear(), m1 - 1, d1);
+    const diffDias = Math.floor((hoy - fechaUltima) / 86400000);
 
-    for (let i = 0; i < diasPasados; i++) {
+    if (diffDias <= 0) return;
+
+    // Desplazar el array: eliminar días viejos, añadir ceros por días sin jugar
+    const diasDesplazar = Math.min(diffDias, 7);
+    for (let i = 0; i < diasDesplazar; i++) {
         perfil.sesionesDiarias.shift();
         perfil.sesionesDiarias.push(0);
     }
 
+    // Registrar 1 sesión hoy (no acumular)
+    perfil.sesionesDiarias[6] = 1;
     perfil.ultimaSesionDia = hoyStr;
+
+    // Calcular racha actual
+    let racha = 0;
+    for (let i = 6; i >= 0; i--) {
+        if (perfil.sesionesDiarias[i] > 0) {
+            racha++;
+        } else {
+            break;
+        }
+    }
+    perfil.racha = racha;
+
+    // Máxima racha histórica
+    if (racha > (perfil.rachaMaxima || 0)) {
+        perfil.rachaMaxima = racha;
+        perfil.nuevaRachaMaxima = true;
+    }
+
     saveperfil(perfil);
 }
+
 
 function getDiasJugadosSemana(perfil) {
     sincronizarSesionesDiarias(perfil);
@@ -293,24 +326,16 @@ function actualizarSesionesDiarias(perfil) {
     return perfil;
 }
 
-function calcularDiasPasados(fechaAnteriorStr, fechaActualStr) {
-    const [d1, m1] = fechaAnteriorStr.split("/").map(Number);
-    const [d2, m2] = fechaActualStr.split("/").map(Number);
-
-    const hoy = new Date();
-    let añoAnterior = hoy.getFullYear();
-    let añoActual = hoy.getFullYear();
-
-    if (m1 > m2 || (m1 === m2 && d1 > d2)) {
-        añoAnterior--;
-    }
-
-    const fecha1 = new Date(añoAnterior, m1 - 1, d1);
-    const fecha2 = new Date(añoActual, m2 - 1, d2);
-
-    return Math.floor((fecha2 - fecha1) / 86400000);
+function calcularDiasPasados(fechaStr1, fechaStr2) {
+    const [d1, m1] = fechaStr1.split('/').map(Number);
+    const [d2, m2] = fechaStr2.split('/').map(Number);
+    
+    const fecha1 = new Date(new Date().getFullYear(), m1 - 1, d1);
+    const fecha2 = new Date(new Date().getFullYear(), m2 - 1, d2);
+    
+    const diff = Math.floor((fecha2 - fecha1) / 86400000);
+    return Math.max(0, diff);
 }
-
 
 
 // ========== COACH ==========
