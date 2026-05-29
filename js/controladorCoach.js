@@ -2,23 +2,63 @@ function CoachController(perfil) {
     if (isCoachDisabled()) return;
     
     this.perfil = perfil;
-    this.entity = new CoachEntity(
-        document.getElementById("coach"),
-        document.getElementById("coach-bubble")
-    );
-    
+    this.entity = null;
     this.timer = null;
-    this.setupListeners();
-    this.mostrarMensajeActual();
+    this.init();
 }
+
+CoachController.prototype.init = function() {
+    const self = this;
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            self.setupCoach();
+        });
+    } else {
+        this.setupCoach();
+    }
+};
+
+CoachController.prototype.setupCoach = function() {
+    const coachElement = document.getElementById("coach");
+    const bubbleElement = document.getElementById("coach-bubble");
+    if (!coachElement || !bubbleElement) return;
+    
+    this.entity = new CoachEntity(coachElement, bubbleElement);
+    this.setupListeners();
+    this.ajustarPosicion();
+    this.mostrarMensajeActual();
+    
+    window.addEventListener('resize', () => this.ajustarPosicion());
+    window.addEventListener('orientationchange', () => setTimeout(() => this.ajustarPosicion(), 100));
+};
+
+CoachController.prototype.ajustarPosicion = function() {
+    if (!this.entity || !this.entity.bubble || !this.entity.element) return;
+    
+    const coach = this.entity.element;
+    const bubble = this.entity.bubble;
+    
+    // Obtener dimensiones
+    const coachRect = coach.getBoundingClientRect();
+    const bubbleWidth = bubble.offsetWidth;
+    
+    // Si la burbuja no cabe a la izquierda, ponerla arriba
+    const cabeIzquierda = coachRect.left - bubbleWidth - 20 >= 0;
+    
+    if (cabeIzquierda) {
+        coach.classList.remove('bubble-top');
+    } else {
+        coach.classList.add('bubble-top');
+    }
+};
 
 CoachController.prototype.setupListeners = function() {
     const self = this;
     const hideAndSchedule = function() {
-        self.entity.hide();
+        if (self.entity) self.entity.hide();
         if (self.timer) clearTimeout(self.timer);
         self.timer = setTimeout(function() {
-            self.mostrarMensajeActual();
+            if (self.entity) self.mostrarMensajeActual();
         }, 5000);
     };
     document.addEventListener("click", hideAndSchedule);
@@ -26,6 +66,10 @@ CoachController.prototype.setupListeners = function() {
 };
 
 CoachController.prototype.mostrarMensajeActual = function() {
+    if (!this.entity) return;
+    
+    this.ajustarPosicion();
+    
     const path = window.location.pathname;
     let contexto = "inicio";
     if (path.includes("perfil.html")) contexto = "perfil";
@@ -38,6 +82,7 @@ CoachController.prototype.mostrarMensajeActual = function() {
 };
 
 CoachController.prototype.onResultados = function(skill, diferencia, nuevaMedalla) {
+    if (!this.entity) return;
     const msg = getCoachMessage(this.perfil, "resultados", null, { skill, diferencia, nuevaMedalla });
     if (msg) this.entity.show(msg);
 };

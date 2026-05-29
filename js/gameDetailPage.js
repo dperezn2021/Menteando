@@ -77,10 +77,55 @@ function renderGameDetailPage(gameId) {
     let color = juego.disponible === "Disponible" ? 'bg-green-500' : 'bg-red-500';
 
     content.innerHTML = `
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 py-8 lg:py-10">
-            <div class="items-stretch grid grid-cols-1 xl:grid-cols-[1.35fr_0.85fr] gap-8 ">
-                <article class="flex flex-col h-full rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
-                    <div class="relative flex-1 aspect-video bg-slate-950">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 py-8 lg:py-10">
+        
+        <!-- ============================================================ -->
+        <!-- 1. EYEBROWN + TÍTULO + DESCRIPCIÓN + SOBRE EL JUEGO         -->
+        <!-- ============================================================ -->
+        <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-6 lg:p-8 mb-8">
+            <span class="inline-flex px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-sm font-bold uppercase tracking-[0.2em] mb-5">
+                ${juego.heroEyebrow || "Juego recomendado"}
+            </span>
+            <h2 class="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white leading-tight mb-4">
+                ${juego.nombre}
+            </h2>
+            <p class="text-lg leading-8 text-slate-600 dark:text-slate-300 mb-6">
+                ${juego.descripcion}
+            </p>
+            
+            <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Sobre el juego</h3>
+                </div>
+                <p class="text-slate-600 dark:text-slate-300 leading-8">${juego.detalleDescripcion || juego.descripcion}</p>
+            </div>
+            <div class="flex flex-wrap mt-6 gap-3">
+                ${skillChips}
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 2. CÓMO SE JUEGA + JUEGO (2 columnas en desktop)            -->
+        <!-- ============================================================ -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            
+            <!-- Cómo se juega -->
+            <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-6 lg:p-8">
+                <div class="flex items-center gap-3 mb-5">
+                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Cómo se juega</h3>
+                </div>
+                <ol class="space-y-4">${howToPlay}</ol>
+            </div>
+
+            <!-- Juego (iframe) -->
+            <article class="flex flex-col h-full rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
+                <div class="relative flex-1 aspect-video bg-slate-950">
                     <iframe 
                         id="game-iframe" 
                         src="${juego.buildUrl.split("/").pop()}" 
@@ -89,82 +134,72 @@ function renderGameDetailPage(gameId) {
                         allowfullscreen
                         referrerpolicy="no-referrer"
                         loading="eager">
-                    </iframe>                    </div>
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
-                        <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-                            <span class="w-2.5 h-2.5 rounded-full ${color} inline-block"></span>
-                            ${juego.disponible}
-                        </span>
-                        <button id="fullscreen-btn" class="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold hover:bg-blue-500 dark:hover:bg-blue-500 dark:hover:text-white transition-colors">
-                            Pantalla completa
-                        </button>
-                    </div>
-                </article>
-                <div class="flex flex-col gap-6">
-                    <aside class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-6 lg:p-8">
-                        <span class="inline-flex px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-sm font-bold uppercase tracking-[0.2em] mb-5">
-                            ${juego.heroEyebrow || "Juego recomendado"}
-                        </span>
-                        <h2 class="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white leading-tight mb-4">
-                            ${juego.nombre}
-                        </h2>
-                        <p class="text-lg leading-8 text-slate-600 dark:text-slate-300 mb-6">
-                            ${juego.descripcion}
-                        </p>
-                        <div class="flex flex-wrap gap-3">
-                            ${skillChips}
-                        </div>
-                    </aside>
-                    <div class="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-6">
-                        <p class="text-sm font-medium text-indigo-400">¿Problemas técnicos?</p>
-                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Si el juego no carga correctamente, prueba a recargar la página o revisa tu conexión.</p>
-                        <button class="mt-4 w-full rounded-lg bg-slate-900 text-white py-2 text-sm font-bold hover:bg-blue-500 transition">Recargar juego</button>
-                        <button class="mt-2 w-full rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white py-2 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">Contactar</button>
-                    </div>
+                    </iframe>
                 </div>
-            </div>
-            <div class="grid grid-cols-1 xl:grid-cols-[1.35fr_0.85fr] gap-8 mt-8">
-                <div class="space-y-8">
-                    <section class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-6 lg:p-8">
-                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Sobre el juego</h3>
-                        <p class="text-slate-600 dark:text-slate-300 leading-8">${juego.detalleDescripcion || juego.descripcion}</p>
-                    </section>
-                    <section class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-6 lg:p-8">
-                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-5">Como se juega</h3>
-                        <ol class="space-y-4">${howToPlay}</ol>
-                    </section>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
+                    <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                        <span class="w-2.5 h-2.5 rounded-full ${color} inline-block"></span>
+                        ${juego.disponible}
+                    </span>
+                    <button id="fullscreen-btn" class="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-bold hover:bg-blue-500 dark:hover:bg-blue-500 dark:hover:text-white transition-colors">
+                        Pantalla completa
+                    </button>
                 </div>
-                <aside class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-6 lg:p-8">
-                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-5">Habilidades cognitivas</h3>
-                    <ul class="space-y-5">${skillsDetail}</ul>
-                </aside>
-            </div>
+            </article>
+        </div>
 
-            <div class="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-6 mt-6">
-                <div class="flex items-center gap-3 mb-3">
-                <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                    </path>
+        <!-- ============================================================ -->
+        <!-- 3. HABILIDADES COGNITIVAS                                   -->
+        <!-- ============================================================ -->
+        <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-6 lg:p-8 mb-8">
+            <div class="flex items-center gap-3 mb-5">
+                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                 </svg>
-                <p class="text-sm font-medium text-indigo-400">¿Qué te ha parecido este juego?</p>
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Habilidades cognitivas</h3>
             </div>
-                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Tu opinión nos ayuda a mejorar.
-                    Comparte tu experiencia o reporta algún problema.</p>
+            <ul class="space-y-5">${skillsDetail}</ul>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 4. PROBLEMAS TÉCNICOS + OPINIÓN (2 columnas en desktop)     -->
+        <!-- ============================================================ -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Problemas técnicos -->
+            <div class="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6">
+                <div class="flex items-center gap-3 mb-3">
+                    <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <p class="text-sm font-medium text-amber-600 dark:text-amber-400">Problemas técnicos</p>
+                </div>
+                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Si el juego no carga correctamente, prueba a recargar la página o revisa tu conexión.</p>
                 <div class="flex gap-3 mt-4">
-                    <button id="btn-opinar-juego"
-                        class="flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white py-2 text-sm font-bold transition">
-                        💬 Escribir opinión
-                    </button>
-                    <button id="btn-reportar-juego"
-                        class="flex-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-                        🚩 Reportar problema
-                    </button>
+                    <button id="reload-game-btn" class="flex-1 rounded-lg bg-slate-900 text-white py-2 text-sm font-bold hover:bg-blue-500 transition">Recargar juego</button>
+                    <button id="contactar-btn" class="flex-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white py-2 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">Contactar</button>
                 </div>
             </div>
-        </section>
-    `;
 
+            <!-- Opinión -->
+            <div class="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-6">
+                <div class="flex items-center gap-3 mb-3">
+                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                        </path>
+                    </svg>
+                    <p class="text-sm font-medium text-indigo-400">¿Qué te ha parecido este juego?</p>
+                </div>
+                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Tu opinión nos ayuda a mejorar. Comparte tu experiencia o reporta algún problema.</p>
+                <div class="flex gap-3 mt-4">
+                    <button id="btn-opinar-juego" class="flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white py-2 text-sm font-bold transition">Escribir opinión</button>
+                    <button id="btn-reportar-juego" class="flex-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">Reportar problema</button>
+                </div>
+            </div>
+        </div>
+    </section>
+`;
 
     // Botón Recargar juego
     const recargarBtn = Array.from(content.querySelectorAll("button")).find(btn => btn.textContent.includes("Recargar juego"));
