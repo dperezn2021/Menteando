@@ -36,60 +36,62 @@ function renderTestDetailPage(testId) {
         </li>
     `).join("");
 
-    content.innerHTML = `
-        <div class="max-w-7xl mx-auto px-4 py-8 lg:py-12">
-            <div class="grid grid-cols-1 xl:grid-cols-[1.4fr_0.9fr] gap-8">
-                <!-- COLUMNA IZQUIERDA -->
-                <div class="flex flex-col h-full rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg">
-                    <div class="relative flex-1 bg-slate-900 min-h-[400px] flex items-center justify-center">
-                        <div id="container" class="w-full h-full flex items-center justify-center"></div>
-                    </div>
-                    <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex gap-2">
-                        <button id="start-btn" class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all duration-200 shadow-md">
-                            Iniciar ${test.nombre}
-                        </button>
-                        <button id="fullscreen-btn" class="hidden px-4 py-3 rounded-xl bg-slate-600 hover:bg-slate-500 text-white font-bold transition-all duration-200 shadow-md" title="Pantalla completa" style="touch-action:manipulation">
-                            ⛶
-                        </button>
+content.innerHTML = `
+    <div class="max-w-7xl mx-auto px-4 py-8 lg:py-12">
+        <!-- En móvil: info arriba, test abajo. En desktop: info derecha, test izquierda -->
+        <div class="grid grid-cols-1 xl:grid-cols-[0.9fr_1.4fr] gap-8">
+            
+            <!-- COLUMNA IZQUIERDA (ahora la INFO - en móvil aparece arriba) -->
+            <div class="flex flex-col gap-6 order-1 xl:order-1">
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg p-6">
+                    <span class="inline-block px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wider mb-4">
+                        ${test.heroEyebrow || "Test cognitivo"}
+                    </span>
+                    <h2 class="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white leading-tight mb-3">
+                        ${test.nombre}
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                        ${test.descripcion}
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        ${skillsHTML}
                     </div>
                 </div>
 
-                <!-- COLUMNA DERECHA -->
-                <div class="flex flex-col gap-6">
-                    <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg p-6">
-                        <span class="inline-block px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wider mb-4">
-                            ${test.heroEyebrow || "Test cognitivo"}
-                        </span>
-                        <h2 class="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white leading-tight mb-3">
-                            ${test.nombre}
-                        </h2>
-                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-                            ${test.descripcion}
-                        </p>
-                        <div class="flex flex-wrap gap-2">
-                            ${skillsHTML}
-                        </div>
-                    </div>
-
-                    <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg p-6">
-                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Cómo funciona
-                        </h3>
-                        <ol class="space-y-3">
-                            ${howItWorks}
-                        </ol>
-                    </div>
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Cómo funciona
+                    </h3>
+                    <ol class="space-y-3">
+                        ${howItWorks}
+                    </ol>
                 </div>
             </div>
 
-            <!-- RESULTADOS (mejorados) -->
-            <div id="result" class="hidden mt-10"></div>
+            <!-- COLUMNA DERECHA (ahora el TEST - en móvil aparece abajo) -->
+            <div class="flex flex-col h-full rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg order-2 xl:order-2">
+                <div class="relative flex-1 bg-slate-900 min-h-[400px] flex items-center justify-center">
+                    <div id="container" class="w-full h-full flex items-center justify-center"></div>
+                </div>
+                <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex gap-2">
+                    <button id="start-btn" class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all duration-200 shadow-md">
+                        Iniciar ${test.nombre}
+                    </button>
+                    <button id="fullscreen-btn" class="hidden px-4 py-3 rounded-xl bg-slate-600 hover:bg-slate-500 text-white font-bold transition-all duration-200 shadow-md" title="Pantalla completa" style="touch-action:manipulation">
+                        ⛶
+                    </button>
+                </div>
+            </div>
+        </div>
 
-            <div class="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-6 mt-6">
-                <div class="flex items-center gap-3 mb-3">
+        <!-- RESULTADOS -->
+        <div id="result" class="hidden mt-10"></div>
+
+        <div class="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-6 mt-6">
+            <div class="flex items-center gap-3 mb-3">
                 <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
@@ -97,26 +99,24 @@ function renderTestDetailPage(testId) {
                 </svg>
                 <p class="text-sm font-medium text-indigo-400">¿Qué te ha parecido este test?</p>
             </div>
-                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Tu opinión nos ayuda a mejorar.
-                    Comparte tu experiencia o reporta algún problema.</p>
-                <div class="flex gap-3 mt-4">
-                    <button id="btn-opinar-juego"
-                        class="flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white py-2 text-sm font-bold transition">
-                        💬 Escribir opinión
-                    </button>
-                    <button id="btn-reportar-juego"
-                        class="flex-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-                        🚩 Reportar problema
-                    </button>
-                </div>
+            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Tu opinión nos ayuda a mejorar.
+                Comparte tu experiencia o reporta algún problema.</p>
+            <div class="flex gap-3 mt-4">
+                <button id="btn-opinar-juego"
+                    class="flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white py-2 text-sm font-bold transition">
+                    💬 Escribir opinión
+                </button>
+                <button id="btn-reportar-juego"
+                    class="flex-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                    🚩 Reportar problema
+                </button>
             </div>
         </div>
-
-    `;
-
+    </div>
+`;
     lanzarLogicaDelTest(testId);
 
-    
+
 
     // Botón Escribir opinión
     const btnOpinar = document.getElementById("btn-opinar-juego");
@@ -176,7 +176,7 @@ window.initTestDetailPage = function initTestDetailPage(testId) {
                 // Update nav header: title → test name, subtitle → category
                 const headerH1 = document.querySelector('header h1');
                 if (headerH1) headerH1.textContent = test.nombre;
-                if(headerH1.textContent === "TAVEC – Test de Aprendizaje Verbal España-Complutense") headerH1.textContent = "Test TAVEC";
+                if (headerH1.textContent === "TAVEC – Test de Aprendizaje Verbal España-Complutense") headerH1.textContent = "Test TAVEC";
                 const headerSubtitle = document.querySelector('header .flex-col.leading-tight p');
                 if (headerSubtitle) headerSubtitle.textContent = catLabel;
             }
@@ -503,7 +503,7 @@ function makeResponsiveContainer(innerHtml, customStyles = "") {
 
 
 // ======================================================
-// 1. CORSI (responsivo)
+// 1. CORSI (responsivo) - CON VISUALIZACIÓN DEL ÚLTIMO BLOQUE
 // ======================================================
 function initCorsiLogic(testId, callback) {
     const container = document.getElementById("container");
@@ -518,6 +518,7 @@ function initCorsiLogic(testId, callback) {
     let inicioTest = 0;
     let puedeResponder = false;
     let bloqueo = false;
+    let esperandoTransicion = false;
 
     function actualizarStatus() {
         if (status) status.textContent = `Nivel ${nivel} · Errores ${errores}/2`;
@@ -535,20 +536,38 @@ function initCorsiLogic(testId, callback) {
 
     function renderBloques() {
         container.innerHTML = makeResponsiveContainer(`
-            <div class="grid grid-cols-3 gap-2 max-w-md mx-auto">
-                ${Array(9).fill().map((_, i) => `
-                    <div data-id="${i}" class="aspect-square rounded-xl bg-slate-700 cursor-pointer hover:bg-slate-600 transition-all"></div>
-                `).join('')}
+            <div class="flex flex-col h-full">
+                <div class="text-center mb-4">
+                    <p class="text-sm text-slate-400">Nivel ${nivel} | ${errores}/2 errores</p>
+                </div>
+                <div class="grid grid-cols-3 gap-3 sm:gap-4 max-w-md mx-auto w-full flex-1 items-center">
+                    ${Array(9).fill().map((_, i) => `
+                        <div data-id="${i}" class="aspect-square rounded-xl bg-slate-700 hover:bg-slate-600 transition-all cursor-pointer shadow-md"></div>
+                    `).join('')}
+                </div>
             </div>
         `);
+    }
+
+    function limpiarResaltados(bloques) {
+        bloques.forEach(b => {
+            b.classList.remove("bg-blue-500", "shadow-lg", "scale-95");
+            b.classList.add("bg-slate-700");
+        });
     }
 
     function iluminarSecuencia(seq, callbackFn) {
         const bloques = container.querySelectorAll("[data-id]");
         let i = 0;
         puedeResponder = false;
+
         const interval = setInterval(() => {
-            bloques.forEach(b => b.classList.remove("bg-blue-500"));
+            // Limpiar todos los bloques
+            bloques.forEach(b => {
+                b.classList.remove("bg-blue-500", "shadow-lg", "scale-95");
+                b.classList.add("bg-slate-700");
+            });
+
             if (i === seq.length) {
                 clearInterval(interval);
                 setTimeout(() => {
@@ -557,38 +576,97 @@ function initCorsiLogic(testId, callback) {
                 }, 300);
                 return;
             }
-            bloques[seq[i]].classList.add("bg-blue-500");
+
+            // Iluminar el bloque actual
+            const bloque = bloques[seq[i]];
+            bloque.classList.remove("bg-slate-700");
+            bloque.classList.add("bg-blue-500", "shadow-lg", "scale-95");
             i++;
         }, 600);
+    }
+
+    function mostrarFeedbackError() {
+        const mensajeError = document.createElement('div');
+        mensajeError.className = 'fixed top-1/3 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold z-50 animate-pulse';
+        mensajeError.textContent = '✗ Secuencia incorrecta';
+        document.body.appendChild(mensajeError);
+        setTimeout(() => mensajeError.remove(), 1000);
     }
 
     function iniciarNivel() {
         if (bloqueo) return;
         actualizarStatus();
         renderBloques();
+
         secuencia = generarSecuencia(nivel);
         erroresPorNivel[nivel] = erroresPorNivel[nivel] || 0;
 
         iluminarSecuencia(secuencia, () => {
             let respuesta = [];
+            const inicioRespuesta = performance.now();
+            const bloques = container.querySelectorAll("[data-id]");
+
             const clickHandler = (e) => {
-                if (!puedeResponder) return;
-                const id = e.target.closest("[data-id]")?.dataset.id;
-                if (id === undefined) return;
-                respuesta.push(Number(id));
+                if (!puedeResponder || esperandoTransicion) return;
+
+                const bloque = e.target.closest("[data-id]");
+                if (!bloque) return;
+
+                const id = parseInt(bloque.dataset.id);
+
+                // Si ya está seleccionado, no hacer nada
+                if (respuesta.includes(id)) return;
+
+                respuesta.push(id);
+
+                // Resaltar el bloque seleccionado por el usuario (MISMO AZUL que la animación)
+                bloque.classList.remove("bg-slate-700", "hover:bg-slate-600");
+                bloque.classList.add("bg-blue-500", "shadow-lg", "scale-95");
+
+                // Si es el último de la secuencia
                 if (respuesta.length === secuencia.length) {
                     puedeResponder = false;
-                    if (respuesta.join() === secuencia.join()) {
-                        nivel++;
-                        iniciarNivel();
-                    } else {
-                        errores++;
-                        erroresPorNivel[nivel]++;
-                        if (errores >= 2) finalizarTest();
-                        else iniciarNivel();
-                    }
+                    esperandoTransicion = true;
+
+                    const tiempoRespuesta = performance.now() - inicioRespuesta;
+                    tiemposRespuesta.push(tiempoRespuesta);
+
+                    // Mantener el último bloque resaltado visiblemente
+                    setTimeout(() => {
+                        if (respuesta.join() === secuencia.join()) {
+                            // Acierto
+                            nivel++;
+                            esperandoTransicion = false;
+                            iniciarNivel();
+                        } else {
+                            // Error
+                            errores++;
+                            erroresPorNivel[nivel]++;
+                            mostrarFeedbackError();
+
+                            // Limpiar resaltados antes de reiniciar
+                            limpiarResaltados(bloques);
+
+                            if (errores >= 2) {
+                                finalizarTest();
+                            } else {
+                                esperandoTransicion = false;
+                                setTimeout(() => iniciarNivel(), 1000);
+                            }
+                        }
+                    }, 400); // Tiempo para que el usuario vea el último bloque resaltado
+
+                } else {
+                    // No es el último, restaurar después de un breve momento
+                    setTimeout(() => {
+                        if (bloque && puedeResponder) {
+                            bloque.classList.remove("bg-blue-500", "shadow-lg", "scale-95");
+                            bloque.classList.add("bg-slate-700");
+                        }
+                    }, 200);
                 }
             };
+
             container.onclick = clickHandler;
         });
     }
@@ -596,14 +674,23 @@ function initCorsiLogic(testId, callback) {
     function finalizarTest() {
         bloqueo = true;
         container.onclick = null;
+
         const rachaMaxima = nivel - 1;
         const tiempoTotal = performance.now() - inicioTest;
+        const precision = rachaMaxima > 0 ? rachaMaxima / (rachaMaxima + errores) : 0;
+
         const habilidades = [];
         if (rachaMaxima < 4) habilidades.push("memoria_espacial");
         if (errores >= 2) habilidades.push("memoria_trabajo");
+
         callback({
             testId, timestamp: Date.now(),
-            metrics: { rachaMaxima, errores, precision: rachaMaxima / (rachaMaxima + errores) || 0, tiempoTotalMs: Math.round(tiempoTotal) },
+            metrics: {
+                rachaMaxima,
+                errores,
+                precision,
+                tiempoTotalMs: Math.round(tiempoTotal)
+            },
             habilidadesDebiles: habilidades
         });
         startBtn.classList.remove("hidden");
@@ -611,14 +698,19 @@ function initCorsiLogic(testId, callback) {
 
     startBtn.onclick = () => {
         startBtn.classList.add("hidden");
-        nivel = 2; errores = 0; erroresPorNivel = {}; tiemposRespuesta = []; inicioTest = performance.now(); bloqueo = false;
+        nivel = 2;
+        errores = 0;
+        erroresPorNivel = {};
+        tiemposRespuesta = [];
+        inicioTest = performance.now();
+        bloqueo = false;
+        esperandoTransicion = false;
         iniciarNivel();
     };
 }
 
-
 // ======================================================
-// 2. D2 (responsivo)
+// 2. D2 (responsivo - CORREGIDO, SIN BLOQUEO DEL PRIMER CLICK)
 // ======================================================
 function initD2Logic(testId, callback) {
     const container = document.getElementById("container");
@@ -626,19 +718,21 @@ function initD2Logic(testId, callback) {
     const status = document.getElementById("status");
 
     let lineaActual = 0;
-    const totalLineas = 5;
-    const tiempoPorLinea = 10000;
-    const itemsPorLinea = 30;
+    const totalLineas = 10;
+    const tiempoPorLinea = 5000;
+    const itemsPorLinea = 12;
 
     let aciertosPorLinea = [];
     let erroresComisionPorLinea = [];
     let erroresOmisionPorLinea = [];
     let timer = null;
-    let totalProcesados = 0;
     let aciertos = 0, erroresComision = 0, erroresOmision = 0;
     let inicioTest = 0;
+    let puedeSeleccionar = true;
+    let seleccionesEnLinea = new Set();
 
-    function formatearConComillas(letra, rayas) {
+    // Comillas GRANDES
+        function formatearConComillas(letra, rayas) {
         const combinaciones = {
             1: [{ arriba: 0, abajo: 1 }],
             2: [{ arriba: 2, abajo: 0 }, { arriba: 0, abajo: 2 }, { arriba: 1, abajo: 1 }],
@@ -649,15 +743,17 @@ function initD2Logic(testId, callback) {
         const opciones = combinaciones[rayas] || combinaciones[2];
         const seleccion = opciones[Math.floor(Math.random() * opciones.length)];
 
-        const comillasArriba = "'".repeat(seleccion.arriba);
-        const comillasAbajo = "'".repeat(seleccion.abajo);
-        const alturaArriba = seleccion.arriba === 0 ? 'invisible' : '';
-
         return `
-            <div class="d2-estimulo flex flex-col items-center justify-center min-w-[32px] sm:min-w-[48px]">
-                <div class="rayas-arriba text-xs sm:text-lg leading-none h-4 sm:h-6 ${alturaArriba} text-slate-600 dark:text-slate-400">${comillasArriba || "'"}</div>
-                <div class="letra text-sm sm:text-xl font-bold text-slate-900 dark:text-white">${letra}</div>
-                <div class="rayas-abajo text-xs sm:text-lg leading-none mt-0.5 sm:mt-1 text-slate-600 dark:text-slate-400">${comillasAbajo}</div>
+            <div class="d2-estimulo flex flex-col items-center justify-center min-w-[80px] sm:min-w-[100px] p-3">
+                <div class="rayas-arriba text-3xl sm:text-5xl leading-none h-12 sm:h-16 text-blue-600 dark:text-blue-400 font-bold tracking-wider">
+                    ${"'".repeat(seleccion.arriba) || " "}
+                </div>
+                <div class="letra text-5xl sm:text-7xl font-bold text-blue-600 dark:text-blue-400 my-2">
+                    ${letra}
+                </div>
+                <div class="rayas-abajo text-3xl sm:text-5xl leading-none h-12 sm:h-16 text-blue-600 dark:text-blue-400 font-bold tracking-wider">
+                    ${"'".repeat(seleccion.abajo) || " "}
+                </div>
             </div>
         `;
     }
@@ -667,131 +763,190 @@ function initD2Logic(testId, callback) {
         for (let i = 0; i < itemsPorLinea; i++) {
             const letra = Math.random() < 0.5 ? 'd' : 'p';
             const rayas = Math.floor(Math.random() * 4) + 1;
-            linea.push({ letra, rayas });
+            linea.push({ letra, rayas, marcado: false });
         }
         return linea;
     }
 
     function renderLinea(linea) {
         container.innerHTML = `
-            <div class="w-full h-full overflow-y-auto p-2" style="max-height:100%;">
-                <div class="flex flex-wrap gap-1 sm:gap-3 w-full justify-center">
-                    ${linea.map((stim, idx) => `
-                        <div data-idx="${idx}"
-                             data-letra="${stim.letra}"
-                             data-rayas="${stim.rayas}"
-                             class="estimulo cursor-pointer rounded-lg transition-all duration-150 p-1 sm:p-2 flex justify-center items-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
-                             style="touch-action:manipulation">
-                            ${formatearConComillas(stim.letra, stim.rayas)}
-                        </div>
-                    `).join('')}
+            <div class="w-full h-full flex flex-col p-4" style="max-height:100%;">
+                <div class="text-center mb-3">
+                    <p class="text-lg font-bold text-blue-600 dark:text-blue-400">Línea ${lineaActual + 1}/${totalLineas}</p>
+                    <p class="text-base text-blue-500">Tiempo restante: <span id="d2-timer" class="font-bold text-xl">${tiempoPorLinea/1000}</span> segundos</p>
+                </div>
+                <div class="flex-1 overflow-y-auto">
+                    <div class="grid grid-cols-3 sm:grid-cols-5 gap-3 sm:gap-4 w-full justify-center">
+                        ${linea.map((stim, idx) => `
+                            <div data-idx="${idx}"
+                                 data-letra="${stim.letra}"
+                                 data-rayas="${stim.rayas}"
+                                 data-marcado="${stim.marcado}"
+                                 class="estimulo cursor-pointer rounded-2xl transition-all duration-150 flex justify-center items-center bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 active:scale-95 shadow-md ${stim.marcado ? 'bg-blue-500 dark:bg-blue-600 ring-2 ring-blue-300 scale-95' : ''}"
+                                 style="touch-action:manipulation; min-height:130px;">
+                                ${formatearConComillas(stim.letra, stim.rayas)}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="text-center mt-3 text-sm text-blue-500">
+                    Haz clic en las <span class="font-bold text-blue-600">'d' con DOS comillas</span>
                 </div>
             </div>
         `;
     }
 
-    function procesarLinea(linea, marcados, lineaIndex) {
-        let aciertosLinea = 0, comisionesLinea = 0, omisionesLinea = 0;
-
-        linea.forEach((stim, idx) => {
-            const esObjetivo = (stim.letra === 'd' && stim.rayas === 2);
-            const marcado = marcados.includes(idx);
-            if (marcado) {
-                if (esObjetivo) aciertosLinea++;
-                else comisionesLinea++;
+    function actualizarTimer(segundosRestantes) {
+        const timerSpan = document.getElementById("d2-timer");
+        if (timerSpan) {
+            timerSpan.textContent = segundosRestantes;
+            if (segundosRestantes <= 5) {
+                timerSpan.classList.add("text-red-500");
             } else {
-                if (esObjetivo) omisionesLinea++;
+                timerSpan.classList.remove("text-red-500");
             }
-        });
-
-        aciertosPorLinea.push(aciertosLinea);
-        erroresComisionPorLinea.push(comisionesLinea);
-        erroresOmisionPorLinea.push(omisionesLinea);
-
-        aciertos += aciertosLinea;
-        erroresComision += comisionesLinea;
-        erroresOmision += omisionesLinea;
-        totalProcesados += marcados.length + omisionesLinea;
+        }
     }
 
     function iniciarLinea() {
-        if (lineaActual >= totalLineas) return finalizarTest();
+        if (lineaActual >= totalLineas) {
+            finalizarTest();
+            return;
+        }
+        
+        puedeSeleccionar = true;
+        lineaCompletada = false;
+        
         if (status) status.textContent = `Línea ${lineaActual + 1}/${totalLineas} · Haz clic en las 'd' con DOS comillas`;
-
+        
         const linea = generarLinea();
         renderLinea(linea);
-        let marcados = [];
-
+        
+        let segundosRestantes = tiempoPorLinea / 1000;
+        actualizarTimer(segundosRestantes);
+        
+        const timerInterval = setInterval(() => {
+            if (lineaCompletada) return;
+            segundosRestantes--;
+            actualizarTimer(segundosRestantes);
+            if (segundosRestantes <= 0 && !lineaCompletada) {
+                clearInterval(timerInterval);
+                procesarLinea(linea);
+            }
+        }, 1000);
+        
         const clickHandler = (e) => {
+            if (!puedeSeleccionar || lineaCompletada) return;
+            
             const div = e.target.closest('.estimulo');
             if (!div) return;
+            
             const idx = parseInt(div.dataset.idx);
-            if (marcados.includes(idx)) {
-                marcados = marcados.filter(i => i !== idx);
-                div.classList.remove('bg-blue-500', 'dark:bg-blue-600');
-                div.classList.add('bg-slate-100', 'dark:bg-slate-800');
+            const yaMarcado = linea[idx].marcado;
+            
+            if (yaMarcado) {
+                // Desmarcar
+                linea[idx].marcado = false;
+                div.dataset.marcado = "false";
+                div.classList.remove('bg-blue-500', 'dark:bg-blue-600', 'ring-2', 'ring-blue-300', 'scale-95');
+                div.classList.add('bg-white', 'dark:bg-slate-800');
             } else {
-                marcados.push(idx);
-                div.classList.remove('bg-slate-100', 'dark:bg-slate-800');
-                div.classList.add('bg-blue-500', 'dark:bg-blue-600');
+                // Marcar
+                linea[idx].marcado = true;
+                div.dataset.marcado = "true";
+                div.classList.remove('bg-white', 'dark:bg-slate-800');
+                div.classList.add('bg-blue-500', 'dark:bg-blue-600', 'ring-2', 'ring-blue-300', 'scale-95');
             }
         };
-
+        
         container.onclick = clickHandler;
-
+        
         timer = setTimeout(() => {
-            procesarLinea(linea, marcados);
-            lineaActual++;
-            iniciarLinea();
+            if (!lineaCompletada) {
+                clearInterval(timerInterval);
+                procesarLinea(linea);
+            }
         }, tiempoPorLinea);
     }
-
+    
+    function procesarLinea(linea) {
+        if (lineaCompletada) return;
+        lineaCompletada = true;
+        puedeSeleccionar = false;
+        if (timer) clearTimeout(timer);
+        
+        let aciertosLinea = 0, comisionesLinea = 0, omisionesLinea = 0;
+        
+        linea.forEach((stim, idx) => {
+            const esObjetivo = (stim.letra === 'd' && stim.rayas === 2);
+            const marcado = stim.marcado;
+            
+            if (esObjetivo) {
+                if (marcado) aciertosLinea++;
+                else omisionesLinea++;
+            } else {
+                if (marcado) comisionesLinea++;
+            }
+        });
+        
+        aciertosPorLinea.push(aciertosLinea);
+        erroresComisionPorLinea.push(comisionesLinea);
+        erroresOmisionPorLinea.push(omisionesLinea);
+        
+        aciertos += aciertosLinea;
+        erroresComision += comisionesLinea;
+        erroresOmision += omisionesLinea;
+        
+        lineaActual++;
+        setTimeout(() => iniciarLinea(), 500);
+    }
+    
     function finalizarTest() {
-        clearTimeout(timer);
-        container.onclick = null;
-
-        const precisionSelectiva = aciertos / (aciertos + erroresComision) || 0;
-        const tasaOmisiones = erroresOmision / (aciertos + erroresOmision) || 0;
-
+        const totalObjetivos = aciertos + erroresOmision;
+        const precision = totalObjetivos > 0 ? aciertos / totalObjetivos : 0;
+        const tasaOmisiones = totalObjetivos > 0 ? erroresOmision / totalObjetivos : 0;
+        
         const habilidades = [];
-
-        if (precisionSelectiva < 0.7) habilidades.push("atencion_selectiva");
+        
+        if (precision < 0.7) habilidades.push("atencion_selectiva");
         if (tasaOmisiones > 0.3) habilidades.push("atencion_sostenida");
         if (erroresComision > 8) habilidades.push("control_inhibitorio");
-
+        
+        // Caída de rendimiento: diferencia entre primeras y últimas líneas
         const primerasLineas = aciertosPorLinea.slice(0, 2).reduce((a, b) => a + b, 0) / 2;
         const ultimasLineas = aciertosPorLinea.slice(-2).reduce((a, b) => a + b, 0) / 2;
         const caidaRendimiento = Math.max(0, primerasLineas - ultimasLineas);
-
-        if (caidaRendimiento > 5) habilidades.push("atencion_sostenida");
-
+        
+        if (caidaRendimiento > 2) habilidades.push("atencion_sostenida");
+        
         callback({
             testId, timestamp: Date.now(),
             metrics: {
-                aciertos,
-                erroresComision,
-                erroresOmision,
-                precision: precisionSelectiva,
-                tasaOmisiones: tasaOmisiones.toFixed(2),
+                aciertos: aciertos,
+                erroresComision: erroresComision,
+                erroresOmision: erroresOmision,
+                precision: Math.round(precision * 100),
+                tasaOmisiones: Math.round(tasaOmisiones * 100) / 100,
+                caidaRendimiento: Math.round(caidaRendimiento * 10) / 10
             },
             habilidadesDebiles: habilidades
         });
-
+        
         startBtn.classList.remove("hidden");
         if (status) status.textContent = "";
     }
-
+    
     startBtn.onclick = () => {
         startBtn.classList.add("hidden");
         lineaActual = 0;
         aciertos = 0;
         erroresComision = 0;
         erroresOmision = 0;
-        totalProcesados = 0;
         inicioTest = performance.now();
         iniciarLinea();
     };
 }
+
 
 // ======================================================
 // 3. CPT (responsivo)
@@ -1673,11 +1828,11 @@ function initTAVECLogic(testId, callback) {
     function renderEnsayo() {
         container.innerHTML = makeResponsiveContainer(`
             <div class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl mx-auto">
-                <p class="text-lg font-bold mb-4">Ensayo ${ensayoActual}/5 - Memoriza estas palabras:</p>
+                <p class="text-lg font-bold text-blue-600 dark:text-blue-400 mb-4">Ensayo ${ensayoActual}/5 - Memoriza estas palabras:</p>
                 <div class="grid grid-cols-2 gap-2 mb-4">
-                    ${listaAprendizaje.map(p => `<span class="bg-slate-100 dark:bg-slate-700 p-2 rounded text-center">${p}</span>`).join('')}
+                    ${listaAprendizaje.map(p => `<span class="bg-blue-50 dark:bg-blue-900/30 p-2 rounded text-center text-blue-700 dark:text-blue-300">${p}</span>`).join('')}
                 </div>
-                <button id="siguiente" class="w-full py-2 bg-blue-600 text-white rounded-xl">He memorizado</button>
+                <button id="siguiente" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">He memorizado</button>
             </div>
         `);
         autoFocus();
@@ -1687,9 +1842,9 @@ function initTAVECLogic(testId, callback) {
     function renderRecuerdoEnsayo() {
         container.innerHTML = makeResponsiveContainer(`
             <div class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl mx-auto">
-                <p class="text-lg font-bold mb-4">Ensayo ${ensayoActual} - Escribe las palabras que recuerdes (separadas por comas):</p>
-                <textarea id="recuerdo" rows="4" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
-                <button id="siguiente" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-xl">Continuar</button>
+                <p class="text-lg font-bold text-blue-600 dark:text-blue-400 mb-4">Ensayo ${ensayoActual} - Escribe las palabras que recuerdes (separadas por comas):</p>
+                <textarea id="recuerdo" rows="4" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700"></textarea>
+                <button id="siguiente" class="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Continuar</button>
             </div>
         `);
         autoFocus();
@@ -1710,11 +1865,11 @@ function initTAVECLogic(testId, callback) {
     function renderInterferencia() {
         container.innerHTML = makeResponsiveContainer(`
             <div class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl mx-auto">
-                <p class="text-lg font-bold mb-4">Lista de interferencia - Memoriza estas palabras:</p>
+                <p class="text-lg font-bold text-blue-600 dark:text-blue-400 mb-4">Lista de interferencia - Memoriza estas palabras:</p>
                 <div class="grid grid-cols-2 gap-2 mb-4">
-                    ${listaInterferencia.map(p => `<span class="bg-slate-100 dark:bg-slate-700 p-2 rounded text-center">${p}</span>`).join('')}
+                    ${listaInterferencia.map(p => `<span class="bg-blue-50 dark:bg-blue-900/30 p-2 rounded text-center text-blue-700 dark:text-blue-300">${p}</span>`).join('')}
                 </div>
-                <button id="siguiente" class="w-full py-2 bg-blue-600 text-white rounded-xl">Continuar</button>
+                <button id="siguiente" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Continuar</button>
             </div>
         `);
         autoFocus();
@@ -1724,9 +1879,9 @@ function initTAVECLogic(testId, callback) {
     function renderRecuerdoInmediato() {
         container.innerHTML = makeResponsiveContainer(`
             <div class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl mx-auto">
-                <p class="text-lg font-bold mb-4">Recuerdo inmediato - Escribe las palabras de la lista ORIGINAL que recuerdes:</p>
-                <textarea id="recuerdo" rows="4" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
-                <button id="siguiente" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-xl">Continuar</button>
+                <p class="text-lg font-bold text-blue-600 dark:text-blue-400 mb-4">Recuerdo inmediato - Escribe las palabras de la lista ORIGINAL que recuerdes:</p>
+                <textarea id="recuerdo" rows="4" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700"></textarea>
+                <button id="siguiente" class="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Continuar</button>
             </div>
         `);
         autoFocus();
@@ -1739,7 +1894,12 @@ function initTAVECLogic(testId, callback) {
     }
 
     function renderEspera() {
-        container.innerHTML = makeResponsiveContainer(`<div class="text-center p-8"><p class="text-xl mb-4">Espera 20 segundos...</p><div id="contador" class="text-3xl font-bold">20</div></div>`);
+        container.innerHTML = makeResponsiveContainer(`
+            <div class="text-center p-8 bg-white dark:bg-slate-800 rounded-2xl max-w-md mx-auto">
+                <p class="text-xl text-blue-600 dark:text-blue-400 mb-4">Espera 20 segundos...</p>
+                <div id="contador" class="text-3xl font-bold text-blue-500">20</div>
+            </div>
+        `);
         let seg = 20;
         const interval = setInterval(() => {
             seg--;
@@ -1755,9 +1915,9 @@ function initTAVECLogic(testId, callback) {
     function renderRecuerdoDemorado() {
         container.innerHTML = makeResponsiveContainer(`
             <div class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl mx-auto">
-                <p class="text-lg font-bold mb-4">Recuerdo demorado - Escribe las palabras de la lista ORIGINAL que recuerdes:</p>
-                <textarea id="recuerdo" rows="4" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
-                <button id="siguiente" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-xl">Continuar</button>
+                <p class="text-lg font-bold text-blue-600 dark:text-blue-400 mb-4">Recuerdo demorado - Escribe las palabras de la lista ORIGINAL que recuerdes:</p>
+                <textarea id="recuerdo" rows="4" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700"></textarea>
+                <button id="siguiente" class="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Continuar</button>
             </div>
         `);
         autoFocus();
@@ -1772,11 +1932,11 @@ function initTAVECLogic(testId, callback) {
     function renderReconocimiento() {
         container.innerHTML = makeResponsiveContainer(`
             <div class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl mx-auto">
-                <p class="text-lg font-bold mb-4">Reconocimiento - Marca las que estaban en la lista original:</p>
+                <p class="text-lg font-bold text-blue-600 dark:text-blue-400 mb-4">Reconocimiento - Marca las que estaban en la lista original:</p>
                 <div class="grid grid-cols-2 gap-2 mb-4">
-                    ${listaReconocimiento.map((p, idx) => `<label class="flex items-center gap-2"><input type="checkbox" value="${p}" data-idx="${idx}" class="reco-check"> ${p}</label>`).join('')}
+                    ${listaReconocimiento.map((p, idx) => `<label class="flex items-center gap-2 text-blue-700 dark:text-blue-300"><input type="checkbox" value="${p}" data-idx="${idx}" class="reco-check"> ${p}</label>`).join('')}
                 </div>
-                <button id="finalizar" class="w-full py-2 bg-blue-600 text-white rounded-xl">Finalizar</button>
+                <button id="finalizar" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Finalizar</button>
             </div>
         `);
         autoFocus();
@@ -1789,17 +1949,10 @@ function initTAVECLogic(testId, callback) {
             const olvido = recuerdoInmediato - recuerdoDemorado;
 
             const habilidades = [];
-            // Memoria de trabajo: bajo rendimiento en último ensayo o mucho olvido
             if (aciertosPorEnsayo[4] < 8) habilidades.push("memoria_trabajo");
             if (olvido > 3) habilidades.push("memoria_trabajo");
-
-            // Planificación: bajo total de aprendizaje
             if (totalAprend < 50) habilidades.push("planificacion");
-
-            // Atención sostenida: bajo recuerdo demorado
             if (recuerdoDemorado < 6) habilidades.push("atencion_sostenida");
-
-            // Flexibilidad cognitiva: muchos falsos positivos o mucha interferencia
             if (falsos > 3 || olvido > 4) habilidades.push("flexibilidad_cognitiva");
 
             const precision = totalAprend / 80;
@@ -1834,7 +1987,7 @@ function initTAVECLogic(testId, callback) {
 }
 
 // ======================================================
-// 7. MEC (memoria_trabajo, atencion_sostenida)
+// 7. MEC (Mini-Examen Cognoscitivo) - COMPLETO
 // ======================================================
 function initMECLogic(testId, callback) {
     const container = document.getElementById("container");
@@ -1845,8 +1998,8 @@ function initMECLogic(testId, callback) {
     let indice = 0;
     let inicioTest = 0;
     let tiemposRespuesta = [];
-    let palabrasRecuerdo = [];   // Se llenará con palabras aleatorias
-    let secuenciaPalabras = [];   // Para la repetición
+    let palabrasRecuerdo = [];
+    let secuenciaPalabras = [];
 
     // ========== VARIABLES ALEATORIAS ==========
     const bancosPalabras = [
@@ -1897,17 +2050,53 @@ function initMECLogic(testId, callback) {
     }
     const datosEntorno = obtenerDatosEntorno();
 
-    // Función para enfocar automáticamente el input
     function autoFocus() {
         setTimeout(() => {
-            const input = document.querySelector("input, textarea");
+            const input = document.querySelector("input, select, textarea");
             if (input) input.focus();
         }, 100);
     }
 
-    // Mostrar estímulo con desaparición tras 3 segundos
-    function mostrarConDesaparicion(html, callback) {
-        container.innerHTML = makeResponsiveContainer(html);
+    // ========== FUNCIONES DE UI CON CUADRO ADAPTATIVO ==========
+    function mostrarInput(pregunta, onRespuesta) {
+        container.innerHTML = makeResponsiveContainer(`
+            <div class="w-full max-w-2xl mx-auto">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-700">
+                    <p class="text-xl mb-4 text-blue-600 dark:text-blue-400">${pregunta}</p>
+                    <input id="resp" type="text" 
+                           class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white border-slate-300 dark:border-slate-600">
+                    <button id="next" class="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Responder</button>
+                </div>
+            </div>
+        `);
+        autoFocus();
+        document.getElementById("next").onclick = () => onRespuesta(document.getElementById("resp").value.trim());
+    }
+
+    function mostrarSelect(pregunta, opciones, onRespuesta) {
+        container.innerHTML = makeResponsiveContainer(`
+            <div class="w-full max-w-2xl mx-auto">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-700">
+                    <p class="text-xl mb-4 text-blue-600 dark:text-blue-400">${pregunta}</p>
+                    <select id="resp" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white border-slate-300 dark:border-slate-600">
+                        ${opciones.map(o => `<option value="${o}">${o}</option>`).join('')}
+                    </select>
+                    <button id="next" class="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Responder</button>
+                </div>
+            </div>
+        `);
+        autoFocus();
+        document.getElementById("next").onclick = () => onRespuesta(document.getElementById("resp").value);
+    }
+
+    function mostrarConDesaparicion(contenidoHtml, callback) {
+        container.innerHTML = makeResponsiveContainer(`
+            <div class="w-full max-w-2xl mx-auto">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-700 text-center">
+                    ${contenidoHtml}
+                </div>
+            </div>
+        `);
         autoFocus();
         setTimeout(() => {
             callback();
@@ -1947,30 +2136,6 @@ function initMECLogic(testId, callback) {
                         mostrarInput("¿Qué día del mes es hoy?", (v) => { if (parseInt(v) === parseInt(diaMes)) aciertos++; cb(aciertos); });
                     }
                 }
-                function mostrarInput(pregunta, onRespuesta) {
-                    container.innerHTML = makeResponsiveContainer(`
-                        <div class="p-4">
-                            <p class="text-xl mb-4 text-slate-900 dark:text-white">${pregunta}</p>
-                            <input id="resp" type="number" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="Escribe el número">
-                            <button id="next" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-xl">Responder</button>
-                        </div>
-                    `);
-                    autoFocus();
-                    document.getElementById("next").onclick = () => onRespuesta(document.getElementById("resp").value.trim());
-                }
-                function mostrarSelect(pregunta, opciones, onRespuesta) {
-                    container.innerHTML = makeResponsiveContainer(`
-                        <div class="p-4">
-                            <p class="text-xl mb-4 text-slate-900 dark:text-white">${pregunta}</p>
-                            <select id="resp" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                                ${opciones.map(o => `<option value="${o}">${o}</option>`).join('')}
-                            </select>
-                            <button id="next" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-xl">Responder</button>
-                        </div>
-                    `);
-                    autoFocus();
-                    document.getElementById("next").onclick = () => onRespuesta(document.getElementById("resp").value);
-                }
                 siguiente();
             }
         },
@@ -1992,19 +2157,6 @@ function initMECLogic(testId, callback) {
                         mostrarSelect("¿Qué tipo de conexión usas?", ["wifi", "cable", "4g", "3g", "desconocida"], (v) => { if (v === datosEntorno.conexion) aciertos++; cb(aciertos); });
                     }
                 }
-                function mostrarSelect(pregunta, opciones, onRespuesta) {
-                    container.innerHTML = makeResponsiveContainer(`
-                        <div class="p-4">
-                            <p class="text-xl mb-4 text-slate-900 dark:text-white">${pregunta}</p>
-                            <select id="resp" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                                ${opciones.map(o => `<option value="${o}">${o}</option>`).join('')}
-                            </select>
-                            <button id="next" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-xl">Responder</button>
-                        </div>
-                    `);
-                    autoFocus();
-                    document.getElementById("next").onclick = () => onRespuesta(document.getElementById("resp").value);
-                }
                 siguiente();
             }
         },
@@ -2014,20 +2166,20 @@ function initMECLogic(testId, callback) {
             puntMax: 3,
             ejecutar: (cb) => {
                 mostrarConDesaparicion(`
-                    <div class="p-4 text-center">
-                        <p class="text-xl mb-4 text-slate-900 dark:text-white">Memoriza estas palabras:</p>
-                        <div class="text-2xl font-bold mb-4">${palabrasRecuerdo.join(" - ")}</div>
-                    </div>
+                    <p class="text-xl mb-4 text-blue-600 dark:text-blue-400">Memoriza estas palabras:</p>
+                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">${palabrasRecuerdo.join(" - ")}</div>
                 `, () => {
                     const opciones = [...palabrasRecuerdo, "PERRO", "GATO", "SOL", "LUNA", "COCHE", "CASA", "MESA", "FLOR"];
                     const opcionesUnicas = [...new Set(opciones)].sort(() => 0.5 - Math.random());
                     container.innerHTML = makeResponsiveContainer(`
-                        <div class="p-4">
-                            <p class="text-xl mb-4 text-slate-900 dark:text-white">¿Qué palabras recordabas?</p>
-                            <div class="grid grid-cols-2 gap-3 mb-4">
-                                ${opcionesUnicas.map(p => `<label class="flex items-center gap-2"><input type="checkbox" value="${p}" class="palabra-check"> ${p}</label>`).join('')}
+                        <div class="w-full max-w-2xl mx-auto">
+                            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-700">
+                                <p class="text-xl mb-4 text-blue-600 dark:text-blue-400">¿Qué palabras recordabas?</p>
+                                <div class="grid grid-cols-2 gap-3 mb-4">
+                                    ${opcionesUnicas.map(p => `<label class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><input type="checkbox" value="${p}" class="palabra-check"> ${p}</label>`).join('')}
+                                </div>
+                                <button id="next" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Comprobar</button>
                             </div>
-                            <button id="next" class="w-full py-2 bg-blue-600 text-white rounded-xl">Comprobar</button>
                         </div>
                     `);
                     autoFocus();
@@ -2054,10 +2206,12 @@ function initMECLogic(testId, callback) {
                 function siguiente() {
                     if (step >= 5) { cb(aciertos); return; }
                     container.innerHTML = makeResponsiveContainer(`
-                        <div class="p-4">
-                            <p class="text-xl mb-4 text-slate-900 dark:text-white">Resta 7 a ${current}</p>
-                            <input id="resp" type="number" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                            <button id="next" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-xl">Responder</button>
+                        <div class="w-full max-w-2xl mx-auto">
+                            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-700">
+                                <p class="text-xl mb-4 text-blue-600 dark:text-blue-400">Resta 7 a ${current}</p>
+                                <input id="resp" type="number" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white border-slate-300 dark:border-slate-600">
+                                <button id="next" class="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Responder</button>
+                            </div>
                         </div>
                     `);
                     autoFocus();
@@ -2083,12 +2237,14 @@ function initMECLogic(testId, callback) {
                 const opciones = [...palabrasRecuerdo, "PERRO", "GATO", "SOL", "LUNA", "COCHE", "CASA", "MESA", "FLOR"];
                 const opcionesUnicas = [...new Set(opciones)].sort(() => 0.5 - Math.random());
                 container.innerHTML = makeResponsiveContainer(`
-                    <div class="p-4">
-                        <p class="text-xl mb-4 text-slate-900 dark:text-white">¿Recuerdas las tres palabras del principio?</p>
-                        <div class="grid grid-cols-2 gap-3 mb-4">
-                            ${opcionesUnicas.map(p => `<label class="flex items-center gap-2"><input type="checkbox" value="${p}" class="palabra-check-dif"> ${p}</label>`).join('')}
+                    <div class="w-full max-w-2xl mx-auto">
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-700">
+                            <p class="text-xl mb-4 text-blue-600 dark:text-blue-400">¿Recuerdas las tres palabras del principio?</p>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                ${opcionesUnicas.map(p => `<label class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><input type="checkbox" value="${p}" class="palabra-check-dif"> ${p}</label>`).join('')}
+                            </div>
+                            <button id="next" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Comprobar</button>
                         </div>
-                        <button id="next" class="w-full py-2 bg-blue-600 text-white rounded-xl">Comprobar</button>
                     </div>
                 `);
                 autoFocus();
@@ -2103,7 +2259,7 @@ function initMECLogic(testId, callback) {
                 };
             }
         },
-        // 6. LENGUAJE (sin elementos externos)
+        // 6. LENGUAJE
         {
             nombre: "Lenguaje",
             puntMax: 7,
@@ -2113,16 +2269,16 @@ function initMECLogic(testId, callback) {
                 function siguiente() {
                     if (paso === 0) {
                         mostrarConDesaparicion(`
-                            <div class="p-4 text-center">
-                                <p class="text-xl mb-4 text-slate-900 dark:text-white">Repite esta secuencia de palabras en el mismo orden:</p>
-                                <div class="text-2xl font-bold mb-4">${secuenciaPalabras.join(" → ")}</div>
-                            </div>
+                            <p class="text-xl mb-4 text-blue-600 dark:text-blue-400">Repite esta secuencia de palabras en el mismo orden:</p>
+                            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">${secuenciaPalabras.join(" → ")}</div>
                         `, () => {
                             container.innerHTML = makeResponsiveContainer(`
-                                <div class="p-4">
-                                    <p class="text-xl mb-4 text-slate-900 dark:text-white">Escribe las palabras en el mismo orden (separadas por espacios):</p>
-                                    <textarea id="resp" rows="3" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
-                                    <button id="next" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-xl">Comprobar</button>
+                                <div class="w-full max-w-2xl mx-auto">
+                                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-700">
+                                        <p class="text-xl mb-4 text-blue-600 dark:text-blue-400">Escribe las palabras en el mismo orden (separadas por espacios):</p>
+                                        <textarea id="resp" rows="3" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white border-slate-300 dark:border-slate-600"></textarea>
+                                        <button id="next" class="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Comprobar</button>
+                                    </div>
                                 </div>
                             `);
                             autoFocus();
@@ -2134,10 +2290,12 @@ function initMECLogic(testId, callback) {
                         });
                     } else if (paso === 1) {
                         container.innerHTML = makeResponsiveContainer(`
-                            <div class="p-4">
-                                <p class="text-xl mb-4 text-slate-900 dark:text-white">Escribe una palabra que empiece por la letra "${letraElegida}"</p>
-                                <input id="resp" type="text" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                                <button id="next" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-xl">Comprobar</button>
+                            <div class="w-full max-w-2xl mx-auto">
+                                <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-700">
+                                    <p class="text-xl mb-4 text-blue-600 dark:text-blue-400">Escribe una palabra que empiece por la letra "${letraElegida}"</p>
+                                    <input id="resp" type="text" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white border-slate-300 dark:border-slate-600">
+                                    <button id="next" class="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Comprobar</button>
+                                </div>
                             </div>
                         `);
                         autoFocus();
@@ -2148,10 +2306,12 @@ function initMECLogic(testId, callback) {
                         };
                     } else if (paso === 2) {
                         container.innerHTML = makeResponsiveContainer(`
-                            <div class="p-4">
-                                <p class="text-xl mb-4 text-slate-900 dark:text-white">Escribe el antónimo (lo contrario) de "${palabraAntonimo}"</p>
-                                <input id="resp" type="text" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                                <button id="next" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-xl">Comprobar</button>
+                            <div class="w-full max-w-2xl mx-auto">
+                                <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-700">
+                                    <p class="text-xl mb-4 text-blue-600 dark:text-blue-400">Escribe el antónimo (lo contrario) de "${palabraAntonimo}"</p>
+                                    <input id="resp" type="text" class="w-full p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white border-slate-300 dark:border-slate-600">
+                                    <button id="next" class="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Comprobar</button>
+                                </div>
                             </div>
                         `);
                         autoFocus();
@@ -2340,6 +2500,7 @@ function initStroopLogic(testId, callback) {
         if (status) status.textContent = "Stroop: Elige el COLOR de la tinta (ignora la palabra)";
     };
 }
+
 // ======================================================
 // 9. DIGIT SPAN (memoria_trabajo, atencion_sostenida)
 // ======================================================
@@ -2357,66 +2518,124 @@ function initDigitSpanLogic(testId, callback) {
         return Array.from({ length: n }, () => Math.floor(Math.random() * 10));
     }
 
+    function normalizarEntrada(texto) {
+        const limpio = texto.replace(/[\s,;.-]/g, '');
+        return limpio.split('').map(c => parseInt(c, 10));
+    }
+
     function autoFocus() {
         setTimeout(() => {
             const input = document.getElementById("respuesta");
-            if (input) input.focus();
+            if (input) {
+                input.focus();
+                input.select();
+            }
         }, 100);
+    }
+
+    function mostrarFeedbackNumerico(acertado, mensajeExtra) {
+        const fb = document.createElement('div');
+        fb.className = `fixed top-1/3 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-xl text-white text-base font-bold z-50 ${acertado ? 'bg-green-500' : 'bg-red-500'} animate-pulse`;
+        fb.textContent = acertado ? '✓ Correcto' : `✗ ${mensajeExtra || 'Incorrecto'}`;
+        document.body.appendChild(fb);
+        setTimeout(() => fb.remove(), 1000);
     }
 
     function mostrarDigitos(digitos, callbackFn) {
         container.innerHTML = makeResponsiveContainer(`
-            <div class="flex items-center justify-center min-h-[300px]">
-                <div class="text-5xl sm:text-7xl lg:text-8xl font-bold text-center text-slate-900 dark:text-white tracking-wide">
-                    ${digitos.join(' ')}
+            <div class="flex flex-col items-center justify-center min-h-[300px] p-4">
+                <div class="text-center mb-8">
+                    <p class="text-sm text-blue-500 mb-2">Nivel ${nivel} | ${errores}/2 errores</p>
+                    <div class="text-5xl sm:text-7xl lg:text-8xl font-bold text-center text-blue-600 dark:text-blue-400 tracking-wide space-x-2">
+                        ${digitos.join(' ')}
+                    </div>
+                </div>
+                <div class="text-center text-blue-500 text-sm">
+                    Memoriza la secuencia...
                 </div>
             </div>
         `);
+
         setTimeout(() => {
             container.innerHTML = makeResponsiveContainer(`
                 <div class="flex flex-col items-center justify-center min-h-[300px] p-4">
-                    <p class="text-xl mb-4 text-slate-900 dark:text-white">Escribe los números en el <strong>mismo orden</strong>:</p>
-                    <input id="respuesta" type="text" class="w-full max-w-md p-3 border rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-center text-xl" placeholder="Ej: 3 5 2 8">
-                    <button id="enviar" class="mt-4 px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition">Comprobar</button>
+                    <p class="text-xl mb-4 text-blue-600 dark:text-blue-400">Escribe los números en el <strong>mismo orden</strong>:</p>
+                    <input id="respuesta" type="tel" inputmode="numeric" pattern="[0-9]*" 
+                           class="w-full max-w-md p-4 text-center rounded-xl border border-blue-300 dark:border-blue-700 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 text-2xl tracking-wider"
+                           placeholder="Ej: 3528"
+                           autocomplete="off">
+                    <div class="flex gap-3 mt-6">
+                        <button id="enviar" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition">Comprobar</button>
+                        <button id="borrar" class="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl transition">Borrar</button>
+                    </div>
                 </div>
             `);
+
             autoFocus();
+
             const input = document.getElementById("respuesta");
-            const btn = document.getElementById("enviar");
-            btn.onclick = () => {
-                const respuesta = input.value.trim().split(/\s+/).map(Number);
+            const btnEnviar = document.getElementById("enviar");
+            const btnBorrar = document.getElementById("borrar");
+
+            if (input) {
+                input.setAttribute('inputmode', 'numeric');
+                input.setAttribute('pattern', '[0-9]*');
+            }
+
+            btnBorrar.onclick = () => {
+                if (input) input.value = '';
+                autoFocus();
+            };
+
+            btnEnviar.onclick = () => {
+                const respuestaRaw = input.value.trim();
+                if (!respuestaRaw) {
+                    mostrarFeedbackNumerico(false, "Escribe los números");
+                    return;
+                }
+
+                const respuesta = normalizarEntrada(respuestaRaw);
                 const correcto = JSON.stringify(respuesta) === JSON.stringify(digitos);
                 callbackFn(correcto);
             };
+
             input.addEventListener("keypress", (e) => {
-                if (e.key === "Enter") btn.click();
+                if (e.key === "Enter") btnEnviar.click();
+                if (!/[0-9]/.test(e.key) && e.key !== "Enter" && e.key !== "Backspace" && e.key !== "Delete" && e.key !== "ArrowLeft" && e.key !== "ArrowRight") {
+                    e.preventDefault();
+                }
             });
-        }, 2000);
+        }, 3000);
     }
 
     function iniciarNivel() {
         if (errores >= 2) return finalizarTest();
+
         const digitos = generarDigitos(nivel);
+
         mostrarDigitos(digitos, (correcto) => {
             if (correcto) {
+                mostrarFeedbackNumerico(true);
                 spanMaximo = nivel;
                 nivel++;
                 if (status) status.textContent = `¡Correcto! Siguiente nivel: ${nivel} dígitos`;
-                iniciarNivel();
+                setTimeout(() => iniciarNivel(), 500);
             } else {
                 errores++;
+                mostrarFeedbackNumerico(false, `Era: ${digitos.join(' ')}`);
                 if (status) status.textContent = `Error (${errores}/2). Nivel actual: ${nivel}`;
-                if (errores < 2) iniciarNivel();
-                else finalizarTest();
+                if (errores < 2) {
+                    setTimeout(() => iniciarNivel(), 1500);
+                } else {
+                    setTimeout(() => finalizarTest(), 1000);
+                }
             }
         });
     }
 
     function finalizarTest() {
         const habilidades = [];
-        // Memoria de trabajo: span bajo (adulto sano promedio 7±2, pero para mayores 5 está bien)
         if (spanMaximo < 5) habilidades.push("memoria_trabajo");
-        // Atención sostenida: span muy bajo o muchos errores
         if (spanMaximo < 4 || errores >= 2) habilidades.push("atencion_sostenida");
 
         callback({
@@ -2439,10 +2658,11 @@ function initDigitSpanLogic(testId, callback) {
         errores = 0;
         spanMaximo = 0;
         inicioTest = performance.now();
-        if (status) status.textContent = "Digit Span: Nivel 2 - Introduce los números en el mismo orden";
+        if (status) status.textContent = "Digit Span: Memoriza la secuencia de números";
         iniciarNivel();
     };
 }
+
 // ======================================================
 // 10. TRAIL MAKING TEST (flexibilidad, velocidad, coordinación, atención dividida)
 // ======================================================
@@ -2572,18 +2792,36 @@ function initTMTLogic(testId, callback) {
         }, 300);
     }
 
+    // En initTMTLogic, modifica la función mostrarInstruccionInicio:
+
     function mostrarInstruccionInicio(callback) {
         let mensaje = '';
+        let elementoInicio = '';
         if (fase === 'A') {
-            mensaje = `Empieza por el número<br><span class="text-6xl font-black">${numeroInicio}</span>`;
+            elementoInicio = numeroInicio.toString();
+            mensaje = `Empieza por el número <span class="text-6xl font-black block mt-2">${numeroInicio}</span>
+                   <p class="text-sm text-slate-300 mt-4">Después sigue la secuencia ascendente: ${numeroInicio} → ... → 8 → 1 → ... hasta ${numeroInicio - 1}</p>`;
         } else {
-            mensaje = `Empieza por la letra<br><span class="text-6xl font-black">${letraInicio}</span>`;
+            elementoInicio = letraInicio;
+            const ordenMostrar = ordenCorrectoTotal.slice(0, 5).join(' → ');
+            mensaje = `Empieza por la letra/número <span class="text-6xl font-black block mt-2">${letraInicio}</span>
+                   <p class="text-sm text-slate-300 mt-4">Secuencia: alterna números y letras en orden ascendente</p>
+                   <p class="text-xs text-slate-400 mt-2">Ejemplo: 1 → A → 2 → B → 3 → C...</p>`;
         }
 
         container.innerHTML = makeResponsiveContainer(`
         <div class="flex flex-col items-center justify-center h-full min-h-[400px] bg-slate-900 rounded-2xl">
-            <div class="text-center text-white p-8 animate-pulse">
-                <p class="text-xl mb-4">${mensaje}</p>
+            <div class="text-center text-white p-8">
+                <div class="animate-pulse">
+                    <p class="text-xl mb-4">🎯 Haz clic en el primer elemento</p>
+                    ${mensaje}
+                </div>
+                <div class="mt-8 p-4 bg-blue-500/20 rounded-xl inline-block">
+                    <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-3xl font-bold mx-auto shadow-lg">
+                        ${elementoInicio}
+                    </div>
+                    <p class="text-xs text-slate-300 mt-2">Elemento inicial</p>
+                </div>
                 <p class="text-sm text-slate-400 mt-6" id="cuenta-regresiva">⏱️ El test comenzará en 3 segundos</p>
             </div>
         </div>
@@ -2598,9 +2836,57 @@ function initTMTLogic(testId, callback) {
             }
             if (segundos <= 0) {
                 clearInterval(intervalo);
-                callback();
+                // Resaltar el primer elemento visualmente antes de empezar
+                setTimeout(() => {
+                    callback();
+                }, 100);
             }
         }, 1000);
+    }
+
+    // También modifica la función renderFase para resaltar el siguiente elemento:
+
+    function renderFase() {
+        const valorEsperado = getValorEsperado();
+
+        container.innerHTML = `
+        <div class="w-full h-full flex flex-col p-2">
+            <div class="flex justify-between items-center mb-2 px-1">
+                <div class="text-sm font-bold ${fase === 'A' ? 'text-blue-500' : 'text-green-500'}">
+                    Fase ${fase}
+                </div>
+                <div id="tmt-progreso" class="text-sm text-slate-500 dark:text-slate-400">
+                    Progreso: ${siguienteIndex}/${ordenCorrectoTotal.length}
+                </div>
+            </div>
+            <div class="text-center mb-2">
+                <p class="text-xs text-slate-400">Siguiente: <span class="font-bold text-lg text-yellow-400">${valorEsperado || 'FIN'}</span></p>
+            </div>
+            <div id="tmt-play-area" class="relative flex-1 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden" style="min-height:260px;">
+                <canvas id="tmt-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="z-index:1;"></canvas>
+                <div class="relative w-full h-full" style="z-index:2;">
+                    ${elementos.map(el => {
+            const esCompletado = el.completado === true;
+            const esSiguiente = !esCompletado && el.valor === valorEsperado;
+            return `
+                            <div data-valor="${el.valor}"
+                                 data-x="${el.x}" data-y="${el.y}"
+                                 class="absolute w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all text-xs sm:text-sm font-bold shadow-md
+                                        ${esCompletado ? 'bg-green-500 text-white opacity-80 cursor-default' :
+                    (esSiguiente ? 'bg-yellow-500 text-black hover:bg-yellow-600 ring-4 ring-yellow-300 scale-110' : 'bg-blue-500 text-white hover:bg-blue-600')}"
+                                 style="left:${el.x}%;top:${el.y}%;transform:translate(-50%,-50%);z-index:3;touch-action:manipulation;">
+                                ${el.valor}
+                            </div>
+                        `;
+        }).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+
+        setTimeout(() => dibujarLineas(), 50);
+        asignarEventos();
+        // ... resto del código
     }
     function renderFase() {
         container.innerHTML = `
@@ -2991,21 +3277,21 @@ function initNBackLogic(testId, callback) {
     const startBtn = document.getElementById("start-btn");
     const status = document.getElementById("status");
 
-    let nivel = 1;                 // 1-back o 2-back
+    let nivel = 1;
     let secuencia = [];
     let indice = 0;
-    let aciertos = 0;
-    let comisiones = 0;            // pulsar cuando NO tocaba
-    let omisiones = 0;             // no pulsar cuando SÍ tocaba
+    let aciertos = 0, comisiones = 0, omisiones = 0;
     let tiemposReaccion = [];
     let testActivo = true;
     let puedeResponder = false;
+    let respondidoEnEsteEnsayo = false;
     let temporizadorNumero = null;
-    let temporizadorDescanso = null;
+    let tiempoInicioEnsayo = 0;
+    let enTransicion = false;
 
-    const TOTAL_ESTIMULOS_POR_NIVEL = 15;
-    const TIEMPOS_VISUALIZACION = { 1: 1800, 2: 1200 };
-    const TIEMPO_DESCANSO = 300;   // solo el número desaparece, no el resto
+    const TOTAL_ESTIMULOS_POR_NIVEL = 20;
+    const TIEMPOS_VISUALIZACION = { 1: 1800, 2: 1500 };
+    const TIEMPO_TRANSICION = 100;
 
     function generarSecuencia() {
         const seq = [];
@@ -3030,7 +3316,7 @@ function initNBackLogic(testId, callback) {
     function actualizarContadores() {
         const contadorDiv = document.getElementById("contador-info");
         if (contadorDiv) {
-            contadorDiv.innerHTML = `✅ ${aciertos} &nbsp;|&nbsp; ⚠️ ${comisiones} &nbsp;|&nbsp; ❌ ${omisiones}`;
+            contadorDiv.innerHTML = `✅ ${aciertos} | ⚠️ ${comisiones} | ❌ ${omisiones}`;
         }
     }
 
@@ -3042,100 +3328,105 @@ function initNBackLogic(testId, callback) {
         setTimeout(() => fb.remove(), 400);
     }
 
-    async function mostrarNumero(numero, esObjetivo) {
+    function deshabilitarBoton() {
+        const btn = document.getElementById("btn-coincide");
+        if (btn) {
+            btn.disabled = true;
+            btn.classList.add("opacity-50", "cursor-not-allowed");
+        }
+    }
+
+    function habilitarBoton() {
+        const btn = document.getElementById("btn-coincide");
+        if (btn) {
+            btn.disabled = false;
+            btn.classList.remove("opacity-50", "cursor-not-allowed");
+        }
+    }
+
+    function procesarRespuesta() {
+        if (!puedeResponder || respondidoEnEsteEnsayo || !testActivo || enTransicion) return;
+
+        respondidoEnEsteEnsayo = true;
+        if (temporizadorNumero) clearTimeout(temporizadorNumero);
+
+        const esObjetivo = (indice >= nivel && secuencia[indice - nivel] === secuencia[indice]);
+        const tiempo = performance.now() - tiempoInicioEnsayo;
+        tiemposReaccion.push(tiempo);
+
+        if (esObjetivo) {
+            aciertos++;
+            mostrarFeedback(true);
+        } else {
+            comisiones++;
+            mostrarFeedback(false);
+        }
+
+        actualizarContadores();
+        puedeResponder = false;
+        deshabilitarBoton();
+
+        setTimeout(() => {
+            indice++;
+            mostrarSiguiente();
+        }, 400);
+    }
+
+    function mostrarNumero(numero, esObjetivo) {
         const tiempoVisualizacion = TIEMPOS_VISUALIZACION[nivel];
         puedeResponder = true;
+        respondidoEnEsteEnsayo = false;
+        tiempoInicioEnsayo = performance.now();
 
-        // Renderizamos la interfaz completa, sin "?" ni textos extra
         container.innerHTML = makeResponsiveContainer(`
             <div class="flex flex-col items-center justify-center min-h-[400px] p-4">
                 <div class="text-center mb-2">
                     <p class="text-sm text-slate-400">N-Back (${nivel === 1 ? '1-back' : '2-back'})</p>
-                    <div id="contador-info" class="text-xs text-slate-500 mb-4">✅ 0 | ⚠️ 0 | ❌ 0</div>
+                    <div id="contador-info" class="text-xs text-slate-500 mb-4">✅ ${aciertos} | ⚠️ ${comisiones} | ❌ ${omisiones}</div>
                 </div>
                 <div id="numero-container" class="w-full flex justify-center items-center mb-6 min-h-[150px]">
-                    <div class="text-8xl sm:text-9xl font-bold text-white transition-all transform scale-100" id="numero-display">${numero}</div>
+                    <div id="numero-display" class="text-8xl sm:text-9xl font-bold text-white p-4 bg-slate-800 rounded-2xl inline-block shadow-lg"
+                         style="transition: opacity 0.1s ease; opacity: 1;">
+                        ${numero}
+                    </div>
                 </div>
-                <button id="btn-coincide" class="w-full max-w-xs py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl rounded-2xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <button id="btn-coincide" class="w-full max-w-xs py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl rounded-2xl transition-all active:scale-95">
                     🔄 COINCIDE
                 </button>
                 <p class="text-sm text-slate-400 mt-4">
                     ${nivel === 1 ? "¿Es igual al número anterior?" : "¿Es igual al de hace 2 posiciones?"}
                 </p>
-                <div class="w-full max-w-xs mt-4">
-                    <div class="h-1 bg-slate-700 rounded-full overflow-hidden">
-                        <div id="progreso-tiempo" class="h-full bg-blue-500 w-full transition-all" style="transition-duration: ${tiempoVisualizacion}ms"></div>
-                    </div>
-                </div>
             </div>
         `);
 
         actualizarContadores();
+        habilitarBoton();
 
         const btn = document.getElementById("btn-coincide");
-        const barra = document.getElementById("progreso-tiempo");
-        if (barra) {
-            barra.style.transition = `width ${tiempoVisualizacion}ms linear`;
-            barra.style.width = '0%';
-        }
-
-        btn.disabled = false;
-        const inicioNumero = performance.now();
-        let respondido = false;
-
-        const manejador = () => {
-            if (respondido || !puedeResponder) return;
-            respondido = true;
-            btn.disabled = true;
-            if (temporizadorNumero) clearTimeout(temporizadorNumero);
-            const tiempo = performance.now() - inicioNumero;
-            tiemposReaccion.push(tiempo);
-
-            if (esObjetivo) {
-                aciertos++;
-                mostrarFeedback(true);
-            } else {
-                comisiones++;
-                mostrarFeedback(false);
-            }
-            actualizarContadores();
-            terminarNumero(false); // no reinicia temporizador
-        };
-
-        btn.addEventListener('click', manejador);
-
-        const terminarNumero = (porTimeout) => {
-            if (!respondido && puedeResponder) {
-                respondido = true;
-                btn.disabled = true;
-                if (porTimeout && esObjetivo) {
-                    omisiones++;
-                    mostrarFeedback(false);
-                    actualizarContadores();
-                }
-            }
-            puedeResponder = false;
-            // Ocultar el número (dejamos el div vacío o con un espacio, sin "?")
-            const numeroDiv = document.getElementById("numero-display");
-            if (numeroDiv) numeroDiv.textContent = '';
-            // Pequeña pausa antes del siguiente estímulo (solo el número está oculto)
-            if (temporizadorDescanso) clearTimeout(temporizadorDescanso);
-            temporizadorDescanso = setTimeout(() => {
-                if (!testActivo) return;
-                indice++;
-                mostrarSiguiente();
-            }, TIEMPO_DESCANSO);
-        };
+        btn.onclick = procesarRespuesta;
 
         temporizadorNumero = setTimeout(() => {
-            if (!respondido && puedeResponder) {
-                terminarNumero(true);
+            if (!respondidoEnEsteEnsayo && testActivo && !enTransicion) {
+                respondidoEnEsteEnsayo = true;
+                if (esObjetivo) {
+                    omisiones++;
+                    mostrarFeedback(false);
+                }
+                actualizarContadores();
+                puedeResponder = false;
+                deshabilitarBoton();
+
+                setTimeout(() => {
+                    indice++;
+                    mostrarSiguiente();
+                }, 400);
             }
         }, tiempoVisualizacion);
     }
 
     function mostrarSiguiente() {
         if (!testActivo) return;
+
         if (indice >= secuencia.length) {
             if (nivel === 1) {
                 nivel = 2;
@@ -3153,8 +3444,27 @@ function initNBackLogic(testId, callback) {
             }
             return;
         }
+
         const esObjetivo = (indice >= nivel && secuencia[indice - nivel] === secuencia[indice]);
-        mostrarNumero(secuencia[indice], esObjetivo);
+        const numero = secuencia[indice];
+
+        // Si no es el primer elemento, hacer la transición
+        if (indice > 0) {
+            enTransicion = true;
+            deshabilitarBoton();
+
+            const numeroDisplay = document.getElementById("numero-display");
+            if (numeroDisplay) {
+                numeroDisplay.style.opacity = '0';
+                setTimeout(() => {
+                    mostrarNumero(numero, esObjetivo);
+                    enTransicion = false;
+                }, TIEMPO_TRANSICION);
+                return;
+            }
+        }
+
+        mostrarNumero(numero, esObjetivo);
     }
 
     function mostrarTransicion(mensaje, subtitulo) {
@@ -3172,18 +3482,19 @@ function initNBackLogic(testId, callback) {
 
     function finalizarTest() {
         testActivo = false;
+        enTransicion = false;
+
         const totalRespuestas = aciertos + comisiones + omisiones;
-        const precision = totalRespuestas ? aciertos / (aciertos + comisiones + omisiones) : 0;
+        const precision = totalRespuestas ? aciertos / totalRespuestas : 0;
         const tiempoMedio = tiemposReaccion.length ? tiemposReaccion.reduce((a, b) => a + b, 0) / tiemposReaccion.length : 0;
 
         const habilidades = [];
+
         if (precision < 0.65) habilidades.push("memoria_trabajo");
         if (aciertos < 8) habilidades.push("atencion_sostenida");
         if (comisiones > 5) habilidades.push("control_inhibitorio");
         if (omisiones > 5) habilidades.push("atencion_sostenida");
         if (tiempoMedio > 1300) habilidades.push("velocidad_cognitiva");
-
-        console.log(`N-Back final: nivel ${nivel}, aciertos=${aciertos}, comisiones=${comisiones}, omisiones=${omisiones}, precisión=${Math.round(precision * 100)}%, tiempo medio=${Math.round(tiempoMedio)}ms`);
 
         callback({
             testId, timestamp: Date.now(),
@@ -3197,6 +3508,7 @@ function initNBackLogic(testId, callback) {
             },
             habilidadesDebiles: [...new Set(habilidades)]
         });
+
         startBtn.classList.remove("hidden");
         if (status) status.textContent = `N-Back: ${aciertos} aciertos, ${comisiones} comisiones, ${omisiones} omisiones`;
     }
@@ -3209,6 +3521,7 @@ function initNBackLogic(testId, callback) {
         comisiones = 0;
         omisiones = 0;
         tiemposReaccion = [];
+        enTransicion = false;
         await mostrarTransicion("🧠 Test N-Back", "Pulsa COINCIDE si el número es igual al anterior");
         secuencia = generarSecuencia();
         indice = 0;
@@ -3216,6 +3529,7 @@ function initNBackLogic(testId, callback) {
         if (status) status.textContent = "N-Back (1‑back) – Pulsa COINCIDE cuando corresponda";
     };
 }
+
 
 // ======================================================
 // 13. GO/NO-GO (control_inhibitorio, atencion_sostenida, velocidad_cognitiva)
@@ -3246,14 +3560,6 @@ function initGoNoGoLogic(testId, callback) {
         return seq;
     }
 
-    function deshabilitarBoton() {
-        const btn = document.getElementById("btn-pulsar");
-        if (btn) {
-            btn.disabled = true;
-            btn.classList.add("opacity-50", "cursor-not-allowed");
-        }
-    }
-
     function mostrarFeedback(acertado) {
         const fb = document.createElement('div');
         fb.className = `fixed top-1/3 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg text-white text-sm font-bold z-50 ${acertado ? 'bg-green-500' : 'bg-red-500'}`;
@@ -3278,9 +3584,9 @@ function initGoNoGoLogic(testId, callback) {
         }
 
         puedeResponder = false;
-        deshabilitarBoton();
         if (temporizadorEstímulo) clearTimeout(temporizadorEstímulo);
 
+        // Siguiente estímulo después de 400ms
         setTimeout(() => {
             indice++;
             mostrarSiguiente();
@@ -3303,10 +3609,10 @@ function initGoNoGoLogic(testId, callback) {
                 <div class="text-center mb-6">
                     <p class="text-sm text-slate-400 mb-2">Go/No-Go</p>
                     <p class="text-xs text-slate-500 mb-3">Restantes: ${restantes} | ✅ ${aciertos} | ⚠️ ${comisiones} | ❌ ${omisiones}</p>
-                    <div class="text-8xl sm:text-9xl font-bold text-white mb-6 p-4 bg-slate-800 rounded-2xl inline-block">
+                    <div id="letra-container" class="text-8xl sm:text-9xl font-bold text-white mb-6 p-4 bg-slate-800 rounded-2xl inline-block shadow-lg"
+                         style="transition: opacity 0.1s ease;">
                         ${letra}
                     </div>
-                    
                 </div>
                 <div class="w-full max-w-xs">
                     <button id="btn-pulsar" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl rounded-2xl transition-all active:scale-95">
@@ -3315,6 +3621,15 @@ function initGoNoGoLogic(testId, callback) {
                 </div>
             </div>
         `);
+
+        // Hacer el efecto de desaparición/aparición solo si no es el primero
+        const letraContainer = document.getElementById("letra-container");
+        if (indice > 0 && letraContainer) {
+            letraContainer.style.opacity = '0';
+            setTimeout(() => {
+                letraContainer.style.opacity = '1';
+            }, 100);
+        }
 
         const btn = document.getElementById("btn-pulsar");
         btn.disabled = false;
@@ -3326,18 +3641,17 @@ function initGoNoGoLogic(testId, callback) {
 
         temporizadorEstímulo = setTimeout(() => {
             if (puedeResponder && testActivo) {
-                const esGo = estímulos[indice];
-                if (esGo) {
+                const esGoActual = estímulos[indice];
+                if (esGoActual) {
                     omisiones++;
                     mostrarFeedback(false);
                 }
                 puedeResponder = false;
-                deshabilitarBoton();
 
                 setTimeout(() => {
                     indice++;
                     mostrarSiguiente();
-                }, 300);
+                }, 400);
             }
         }, TIEMPO_RESPUESTA);
     }
@@ -3351,33 +3665,11 @@ function initGoNoGoLogic(testId, callback) {
 
         const habilidades = [];
 
-        // CONTROL INHIBITORIO: muchas comisiones O impulsividad (rápido + impreciso)
-        if (comisiones > 3) {
-            habilidades.push("control_inhibitorio");
-        } else if (rtMedio < 300 && precision < 0.85) {
-            // Responde muy rápido pero comete errores → impulsivo
-            habilidades.push("control_inhibitorio");
-        }
-
-        // ATENCIÓN SOSTENIDA: muchas omisiones O baja precisión
-        if (omisiones > 5) {
-            habilidades.push("atencion_sostenida");
-        } else if (precision < 0.75) {
-            habilidades.push("atencion_sostenida");
-        }
-
-        // VELOCIDAD COGNITIVA: muy rápido (<250ms) pero podría ser normal
-        // Si es muy rápido pero preciso, es bueno; si es rápido e impreciso, ya se penaliza arriba
-        if (rtMedio > 800) {
-            habilidades.push("velocidad_cognitiva"); // lento
-        }
-        // No penalizamos la velocidad rápida porque puede ser buena
+        if (comisiones > 3) habilidades.push("control_inhibitorio");
+        if (omisiones > 5) habilidades.push("atencion_sostenida");
+        if (rtMedio > 700) habilidades.push("velocidad_cognitiva");
 
         const habilidadesUnicas = [...new Set(habilidades)];
-
-        console.log(`Go/No-Go final: aciertos=${aciertos}, comisiones=${comisiones}, omisiones=${omisiones}`);
-        console.log(`Precisión=${(precision * 100).toFixed(1)}%, tiempo medio=${Math.round(rtMedio)}ms`);
-        console.log(`Habilidades detectadas: ${habilidadesUnicas.length ? habilidadesUnicas.join(', ') : 'NINGUNA'}`);
 
         callback({
             testId, timestamp: Date.now(),
@@ -3409,6 +3701,9 @@ function initGoNoGoLogic(testId, callback) {
         if (status) status.textContent = "Go/No-Go: Pulsa el botón solo cuando veas la letra X";
     };
 }
+
+
+
 
 // Pone el área del test en pantalla completa con botón de salida siempre visible
 function enterTestFullscreen() {
@@ -3464,7 +3759,7 @@ function enterTestFullscreen() {
         ].join(';');
         exit.addEventListener('click', () => {
             if (document.fullscreenElement || document.webkitFullscreenElement) {
-                try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch(e) {}
+                try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (e) { }
             }
             restaurar();
         });

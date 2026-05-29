@@ -129,7 +129,7 @@ const CATALOGO_JUEGOS = [
     "descripcion": "Memoriza la lección y levanta la mano solo cuando vuelva a aparecer el mismo símbolo.",
     "detalleDescripcion": "Estás en una clase. Al inicio de cada ronda se muestra una lección: un símbolo concreto con un color concreto. Después aparecen varios estímulos. Solo debes responder cuando vuelva a salir exactamente el símbolo aprendido. Si aparece otro, debes esperar.",
     "comoJugar": [
-      "Memoriza el símbolo y el color que se muestran como lección.",
+      "Memoriza el símbolo y el color que se muestran como lección. Ojo, que el tamaño también importa.",
       "Observa los estímulos que aparecen después.",
       "Pulsa para levantar la mano solo si reaparece la misma lección.",
       "No pulses ante símbolos o colores diferentes.",

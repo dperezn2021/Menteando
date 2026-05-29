@@ -254,7 +254,7 @@ function mostrarComentarios(comentarios) {
 
         const esAutor = com.usuario === usuarioActual;
 
-        if (esAutor) {
+        if (esAutor || esAdmin) {
             const editBtn = document.createElement('button');
             editBtn.className = 'text-xs text-blue-500 hover:text-blue-700 transition';
             editBtn.title = 'Editar';

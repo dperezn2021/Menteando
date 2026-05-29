@@ -1,3 +1,4 @@
+// header.js - Versión corregida
 (function() {
     const header = document.querySelector('header');
     if (!header) return;
@@ -5,98 +6,97 @@
     let lastScroll = 0;
     let ticking = false;
     let menuOpen = false;
-
-    const isMobileDevice = () =>
-        /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
-
-    const isPortrait = () =>
-        window.matchMedia('(orientation: portrait)').matches;
-
-    // Sticky en escritorio, fixed en móvil real (para que el paddingTop compense)
-    function updateHeaderPosition() {
-        if (window.innerWidth < 1024) {
-            header.style.position = "fixed";
-            header.style.top = "0";
-            document.body.style.paddingTop = header.offsetHeight + "px";
-        } else {
-            header.style.position = "sticky";
-            header.style.top = "0";
-            document.body.style.paddingTop = "";
-        }
-    }
+    let resizeTimeout = null;
 
     /* ============================
        MENÚ HAMBURGUESA
     ============================ */
+    let overlay = null;
+    let navContainer = null;
+    let hamburger = null;
+
+    function closeMenu() {
+        if (navContainer) navContainer.classList.remove('open');
+        if (overlay) overlay.classList.remove('visible');
+        menuOpen = false;
+    }
+
+    function openMenu() {
+        if (navContainer) navContainer.classList.add('open');
+        if (overlay) overlay.classList.add('visible');
+        menuOpen = true;
+    }
+
     function crearMenuHamburguesa() {
-        if (document.querySelector('.menu-hamburguesa')) return;
+        // Eliminar elementos existentes
+        const existingHamburger = document.querySelector('.menu-hamburguesa');
+        const existingOverlay = document.querySelector('.menu-overlay');
+        const existingContainer = document.querySelector('.menu-container');
+        if (existingHamburger) existingHamburger.remove();
+        if (existingOverlay) existingOverlay.remove();
+        if (existingContainer) existingContainer.remove();
 
         const nav = header.querySelector('nav');
         if (!nav) return;
 
-        // Páginas de juego/test: un solo enlace → sin hamburguesa, marcar header como simple
-        if (nav.querySelectorAll('a').length <= 1) {
-            header.classList.add('header-simple');
-            return;
-        }
+        const navLinks = nav.querySelectorAll('a');
+        if (navLinks.length <= 1) return;
 
-        const hamburger = document.createElement('button');
+        // Crear hamburguesa
+        hamburger = document.createElement('button');
         hamburger.className = 'menu-hamburguesa';
         hamburger.innerHTML = '☰';
+        hamburger.setAttribute('aria-label', 'Abrir menú');
 
-        const overlay = document.createElement('div');
+        // Crear overlay
+        overlay = document.createElement('div');
         overlay.className = 'menu-overlay';
 
-        const navClone = nav.cloneNode(true);
-        const navContainer = document.createElement('div');
+        // Crear contenedor del menú
+        navContainer = document.createElement('div');
         navContainer.className = 'menu-container';
+        
+        const navClone = nav.cloneNode(true);
+        navClone.querySelectorAll('a').forEach(a => {
+            a.classList.add('menu-link');
+        });
         navContainer.appendChild(navClone);
 
         document.body.appendChild(overlay);
         document.body.appendChild(navContainer);
 
-        function openMenu() {
-            navContainer.classList.add('open');
-            overlay.classList.add('visible');
-            menuOpen = true;
-        }
-
-        function closeMenu() {
-            navContainer.classList.remove('open');
-            overlay.classList.remove('visible');
-            menuOpen = false;
-        }
-
+        // Eventos
         hamburger.onclick = openMenu;
         overlay.onclick = closeMenu;
-
-        // Cerrar el menú al pulsar cualquier enlace del panel
         navClone.querySelectorAll('a').forEach(a => {
             a.addEventListener('click', closeMenu);
         });
 
+        // Insertar hamburguesa
         const rightSection = header.querySelector('.flex.items-center.gap-3:last-child');
-        if (rightSection) rightSection.insertBefore(hamburger, rightSection.firstChild);
-
-        function updateMenu() {
-            if (isMobileDevice() && isPortrait()) {
-                hamburger.style.display = 'block';
-                nav.style.display = 'none';
-            } else {
-                hamburger.style.display = 'none';
-                nav.style.display = 'flex';
-                closeMenu();
-            }
+        if (rightSection) {
+            rightSection.insertBefore(hamburger, rightSection.firstChild);
         }
 
-        updateMenu();
-        window.addEventListener('resize', updateMenu);
-        window.addEventListener('orientationchange', updateMenu);
+        updateMenuVisibility();
+    }
+
+    function updateMenuVisibility() {
+        const nav = header.querySelector('nav');
+        if (!hamburger || !nav) return;
+
+        if (window.innerWidth < 1024) {
+            hamburger.style.display = 'block';
+            nav.style.display = 'none';
+        } else {
+            hamburger.style.display = 'none';
+            nav.style.display = 'flex';
+            closeMenu();
+        }
     }
 
     /* ============================
        AUTO-OCULTACIÓN DEL HEADER
-       Funciona en cualquier dispositivo con viewport < 1024px
     ============================ */
     function handleScroll() {
         if (window.innerWidth >= 1024) {
@@ -105,7 +105,7 @@
         }
 
         const currentScroll = window.pageYOffset;
-
+        
         if (menuOpen) {
             header.classList.remove('header-hidden');
             lastScroll = currentScroll;
@@ -123,6 +123,19 @@
         lastScroll = currentScroll;
     }
 
+    function handleResize() {
+        updateMenuVisibility();
+        
+        if (menuOpen && window.innerWidth >= 1024) {
+            closeMenu();
+        }
+        
+        if (window.innerWidth >= 1024) {
+            header.classList.remove('header-hidden');
+        }
+    }
+
+    // Event listeners
     window.addEventListener('scroll', () => {
         if (!ticking) {
             requestAnimationFrame(() => {
@@ -133,12 +146,19 @@
         }
     });
 
-    window.addEventListener('resize', updateHeaderPosition);
-    window.addEventListener('orientationchange', () => {
-        updateHeaderPosition();
-        crearMenuHamburguesa();
+    window.addEventListener('resize', () => {
+        if (resizeTimeout) clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(handleResize, 100);
     });
 
-    crearMenuHamburguesa();
-    updateHeaderPosition();
+    function init() {
+        crearMenuHamburguesa();
+        updateMenuVisibility();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();

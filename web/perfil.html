@@ -5,7 +5,7 @@
     <!-- METADATOS -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Perfil de usuario en Menteando – revisa tus estadísticas cognitivas">
+    <meta name="description" content="Menteando - Entrena tu mente, pero jugando">
     <meta name="keywords" content="perfil Menteando, estadísticas, cognitivo, usuario">
     <meta name="author" content="Daniel Pérez Navarro">
 
@@ -454,47 +454,69 @@
 
     <!------------------------------- FOOTER ------------------------>
     <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
-        <div class="max-w-screen-xl mx-auto px-6 pt-8">
-            <div class="flex flex-col md:flex-row items-center md:items-start justify-center gap-12 mb-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 md:py-16">
 
-                <!-- 3 columnas: logo+descripción, enlaces, legal-->
-                <div class="w-full md:w-96 text-center md:text-left">
-                    <div class="flex items-center gap-3 flex-shrink-0">
-                        <img src="../assets/img/logo_1.png" alt="Logo Menteando" class="w-10 h-10 md:w-12 md:h-12" />
-                        <div class="flex flex-col leadig-ntight text-left">
-                            <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
-                                Menteando
-                            </h1>
+            <!-- Grid principal: 3 columnas en desktop -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-10">
+
+                <!-- Columna 1: Logo y descripción (más ancha) -->
+                <div class="md:col-span-5 text-center md:text-left">
+                    <div class="flex items-center gap-3 justify-center md:justify-start mb-4">
+                        <img src="../assets/img/logo_1.png" alt="Logo" class="w-10 h-10 md:w-12 md:h-12" />
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Menteando</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Entrena tu mente, pero jugando</p>
                         </div>
                     </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-md mx-auto md:mx-0">
+                        Plataforma de estimulación cognitiva diseñada para mantener tu cerebro ágil, joven y saludable.
+                    </p>
+                </div>
 
-                    <p class="text-sm md:text-base font-normal text-slate-500 dark:text-slate-400 pt-4">Dedicados a
-                        mejorar
-                        la calidad
-                        de vida de las personas mayores a través de la tecnología y la ciencia cognitiva.</p>
-                </div>
-                <div class="w-full md:w-64 text-center md:text-left">
-                    <h4 class="font-bold text-slate-900 dark:text-white mb-6">Enlaces de interés</h4>
-                    <ul class="space-y-4 text-slate-500 dark:text-slate-400">
-                        <li><a href="index.html" class="hover:text-blue-500 transition-colors">Inicio</a></li>
-                        <li><a href="games.html" class="hover:text-blue-500 transition-colors">Entrenamiento</a></li>
-                        <li><a href="https://github.com/dperezn2021/Menteando" target="_blank"
-                                class="hover:text-blue-500 transition-colors">GitHub del proyecto</a></li>
-                    </ul>
-                </div>
-                <div class="w-full md:w-64 text-center md:text-left">
-                    <h4 class="font-bold text-slate-900 dark:text-white mb-6">Más información</h4>
-                    <ul class="space-y-4 text-slate-500 dark:text-slate-400">
-                        <li><a href="about.html" class="hover:text-blue-500 transition-colors">Acerca de</a></li>
-                        <li><a href="about.html#contacto" class="hover:text-blue-500 transition-colors">Contacto</a>
+                <!-- Columna 2: Enlaces rápidos -->
+                <div class="md:col-span-3 text-center md:text-left">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-4 text-lg">Enlaces rápidos</h4>
+                    <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a href="index.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Inicio</a>
                         </li>
+                        <li><a href="tests.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Tests
+                                cognitivos</a></li>
+                        <li><a href="games.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Juegos</a>
+                        </li>
+                        <li><a href="perfil.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Mi
+                                perfil</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 3: Información y contacto -->
+                <div class="md:col-span-4 text-center md:text-left">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-4 text-lg">Información</h4>
+                    <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a href="about.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Acerca
+                                de Menteando</a></li>
+                        <li><a href="about.html#faq"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Preguntas
+                                frecuentes</a></li>
+                        <li><a href="about.html#contacto"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Contacto</a>
+                        </li>
+                        <li><a href="https://github.com/dperezn2021/Menteando" target="_blank"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">GitHub
+                                del proyecto</a></li>
                     </ul>
                 </div>
             </div>
 
-            <div class="pt-16 border-t border-slate-100 dark:border-slate-800 text-center">
-                <p class="text-sm font-normal text-slate-400">© 2026 Menteando. Todos los derechos reservados.</p>
+            <!-- Copyright -->
+            <div class="pt-6 border-t border-slate-100 dark:border-slate-800 text-center text-xs text-slate-400">
+                © 2026 Menteando. Daniel Pérez Navarro.
             </div>
+
         </div>
     </footer>
 

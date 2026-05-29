@@ -1,30 +1,17 @@
 ﻿<!DOCTYPE html>
 <html class="light" lang="es">
 
-<head>
-    <!-- METADATOS -->
+<head> <!-- METADATOS -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Perfil de usuario en Menteando – revisa tus estadísticas cognitivas">
+    <meta name="description" content="Menteando - Entrena tu mente, pero jugando">
     <meta name="keywords" content="perfil Menteando, estadísticas, cognitivo, usuario">
     <meta name="author" content="Daniel Pérez Navarro">
     <meta name="google-site-verification" content="ZUKOSUn8s8PjWK-UclGAfS4uKNMRCgk9l1uXoMtAM9I" />
     <!--Valores de la web-->
     <title>Menteando</title>
     <link rel="icon" href="assets/img/logo_1.png" type="image/png" sizes="32x32">
-
-    <script>
-        (() => {
-            const storedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const useDark = storedTheme ? storedTheme === 'dark' : prefersDark;
-
-            document.documentElement.classList.toggle('dark', useDark);
-            document.documentElement.classList.toggle('light', !useDark);
-        })();
-    </script>
-
-
+    <script> (() => { const storedTheme = localStorage.getItem('theme'); const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; const useDark = storedTheme ? storedTheme === 'dark' : prefersDark; document.documentElement.classList.toggle('dark', useDark); document.documentElement.classList.toggle('light', !useDark); })(); </script>
     <!-- Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/js/catalogoJuegos.js"></script>
@@ -33,28 +20,10 @@
     <script src="/coach/mensajesCoach.js"></script>
     <script src="/coach/cerebroCoach.js"></script>
     <script src="/coach/entidadCoach.js"></script>
-    <script src="/js/controladorCoach.js"></script>
 
-
-    <!-- Tailwind CSS with plugins -->
+    <script src="/js/controladorCoach.js"></script> <!-- Tailwind CSS with plugins -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            primary: '#3b82f6',
-                            secondary: '#6366f1',
-                            accent: '#f59e0b'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
+    <script> tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { primary: '#3b82f6', secondary: '#6366f1', accent: '#f59e0b' } } } } } </script>
     <!-- Estilos -->
     <link rel="stylesheet" href="/coach/animacionesCoach.css">
     <link rel="stylesheet" href="css/style.css">
@@ -62,26 +31,23 @@
     <script defer src="js/header.js"></script>
 </head>
 
-
 <body
     class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased overflow-x-hidden">
-
     <!-------------------------------------HEADER----------------------------------->
     <header
         class="header-auto-hide w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
         <div
             class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3 flex-shrink-0">
-                <img src="../assets/img/logo_1.png" alt="Logo" class="w-10 h-10 md:w-12 md:h-12" />
+            <div class="flex items-center gap-3 flex-shrink-0"> <img src="../assets/img/logo_1.png" alt="Logo"
+                    class="w-10 h-10 md:w-12 md:h-12" />
                 <div class="flex flex-col leading-tight text-left">
                     <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Menteando</h1>
                     <p class="text-xs md:text-sm font-normal text-slate-500 dark:text-slate-300">Entrena tu mente, pero
                         jugando</p>
                 </div>
             </div>
-
-            <nav class="flex flex-direction-row md:flex-row items-center justify-center gap-1 md:gap-3">
-                <a href="index.html"
+            <nav class="flex flex-direction-row md:flex-row items-center justify-center gap-1 md:gap-3"> <a
+                    href="index.html"
                     class="text-lg md:text-2xl font-bold text-blue-500 hover:text-blue-700 transition-colors px-2">Inicio</a>
                 <a href="tests.html"
                     class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Tests</a>
@@ -91,23 +57,19 @@
                     class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Acerca
                     De</a>
             </nav>
-
-            <div class="flex items-center gap-3">
-                <a href="perfil.html" class="flex items-center gap-2">
-                    <span id="perfil-apodo-header"
+            <div class="flex items-center gap-3"> <a href="perfil.html" class="flex items-center gap-2"> <span
+                        id="perfil-apodo-header"
                         class="text-md md:text-xl font-normal text-slate-500 dark:text-slate-300"></span>
                     <div
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-blue-500 bg-blue-500/10">
                         <img id="perfil-avatar-header" src="/assets/icon/usuario.webp" alt="Avatar"
                             class="w-full h-full object-cover" />
                     </div>
-                </a>
-                <button id="theme-toggle-btn"
+                </a> <button id="theme-toggle-btn"
                     class="text-lg md:text-2xl text-slate-900 dark:text-white hover:text-blue-500 transition-colors"></button>
             </div>
         </div>
     </header>
-
     <!--------------------------------MAIN-------------------------------->
     <main class="w-full">
 
@@ -116,247 +78,369 @@
             <div id="coach-bubble" class="coach-bubble"></div>
         </div>
 
-        <!-- SECTION HERO -->
+        <!-- SECTION HERO - UNIFICADA -->
         <section
-            class="relative pt-24 pb-32 bg-gradient-to-br from-indigo-400/20 via-indigo-100 via-[22%] to-neutral-100 to-[36%] dark:from-indigo-900/20 dark:via-slate-950 dark:to-slate-950 overflow-hidden">
-            <div class="w-full px-4 text-center">
+            class="relative py-24  bg-gradient-to-br from-indigo-400/20 via-indigo-100 via-[22%] to-neutral-100 to-[36%] dark:from-indigo-900/20 dark:via-slate-950 dark:to-slate-950 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 text-center">
                 <h1
-                    class="text-6xl md:text-8xl text-center justify-center font-black text-slate-900 dark:text-white leading-[94px]">
+                    class="text-6xl md:text-7xl lg:text-8xl font-black text-slate-900 dark:text-white leading-[1.2] tracking-tight">
                     Mantén tu
                     <span class="text-blue-500">mente</span><br>
-                    </span> activa y joven
+                    activa y joven
                 </h1>
-                <p class="max-w-2xl mx-auto text-2xl font-normal text-gray-700 dark:text-slate-400 leading-7 mt-10">
+                <p
+                    class="max-w-3xl mx-auto text-xl md:text-2xl font-normal text-gray-700 dark:text-slate-300 leading-relaxed mt-8 text-readable-lg">
                     Ejercicios cognitivos diseñados para mantener tu cerebro ágil, joven y saludable. Divertido, fácil
-                    de usar y accesible para todos.</p>
+                    de usar y accesible para todos.
+                </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-                    <a href="#juegos-destacados"
-                        class="px-8 py-4 bg-blue-500 text-white rounded-2xl font-bold text-xl transition-all transform hover:scale-105 shadow-xl shadow-blue-600/20">Ver
-                        juegos disponibles</a>
+                    <a href="#juegos-dia"
+                        class="px-8 py-4 bg-blue-500 text-white rounded-2xl font-bold text-lg md:text-xl transition-all hover:scale-105 shadow-xl shadow-blue-600/20">Ver
+                        juegos del día</a>
                     <button
-                        class="px-8 py-4 bg-slate-800 text-white rounded-2xl font-bold text-xl transition-all transform hover:scale-105 shadow-xl shadow-blue-600/20"
-                        onclick="window.location.href='about.html'">Saber
-                        más</button>
+                        class="px-8 py-4 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-2xl font-bold text-lg md:text-xl transition-all hover:scale-105 shadow-lg border border-slate-300 dark:border-slate-600"
+                        onclick="window.location.href='about.html#contexto-academico'">Saber más</button>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION INFORMATIVA: ¿QUÉ ES MENTEANDO? -->
-        <section class="py-20 px-6 md:px-12 lg:px-24 xl:px-64 bg-white dark:bg-slate-900">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-5xl md:text-6xl font-black text-slate-900 dark:text-white mb-8">¿Qué es Menteando?</h2>
-                <p class="max-w-3xl mx-auto text-2xl font-normal text-gray-700 dark:text-slate-400 leading-7 mb-16">Una
-                    plataforma integral de estimulación cognitiva que adapta los desafíos a tu nivel personal,
-                    ayudándote a mantener la independencia mental.</p>
+        <!-- SECTION HABILIDADES - UNIFICADA con el mismo ancho que juegos -->
+        <section class="py-10 bg-white dark:bg-slate-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+                <div class="text-center mb-16">
+                    <span
+                        class="inline-flex px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 text-sm font-semibold mb-6">
+                        Información general
+                    </span>
+                    <h2
+                        class="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">
+                        ¿Qué entrenas?</h2>
+                    <p
+                        class="max-w-3xl mx-auto text-xl md:text-2xl font-normal text-gray-700 dark:text-slate-300 leading-relaxed">
+                        Cada juego está diseñado para potenciar una habilidad mental específica.
+                    </p>
+                </div>
 
-                <!-- Habilidades entrenadas -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 ">
-                    <article
-                        class="p-6 bg-indigo-100 dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 text-center flex flex-col items-center h-full">
-                        <img src="../assets/icon/atencion.png" alt="Atención" class="w-14 h-14 object-contain mb-4" />
-                        <h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-3">Atención</h3>
-                        <p class="text-base md:text-lg text-slate-600 dark:text-slate-400 leading-relaxed">Mejora la
-                            capacidad de concentración en tareas cotidianas.</p>
-                    </article>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                    <div
+                        class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 text-center transition-all hover:border-blue-300 dark:hover:border-blue-700">
+                        <div
+                            class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-blue-100 dark:bg-blue-500/10 flex items-center justify-center">
+                            <img src="../assets/icon/atencion.png" alt="Atención" class="w-12 h-12 object-contain" />
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-3">Atención</h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Mejora la capacidad de
+                            concentración en tareas cotidianas.</p>
+                    </div>
 
-                    <article
-                        class="p-6 bg-indigo-100 dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 text-center flex flex-col items-center h-full">
-                        <img src="../assets/icon/memoria.png" alt="Memoria" class="w-14 h-14 object-contain mb-4" />
-                        <h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-3">Memoria</h3>
-                        <p class="text-base md:text-lg text-slate-600 dark:text-slate-400 leading-relaxed">Fortalece la
-                            retención de información y recuerdos a corto y largo plazo.</p>
-                    </article>
-                    
-                    <article
-                        class="p-6 bg-indigo-100 dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 text-center flex flex-col items-center h-full">
-                        <img src="../assets/icon/control.png" alt="Control" class="w-14 h-14 object-contain mb-4" />
-                        <h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-3">Control</h3>
-                        <p class="text-base md:text-lg text-slate-600 dark:text-slate-400 leading-relaxed">Desarrolla la
-                            capacidad de filtrar distracciones innecesarias.</p>
-                    </article>
+                    <div
+                        class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 text-center transition-all hover:border-blue-300 dark:hover:border-blue-700">
+                        <div
+                            class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-blue-100 dark:bg-blue-500/10 flex items-center justify-center">
+                            <img src="../assets/icon/memoria.png" alt="Memoria" class="w-12 h-12 object-contain" />
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-3">Memoria</h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Fortalece la retención de
+                            información y recuerdos.</p>
+                    </div>
 
-                    <article
-                        class="p-6 bg-indigo-100 dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 text-center flex flex-col items-center h-full">
-                        <img src="../assets/icon/reflejos.png" alt="Reflejos" class="w-14 h-14 object-contain mb-4" />
-                        <h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-3">Reflejos</h3>
-                        <p class="text-base md:text-lg text-slate-600 dark:text-slate-400 leading-relaxed">Agiliza la
-                            respuesta mental y física ante estímulos externos.</p>
-                    </article>
+                    <div
+                        class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 text-center transition-all hover:border-blue-300 dark:hover:border-blue-700">
+                        <div
+                            class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-blue-100 dark:bg-blue-500/10 flex items-center justify-center">
+                            <img src="../assets/icon/control.png" alt="Control" class="w-12 h-12 object-contain" />
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-3">Control</h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Desarrolla la capacidad de filtrar
+                            distracciones.</p>
+                    </div>
 
+                    <div
+                        class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 text-center transition-all hover:border-blue-300 dark:hover:border-blue-700">
+                        <div
+                            class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-blue-100 dark:bg-blue-500/10 flex items-center justify-center">
+                            <img src="../assets/icon/reflejos.png" alt="Reflejos" class="w-12 h-12 object-contain" />
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-3">Reflejos</h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Agiliza la respuesta mental y
+                            física ante estímulos.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION INFORMATIVA: ¿CÓMO FUNCIONA? -->
-        <section class="py-20 px-6">
-            <div class="w-full flex flex-col items-center justify-center">
-                <h2 class="text-5xl font-black text-center text-slate-900 dark:text-white mb-16">¿Cómo funciona?</h2>
+        <!-- SECTION CÓMO FUNCIONA - UNIFICADA -->
+        <section class="py-10 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+                <div class="text-center mb-16">
+                    <h2
+                        class="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">
+                        ¿Cómo funciona?</h2>
+                    <p class="max-w-2xl mx-auto text-xl text-gray-700 dark:text-slate-300">Tres pasos, cero
+                        complicaciones</p>
+                </div>
 
-                <!-- 3 PASOS -->
-                <ol class="relative space-y-12">
-                    <li class="flex gap-8 items-start">
-                        <span
-                            class="flex-shrink-0 w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl font-black shadow-lg">1</span>
-                        <div>
-                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Elige tu juego</h3>
-                            <p class="text-xl font-normal text-gray-700 dark:text-slate-400 leading-7">Selecciona entre
-                                nuestra variedad de categorías diseñadas para diferentes niveles de habilidad.</p>
-                        </div>
-                    </li>
-                    <li class="flex gap-8 items-start">
-                        <span
-                            class="flex-shrink-0 w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl font-black shadow-lg">2</span>
-                        <div>
-                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Practica a diario</h3>
-                            <p class="text-xl font-normal text-gray-700 dark:text-slate-400 leading-7">Solo necesitas
-                                15 minutos al día para ver resultados consistentes en tu agilidad mental.</p>
-                        </div>
-                    </li>
-                    <li class="flex gap-8 items-start">
-                        <span
-                            class="flex-shrink-0 w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl font-black shadow-lg">3</span>
-                        <div>
-                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Mira tu progreso</h3>
-                            <p class="text-xl font-normal text-gray-700 dark:text-slate-400 leading-7">Revisa tus
-                                estadísticas, trofeos y niveles alcanzados en tu panel personal.</p>
-                        </div>
-                    </li>
-                </ol>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+                    <div class="text-center">
+                        <div
+                            class="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center text-white text-3xl font-black mx-auto mb-6 shadow-lg">
+                            1</div>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-3">Elige un juego
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Cada juego entrena habilidades
+                            distintas.</p>
+                    </div>
+                    <div class="text-center">
+                        <div
+                            class="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center text-white text-3xl font-black mx-auto mb-6 shadow-lg">
+                            2</div>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-3">Juega y mejora
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed">La dificultad se adapta a tu
+                            rendimiento.</p>
+                    </div>
+                    <div class="text-center">
+                        <div
+                            class="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center text-white text-3xl font-black mx-auto mb-6 shadow-lg">
+                            3</div>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-3">Consulta tu
+                            progreso</h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Tus métricas se guardan
+                            localmente.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
+        <!-- SECTION PRIVACIDAD - UNIFICADA -->
+        <section class="py-10 bg-white dark:bg-slate-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+
+
+                <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+                    <div class="text-center max-w-3xl mx-auto mb-16">
+                        <span
+                            class="inline-flex px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 text-sm font-semibold mb-6">
+                            Privacidad y seguridad
+                        </span>
+                        <h2
+                            class="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white mb-4">
+                            Tus datos nunca salen de tu dispositivo
+                        </h2>
+                        <p class="text-lg text-slate-700 dark:text-slate-300 leading-relaxed">Sin cuentas, sin
+                            servidores,
+                            sin recopilación.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-12">
+                        <div
+                            class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 text-center">
+                            <div class="text-4xl mb-4">🔒</div>
+                            <h3 class="text-xl md:text-2xl font-black mb-2">Sin cuentas</h3>
+                            <p class="text-slate-600 dark:text-slate-400">No necesitas registro ni contraseñas.</p>
+                        </div>
+                        <div
+                            class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 text-center">
+                            <div class="text-4xl mb-4">💾</div>
+                            <h3 class="text-xl md:text-2xl font-black mb-2">Guardado local</h3>
+                            <p class="text-slate-600 dark:text-slate-400">Todo el progreso en tu navegador.</p>
+                        </div>
+                        <div
+                            class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 text-center">
+                            <div class="text-4xl mb-4">🧠</div>
+                            <h3 class="text-xl md:text-2xl font-black mb-2">Privacidad real</h3>
+                            <p class="text-slate-600 dark:text-slate-400">No compartimos datos con terceros.</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 md:p-8 max-w-3xl mx-auto">
+                        <h3 class="text-xl md:text-2xl font-black mb-6 text-center">Lo que debes saber</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="flex gap-4">
+                                <div class="text-2xl flex-shrink-0">⚠️</div>
+                                <div>
+                                    <h4 class="font-bold mb-1 text-slate-900 dark:text-white">Cambio de dispositivo</h4>
+                                    <p class="text-slate-600 dark:text-slate-400 text-sm">Si cambias de navegador, el
+                                        progreso no se puede recuperar.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="text-2xl flex-shrink-0">✉️</div>
+                                <div>
+                                    <h4 class="font-bold mb-1 text-slate-900 dark:text-white">Exportar métricas</h4>
+                                    <p class="text-slate-600 dark:text-slate-400 text-sm">Puedes mandar tus resultados
+                                        por correo electrónico desde tu perfil.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </section>
 
         <!-- SECTION RESUMEN DE JUGADOR -->
-        <section class="px-6 md:px-12 lg:px-24 xl:px-64 py-20 bg-blue-500/5 dark:bg-slate-900/50">
-            <div class="w-full">
-                <article class="w-full bg-white dark:bg-slate-800 p-6 md:p-10 lg:p-12 rounded-3xl shadow-xl">
+        <section class="px-6  py-10 w-max-7xl  bg-blue-500/5 dark:bg-slate-900/50">
+            <div class="w-max-7xl mx-auto">
+                <article class="w-max-7xl mx-auto bg-white dark:bg-slate-800 p-6 md:p-10 lg:p-12 rounded-3xl shadow-xl">
 
-                    <div class="flex flex-col lg:flex-row gap-6 lg:gap-7">
-
-                        <!-- AVATAR -->
+                    <div class="flex flex-col lg:flex-row gap-6 lg:gap-7 " >
                         <a href="perfil.html"
-                            class="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden border-8 border-blue-500/20">
+                            class="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden border-8 border-blue-500/20 transition-all hover:scale-105">
                             <img id="perfil-avatar" src="/assets/icon/usuario.webp" alt="Avatar de usuario"
                                 class="w-full h-full object-cover" />
                         </a>
 
-
-                        <!-- NOMBRE Y ESTADÍSTICAS -->
                         <div class="flex-1 min-w-0">
                             <h3 class="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white mb-2">Hola, <span
                                     id="perfil-nombre"></span></h3>
                             <p class="text-lg lg:text-xl font-normal text-slate-500 dark:text-slate-400 mb-4"><span
                                     id="perfil-edad"></span> años • Jugando desde <span id="perfil-desde"></span></p>
-                            <a href="perfil.html" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div class="p-4 bg-neutral-100 dark:bg-slate-700 rounded-2xl text-center">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div
+                                    class="p-4 bg-neutral-100 dark:bg-slate-700 rounded-2xl text-center transition-all hover:bg-neutral-200 dark:hover:bg-slate-600">
                                     <p class="text-blue-500 font-bold uppercase text-sm mb-1">Nivel</p>
-                                    <p id="perfil-nivel">
-                                    </p>
+                                    <p id="perfil-nivel" class="text-2xl font-black"></p>
                                 </div>
-                                <div class="p-4 bg-neutral-100 dark:bg-slate-700 rounded-2xl text-center">
+                                <div
+                                    class="p-4 bg-neutral-100 dark:bg-slate-700 rounded-2xl text-center transition-all hover:bg-neutral-200 dark:hover:bg-slate-600">
                                     <p class="text-blue-500 font-bold uppercase text-sm mb-1">Días en Racha</p>
                                     <p class="text-2xl font-black text-slate-900 dark:text-white"><span
                                             id="perfil-racha-total"></span><span class="text-base"> días</span></p>
                                 </div>
-                                <div class="p-4 bg-neutral-100 dark:bg-slate-700 rounded-2xl text-center">
+                                <div
+                                    class="p-4 bg-neutral-100 dark:bg-slate-700 rounded-2xl text-center transition-all hover:bg-neutral-200 dark:hover:bg-slate-600">
                                     <p class="text-blue-500 font-bold uppercase text-sm mb-1">Sesiones</p>
                                     <p class="text-2xl font-black text-slate-900 dark:text-white" id="perfil-sesiones">
                                     </p>
                                 </div>
-                                <div class="p-4 bg-neutral-100 dark:bg-slate-700 rounded-2xl text-center">
+                                <div
+                                    class="p-4 bg-neutral-100 dark:bg-slate-700 rounded-2xl text-center transition-all hover:bg-neutral-200 dark:hover:bg-slate-600">
                                     <p class="text-blue-500 font-bold uppercase text-sm mb-1">Puntos</p>
                                     <p class="text-2xl font-black text-slate-900 dark:text-white" id="perfil-puntos">
                                     </p>
                                 </div>
-                            </a>
+                            </div>
 
-                            <!-- BOTÓN DE ENTRENAR -->
                             <div class="mt-6">
                                 <button
-                                    class="w-full py-4 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600 transition-colors"
-                                    onclick="window.location.href='games.html'">Entrenar</button>
+                                    class="w-full py-4 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600 transition-all hover:scale-[1.02]"
+                                    onclick="window.location.href='perfil.html'">Ir al perfil</button>
                             </div>
                         </div>
                     </div>
-
-
-
                 </article>
-
-                <!--Lo pongo aqui para que al deslizar hacia abajo cuadre perfecto con la seccion-->
-                <div id="juegos-destacados"></div>
-
             </div>
         </section>
 
-        <!-- SECCIÓN DE JUEGOS DESTACADOS -->
-        <section class="px-6 md:px-12 lg:px-24 xl:px-64 pt-14 pb-10" id="juegos-dia">
-            <div class="w-full overflow-x-auto">
-                <!-- Título y enlace a catálogo completo -->
-                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-12 gap-6">
+        <!-- SECTION TEST COGNITIVO - UNIFICADA -->
+        <section class="py-10 bg-white dark:bg-slate-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+                <div
+                    class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 px-6 md:px-8 py-12 md:py-16 text-center text-white shadow-2xl">
+                    <div class="relative z-10 max-w-2xl mx-auto">
+                        <div class="text-5xl md:text-6xl mb-4">🎯</div>
+                        <h2 class="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight">¿No sabes por dónde
+                            empezar?</h2>
+                        <p class="mt-4 md:mt-6 text-base md:text-lg text-slate-200 leading-relaxed">Haz un test
+                            cognitivo y te recomendaremos el juego ideal para ti.</p>
+                        <div class="mt-8 md:mt-10">
+                            <button
+                                class="px-6 md:px-8 py-3 md:py-4 bg-blue-500 text-white rounded-xl font-bold text-lg md:text-xl transition-all hover:scale-105 shadow-xl shadow-blue-600/20 inline-flex items-center gap-2"
+                                onclick="window.location.href='tests.html'">Tests cognitivos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE JUEGOS DESTACADOS - Siempre 1 columna en móvil, 3 en desktop -->
+        <section class="py-10" id="juegos-dia">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-4">
                     <div>
-                        <h2 class="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-2">Juegos
-                            Destacados</h2>
-                        <p class="text-lg md:text-xl font-normal text-gray-700 dark:text-slate-400">Los juegos más
-                            populares de
+                        <h2
+                            class="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">
+                            Juegos Destacados</h2>
+                        <p class="text-base md:text-lg text-gray-700 dark:text-slate-300">Los juegos más populares de
                             esta semana</p>
                     </div>
-                    <a href="games.html" class="text-lg md:text-xl font-bold text-blue-500 hover:underline">Ver catálogo
-                        completo</a>
+                    <a href="games.html" class="text-blue-500 font-bold hover:underline">Ver catálogo completo →</a>
                 </div>
 
-                <!-- GRID DE JUEGOS DEL DIA -->
-                <div id="juegos-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- GRID: 1 columna siempre en móvil, 3 columnas fijas en desktop (NUNCA 2) -->
+                <div id="juegos-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
                     <!-- tarjetas generadas dinámicamente -->
                 </div>
             </div>
         </section>
     </main>
 
-
-    <!------------------------------- FOOTER ------------------------>
+    <!-- FOOTER - Versión mejorada -->
     <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
-        <div class="max-w-screen-xl mx-auto px-6 pt-8">
-            <div class="flex flex-col md:flex-row items-center md:items-start justify-center gap-12 mb-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 md:py-16">
 
-                <!-- 3 columnas: logo+descripción, enlaces, legal-->
-                <div class="w-full md:w-96 text-center md:text-left">
-                    <div class="flex items-center gap-3 flex-shrink-0">
-                        <img src="../assets/img/logo_1.png" alt="Logo Menteando" class="w-10 h-10 md:w-12 md:h-12" />
-                        <div class="flex flex-col leadig-ntight text-left">
-                            <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
-                                Menteando
-                            </h1>
+            <!-- Grid principal: 3 columnas en desktop -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-10">
+
+                <!-- Columna 1: Logo y descripción (más ancha) -->
+                <div class="md:col-span-5 text-center md:text-left">
+                    <div class="flex items-center gap-3 justify-center md:justify-start mb-4">
+                        <img src="../assets/img/logo_1.png" alt="Logo" class="w-10 h-10 md:w-12 md:h-12" />
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Menteando</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Entrena tu mente, pero jugando</p>
                         </div>
                     </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-md mx-auto md:mx-0">
+                        Plataforma de estimulación cognitiva diseñada para mantener tu cerebro ágil, joven y saludable.
+                    </p>
+                </div>
 
-                    <p class="text-sm md:text-base font-normal text-slate-500 dark:text-slate-400 pt-4">Dedicados a
-                        mejorar
-                        la calidad
-                        de vida de las personas mayores a través de la tecnología y la ciencia cognitiva.</p>
-                </div>
-                <div class="w-full md:w-64 text-center md:text-left">
-                    <h4 class="font-bold text-slate-900 dark:text-white mb-6">Enlaces de interés</h4>
-                    <ul class="space-y-4 text-slate-500 dark:text-slate-400">
-                        <li><a href="index.html" class="hover:text-blue-500 transition-colors">Inicio</a></li>
-                        <li><a href="games.html" class="hover:text-blue-500 transition-colors">Entrenamiento</a></li>
-                        <li><a href="https://github.com/dperezn2021/Menteando" target="_blank"
-                                class="hover:text-blue-500 transition-colors">GitHub del proyecto</a></li>
-                    </ul>
-                </div>
-                <div class="w-full md:w-64 text-center md:text-left">
-                    <h4 class="font-bold text-slate-900 dark:text-white mb-6">Más información</h4>
-                    <ul class="space-y-4 text-slate-500 dark:text-slate-400">
-                        <li><a href="about.html" class="hover:text-blue-500 transition-colors">Acerca de</a></li>
-                        <li><a href="about.html#contacto" class="hover:text-blue-500 transition-colors">Contacto</a>
+                <!-- Columna 2: Enlaces rápidos -->
+                <div class="md:col-span-3 text-center md:text-left">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-4 text-lg">Enlaces rápidos</h4>
+                    <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a href="index.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Inicio</a>
                         </li>
+                        <li><a href="tests.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Tests
+                                cognitivos</a></li>
+                        <li><a href="games.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Juegos</a>
+                        </li>
+                        <li><a href="perfil.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Mi
+                                perfil</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 3: Información y contacto -->
+                <div class="md:col-span-4 text-center md:text-left">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-4 text-lg">Información</h4>
+                    <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a href="about.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Acerca
+                                de Menteando</a></li>
+                        <li><a href="about.html#faq"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Preguntas
+                                frecuentes</a></li>
+                        <li><a href="about.html#contacto"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Contacto</a>
+                        </li>
+                        <li><a href="https://github.com/dperezn2021/Menteando" target="_blank"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">GitHub
+                                del proyecto</a></li>
                     </ul>
                 </div>
             </div>
 
-            <div class="pt-16 border-t border-slate-100 dark:border-slate-800 text-center">
-                <p class="text-sm font-normal text-slate-400">© 2026 Menteando. Todos los derechos reservados.</p>
+            <!-- Copyright -->
+            <div class="pt-6 border-t border-slate-100 dark:border-slate-800 text-center text-xs text-slate-400">
+                © 2026 Menteando. Daniel Pérez Navarro.
             </div>
+
         </div>
     </footer>
 
