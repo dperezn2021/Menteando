@@ -13,7 +13,7 @@
     set("perfil-desde", new Date(perfil.desde).toLocaleDateString("es-ES", { year: "numeric", month: "long" }));
     set("perfil-correo", perfil.correo);
 
-    // MOSTRAR RACHA VISIBLE (sin modificar el perfil)
+    // Alinear estadísticas visibles sin registrar una sesión nueva.
     sincronizarSesionesDiarias(perfil);
     saveperfil(perfil);
 
@@ -431,16 +431,111 @@
         });
     }
 
-    // === BOTÓN RESET PERFIL ===
+    // === BOTÓN RESET PERFIL (modal de confirmación personalizado) ===
     const btnReset = document.getElementById("btn-reset-perfil");
+
     if (btnReset) {
         btnReset.addEventListener("click", () => {
-            if (confirm("¿Seguro que quieres reiniciar todo tu progreso cognitivo?")) {
-                resetperfil();
-            }
+            // Evitar múltiples modales
+            const existing = document.getElementById("modal-reset-confirm");
+            if (existing) return;
+
+            // Crear modal
+            const modal = document.createElement("div");
+            modal.id = "modal-reset-confirm";
+            modal.className =
+                "fixed inset-0 z-[10000] flex items-center justify-center bg-black/50";
+
+            modal.innerHTML = `
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="modal-reset-titulo"
+                class="w-[90%] max-w-md rounded-xl bg-white p-5 text-slate-900 shadow-xl dark:bg-slate-800 dark:text-slate-100"
+            >
+                <h3
+                    id="modal-reset-titulo"
+                    class="mb-2 text-lg font-semibold"
+                >
+                    Reiniciar progreso
+                </h3>
+
+                <p class="mb-4 text-sm text-slate-600 dark:text-slate-300">
+                    ¿Seguro que quieres reiniciar todo tu progreso cognitivo?
+                    Esta acción no se puede deshacer.
+                </p>
+
+                <div class="flex justify-end gap-2">
+                    <button
+                        id="modal-reset-no"
+                        type="button"
+                        class="rounded-lg bg-gray-200 px-3 py-2 text-slate-700 transition-colors hover:bg-gray-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
+                    >
+                        No
+                    </button>
+
+                    <button
+                        id="modal-reset-si"
+                        type="button"
+                        class="rounded-lg bg-red-500 px-3 py-2 text-white transition-colors hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
+                    >
+                        Sí, reiniciar
+                    </button>
+                </div>
+            </div>
+        `;
+
+            document.body.appendChild(modal);
+
+            const btnNo = document.getElementById("modal-reset-no");
+            const btnSi = document.getElementById("modal-reset-si");
+
+            // Foco inicial en botón "No"
+            setTimeout(() => btnNo && btnNo.focus(), 50);
+
+            const close = () => {
+                const m = document.getElementById("modal-reset-confirm");
+                if (m) m.remove();
+                document.removeEventListener("keydown", onKey);
+            };
+
+            const onKey = (e) => {
+                if (e.key === "Escape") close();
+                if (e.key === "Enter") {
+                    // Enter confirma sólo si el foco está en el botón Sí (o si no, no forzar)
+                    if (document.activeElement === btnSi) {
+                        btnSi.click();
+                    }
+                }
+            };
+
+            btnNo && btnNo.addEventListener("click", () => {
+                close();
+            });
+
+            btnSi && btnSi.addEventListener("click", () => {
+                try {
+                    // cerrar modal antes de ejecutar la acción
+                    close();
+                    // acción real de reinicio
+                    if (typeof resetperfil === "function") {
+                        resetperfil();
+                    } else {
+                        console.warn("resetperfil no está definida");
+                    }
+                } catch (err) {
+                    console.error("Error al reiniciar perfil:", err);
+                }
+            });
+
+            // Cerrar si se pulsa fuera del cuadro
+            modal.addEventListener("click", (e) => {
+                if (e.target === modal) close();
+            });
+
+            document.addEventListener("keydown", onKey);
         });
     }
-
     // === MODAL DEL AVATAR ===
     const modalAvatar = document.getElementById("modal-avatar");
     const btnCambiarAvatar = document.getElementById("btn-cambiar-avatar");

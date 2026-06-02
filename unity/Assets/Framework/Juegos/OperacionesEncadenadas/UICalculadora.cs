@@ -36,6 +36,7 @@ public class UICalculadora : MonoBehaviour
 
         ConfigurarInput();
         ConfigurarBotones();
+        ConfigurarTextosResponsivos();
 
         if (gameLogic == null)
         {
@@ -50,6 +51,7 @@ public class UICalculadora : MonoBehaviour
         gameLogic = logic;
         ConfigurarInput();
         ConfigurarBotones();
+        ConfigurarTextosResponsivos();
         LimpiarInput();
         ActualizarHUD();
     }
@@ -200,11 +202,9 @@ public class UICalculadora : MonoBehaviour
     {
         if (textoOperacion == null)
         {
-            Debug.LogError("textoOperacion es NULL");
             return;
         }
         textoOperacion.text = mensaje;
-        Debug.Log("MostrarMemorizacion: " + mensaje);
     }
 
     public void OcultarMemorizacion()
@@ -273,5 +273,26 @@ public class UICalculadora : MonoBehaviour
 
         if (textoNivel != null && DifficultyManager.Instance != null)
             textoNivel.text = $"NIVEL: {DifficultyManager.Instance.nivelActual}/10";
+    }
+
+    private void ConfigurarTextosResponsivos()
+    {
+        ConfigurarTexto(textoOperacion, 28f, 84f);
+        ConfigurarTexto(textoRachaActual, 16f, 38f);
+        ConfigurarTexto(textoTiempoRestante, 16f, 38f);
+        ConfigurarTexto(textoNivel, 16f, 38f);
+    }
+
+    private void ConfigurarTexto(TextMeshProUGUI texto, float min, float max)
+    {
+        if (texto == null)
+            return;
+
+        texto.enableAutoSizing = true;
+        texto.fontSizeMin = min;
+        texto.fontSizeMax = max;
+        texto.textWrappingMode = TextWrappingModes.Normal;
+        texto.overflowMode = TextOverflowModes.Ellipsis;
+        texto.raycastTarget = false;
     }
 }

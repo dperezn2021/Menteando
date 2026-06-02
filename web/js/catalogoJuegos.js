@@ -77,17 +77,18 @@ const CATALOGO_JUEGOS = [
     ],
     "habilidadesDetalle": [
       { "nombre": "Atención selectiva", "descripcion": "Habilidad principal. Mide tu precisión localizando el objetivo correcto entre muchos distractores." },
+      { "nombre": "Atención dividida", "descripcion": "Valora tu capacidad para manejar una pantalla cada vez más cargada sin perder el objetivo." },
       { "nombre": "Velocidad cognitiva", "descripcion": "Evalúa lo rápido que procesas la escena y respondes dentro del tiempo disponible." },
       { "nombre": "Coordinación visomotora", "descripcion": "Combina precisión visual y clic correcto sobre el sospechoso." },
-      { "nombre": "Atención dividida", "descripcion": "Valora tu capacidad para manejar una pantalla cada vez más cargada sin perder el objetivo." }
     ],
     "url": "games/detector-intrusos/detector-intrusos-page.html",
     "buildUrl": "games/detector-intrusos/detector-intrusos-build.html",
+    "fullscreenOrientation": "landscape",
     "imagen": "assets/juegos/detector-intrusos.png",
     "logo": "assets/icon/juegos/detector-intrusos.png",
     "heroEyebrow": "Búsqueda visual bajo presión",
     "destacado": false,
-    "skills": ["atencion_selectiva", "velocidad_cognitiva", "coordinacion_visomotora", "atencion_dividida"],
+    "skills": ["atencion_selectiva", "atencion_dividida", "velocidad_cognitiva", "coordinacion_visomotora"],
     "disponible": "Disponible"
   },
   {
@@ -107,17 +108,18 @@ const CATALOGO_JUEGOS = [
     ],
     "habilidadesDetalle": [
       { "nombre": "Atención dividida", "descripcion": "Habilidad principal. Mide cómo repartes tu atención entre la tarea motora y la tarea de señales." },
-      { "nombre": "Coordinación visomotora", "descripcion": "Evalúa la precisión con la que controlas el personaje y esquivas obstáculos." },
       { "nombre": "Atención sostenida", "descripcion": "Valora si mantienes el rendimiento durante toda la partida." },
+      { "nombre": "Coordinación visomotora", "descripcion": "Evalúa la precisión con la que controlas el personaje y esquivas obstáculos." },
       { "nombre": "Velocidad cognitiva", "descripcion": "Mide tu rapidez al interpretar señales y responder." }
     ],
     "url": "games/doble-canal/doble-canal-page.html",
     "buildUrl": "games/doble-canal/doble-canal-build.html",
+    "fullscreenOrientation": "landscape",
     "imagen": "assets/juegos/doble-canal.png",
     "logo": "assets/icon/juegos/doble-canal.png",
     "heroEyebrow": "Doble tarea simultánea",
     "destacado": false,
-    "skills": ["atencion_dividida", "coordinacion_visomotora", "atencion_sostenida", "velocidad_cognitiva"],
+    "skills": ["atencion_dividida", "atencion_sostenida",  "coordinacion_visomotora", "velocidad_cognitiva"],
     "disponible": "Disponible"
   },
   {
@@ -137,17 +139,18 @@ const CATALOGO_JUEGOS = [
     ],
     "habilidadesDetalle": [
       { "nombre": "Atención sostenida", "descripcion": "Habilidad principal. Mide tu capacidad para mantener la vigilancia durante toda la tarea." },
-      { "nombre": "Control inhibitorio", "descripcion": "Evalúa si evitas responder ante estímulos que no son la lección correcta." },
       { "nombre": "Atención selectiva", "descripcion": "Valora si distingues el objetivo real de los distractores." },
+      { "nombre": "Control inhibitorio", "descripcion": "Evalúa si evitas responder ante estímulos que no son la lección correcta." },
       { "nombre": "Memoria de trabajo", "descripcion": "Mide si mantienes activa la lección que debes reconocer." }
     ],
     "url": "games/silencio-mental/silencio-mental-page.html",
     "buildUrl": "games/silencio-mental/silencio-mental-build.html",
+    "fullscreenOrientation": "landscape",
     "imagen": "assets/juegos/silencio-mental.png",
     "logo": "assets/icon/juegos/silencio-mental.png",
     "heroEyebrow": "Vigilancia e inhibición",
     "destacado": false,
-    "skills": ["atencion_sostenida", "control_inhibitorio", "atencion_selectiva", "memoria_trabajo"],
+    "skills": ["atencion_sostenida", "atencion_selectiva", "control_inhibitorio", "memoria_trabajo"],
     "disponible": "Disponible"
   },
   {
@@ -173,6 +176,7 @@ const CATALOGO_JUEGOS = [
     ],
     "url": "games/operaciones-encadenadas/operaciones-encadenadas-page.html",
     "buildUrl": "games/operaciones-encadenadas/operaciones-encadenadas-build.html",
+    "fullscreenOrientation": "landscape",
     "imagen": "assets/juegos/operaciones-encadenadas.png",
     "logo": "assets/icon/juegos/operaciones-encadenadas.png",
     "heroEyebrow": "Memoria activa y cálculo",
@@ -198,16 +202,17 @@ const CATALOGO_JUEGOS = [
     "habilidadesDetalle": [
       { "nombre": "Memoria espacial", "descripcion": "Habilidad principal. Mide la precisión con la que recuerdas ubicaciones." },
       { "nombre": "Atención selectiva", "descripcion": "Evalúa si atiendes a los objetos y posiciones relevantes." },
+      { "nombre": "Atención sostenida", "descripcion": "Mide si mantienes el foco durante observación y reconstrucción." } ,
       { "nombre": "Flexibilidad cognitiva", "descripcion": "Valora tu capacidad para reorganizar mentalmente la escena." },
-      { "nombre": "Atención sostenida", "descripcion": "Mide si mantienes el foco durante observación y reconstrucción." }
     ],
     "url": "games/eco-visual/eco-visual-page.html",
     "buildUrl": "games/eco-visual/eco-visual-build.html",
+    "fullscreenOrientation": "landscape",
     "imagen": "assets/juegos/eco-visual.png",
     "logo": "assets/icon/juegos/eco-visual.png",
     "heroEyebrow": "Recuerdo de posiciones",
     "destacado": false,
-    "skills": ["memoria_espacial", "atencion_selectiva", "flexibilidad_cognitiva", "atencion_sostenida"],
+    "skills": ["memoria_espacial", "atencion_selectiva", "atencion_sostenida","flexibilidad_cognitiva" ],
     "disponible": "Disponible"
   },
   {
@@ -233,6 +238,7 @@ const CATALOGO_JUEGOS = [
     ],
     "url": "games/color-match/color-match-page.html",
     "buildUrl": "games/color-match/color-match-build.html",
+    "fullscreenOrientation": "landscape",
     "imagen": "assets/juegos/color-match.png",
     "logo": "assets/icon/juegos/color-match.png",
     "heroEyebrow": "Interferencia y respuesta",
@@ -263,6 +269,7 @@ const CATALOGO_JUEGOS = [
     ],
     "url": "games/cambio-de-reglas/cambio-de-reglas-page.html",
     "buildUrl": "games/cambio-de-reglas/cambio-de-reglas-build.html",
+    "fullscreenOrientation": "landscape",
     "imagen": "assets/juegos/cambio-de-reglas.png",
     "logo": "assets/icon/juegos/cambio-de-reglas.png",
     "heroEyebrow": "Cambio de criterio",
@@ -293,6 +300,7 @@ const CATALOGO_JUEGOS = [
     ],
     "url": "games/trayectorias-mentales/trayectorias-mentales-page.html",
     "buildUrl": "games/trayectorias-mentales/trayectorias-mentales-build.html",
+    "fullscreenOrientation": "landscape",
     "imagen": "assets/juegos/trayectorias-mentales.png",
     "logo": "assets/icon/juegos/trayectorias-mentales.png",
     "heroEyebrow": "Ruta antes de actuar",
@@ -323,6 +331,7 @@ const CATALOGO_JUEGOS = [
     ],
     "url": "games/mision-orbital/mision-orbital-page.html",
     "buildUrl": "games/mision-orbital/mision-orbital-build.html",
+    "fullscreenOrientation": "landscape",
     "imagen": "assets/juegos/mision-orbital.png",
     "logo": "assets/icon/juegos/mision-orbital.png",
     "heroEyebrow": "Timing espacial",
@@ -347,17 +356,18 @@ const CATALOGO_JUEGOS = [
     ],
     "habilidadesDetalle": [
       { "nombre": "Coordinación visomotora", "descripcion": "Habilidad principal. Mide la precisión con la que conviertes estímulos visuales en disparos." },
-      { "nombre": "Control inhibitorio", "descripcion": "Evalúa si evitas disparar a dianas incorrectas." },
       { "nombre": "Memoria espacial", "descripcion": "Valora cómo sigues la posición y trayectoria de varias dianas." },
+      { "nombre": "Control inhibitorio", "descripcion": "Evalúa si evitas disparar a dianas incorrectas." },
       { "nombre": "Planificación", "descripcion": "Mide cómo priorizas qué dianas disparar para mantener precisión y racha." }
     ],
     "url": "games/reflejos-cruzados/reflejos-cruzados-page.html",
     "buildUrl": "games/reflejos-cruzados/reflejos-cruzados-build.html",
+    "fullscreenOrientation": "landscape",
     "imagen": "assets/juegos/reflejos-cruzados.png",
     "logo": "assets/icon/juegos/reflejos-cruzados.png",
     "heroEyebrow": "Disparo preciso",
     "destacado": false,
-    "skills": ["coordinacion_visomotora", "control_inhibitorio", "memoria_espacial", "planificacion"],
+    "skills": ["coordinacion_visomotora", "memoria_espacial", "control_inhibitorio", "planificacion"],
     "disponible": "Disponible"
   }
 ];

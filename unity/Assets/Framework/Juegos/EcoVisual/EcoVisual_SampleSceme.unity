@@ -3242,8 +3242,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 54
-  m_fontSizeBase: 54
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3757,12 +3757,19 @@ MonoBehaviour:
   musicaSource: {fileID: 1757404548}
   sfxSource: {fileID: 694963278}
   clickUI: {fileID: 8300000, guid: 619ccb9171fcae743af96434958917d8, type: 3}
+  reboteRata: {fileID: 0}
+  disparo: {fileID: 0}
+  PU: {fileID: 0}
   acierto: {fileID: 8300000, guid: cd4314ef777309541bb8648265227b24, type: 3}
   error: {fileID: 8300000, guid: 29e5080068db174498825a06299c9d99, type: 3}
   nivelUp: {fileID: 0}
   musicaMenu: {fileID: 8300000, guid: c749f5d454676cc408241060fa817644, type: 3}
   musicaJuego: {fileID: 8300000, guid: 330bac9f16e482d40ab50149a3b399ff, type: 3}
   musicaVictoria: {fileID: 8300000, guid: c749f5d454676cc408241060fa817644, type: 3}
+  coheteSalto: {fileID: 0}
+  escudoAcierto: {fileID: 0}
+  peligroError: {fileID: 0}
+  choqueCaja: {fileID: 0}
   musicaVolumen: 0.5
   sfxVolumen: 0.5
   generarClipsFallback: 1
@@ -6228,7 +6235,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 774.6, y: -459.8}
-  m_SizeDelta: {x: 316.7, y: 96.1}
+  m_SizeDelta: {x: 275, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1965187997
 MonoBehaviour:

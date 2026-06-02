@@ -129,8 +129,8 @@ function generarJuegoDelDia(juego) {
 
             
             <!-- Imagen -->
-            <a href="${juego.url}" class="relative w-full lg:flex-1 min-h-[200px] lg:min-h-[240px] rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-700">
-                <img src="${juego.imagen}" alt="${juego.nombre}" class="w-full h-full object-cover">
+            <a href="${juego.url}" class="relative block w-full h-56 sm:h-64 lg:h-auto lg:flex-1 lg:min-h-[240px] rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-700">
+                <img src="${juego.imagen}" alt="${juego.nombre}" class="block w-full h-full object-cover">
                 <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
             </a>
 

@@ -84,9 +84,12 @@ public class ColorMatchGame : BaseGame
             colorWheel.GenerarRosco(nivelInicial);
         }
 
+        bool responderTextoInicial = DebeResponderTexto(nivelInicial);
+        ultimaRegla = responderTextoInicial;
+
         OnRachaActualizada?.Invoke(0);
         OnNivelActualizado?.Invoke(nivelInicial);
-        OnReglaActualizada?.Invoke(DebeResponderTexto(nivelInicial)); // 🔥 CAMBIO
+        OnReglaActualizada?.Invoke(responderTextoInicial); // 🔥 CAMBIO
 
         rutinaInicio = StartCoroutine(IniciarPartida(rondaId)); // 🔥 CAMBIO
     }

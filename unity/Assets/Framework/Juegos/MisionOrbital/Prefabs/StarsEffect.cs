@@ -54,7 +54,6 @@ public class StarfieldEffect : MonoBehaviour
 
         if (shader == null)
         {
-            Debug.LogError("No se encontró ningún shader válido para las estrellas");
             return;
         }
 

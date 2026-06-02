@@ -275,6 +275,7 @@ public class DobleCanalUI : MonoBehaviour
             root = rootGo.GetComponent<RectTransform>();
         }
         Estirar(root);
+        RuntimeMiniGameUI.EnsureSafeAreaIfNeeded(root);
 
         Image fondo = root.GetComponent<Image>();
         if (fondo == null) fondo = root.gameObject.AddComponent<Image>();
@@ -316,21 +317,33 @@ public class DobleCanalUI : MonoBehaviour
 
     private void CrearHud()
     {
+        bool compacto = EsHudCompacto();
+        float altoHud = compacto ? 108f : 140f;
+        float puntosSize = compacto ? 40f : 52f;
+        float rachaSize = compacto ? 42f : 56f;
+        float tiempoSize = compacto ? 44f : 60f;
+
         RectTransform hud = GetOrCreateRect(root, "HUD_DobleCanal");
-        ConfigurarRect(hud, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -70f), new Vector2(0f, 140f));
+        ConfigurarRect(hud, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -altoHud * 0.5f), new Vector2(0f, altoHud));
         ObtenerImage(hud.gameObject, colorPanel).raycastTarget = false;
 
-        textoPuntuacion = textoPuntuacion ?? CrearTextoNumerico("TextoPuntuacion", hud, "puntos\n0", 52, TextAlignmentOptions.Center, colorTexto, new Vector2(0.02f, 0f), new Vector2(0.18f, 1f));
-        textoFallos = textoFallos ?? CrearTextoNumerico("TextoFallos", hud, "errores\n0", 52, TextAlignmentOptions.Center, colorTexto, new Vector2(0.20f, 0f), new Vector2(0.36f, 1f));
-        textoRacha = textoRacha ?? CrearTextoNumerico("TextoRacha", hud, "racha\n0", 56, TextAlignmentOptions.Center, colorTexto, new Vector2(0.38f, 0f), new Vector2(0.54f, 1f));
-        textoTiempo = textoTiempo ?? CrearTextoNumerico("TextoTiempo", hud, "tiempo\n0s", 60, TextAlignmentOptions.Center, colorAcento, new Vector2(0.56f, 0f), new Vector2(0.76f, 1f));
-        textoNivel = textoNivel ?? CrearTextoNumerico("TextoNivel", hud, "nivel\n1", 56, TextAlignmentOptions.Center, colorTexto, new Vector2(0.78f, 0f), new Vector2(0.98f, 1f));
+        textoPuntuacion = textoPuntuacion ?? CrearTextoNumerico("TextoPuntuacion", hud, "puntos\n0", puntosSize, TextAlignmentOptions.Center, colorTexto, new Vector2(0.02f, 0f), new Vector2(0.18f, 1f));
+        textoFallos = textoFallos ?? CrearTextoNumerico("TextoFallos", hud, "errores\n0", puntosSize, TextAlignmentOptions.Center, colorTexto, new Vector2(0.20f, 0f), new Vector2(0.36f, 1f));
+        textoRacha = textoRacha ?? CrearTextoNumerico("TextoRacha", hud, "racha\n0", rachaSize, TextAlignmentOptions.Center, colorTexto, new Vector2(0.38f, 0f), new Vector2(0.54f, 1f));
+        textoTiempo = textoTiempo ?? CrearTextoNumerico("TextoTiempo", hud, "tiempo\n0s", tiempoSize, TextAlignmentOptions.Center, colorAcento, new Vector2(0.56f, 0f), new Vector2(0.76f, 1f));
+        textoNivel = textoNivel ?? CrearTextoNumerico("TextoNivel", hud, "nivel\n1", rachaSize, TextAlignmentOptions.Center, colorTexto, new Vector2(0.78f, 0f), new Vector2(0.98f, 1f));
 
-        ConfigurarTextoHud(textoPuntuacion, hud, new Vector2(0.02f, 0f), new Vector2(0.18f, 1f), 52, colorTexto);
-        ConfigurarTextoHud(textoFallos, hud, new Vector2(0.20f, 0f), new Vector2(0.36f, 1f), 52, colorTexto);
-        ConfigurarTextoHud(textoRacha, hud, new Vector2(0.38f, 0f), new Vector2(0.54f, 1f), 56, colorTexto);
-        ConfigurarTextoHud(textoTiempo, hud, new Vector2(0.56f, 0f), new Vector2(0.76f, 1f), 60, colorAcento);
-        ConfigurarTextoHud(textoNivel, hud, new Vector2(0.78f, 0f), new Vector2(0.98f, 1f), 56, colorTexto);
+        ConfigurarTextoHud(textoPuntuacion, hud, new Vector2(0.02f, 0f), new Vector2(0.18f, 1f), puntosSize, colorTexto);
+        ConfigurarTextoHud(textoFallos, hud, new Vector2(0.20f, 0f), new Vector2(0.36f, 1f), puntosSize, colorTexto);
+        ConfigurarTextoHud(textoRacha, hud, new Vector2(0.38f, 0f), new Vector2(0.54f, 1f), rachaSize, colorTexto);
+        ConfigurarTextoHud(textoTiempo, hud, new Vector2(0.56f, 0f), new Vector2(0.76f, 1f), tiempoSize, colorAcento);
+        ConfigurarTextoHud(textoNivel, hud, new Vector2(0.78f, 0f), new Vector2(0.98f, 1f), rachaSize, colorTexto);
+    }
+
+    private bool EsHudCompacto()
+    {
+        float ancho = root != null && root.rect.width > 0f ? root.rect.width : Screen.width;
+        return ancho < 1000f;
     }
 
     private void CrearRadar(RectTransform parent)

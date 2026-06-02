@@ -32,6 +32,7 @@ public class UIDetectorIntrusos : MonoBehaviour
 
     private Coroutine lupaCoroutine;
     private float tiempoPartidaTotal = 60f; // Duración total de la partida (se actualiza desde GameManager)
+    private Vector2 ultimoTamanoGrid = Vector2.zero;
 
     private void Start()
     {
@@ -50,6 +51,7 @@ public class UIDetectorIntrusos : MonoBehaviour
             lupaScript = FindAnyObjectByType<LupaFlotante>();
 
         ConfigurarGridLayout();
+        ConfigurarTextosHUD();
 
         // Obtener duración total de la partida desde GameManager
         if (GameManager.Instance != null)
@@ -67,6 +69,8 @@ public class UIDetectorIntrusos : MonoBehaviour
 
         
         }
+
+        ActualizarGridSiCambioTamano();
     }
 
     private void ConfigurarGridLayout()
@@ -74,13 +78,49 @@ public class UIDetectorIntrusos : MonoBehaviour
         if (gridLayout == null) return;
 
         // Calcular tamaño de celda según pantalla
-        float anchoPantalla = ((RectTransform)gridLayout.transform).rect.width;
-        float nuevoAnchoCelda = Mathf.Clamp(anchoPantalla / 6f, 70f, 120f);
+        RectTransform gridRect = (RectTransform)gridLayout.transform;
+        float anchoPantalla = Mathf.Max(1f, gridRect.rect.width);
+        float altoPantalla = Mathf.Max(1f, gridRect.rect.height);
+        float referencia = Mathf.Min(anchoPantalla / 6f, altoPantalla / 5f);
+        float nuevoAnchoCelda = Mathf.Clamp(referencia, 58f, 120f);
 
         gridLayout.cellSize = new Vector2(nuevoAnchoCelda, nuevoAnchoCelda);
-        gridLayout.spacing = new Vector2(espaciado, espaciado);
+        float spacing = Mathf.Clamp(espaciado, 8f, nuevoAnchoCelda * 0.22f);
+        gridLayout.spacing = new Vector2(spacing, spacing);
         gridLayout.startAxis = GridLayoutGroup.Axis.Horizontal;
         gridLayout.childAlignment = TextAnchor.MiddleCenter;
+        ultimoTamanoGrid = gridRect.rect.size;
+    }
+
+    private void ActualizarGridSiCambioTamano()
+    {
+        if (gridLayout == null)
+            return;
+
+        RectTransform gridRect = (RectTransform)gridLayout.transform;
+        if ((gridRect.rect.size - ultimoTamanoGrid).sqrMagnitude > 1f)
+            ConfigurarGridLayout();
+    }
+
+    private void ConfigurarTextosHUD()
+    {
+        ConfigurarTextoHUD(textoTiempoPartida, 18f, 42f);
+        ConfigurarTextoHUD(textoAciertos, 18f, 42f);
+        ConfigurarTextoHUD(textoNivel, 18f, 42f);
+        ConfigurarTextoHUD(textoTotalCasos, 18f, 42f);
+    }
+
+    private void ConfigurarTextoHUD(TextMeshProUGUI texto, float min, float max)
+    {
+        if (texto == null)
+            return;
+
+        texto.enableAutoSizing = true;
+        texto.fontSizeMin = min;
+        texto.fontSizeMax = max;
+        texto.textWrappingMode = TextWrappingModes.Normal;
+        texto.overflowMode = TextOverflowModes.Ellipsis;
+        texto.raycastTarget = false;
     }
 
     private void ActualizarGridSize(int filas, int columnas)

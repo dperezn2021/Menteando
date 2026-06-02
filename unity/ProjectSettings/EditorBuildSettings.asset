@@ -23,7 +23,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Framework/Juegos/MisionOrbital/MisionOrbital_SampleScene.unity
     guid: 4181590a9d7b6064a85be41203388ec5
-  - enabled: 1
+  - enabled: 0
     path: Assets/Framework/Juegos/SilencioMental/SilencioMental_SampleScene.unity
     guid: f4daf99b127ca504189379256b8096c0
   - enabled: 0
@@ -38,7 +38,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Framework/Juegos/ReflejosCruzados/ReflejosCruzados_SampleScene.unity
     guid: f002e4f1d2d0df644b68ddae14d40545
-  - enabled: 0
+  - enabled: 1
     path: Assets/Framework/Juegos/TrayectoriasMentales/TrayectoriasMentales_SampleScene.unity
     guid: e51cc32bb9034ce3915784f9afb84322
   - enabled: 0

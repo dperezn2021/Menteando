@@ -17,6 +17,7 @@ public class UIReflejosCruzados : MonoBehaviour
 
     [Header("Layout")]
     public float altoHeader = 104f;
+    public float altoHUDCompacto = 92f;
     public Color colorHeader = new Color(0f, 0f, 0f, 0.55f);
     public Color colorHUDFallback = new Color(0.08f, 0.13f, 0.16f, 0.72f);
     public Color colorFeedbackAcierto = new Color(0.22f, 0.78f, 0.45f, 1f);
@@ -61,6 +62,7 @@ public class UIReflejosCruzados : MonoBehaviour
     private ReflejosCruzadosGame juegoSuscrito;
     private Coroutine feedbackRoutine;
     private Coroutine alertaRoutine;
+    private bool layoutCompacto;
 
     public RectTransform ZonaJuego => zonaJuego;
 
@@ -235,6 +237,8 @@ public class UIReflejosCruzados : MonoBehaviour
         rootObject.transform.SetParent(parent, false);
         raizLayout = rootObject.GetComponent<RectTransform>();
         SetRect(raizLayout, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+        RuntimeMiniGameUI.EnsureSafeAreaIfNeeded(raizLayout);
+        layoutCompacto = DebeUsarLayoutCompacto();
 
         CrearFondo();
         CrearHeader(pausa);
@@ -263,7 +267,8 @@ public class UIReflejosCruzados : MonoBehaviour
         SetRect(headerNorma, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -altoHeader), Vector2.zero);
         headerImage.raycastTarget = false;
 
-        textoNorma = CrearTexto("TextoNorma", headerNorma, "NORMA: TOCA VERDES", 58f, Color.white, TextAlignmentOptions.Center);
+        float tamanoNorma = layoutCompacto ? 44f : 58f;
+        textoNorma = CrearTexto("TextoNorma", headerNorma, "NORMA: TOCA VERDES", tamanoNorma, Color.white, TextAlignmentOptions.Center);
         SetRect(textoNorma.rectTransform, Vector2.zero, Vector2.one, new Vector2(24f, 8f), new Vector2(-190f, -8f));
 
         ReubicarBotonPausa(pausa);
@@ -273,7 +278,22 @@ public class UIReflejosCruzados : MonoBehaviour
     {
         imagenHUD = CrearImagen("PanelHUD", raizLayout, colorHUDFallback);
         panelHUD = imagenHUD.rectTransform;
-        SetRect(panelHUD, new Vector2(0f, 0f), new Vector2(0.4f, 1f), new Vector2(18f, 22f), new Vector2(-10f, -altoHeader - 18f));
+        if (layoutCompacto)
+        {
+            SetRect(panelHUD, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(18f, 22f), new Vector2(-18f, 22f + altoHUDCompacto));
+            HorizontalLayoutGroup layout = panelHUD.gameObject.AddComponent<HorizontalLayoutGroup>();
+            layout.padding = new RectOffset(8, 8, 6, 6);
+            layout.spacing = 6f;
+            layout.childAlignment = TextAnchor.MiddleCenter;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = true;
+        }
+        else
+        {
+            SetRect(panelHUD, new Vector2(0f, 0f), new Vector2(0.4f, 1f), new Vector2(18f, 22f), new Vector2(-10f, -altoHeader - 18f));
+        }
         imagenHUD.sprite = fondoHUD;
         imagenHUD.preserveAspect = false;
         imagenHUD.raycastTarget = false;
@@ -291,17 +311,26 @@ public class UIReflejosCruzados : MonoBehaviour
         GameObject zonaObject = new GameObject("ZonaJuego", typeof(RectTransform), typeof(RectMask2D));
         zonaObject.transform.SetParent(raizLayout, false);
         zonaJuego = zonaObject.GetComponent<RectTransform>();
-        SetRect(zonaJuego, new Vector2(0.4f, 0f), new Vector2(1f, 1f), new Vector2(12f, 22f), new Vector2(-24f, -altoHeader - 18f));
+        if (layoutCompacto)
+            SetRect(zonaJuego, Vector2.zero, Vector2.one, new Vector2(18f, altoHUDCompacto + 38f), new Vector2(-18f, -altoHeader - 18f));
+        else
+            SetRect(zonaJuego, new Vector2(0.4f, 0f), new Vector2(1f, 1f), new Vector2(12f, 22f), new Vector2(-24f, -altoHeader - 18f));
     }
 
     private void CrearFeedback()
     {
         fondoFeedback = CrearImagen("FondoFeedback", raizLayout, colorFondoFeedback);
-        SetRect(fondoFeedback.rectTransform, new Vector2(0.4f, 0f), new Vector2(1f, 0f), new Vector2(54f, 18f), new Vector2(-66f, 92f));
+        if (layoutCompacto)
+            SetRect(fondoFeedback.rectTransform, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(54f, altoHUDCompacto + 28f), new Vector2(-54f, altoHUDCompacto + 92f));
+        else
+            SetRect(fondoFeedback.rectTransform, new Vector2(0.4f, 0f), new Vector2(1f, 0f), new Vector2(54f, 18f), new Vector2(-66f, 92f));
         fondoFeedback.gameObject.SetActive(false);
 
         textoFeedback = CrearTexto("Feedback", raizLayout, "", 34f, colorFeedbackAcierto, TextAlignmentOptions.Center);
-        SetRect(textoFeedback.rectTransform, new Vector2(0.4f, 0f), new Vector2(1f, 0f), new Vector2(12f, 24f), new Vector2(-24f, 84f));
+        if (layoutCompacto)
+            SetRect(textoFeedback.rectTransform, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(24f, altoHUDCompacto + 34f), new Vector2(-24f, altoHUDCompacto + 84f));
+        else
+            SetRect(textoFeedback.rectTransform, new Vector2(0.4f, 0f), new Vector2(1f, 0f), new Vector2(12f, 24f), new Vector2(-24f, 84f));
         textoFeedback.gameObject.SetActive(false);
 
         fondoAlertaRegla = CrearImagen("FondoAlertaRegla", zonaJuego, colorFondoCambioRegla);
@@ -315,7 +344,18 @@ public class UIReflejosCruzados : MonoBehaviour
 
     private TextMeshProUGUI CrearLineaHUD(string name, string value, int index)
     {
-        TextMeshProUGUI text = CrearTexto(name, panelHUD, value, 42f, Color.white, TextAlignmentOptions.Center);
+        float tamano = layoutCompacto ? 30f : 42f;
+        TextMeshProUGUI text = CrearTexto(name, panelHUD, value, tamano, Color.white, TextAlignmentOptions.Center);
+        if (layoutCompacto)
+        {
+            LayoutElement layout = text.gameObject.AddComponent<LayoutElement>();
+            layout.minWidth = 92f;
+            layout.flexibleWidth = 1f;
+            layout.flexibleHeight = 1f;
+            SetRect(text.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            return text;
+        }
+
         float top = -272f - index * 72f;
         SetRect(text.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(24f, top - 68f), new Vector2(-24f, top));
         return text;
@@ -365,9 +405,17 @@ public class UIReflejosCruzados : MonoBehaviour
         rect.anchorMin = new Vector2(1f, 0.5f);
         rect.anchorMax = new Vector2(1f, 0.5f);
         rect.pivot = new Vector2(1f, 0.5f);
-        rect.sizeDelta = new Vector2(220f, 58f);
-        rect.anchoredPosition = new Vector2(-22f, 0f);
+        rect.sizeDelta = layoutCompacto ? new Vector2(160f, 54f) : new Vector2(220f, 58f);
+        rect.anchoredPosition = new Vector2(layoutCompacto ? -14f : -22f, 0f);
         pausa.transform.SetAsLastSibling();
+    }
+
+    private bool DebeUsarLayoutCompacto()
+    {
+        if (Screen.width <= 0 || Screen.height <= 0)
+            return false;
+
+        return Screen.width < Screen.height || Mathf.Min(Screen.width, Screen.height) < 900;
     }
 
     private void CachearJuego()

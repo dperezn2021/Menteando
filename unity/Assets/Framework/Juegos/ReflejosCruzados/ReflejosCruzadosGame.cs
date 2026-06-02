@@ -38,6 +38,8 @@ public class ReflejosCruzadosGame : BaseGame
     public float velocidadNivel10 = 480f;
     public Vector2 tamanoDianaNivel1 = new Vector2(108f, 108f);
     public Vector2 tamanoDianaNivel10 = new Vector2(76f, 76f);
+    public float escalaHitboxDiana = 1.35f;
+    public float tamanoMinimoHitboxDiana = 118f;
 
     [Header("Estilo dianas")]
     public Color colorDianaVerde = new Color(0.372549f, 0.4980392f, 0.227451f, 1f);
@@ -171,9 +173,10 @@ public class ReflejosCruzadosGame : BaseGame
         maxLevelReached = Mathf.Max(maxLevelReached, level);
 
         FallingKind kind = Random.value < Mathf.Lerp(0.62f, 0.50f, (level - 1f) / 9f) ? FallingKind.Green : FallingKind.Red;
-        Vector2 size = CurrentSize(level);
+        Vector2 visualSize = CurrentSize(level);
+        Vector2 hitboxSize = CurrentHitboxSize(visualSize);
 
-        GameObject itemObject = new GameObject("Diana_" + kind, typeof(RectTransform), typeof(CanvasRenderer), typeof(SimpleShapeGraphic), typeof(Button));
+        GameObject itemObject = new GameObject("Diana_" + kind, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
         itemObject.transform.SetParent(zonaJuego, false);
 
         FallingItem item = new FallingItem
@@ -187,21 +190,36 @@ public class ReflejosCruzadosGame : BaseGame
         item.rect.anchorMin = new Vector2(0.5f, 0.5f);
         item.rect.anchorMax = new Vector2(0.5f, 0.5f);
         item.rect.pivot = new Vector2(0.5f, 0.5f);
-        item.rect.sizeDelta = size;
-        item.rect.anchoredPosition = new Vector2(RandomX(size.x), PlayHeight() * 0.5f + size.y);
+        item.rect.sizeDelta = hitboxSize;
+        item.rect.anchoredPosition = new Vector2(RandomX(hitboxSize.x), PlayHeight() * 0.5f + hitboxSize.y);
 
-        SimpleShapeGraphic outer = itemObject.GetComponent<SimpleShapeGraphic>();
+        Image hitbox = itemObject.GetComponent<Image>();
+        hitbox.color = new Color(1f, 1f, 1f, 0f);
+        hitbox.raycastTarget = true;
+
+        GameObject visualObject = new GameObject("Visual", typeof(RectTransform), typeof(CanvasRenderer), typeof(SimpleShapeGraphic));
+        visualObject.transform.SetParent(itemObject.transform, false);
+        RectTransform visualRect = visualObject.GetComponent<RectTransform>();
+        visualRect.anchorMin = new Vector2(0.5f, 0.5f);
+        visualRect.anchorMax = new Vector2(0.5f, 0.5f);
+        visualRect.pivot = new Vector2(0.5f, 0.5f);
+        visualRect.sizeDelta = visualSize;
+        visualRect.anchoredPosition = Vector2.zero;
+
+        SimpleShapeGraphic outer = visualObject.GetComponent<SimpleShapeGraphic>();
         outer.SetShape(SimpleShapeKind.Circle, ColorForKind(kind));
+        outer.raycastTarget = false;
 
-        SimpleShapeGraphic middle = RuntimeMiniGameUI.CreateShape("Ring", itemObject.transform, SimpleShapeKind.Circle, colorCentroDiana);
+        SimpleShapeGraphic middle = RuntimeMiniGameUI.CreateShape("Ring", visualObject.transform, SimpleShapeKind.Circle, colorCentroDiana);
         middle.raycastTarget = false;
         RuntimeMiniGameUI.SetRect(middle.rectTransform, new Vector2(0.16f, 0.16f), new Vector2(0.84f, 0.84f), Vector2.zero, Vector2.zero);
 
-        SimpleShapeGraphic center = RuntimeMiniGameUI.CreateShape("Center", itemObject.transform, SimpleShapeKind.Circle, ColorForKind(kind));
+        SimpleShapeGraphic center = RuntimeMiniGameUI.CreateShape("Center", visualObject.transform, SimpleShapeKind.Circle, ColorForKind(kind));
         center.raycastTarget = false;
         RuntimeMiniGameUI.SetRect(center.rectTransform, new Vector2(0.34f, 0.34f), new Vector2(0.66f, 0.66f), Vector2.zero, Vector2.zero);
 
-        item.button.targetGraphic = outer;
+        item.button.targetGraphic = hitbox;
+        item.button.transition = Selectable.Transition.None;
         item.button.onClick.AddListener(() => TouchItem(item));
         items.Add(item);
     }
@@ -219,6 +237,16 @@ public class ReflejosCruzadosGame : BaseGame
     private Vector2 CurrentSize(int level)
     {
         return Vector2.Lerp(tamanoDianaNivel1, tamanoDianaNivel10, (level - 1f) / 9f);
+    }
+
+    private Vector2 CurrentHitboxSize(Vector2 visualSize)
+    {
+        float minSize = Mathf.Max(1f, tamanoMinimoHitboxDiana);
+        float scale = Mathf.Max(1f, escalaHitboxDiana);
+        return new Vector2(
+            Mathf.Max(minSize, visualSize.x * scale),
+            Mathf.Max(minSize, visualSize.y * scale)
+        );
     }
 
     private Color ColorForKind(FallingKind kind)

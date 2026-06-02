@@ -276,7 +276,7 @@ public class TrayectoriasMentalesGame : BaseGame
             List<Vector2> pathPU = null;
             // 4. Colocar PowerUps
             int puCount = PowerUpCountForLevel(level);
-            Debug.Log($"[GEN] Intento {gen}: Nivel={level}, PUs={puCount}, rebotes={requiredBounces}/{rebotesMaximos}, pathNormal={pathNormal.Count}pts");
+
 
             if (puCount >= 1 && pathNormal.Count > 3)
             {
@@ -302,30 +302,19 @@ public class TrayectoriasMentalesGame : BaseGame
                     {
                         if (requiredBounces < rebotesMaximos)
                         {
-                            Debug.Log($"[GEN] Buscando ruta PU con {requiredBounces + 1} rebotes...");
                             if (TryFindSolvableAim(out Vector2 puDir, requiredBounces + 1, 0))
                             {
                                 pathPU = new List<Vector2>(solutionPath);
-                                Debug.Log($"[GEN] ✅ Ruta PU (N+1) encontrada: {pathPU.Count} puntos");
 
                                 if (pathPU.Count > 3)
                                 {
                                     PlacePowerUpOnPath(pathPU, PowerUpType.ExtraBounce);
                                 }
-                                else
-                                {
-                                    Debug.LogWarning("[GEN] Ruta PU muy corta, no se coloca PU Rebote");
-                                }
-                            }
-                            else
-                            {
-                                Debug.LogWarning($"[GEN] ❌ NO se encontró ruta PU (N+1)");
                             }
                         }
                     }
                 }
             }
-            Debug.Log($"[GEN] Total PUs creados: {powerUps.Count}"); BuildTraps(TrapCountForLevel(level), pathNormal, pathPU);
             solutionPath.Clear();
             solutionPath.AddRange(pathNormal);
             TryFindSolvableAim(out aimDirection, requiredBounces, 0);
@@ -398,7 +387,6 @@ public class TrayectoriasMentalesGame : BaseGame
     {
         if (path.Count < 3)
         {
-            Debug.LogWarning($"[PU] Ruta muy corta ({path.Count}pts), no se puede colocar {type}");
             return;
         }
 
@@ -414,23 +402,18 @@ public class TrayectoriasMentalesGame : BaseGame
             if (AnyOverlap(r)) continue;
 
             CreatePowerUpObject(pos, new Vector2(50f, 50f), type);
-            Debug.Log($"[PU] {type} colocado en intento {attempt}: {pos}");
             return;
         }
 
         // Fallback: punto medio
         Vector2 fallback = path[path.Count / 2];
         CreatePowerUpObject(fallback, new Vector2(50f, 50f), type);
-        Debug.Log($"[PU] {type} colocado en FALLBACK: {fallback}");
     }
 
     private void CreatePowerUpObject(Vector2 pos, Vector2 size, PowerUpType type)
     {
         Sprite s = type == PowerUpType.ExtraBounce ? spritePowerUpBounce : spritePowerUpLife;
-        if (s == null)
-        {
-            Debug.LogError($"❌ SPRITE NULO para PU tipo {type}. ¡Asigna el sprite en el Inspector!");
-        }
+        
 
         GameObject obj = new GameObject("PowerUp", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         obj.transform.SetParent(powerUpLayer, false);
@@ -785,7 +768,6 @@ public class TrayectoriasMentalesGame : BaseGame
             return true;
         }
 
-        Debug.LogWarning($"[SOLVE] NO se encontró ruta para {targetBounces} rebotes");
         simulationSilent = false;
         return false;
     }

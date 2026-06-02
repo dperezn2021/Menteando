@@ -10,6 +10,25 @@ function getTestById(testId) {
     return (window.CATALOGO_TESTS || []).find((test) => test.id === testId) || null;
 }
 
+function iniciarCoachDetalle(contexto, datos) {
+    if (typeof window.initDetalleCoach === "function") {
+        window.initDetalleCoach(contexto, datos);
+        return;
+    }
+
+    const existing = document.querySelector('script[data-coach-detail-loader="true"]');
+    if (existing) {
+        existing.addEventListener("load", () => window.initDetalleCoach?.(contexto, datos), { once: true });
+        return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "/js/detalleCoach.js";
+    script.dataset.coachDetailLoader = "true";
+    script.onload = () => window.initDetalleCoach?.(contexto, datos);
+    document.head.appendChild(script);
+}
+
 function renderTestDetailPage(testId) {
     const test = getTestById(testId);
     const content = document.getElementById("test-detail-content");
@@ -122,8 +141,8 @@ content.innerHTML = `
     const btnOpinar = document.getElementById("btn-opinar-juego");
     if (btnOpinar) {
         btnOpinar.addEventListener("click", () => {
-            // Redirigir a about.html con categoría "juego" pre-seleccionada
-            window.location.href = "../../about.html?categoria=juego#seccion-comentarios";
+            // Redirigir a about.html con categoría "test" pre-seleccionada
+            window.location.href = "../../about.html?categoria=test#seccion-comentarios";
         });
     }
 
@@ -164,6 +183,7 @@ window.initTestDetailPage = function initTestDetailPage(testId) {
 
     syncThemeButton();
     renderTestDetailPage(testId);
+    iniciarCoachDetalle("testDetalle", { testId });
 
     // After rendering, set header subtitle to the test category and attach fullscreen behavior to start button so tests open full-screen on any device
     setTimeout(() => {
@@ -427,6 +447,11 @@ function procesarResultadosTest(resultado) {
 
     if (typeof window.notificarTestCompletado === "function") {
         window.notificarTestCompletado();
+    }
+
+    if (window.coachController && typeof window.coachController.setContextoFijo === "function") {
+        window.coachController.perfil = window.getperfil();
+        window.coachController.setContextoFijo("testDetalle", { testId: resultado.testId });
     }
 }
 

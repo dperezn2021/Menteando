@@ -155,7 +155,7 @@ public class UITrayectoriasMentales : MonoBehaviour
         if (lifePowerUpIcon != null)
             lifePowerUpIcon.color = extraLives > 0 ? powerUpActiveColor : powerUpInactiveColor;
         if (extraLivesCountText != null)
-            extraLivesCountText.text = extraLives > 0 ? $"x{extraLives}" : "";
+            extraLivesCountText.text = extraLives > 0 ? $"Vidas extra: {extraLives}" : "";
     }
 
     // ============================================================

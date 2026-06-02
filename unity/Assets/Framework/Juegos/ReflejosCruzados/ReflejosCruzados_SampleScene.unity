@@ -1917,6 +1917,8 @@ MonoBehaviour:
   velocidadNivel10: 480
   tamanoDianaNivel1: {x: 108, y: 108}
   tamanoDianaNivel10: {x: 76, y: 76}
+  escalaHitboxDiana: 1.35
+  tamanoMinimoHitboxDiana: 118
   colorDianaVerde: {r: 0.372549, g: 0.4980392, b: 0.227451, a: 1}
   colorDianaRoja: {r: 0.5254902, g: 0.1843137, b: 0.2039216, a: 1}
   colorCentroDiana: {r: 1, g: 0.9137255, b: 0.7215686, a: 1}
@@ -3847,13 +3849,19 @@ MonoBehaviour:
   musicaSource: {fileID: 270861320}
   sfxSource: {fileID: 1538006878}
   clickUI: {fileID: 8300000, guid: 3d7c9e236bfc1d245a398ee165a39352, type: 3}
+  reboteRata: {fileID: 0}
   disparo: {fileID: 8300000, guid: 614af8f650fc70343a5806ee9b52a1e5, type: 3}
+  PU: {fileID: 0}
   acierto: {fileID: 8300000, guid: 7f07fe20f56a1fe4e9f78cf746a9c069, type: 3}
   error: {fileID: 8300000, guid: 5ffe6f242fed63341abf5c88fde5edb3, type: 3}
   nivelUp: {fileID: 0}
   musicaMenu: {fileID: 8300000, guid: 7779d1920691e4b43aafe1b058b4c2f4, type: 3}
   musicaJuego: {fileID: 8300000, guid: 40ff7516ea194ea4f95ae1392ffbc1d8, type: 3}
   musicaVictoria: {fileID: 8300000, guid: ae82e39eb1233a244861db308ea89c70, type: 3}
+  coheteSalto: {fileID: 0}
+  escudoAcierto: {fileID: 0}
+  peligroError: {fileID: 0}
+  choqueCaja: {fileID: 0}
   musicaVolumen: 0.5
   sfxVolumen: 0.5
   generarClipsFallback: 1
@@ -5025,7 +5033,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1657536004
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5061,8 +5069,9 @@ MonoBehaviour:
   juego: {fileID: 638485019}
   fuenteTextos: {fileID: 11400000, guid: cbb4ea1c3342a75419c137de545c6bc9, type: 2}
   fondoJuego: {fileID: 21300000, guid: f6135b7836475ae43aba074f5347ab23, type: 3}
-  fondoHUD: {fileID: 21300000, guid: 60844a516dbd8bd48914bdd639dc901f, type: 3}
+  fondoHUD: {fileID: 0}
   altoHeader: 100
+  altoHUDCompacto: 92
   colorHeader: {r: 0, g: 0, b: 0, a: 0.55}
   colorHUDFallback: {r: 0.08, g: 0.13, b: 0.16, a: 0.72}
   colorFeedbackAcierto: {r: 0.22, g: 0.78, b: 0.45, a: 1}

@@ -856,16 +856,28 @@ public class EcoVisualGame : BaseGame, IBeginDragHandler, IDragHandler, IEndDrag
         if (ui == null || ui.botonPausa == null) return;
 
         Transform boton = ui.botonPausa.transform;
-        Transform raizDirecta = boton;
+        RectTransform parent = raizLayout != null ? raizLayout : ui.UIPartida != null ? ui.UIPartida.GetComponent<RectTransform>() : null;
+        if (parent != null && boton.parent != parent)
+            boton.SetParent(parent, false);
 
-        if (raizLayout != null)
+        ui.botonPausa.gameObject.SetActive(true);
+
+        RectTransform rect = ui.botonPausa.GetComponent<RectTransform>();
+        if (rect != null)
         {
-            while (raizDirecta.parent != null && raizDirecta.parent != raizLayout)
-                raizDirecta = raizDirecta.parent;
+            float ancho = raizLayout != null && raizLayout.rect.width > 0f ? raizLayout.rect.width : Screen.width;
+            bool compacto = ancho < 1000f;
+            rect.anchorMin = new Vector2(1f, 0f);
+            rect.anchorMax = new Vector2(1f, 0f);
+            rect.pivot = new Vector2(1f, 0f);
+            rect.anchoredPosition = new Vector2(-24f, 24f);
+            rect.sizeDelta = compacto ? new Vector2(200f, 75f) : new Vector2(275f, 100f);
+            rect.localScale = Vector3.one;
         }
 
-        if (raizLayout != null && raizDirecta.parent == raizLayout)
-            raizDirecta.SetAsLastSibling();
+        LayoutElement layout = ui.botonPausa.GetComponent<LayoutElement>();
+        if (layout != null)
+            layout.ignoreLayout = true;
 
         boton.SetAsLastSibling();
     }

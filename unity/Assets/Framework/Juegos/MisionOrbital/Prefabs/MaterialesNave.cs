@@ -24,18 +24,5 @@ public class MaterialesNave : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-        // Verificar que los materiales están asignados
-        if (NaveActiva == null)
-            Debug.LogWarning("⚠️ Asigna el material Nave Activa en el Inspector");
-        if (NaveObjetivo == null)
-            Debug.LogWarning("⚠️ Asigna el material Nave Objetivo en el Inspector");
-        if (NaveNeutral == null)
-            Debug.LogWarning("⚠️ Asigna el material Nave Neutral en el Inspector");
-        if (NaveImpacto == null)
-            Debug.LogWarning("⚠️ Asigna el material Nave Impacto en el Inspector");
-        else
-            Debug.Log("✅ Todos los materiales de naves están asignados correctamente");
-    }
+    
 }

@@ -22,6 +22,7 @@ public class UISilencioMental : MonoBehaviour
         if (textoMensaje != null) textoMensaje.text = "";
         if (textoIcono != null) textoIcono.text = "";
         if (textoFeedback != null) textoFeedback.text = "";
+        ConfigurarTextosResponsivos();
     }
 
     private void Start()
@@ -92,5 +93,27 @@ public class UISilencioMental : MonoBehaviour
     private void SetText(TextMeshProUGUI tmp, string txt)
     {
         if (tmp != null) tmp.text = txt;
+    }
+
+    private void ConfigurarTextosResponsivos()
+    {
+        ConfigurarTexto(textoRacha, 16f, 38f);
+        ConfigurarTexto(textoTiempo, 16f, 38f);
+        ConfigurarTexto(textoNivel, 16f, 38f);
+        ConfigurarTexto(textoMensaje, 18f, 48f);
+        ConfigurarTexto(textoFeedback, 18f, 48f);
+    }
+
+    private void ConfigurarTexto(TextMeshProUGUI texto, float min, float max)
+    {
+        if (texto == null)
+            return;
+
+        texto.enableAutoSizing = true;
+        texto.fontSizeMin = min;
+        texto.fontSizeMax = max;
+        texto.textWrappingMode = TextWrappingModes.Normal;
+        texto.overflowMode = TextOverflowModes.Ellipsis;
+        texto.raycastTarget = false;
     }
 }

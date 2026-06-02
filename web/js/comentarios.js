@@ -19,13 +19,41 @@ let filtroActual = "todos";
 let mostrarTodos = false;
 // Sort order: true = newest first (desc), false = oldest first (asc)
 let sortDesc = true;
+// Cache of last loaded comments — used for duplicate-name validation before publishing
+let comentariosCacheados = [];
+
+// ========== PROPIEDAD DE COMENTARIOS (localStorage) ==========
+// Los IDs de los comentarios publicados desde este navegador se guardan aquí.
+// Los botones de editar/borrar se muestran solo para estos IDs, no por nombre,
+// para evitar que alguien edite comentarios ajenos cambiándose el apodo.
+
+const OWNED_IDS_KEY = 'menteando_owned_ids';
+
+function getOwnedIds() {
+    try { return new Set(JSON.parse(localStorage.getItem(OWNED_IDS_KEY) || '[]')); }
+    catch { return new Set(); }
+}
+
+function claimCommentId(id) {
+    const set = getOwnedIds();
+    set.add(String(id));
+    localStorage.setItem(OWNED_IDS_KEY, JSON.stringify([...set]));
+}
+
+// IDs alfanuméricos (formato nuevo, ej: 'mpwrvot6lo24uqj'): requieren localStorage.
+// IDs numéricos (formato antiguo, timestamps): fallback por nombre para migración.
+function isMyComment(com) {
+    const id = String(com.id);
+    if (/[a-z]/i.test(id)) return getOwnedIds().has(id);
+    return com.usuario === getUsuarioActual();
+}
 
 // ========== FUNCIONES DE USUARIO ==========
 
 function getUsuarioActual() {
     if (typeof getperfil === 'function') {
         const perfil = getperfil();
-        return perfil?.nombre || null;
+        return perfil?.apodo || perfil?.nombre || null;
     }
     return null;
 }
@@ -154,6 +182,7 @@ async function cargarComentarios() {
 }
 
 function mostrarComentarios(comentarios) {
+    comentariosCacheados = comentarios || [];
     const container = document.getElementById("comentarios-container");
     if (!container) return;
 
@@ -222,12 +251,15 @@ function mostrarComentarios(comentarios) {
         const categoriaInfo = CATEGORIAS[com.categoria] || CATEGORIAS.general;
         const catBadge = document.createElement('span');
         catBadge.className = `px-2 py-0.5 rounded-full text-xs ${categoriaInfo.color}`;
-        catBadge.textContent = categoriaInfo.nombre;
+        catBadge.textContent = com.subtipo ? `${categoriaInfo.nombre}: ${com.subtipo}` : categoriaInfo.nombre;
+        
 
         left.appendChild(name);
         left.appendChild(dateSpan);
         left.appendChild(catBadge);
+       
         
+
         if (com.editado) {
             const editLabel = document.createElement('span');
             editLabel.className = 'text-xs text-slate-400';
@@ -252,34 +284,34 @@ function mostrarComentarios(comentarios) {
         const right = document.createElement('div');
         right.className = 'flex gap-2 comentario-controls';
 
-        const esAutor = com.usuario === usuarioActual;
+        // esAutor (localStorage): controla editar/borrar
+        // esMiNombre (apodo): controla la 🚩 (no reportas los tuyos aunque hayas cambiado de nombre)
+        const esAutor = isMyComment(com);
+        const esMiNombre = usuarioActual && com.usuario === usuarioActual;
 
-        if (esAutor || esAdmin) {
+        if (esAutor || admin) {
             const editBtn = document.createElement('button');
             editBtn.className = 'text-xs text-blue-500 hover:text-blue-700 transition';
             editBtn.title = 'Editar';
             editBtn.textContent = '✏️';
             editBtn.addEventListener('click', () => editarComentario(com.id));
             right.appendChild(editBtn);
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'text-xs text-red-400 hover:text-red-600 transition';
+            delBtn.title = 'Eliminar';
+            delBtn.textContent = '🗑️';
+            delBtn.addEventListener('click', () => borrarComentarioPrompt(com.id));
+            right.appendChild(delBtn);
         }
 
-        if (!esAutor) {
+        if (!esMiNombre && !admin) {
             const reportBtn = document.createElement('button');
             reportBtn.className = 'text-xs text-yellow-500 hover:text-yellow-700 transition';
             reportBtn.title = 'Reportar';
             reportBtn.textContent = '🚩';
             reportBtn.addEventListener('click', () => reportarComentario(com.id));
             right.appendChild(reportBtn);
-        }
-
-        if (admin) {
-            
-            const delBtn = document.createElement('button');
-            delBtn.className = 'text-xs text-blue-500 hover:text-blue-700 transition';
-            delBtn.title = 'Eliminar';
-            delBtn.textContent = '🗑️';
-            delBtn.addEventListener('click', () => borrarComentarioPrompt(com.id));
-            right.appendChild(delBtn);
         }
 
         header.appendChild(left);
@@ -305,8 +337,10 @@ function mostrarComentarios(comentarios) {
         }
         textoDiv.appendChild(textoP);
 
-        // Guardamos el texto original
+        // Guardamos el texto original y metadatos de la card
         card.dataset.raw = com.texto || '';
+        card.dataset.categoria = com.categoria || 'general';
+        card.dataset.subtipo = com.subtipo || '';
 
         const actions = document.createElement('div');
         actions.className = 'flex items-center gap-4 mt-3';
@@ -385,10 +419,19 @@ function mostrarComentarios(comentarios) {
 async function publicarComentario() {
     const usuario = getUsuarioActual();
     const texto = document.getElementById("comentario-texto")?.value.trim();
-    const categoria = document.getElementById("comentario-categoria")?.value || "general";
-    
+    const categoria = document.getElementById("comentario-categoria")?.value;
+    const subtipo = document.getElementById("comentario-subtipo")?.value || "";
+
     if (!usuario) {
-        mostrarModal("Debes tener un nombre de perfil para comentar", "info");
+        mostrarModal("Debes configurar un apodo en tu perfil para comentar", "info");
+        return;
+    }
+    if (!categoria) {
+        mostrarModal("Debes seleccionar una categoría antes de publicar", "info");
+        return;
+    }
+    if ((categoria === "test" || categoria === "juego") && !subtipo) {
+        mostrarModal(`Debes seleccionar ${categoria === "test" ? "el test" : "el juego"} al que se refiere tu comentario`, "info");
         return;
     }
     if (!texto) {
@@ -402,14 +445,27 @@ async function publicarComentario() {
         if (perfil?.avatar) avatar = perfil.avatar;
     }
 
+    // Check for name conflict: if another user already claimed this apodo with a different avatar
+    const primeraOcurrencia = comentariosCacheados.find(c => c.usuario === usuario);
+    if (primeraOcurrencia && normalizeAvatarPath(primeraOcurrencia.avatar) !== normalizeAvatarPath(avatar) && !esAdmin) {
+        mostrarModal("Ya existe otro usuario con ese apodo. Cámbialo en tu perfil antes de comentar.", "error");
+        return;
+    }
+
     try {
+        const body = { usuario, texto, avatar, categoria };
+        if (subtipo) body.subtipo = subtipo;
+        console.log('[publicarComentario] enviando:', body);
         const response = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ usuario, texto, avatar, categoria })
+            body: JSON.stringify(body)
         });
 
         if (response.ok) {
+            const data = await response.json().catch(() => ({}));
+            console.log('[publicarComentario] respuesta:', data);
+            if (data?.id) claimCommentId(data.id);
             document.getElementById("comentario-texto").value = "";
             cargarComentarios();
             mostrarModal("Comentario publicado", "success");
@@ -450,41 +506,60 @@ async function darLike(id) {
 
 function editarComentario(id) {
     const divTexto = document.getElementById(`texto-${id}`);
-    // Read raw text stored on the card (preserves newlines)
     const card = document.getElementById(`comentario-${id}`);
     const textoActual = (card && card.dataset.raw) ? card.dataset.raw : (divTexto.innerText || '');
-    
-    const categoriaSelect = document.createElement('select');
-    categoriaSelect.id = `edit-categoria-${id}`;
-    categoriaSelect.className = "mt-2 px-3 py-1 rounded-lg border text-sm w-full dark:bg-slate-700";
-    categoriaSelect.innerHTML = `
-        <option value="general">💬 General</option>
-        <option value="sugerencia">💡 Sugerencia</option>
-        <option value="error">🐛 Error</option>
-        <option value="pregunta">❓ Pregunta</option>
-        <option value="test">📝 Test</option>
-        <option value="juego">🎮 Juego</option>
-    `;
-    
-    // Build edit UI with DOM to avoid string interpolation issues
+    const categoriaActual = card?.dataset.categoria || 'general';
+    const subtipoActual = card?.dataset.subtipo || '';
+
     divTexto.innerHTML = '';
+    const wrapper = document.createElement('div');
+
+    // Textarea
     const textarea = document.createElement('textarea');
     textarea.id = `edit-texto-${id}`;
     textarea.className = 'w-full p-2 rounded-lg border text-sm dark:bg-slate-700 dark:border-slate-600';
     textarea.rows = 3;
     textarea.value = textoActual;
-
-    const wrapper = document.createElement('div');
     wrapper.appendChild(textarea);
 
-    // insert categoria select
-    const tempSelect = document.createElement('div');
-    tempSelect.innerHTML = categoriaSelect.outerHTML;
-    const selectEl = tempSelect.querySelector('select');
+    // Selector de categoría
+    const selectEl = document.createElement('select');
     selectEl.id = `edit-categoria-${id}`;
     selectEl.className = 'mt-2 px-3 py-1 rounded-lg border text-sm w-full dark:bg-slate-700';
+    [['general','💬 General'],['sugerencia','💡 Sugerencia'],['error','🐛 Error'],
+     ['pregunta','❓ Pregunta'],['test','📝 Test'],['juego','🎮 Juego']].forEach(([val, txt]) => {
+        const opt = document.createElement('option');
+        opt.value = val; opt.textContent = txt;
+        selectEl.appendChild(opt);
+    });
+    selectEl.value = categoriaActual;
     wrapper.appendChild(selectEl);
 
+    // Selector de subtipo (test / juego)
+    const subWrapper = document.createElement('div');
+    subWrapper.className = 'mt-2 hidden';
+    const subSelect = document.createElement('select');
+    subSelect.id = `edit-subtipo-${id}`;
+    subSelect.className = 'w-full px-3 py-1 rounded-lg border text-sm dark:bg-slate-700';
+    subWrapper.appendChild(subSelect);
+    wrapper.appendChild(subWrapper);
+
+    // Si la categoría actual ya es test/juego, mostrar el selector pre-poblado
+    if (categoriaActual === 'test' || categoriaActual === 'juego') {
+        poblarSelectSubtipo(subSelect, subWrapper, categoriaActual, subtipoActual);
+    }
+
+    // Al cambiar categoría, mostrar/ocultar subtipo
+    selectEl.addEventListener('change', () => {
+        const cat = selectEl.value;
+        if (cat === 'test' || cat === 'juego') {
+            poblarSelectSubtipo(subSelect, subWrapper, cat, '');
+        } else {
+            subWrapper.classList.add('hidden');
+        }
+    });
+
+    // Fila de botones
     const btnRow = document.createElement('div');
     btnRow.className = 'flex gap-2 mt-2';
 
@@ -500,52 +575,42 @@ function editarComentario(id) {
 
     btnRow.appendChild(saveBtn);
     btnRow.appendChild(cancelBtn);
-
-    // Delete button for author/admin
-    const usuarioActual = getUsuarioActual();
-    const admin = esAdmin();
-    // We allow the delete button if the current user is admin or author (handled earlier by edit button call)
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'ml-auto px-3 py-1 bg-red-500 text-white rounded-lg text-xs hover:bg-red-600 transition';
-    deleteBtn.textContent = 'Borrar';
-    deleteBtn.addEventListener('click', () => {
-        confirmModal('¿Eliminar este comentario?', 'Eliminar').then(ok => { if (ok) borrarComentario(id); });
-    });
-
-    btnRow.appendChild(deleteBtn);
     wrapper.appendChild(btnRow);
-
     divTexto.appendChild(wrapper);
 }
 
 async function guardarEdicion(id) {
     const nuevoTexto = document.getElementById(`edit-texto-${id}`).value;
     const nuevaCategoria = document.getElementById(`edit-categoria-${id}`).value;
+    const nuevoSubtipo = document.getElementById(`edit-subtipo-${id}`)?.value || '';
     const usuario = getUsuarioActual();
-    
+
     if (!usuario) {
         mostrarModal("No se pudo identificar al usuario", "error");
         return;
     }
-    
+    if ((nuevaCategoria === 'test' || nuevaCategoria === 'juego') && !nuevoSubtipo) {
+        mostrarModal(`Debes seleccionar ${nuevaCategoria === 'test' ? 'el test' : 'el juego'} al que se refiere el comentario`, 'info');
+        return;
+    }
+
+    const payload = { id, usuario, texto: nuevoTexto, categoria: nuevaCategoria, subtipo: nuevoSubtipo };
+    console.log('[guardarEdicion] enviando:', payload);
     try {
         const response = await fetch(API_URL, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                id, 
-                usuario, 
-                texto: nuevoTexto, 
-                categoria: nuevaCategoria 
-            })
+            body: JSON.stringify(payload)
         });
-        
+
+        const data = await response.json().catch(() => null);
+        console.log('[guardarEdicion] respuesta:', response.status, data);
+
         if (response.ok) {
             cargarComentarios();
             mostrarModal("Comentario editado", "success");
         } else {
-            const error = await response.json();
-            mostrarModal(error.error || "Error al editar", "error");
+            mostrarModal(data?.error || "Error al editar", "error");
         }
     } catch (error) {
         console.error("Error:", error);
@@ -581,6 +646,7 @@ async function reportarComentario(id) {
         });
 
         const data = await response.json().catch(() => null);
+        console.log('[reporte]', response.status, data);
         if (!response.ok) {
             const err = data?.error || 'Error al reportar';
             mostrarModal(err, 'error');
@@ -605,17 +671,13 @@ async function reportarComentario(id) {
 
 async function borrarComentario(id) {
     const usuario = getUsuarioActual();
-    // Allow deletion if admin or the original author
-    // To check author ownership we will attempt deletion and rely on the server-side author check.
-    // If your Worker enforces authorization, it should validate that the requesting user can delete.
-    
     try {
         const headers = { 'Content-Type': 'application/json' };
         if (window.ADMIN_BEARER) headers['Authorization'] = `Bearer ${window.ADMIN_BEARER}`;
         const response = await fetch(API_URL, {
             method: "DELETE",
             headers,
-            body: JSON.stringify({ id })
+            body: JSON.stringify({ id, usuario })
         });
         
         if (response.ok) {
@@ -731,7 +793,7 @@ function inputModal(mensaje, placeholder = '') {
         document.body.appendChild(modal);
         modal.onclick = (e) => { if (e.target === modal) { modal.remove(); resolve(null); } };
         document.getElementById('modal-cancel-btn').onclick = () => { modal.remove(); resolve(null); };
-        document.getElementById('modal-ok-btn').onclick = () => { const v = document.getElementById('modal-input').value.trim(); modal.remove(); resolve(v || null); };
+        document.getElementById('modal-ok-btn').onclick = () => { const v = document.getElementById('modal-input').value.trim(); modal.remove(); resolve(v); };
         // focus
         setTimeout(() => document.getElementById('modal-input').focus(), 50);
     });
@@ -765,8 +827,9 @@ function actualizarAvatar() {
         if (perfil?.avatar && avatarImg) {
             avatarImg.src = normalizeAvatarPath(perfil.avatar);
         }
-        if (perfil?.nombre && nombreInput) {
-            nombreInput.value = perfil.nombre;
+        const apodo = perfil?.apodo || perfil?.nombre;
+        if (apodo && nombreInput) {
+            nombreInput.value = apodo;
             nombreInput.readOnly = true;
             nombreInput.disabled = true;
             nombreInput.classList.add("cursor-not-allowed", "bg-slate-100", "dark:bg-slate-700");
@@ -774,11 +837,76 @@ function actualizarAvatar() {
     }
 }
 
+// ========== SELECTOR DE SUBTIPO (test / juego) ==========
+
+// Devuelve array de nombres legibles para test o juego, usando catálogos o fallback
+function getOpcionesSubtipo(categoria) {
+    const fallbackJuegos = [
+        "Detector de Intrusos", "Doble Canal", "Silencio Mental", "Operaciones Encadenadas",
+        "Eco Visual", "Color Match", "Cambio de Reglas", "Trayectorias Mentales",
+        "Misión Orbital", "Reflejos Cruzados"
+    ];
+    const fallbackTests = [
+        "Mini-Examen Cognoscitivo (MEC)", "TAVEC", "Test d2 de Atención",
+        "Continuous Performance Test (CPT)", "Corsi Block-Tapping Test (CBT)",
+        "Tower of London", "Wisconsin Card Sorting Test (WCST)", "Stroop Test",
+        "Digit Span", "Trail Making Test A/B", "Symbol Search", "N-Back", "Go/No-Go Test"
+    ];
+    if (categoria === 'juego') {
+        const lista = typeof window.getCatalogoJuegos === 'function' ? window.getCatalogoJuegos() : [];
+        return lista.length ? lista.map(j => j.nombre) : fallbackJuegos;
+    }
+    if (categoria === 'test') {
+        const lista = window.CATALOGO_TESTS || [];
+        return lista.length ? lista.map(t => t.nombre) : fallbackTests;
+    }
+    return [];
+}
+
+// Puebla un <select> con las opciones de subtipo para la categoría dada
+function poblarSelectSubtipo(selectEl, wrapperEl, categoria, valorActual) {
+    const opciones = getOpcionesSubtipo(categoria);
+    if (!opciones.length) { wrapperEl.classList.add('hidden'); return; }
+    const label = categoria === 'test' ? 'el test' : 'el juego';
+    selectEl.innerHTML = `<option value="">Selecciona ${label}</option>`;
+    opciones.forEach(nombre => {
+        const opt = document.createElement('option');
+        opt.value = nombre;
+        opt.textContent = nombre;
+        if (nombre === valorActual) opt.selected = true;
+        selectEl.appendChild(opt);
+    });
+    wrapperEl.classList.remove('hidden');
+}
+
+function initSubtipoSelector() {
+    const catSelect = document.getElementById("comentario-categoria");
+    const wrapper = document.getElementById("comentario-subtipo-wrapper");
+    const subSelect = document.getElementById("comentario-subtipo");
+    if (!catSelect || !wrapper || !subSelect) return;
+
+    catSelect.addEventListener('change', () => {
+        const val = catSelect.value;
+        let tipo = '';
+        if (val === 'juego'){
+            tipo = 'juego';
+            poblarSelectSubtipo(subSelect, wrapper, tipo, '');
+        }else if (val === 'test') {
+            tipo = 'test';
+            poblarSelectSubtipo(subSelect, wrapper, tipo, '');
+        } else {
+            wrapper.classList.add('hidden');
+            subSelect.innerHTML = `<option value="">Selecciona el ${tipo}</option>`;
+        }
+    });
+}
+
 // ========== INICIALIZACIÓN ==========
 
 document.addEventListener("DOMContentLoaded", () => {
     cargarComentarios();
     actualizarAvatar();
+    initSubtipoSelector();
     
     const btnPublicar = document.getElementById("btn-publicar");
     if (btnPublicar) {

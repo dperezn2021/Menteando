@@ -19,8 +19,6 @@ public class UIColorMatch : MonoBehaviour
     public Image flashPanel;
 
     private Coroutine flashCoroutine;
-    private Coroutine reglaCoroutine;
-    
 
     private void Awake() // 🔥 CAMBIO
     {
@@ -45,10 +43,8 @@ public class UIColorMatch : MonoBehaviour
             flashPanel.color = c;
             flashPanel.gameObject.SetActive(false);
         }
-        if (colorGame != null)
-            colorGame.OnReglaActualizada += ManejarCambioRegla;
 
-
+        AjustarHudAContenedor();
         ActualizarRacha(0); // 🔥 CAMBIO
         ActualizarNivel(DifficultyManager.Instance?.nivelActual ?? 1); // 🔥 CAMBIO
         ManejarCambioRegla((DifficultyManager.Instance?.nivelActual ?? 1) >= 6);
@@ -56,11 +52,7 @@ public class UIColorMatch : MonoBehaviour
 
     private void ManejarCambioRegla(bool responderTexto)
     {
-        // 🔥 Siempre mostrar cuando cambia la regla
-        if (reglaCoroutine != null)
-            StopCoroutine(reglaCoroutine);
-
-        reglaCoroutine = StartCoroutine(MostrarReglaTemporal(responderTexto, 2f));
+        MostrarReglaPermanente(responderTexto);
     }
 
     private void Update()
@@ -83,35 +75,20 @@ public class UIColorMatch : MonoBehaviour
         flashCoroutine = StartCoroutine(FlashRoutine(color));
     }
 
-    private IEnumerator MostrarReglaTemporal(bool responderTexto, float duracion)
+    private void MostrarReglaPermanente(bool responderTexto)
     {
-        // 🔥 Asegurar que el objeto padre está activo
         if (textoRegla == null)
-        {
-            yield break;
-        }
+            return;
 
-        // 🔥 Asegurar que el GameObject está activo
-        if (!textoRegla.gameObject.activeSelf)
-        {
-            textoRegla.gameObject.SetActive(true);
-        }
-
-        // 🔥 También activar el objeto padre si es necesario
         if (textoRegla.transform.parent != null && !textoRegla.transform.parent.gameObject.activeSelf)
-        {
             textoRegla.transform.parent.gameObject.SetActive(true);
-        }
+
+        if (!textoRegla.gameObject.activeSelf)
+            textoRegla.gameObject.SetActive(true);
 
         textoRegla.text = responderTexto
             ? "NORMA: COLOR ESCRITO"
             : "NORMA: COLOR PINTADO";
-
-
-        yield return new WaitForSeconds(duracion);
-
-        textoRegla.gameObject.SetActive(false);
-        reglaCoroutine = null;
     }
 
     private IEnumerator FlashRoutine(Color color)
@@ -149,6 +126,27 @@ public class UIColorMatch : MonoBehaviour
     {
         if (textoNivel != null)
             textoNivel.text = $"NIVEL: {Mathf.Clamp(nivel, 1, 10)}/10"; // 🔥 CAMBIO
+    }
+
+    private void AjustarHudAContenedor()
+    {
+        ConfigurarTextoHud(textoRacha, 16f, 38f);
+        ConfigurarTextoHud(textoTiempo, 16f, 38f);
+        ConfigurarTextoHud(textoNivel, 16f, 38f);
+        ConfigurarTextoHud(textoRegla, 18f, 42f);
+    }
+
+    private void ConfigurarTextoHud(TextMeshProUGUI texto, float min, float max)
+    {
+        if (texto == null)
+            return;
+
+        texto.enableAutoSizing = true;
+        texto.fontSizeMin = min;
+        texto.fontSizeMax = max;
+        texto.textWrappingMode = TextWrappingModes.Normal;
+        texto.overflowMode = TextOverflowModes.Ellipsis;
+        texto.raycastTarget = false;
     }
 
     private void CachearReferencias() // 🔥 CAMBIO

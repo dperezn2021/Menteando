@@ -221,11 +221,9 @@ public class CristalNave : MonoBehaviour
         if (fuente != null)
         {
             texto.font = fuente;
-            Debug.Log("✅ Fuente cargada correctamente: " + fuente.name);
         }
         else
         {
-            Debug.LogError("❌ No se encontró la fuente 'space age SDF' en la carpeta Resources");
         }
     }
 

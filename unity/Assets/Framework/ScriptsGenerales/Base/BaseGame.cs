@@ -15,7 +15,6 @@ public abstract class BaseGame : MonoBehaviour
     public virtual void PausarJuego(bool pausar)
     {
         juegoPausado = pausar;
-        Debug.Log($"⏸️ {nombre} - Pausado: {juegoPausado}");
     }
 
     public virtual bool EstaPausado()

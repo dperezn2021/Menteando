@@ -369,8 +369,9 @@ public class UICambioDeReglas : MonoBehaviour
         RectTransform parent = ObtenerPadrePizarra() as RectTransform;
         if (parent != null)
         {
-            parent.anchorMin = new Vector2(0.15f, 0.15f);
-            parent.anchorMax = new Vector2(0.85f, 0.47f);
+            bool compacto = Screen.width > 0 && Screen.height > 0 && Screen.width < Screen.height;
+            parent.anchorMin = compacto ? new Vector2(0.08f, 0.12f) : new Vector2(0.15f, 0.15f);
+            parent.anchorMax = compacto ? new Vector2(0.92f, 0.50f) : new Vector2(0.85f, 0.47f);
             parent.anchoredPosition = Vector2.zero;
             parent.sizeDelta = Vector2.zero;
 
@@ -398,14 +399,18 @@ public class UICambioDeReglas : MonoBehaviour
             return;
 
         RectTransform rect = text.rectTransform;
+        float anchoDisponible = rect != null && rect.parent is RectTransform parent
+            ? Mathf.Max(220f, parent.rect.width * 0.92f)
+            : 340f;
+        bool compacto = Screen.width > 0 && Screen.height > 0 && Screen.width < Screen.height;
         if (rect != null)
-            rect.sizeDelta = new Vector2(340f, 44f);
+            rect.sizeDelta = new Vector2(Mathf.Min(340f, anchoDisponible), compacto ? 38f : 44f);
 
         AplicarFuenteSegura(text);
-        text.fontSize = 40f;
+        text.fontSize = compacto ? 34f : 40f;
         text.enableAutoSizing = true;
-        text.fontSizeMin = 20f;
-        text.fontSizeMax = 40f;
+        text.fontSizeMin = compacto ? 16f : 20f;
+        text.fontSizeMax = compacto ? 34f : 40f;
         text.textWrappingMode = TextWrappingModes.Normal;
         text.raycastTarget = false;
     }

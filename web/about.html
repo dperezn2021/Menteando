@@ -548,18 +548,26 @@
                         <img src="/assets/icon/usuario.webp" alt="Avatar"
                             class="w-10 h-10 rounded-full border-2 border-blue-500" id="comentario-avatar">
                         <div class="flex-1 min-w-[150px]">
+                            <label class="block text-xs text-slate-500 dark:text-slate-400 mb-0.5">Apodo</label>
                             <input type="text" id="comentario-usuario"
                                 class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white cursor-not-allowed font-semibold text-sm"
-                                readonly disabled>
+                                placeholder="Sin apodo" readonly disabled>
                         </div>
                         <select id="comentario-categoria"
-                            class="px-3 py-2 rounded-lg border bg-white dark:bg-slate-800 text-sm">
+                            class="pr-10 py-2 rounded-lg border bg-white dark:bg-slate-800 text-sm">
+                            <option value="">Elige categoría</option>
                             <option value="general">💬 General</option>
                             <option value="sugerencia">💡 Sugerencia</option>
                             <option value="error">🐛 Error</option>
                             <option value="pregunta">❓ Pregunta</option>
                             <option value="test">📝 Test</option>
                             <option value="juego">🎮 Juego</option>
+                        </select>
+                    </div>
+                    <div id="comentario-subtipo-wrapper" class="hidden mb-3">
+                        <select id="comentario-subtipo"
+                            class="w-full px-3 py-2 rounded-lg border bg-white dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-200">
+                            <option value="">Selecciona el elemento</option>
                         </select>
                     </div>
                     <textarea id="comentario-texto" rows="3" placeholder="Escribe tu comentario..."
@@ -648,6 +656,8 @@
 
     <script src="/js/perfil.js"></script>
     <script src="/js/emailService.js"></script>
+    <script src="/js/catalogoJuegos.js"></script>
+    <script src="/js/catalogoTests.js"></script>
     <script src="/js/comentarios.js"></script>
     <script src="/js/datosPerfil.js"></script>
     <script src="/coach/mensajesCoach.js"></script>

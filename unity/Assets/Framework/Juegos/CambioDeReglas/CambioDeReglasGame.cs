@@ -31,6 +31,14 @@ public class CambioDeReglasGame : BaseGame
     public float escalaVisualMediano = 1f;
     public float escalaVisualGrande = 1.65f;
 
+    [Header("Claridad visual de colores")]
+    public bool reforzarColoresEnReglasDeColor = true;
+    [Range(0f, 1f)]
+    public float intensidadTinteColor = 0.35f;
+    public Color colorVisualAmarillo = new Color(1f, 0.92f, 0.05f, 1f);
+    public Color colorVisualNaranja = new Color(1f, 0.40f, 0.02f, 1f);
+    public Color colorVisualMarron = new Color(0.42f, 0.20f, 0.07f, 1f);
+
     [Header("Rendimiento")]
     public int rondasCompletadasParaSubirNivel = 5;
     public int rondasConFalloParaBajarNivel = 3;
@@ -435,6 +443,8 @@ public class CambioDeReglasGame : BaseGame
         nuevo.imagen.sprite = comida.sprite;
         nuevo.imagen.preserveAspect = true;
         nuevo.imagen.raycastTarget = true;
+        nuevo.imagen.color = ObtenerColorImagen(comida);
+        CrearMarcadorColorSiProcede(obj.transform, comida);
 
         nuevo.boton.targetGraphic = nuevo.imagen;
         nuevo.boton.onClick.AddListener(() => OnAlimentoPresionado(nuevo));
@@ -702,6 +712,82 @@ public class CambioDeReglasGame : BaseGame
     private bool EsReglaTamano()
     {
         return tagActual == FoodTags.Pequeno || tagActual == FoodTags.Mediano || tagActual == FoodTags.Grande;
+    }
+
+    private bool EsReglaColor()
+    {
+        return EsTagColor(tagActual);
+    }
+
+    private bool EsTagColor(FoodTags tag)
+    {
+        return tag == FoodTags.Rojo ||
+               tag == FoodTags.Verde ||
+               tag == FoodTags.Amarillo ||
+               tag == FoodTags.Naranja ||
+               tag == FoodTags.Marron ||
+               tag == FoodTags.Blanco ||
+               tag == FoodTags.Azul ||
+               tag == FoodTags.Rosa;
+    }
+
+    private FoodTags ObtenerColorPrincipal(FoodItem comida)
+    {
+        if (comida == null)
+            return FoodTags.None;
+
+        if (comida.HasEffectiveTag(FoodTags.Amarillo)) return FoodTags.Amarillo;
+        if (comida.HasEffectiveTag(FoodTags.Naranja)) return FoodTags.Naranja;
+        if (comida.HasEffectiveTag(FoodTags.Marron)) return FoodTags.Marron;
+        if (comida.HasEffectiveTag(FoodTags.Rojo)) return FoodTags.Rojo;
+        if (comida.HasEffectiveTag(FoodTags.Verde)) return FoodTags.Verde;
+        if (comida.HasEffectiveTag(FoodTags.Blanco)) return FoodTags.Blanco;
+        if (comida.HasEffectiveTag(FoodTags.Azul)) return FoodTags.Azul;
+        if (comida.HasEffectiveTag(FoodTags.Rosa)) return FoodTags.Rosa;
+
+        return FoodTags.None;
+    }
+
+    private Color ObtenerColorImagen(FoodItem comida)
+    {
+        if (!reforzarColoresEnReglasDeColor || !EsReglaColor())
+            return Color.white;
+
+        FoodTags color = ObtenerColorPrincipal(comida);
+        if (!EsTagColor(color))
+            return Color.white;
+
+        return Color.Lerp(Color.white, ObtenerColorVisual(color), Mathf.Clamp01(intensidadTinteColor));
+    }
+
+    private Color ObtenerColorVisual(FoodTags color)
+    {
+        switch (color)
+        {
+            case FoodTags.Rojo: return new Color(0.92f, 0.08f, 0.06f, 1f);
+            case FoodTags.Verde: return new Color(0.08f, 0.72f, 0.16f, 1f);
+            case FoodTags.Amarillo: return colorVisualAmarillo;
+            case FoodTags.Naranja: return colorVisualNaranja;
+            case FoodTags.Marron: return colorVisualMarron;
+            case FoodTags.Blanco: return new Color(0.94f, 0.94f, 0.90f, 1f);
+            case FoodTags.Azul: return new Color(0.10f, 0.35f, 0.95f, 1f);
+            case FoodTags.Rosa: return new Color(1f, 0.20f, 0.55f, 1f);
+            default: return Color.white;
+        }
+    }
+
+    private void CrearMarcadorColorSiProcede(Transform parent, FoodItem comida)
+    {
+        if (!reforzarColoresEnReglasDeColor || !EsReglaColor() || parent == null)
+            return;
+
+        FoodTags color = ObtenerColorPrincipal(comida);
+        if (!EsTagColor(color))
+            return;
+
+        SimpleShapeGraphic marker = RuntimeMiniGameUI.CreateShape("MarcadorColor", parent, SimpleShapeKind.Circle, ObtenerColorVisual(color));
+        marker.raycastTarget = false;
+        RuntimeMiniGameUI.SetRect(marker.rectTransform, new Vector2(0.66f, 0.02f), new Vector2(0.98f, 0.34f), Vector2.zero, Vector2.zero);
     }
 
     private float ObtenerEscalaVisualPorTamano(FoodItem comida)

@@ -66,6 +66,7 @@ public class UIManager : MonoBehaviour
         AplicarSafeAreaSiProcede(pantallaPausa);
         AplicarSafeAreaSiProcede(pantallaAjustes);
         AplicarSafeAreaSiProcede(pantallaFinPartida);
+        AplicarSafeAreaSiProcede(cristalCanvas);
     }
 
     private void AplicarSafeAreaSiProcede(GameObject pantalla)
@@ -73,8 +74,17 @@ public class UIManager : MonoBehaviour
         if (pantalla == null || pantalla.GetComponent<RectTransform>() == null)
             return;
 
-        if (pantalla.GetComponent<SafeAreaFitter>() == null)
-            pantalla.AddComponent<SafeAreaFitter>();
+        SafeAreaFitter fitter = pantalla.GetComponent<SafeAreaFitter>();
+        if (fitter == null)
+            fitter = pantalla.AddComponent<SafeAreaFitter>();
+
+        fitter.ApplySafeArea();
+
+        ResponsiveHudTextFitter textFitter = pantalla.GetComponent<ResponsiveHudTextFitter>();
+        if (textFitter == null)
+            textFitter = pantalla.AddComponent<ResponsiveHudTextFitter>();
+
+        textFitter.ApplyNow();
     }
 
     void Update()
@@ -107,27 +117,21 @@ public class UIManager : MonoBehaviour
         });
 
         botonReanudar.onClick.AddListener(() => {
-            Debug.Log("🔘 Botón REANUDAR clickeado - ANTES");
             AudioManager.Instance.Click();
-            Debug.Log("🔘 Botón REANUDAR - después de Audio");
             TogglePausa();
-            Debug.Log("🔘 Botón REANUDAR - después de TogglePausa");
         });
 
         botonReiniciar.onClick.AddListener(() => {
-            Debug.Log("🔘 Botón REINICIAR clickeado");
             AudioManager.Instance.Click();
             ReiniciarPartida();
         });
 
         botonMenu.onClick.AddListener(() => {
-            Debug.Log("🔘 Botón MENU clickeado");
             AudioManager.Instance.Click();
             VolverAlMenu();
         });
 
         botonAjustesPausa.onClick.AddListener(() => {
-            Debug.Log("🔘 Botón AJUSTES clickeado");
             AudioManager.Instance.Click();
             pantallaAnterior = pantallaPausa;
             MusicaAbrirAjustes();
@@ -173,11 +177,11 @@ public class UIManager : MonoBehaviour
         pantallaPausa.SetActive(pantalla == pantallaPausa);
         pantallaAjustes.SetActive(pantalla == pantallaAjustes);
         pantallaFinPartida.SetActive(pantalla == pantallaFinPartida);
+        ConfigurarSafeArea();
     }
 
     void ReiniciarPartida()
     {
-        Debug.Log("🎮 ReiniciarPartida - Click en Jugar de nuevo");
         
         Time.timeScale = 1f;
         pausado = false;
@@ -198,13 +202,11 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("❌ No se encontró DetectorDeIntrusosGame");
         }
     }
 
     void IniciarPartida()
     {
-        Debug.Log("🎮 IniciarPartida");
 
         Time.timeScale = 1f;
         MostrarSolo(UIPartida);
@@ -216,11 +218,9 @@ public class UIManager : MonoBehaviour
 
         if (juego == null)
         {
-            Debug.LogError("❌ No se encontró ningún juego");
             return;
         }
 
-        Debug.Log($"✅ Juego encontrado: {juego.nombre}");
 
         // 🔥 NO llamar a ResetGame aquí (GameManager.EmpezarJuego lo hará)
         GameManager.Instance.EmpezarJuego(juego);
@@ -257,7 +257,6 @@ public class UIManager : MonoBehaviour
 
         // Buscar el juego actual
         var juego = FindAnyObjectByType<BaseGame>(FindObjectsInactive.Include);
-        Debug.Log($"🎮 TogglePausa - pausado: {pausado}, Time.timeScale: {Time.timeScale}");
 
         if (pausado)
         {

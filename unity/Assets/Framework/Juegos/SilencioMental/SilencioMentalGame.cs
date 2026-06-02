@@ -539,6 +539,5 @@ public class SilencioMentalGame : BaseGame
             rutinaActual = StartCoroutine(SecuenciaRecordar());
         }
 
-        Debug.Log($"⏸️ Pausa: {pausar} | enPausa: {enPausa}");
     }
 }

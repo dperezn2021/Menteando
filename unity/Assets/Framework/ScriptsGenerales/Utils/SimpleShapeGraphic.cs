@@ -134,6 +134,7 @@ public static class RuntimeMiniGameUI
 
         RectTransform root = rootObject.GetComponent<RectTransform>();
         SetRect(root, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+        EnsureSafeAreaIfNeeded(root);
 
         Image background = rootObject.GetComponent<Image>();
         background.color = Background;
@@ -233,6 +234,29 @@ public static class RuntimeMiniGameUI
         rect.anchorMax = anchorMax;
         rect.offsetMin = offsetMin;
         rect.offsetMax = offsetMax;
+    }
+
+    public static void EnsureSafeAreaIfNeeded(RectTransform rect)
+    {
+        if (rect == null || HasSafeAreaInParents(rect.transform))
+            return;
+
+        if (rect.GetComponent<SafeAreaFitter>() == null)
+            rect.gameObject.AddComponent<SafeAreaFitter>();
+    }
+
+    public static bool HasSafeAreaInParents(Transform transform)
+    {
+        Transform current = transform != null ? transform.parent : null;
+        while (current != null)
+        {
+            if (current.GetComponent<SafeAreaFitter>() != null)
+                return true;
+
+            current = current.parent;
+        }
+
+        return false;
     }
 
     public static void SetButtonText(Button button, string label)

@@ -84,7 +84,6 @@ public class OperacionesEncadenadasGame : BaseGame
 
         if (ui == null)
         {
-            Debug.LogError("UICalculadora es NULL");
             yield break;
         }
 

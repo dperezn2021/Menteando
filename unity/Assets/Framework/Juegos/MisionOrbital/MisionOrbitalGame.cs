@@ -411,8 +411,6 @@ public class MisionOrbitalGame : BaseGame
         m.flexibilidadCognitiva = Mathf.Clamp((precision * 0.4f + adaptacionDireccion * 0.4f + rachaBonus * 0.2f) * factorNivel, 0.15f, 0.9f);
         m.planificacion = Mathf.Clamp((precision * 0.5f + consistencia * 0.3f + rachaBonus * 0.2f) * factorNivel, 0.1f, 0.85f);
 
-        Debug.Log($"📊 Misión Orbital - Aciertos:{aciertos}/{totalIntentos} ({precision:P1}) | RT medio:{rtMedio:F2}s | Nivel:{maxLevelReached} | Racha:{mejorRacha}");
-        Debug.Log($"📊 Métricas - Vel:{m.velocidadCognitiva:F2} Coord:{m.coordinacionVisomotora:F2} Flex:{m.flexibilidadCognitiva:F2} Plan:{m.planificacion:F2}");
 
         return m;
     }
@@ -444,6 +442,5 @@ public class MisionOrbitalGame : BaseGame
         CognitiveMetrics p = AplicarPesos(m);
 
         WebExporter.EnviarSesion(nombre, p);
-        Debug.Log($"📤 Resultados enviados - Velocidad: {p.velocidadCognitiva:F2}, Coordinación: {p.coordinacionVisomotora:F2}, Flexibilidad: {p.flexibilidadCognitiva:F2}, Planificación: {p.planificacion:F2}");
     }
 }
