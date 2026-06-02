@@ -15,6 +15,25 @@ function getSkillToneClasses(skillSlug) {
     return badgeMap[accent] || badgeMap.blue;
 }
 
+function iniciarCoachDetalle(contexto, datos) {
+    if (typeof window.initDetalleCoach === "function") {
+        window.initDetalleCoach(contexto, datos);
+        return;
+    }
+
+    const existing = document.querySelector('script[data-coach-detail-loader="true"]');
+    if (existing) {
+        existing.addEventListener("load", () => window.initDetalleCoach?.(contexto, datos), { once: true });
+        return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "/js/detalleCoach.js";
+    script.dataset.coachDetailLoader = "true";
+    script.onload = () => window.initDetalleCoach?.(contexto, datos);
+    document.head.appendChild(script);
+}
+
 function renderGameDetailPage(gameId) {
     const juego = window.getJuegoById?.(gameId);
     const content = document.getElementById("game-detail-content");
@@ -110,10 +129,10 @@ function renderGameDetailPage(gameId) {
         <!-- ============================================================ -->
         <!-- 2. CÓMO SE JUEGA + JUEGO (2 columnas en desktop)            -->
         <!-- ============================================================ -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             
             <!-- Cómo se juega -->
-            <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-6 lg:p-8">
+            <div class="rounded-3xl border lg:col-span-1 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-6 lg:p-8">
                 <div class="flex items-center gap-3 mb-5">
                     <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -124,17 +143,20 @@ function renderGameDetailPage(gameId) {
             </div>
 
             <!-- Juego (iframe) -->
-            <article class="flex flex-col h-full rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
-                <div class="relative flex-1 aspect-video bg-slate-950">
+            <article class="flex flex-col h-full lg:col-span-2 rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
+                <div class="sticky flex-1 aspect-video bg-slate-950">
                     <iframe 
                         id="game-iframe" 
                         src="${juego.buildUrl.split("/").pop()}" 
                         title="Juego ${juego.nombre}" 
                         class="absolute inset-0 w-full h-full border-0" 
+                        allow="fullscreen; screen-orientation"
                         allowfullscreen
                         referrerpolicy="no-referrer"
                         loading="eager">
                     </iframe>
+                    
+
                 </div>
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
                     <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
@@ -238,11 +260,11 @@ function renderGameDetailPage(gameId) {
     }
 
     // Iniciar pantalla completa
-    iniciarPantallaCompleta(content);
+    iniciarPantallaCompleta(content, juego);
 }
 
 
-function iniciarPantallaCompleta(content) {
+function iniciarPantallaCompleta(content, juego = {}) {
     const fullscreenBtn = document.getElementById("fullscreen-btn");
     const iframe = document.getElementById("game-iframe");
 
@@ -260,10 +282,52 @@ function iniciarPantallaCompleta(content) {
     let originalParent = null;
     let originalNextSibling = null;
     let usingOverlayFallback = false;
+    let orientationLockedByPage = false;
+    const requiresLandscapeFullscreen = juego.fullscreenOrientation === "landscape";
+
+    function isMobileLikeViewport() {
+        return window.matchMedia("(hover: none) and (pointer: coarse)").matches
+            || window.matchMedia("(max-width: 900px)").matches;
+    }
+
+    function isPortraitViewport() {
+        return window.innerHeight > window.innerWidth;
+    }
+
+    function shouldRotateLandscapeFallback() {
+        return requiresLandscapeFullscreen && isMobileLikeViewport() && isPortraitViewport();
+    }
+
+    async function lockLandscapeOrientation() {
+        if (!requiresLandscapeFullscreen || !isMobileLikeViewport()) return;
+
+        try {
+            if (screen.orientation?.lock) {
+                await screen.orientation.lock("landscape");
+                orientationLockedByPage = true;
+            }
+        } catch (err) {
+            orientationLockedByPage = false;
+        }
+    }
+
+    function unlockLandscapeOrientation() {
+        if (!orientationLockedByPage) return;
+
+        try {
+            if (screen.orientation?.unlock) {
+                screen.orientation.unlock();
+            }
+        } catch (err) { }
+
+        orientationLockedByPage = false;
+    }
 
     // Función para restaurar todo al estado original
     function restoreOriginalState() {
         const container = iframe.parentElement;
+
+        unlockLandscapeOrientation();
 
         // Si usamos overlay fallback, NO movimos el contenedor — solo restauramos estilos y quitamos el backdrop
         if (usingOverlayFallback && overlayEl) {
@@ -274,6 +338,8 @@ function iniciarPantallaCompleta(content) {
             container.style.height = originalContainerStyles.height || "";
             container.style.zIndex = originalContainerStyles.zIndex || "";
             container.style.borderRadius = originalContainerStyles.borderRadius || "";
+            container.style.transform = originalContainerStyles.transform || "";
+            container.style.transformOrigin = originalContainerStyles.transformOrigin || "";
 
             iframe.style.width = originalIframeStyles.width || "";
             iframe.style.height = originalIframeStyles.height || "";
@@ -290,6 +356,8 @@ function iniciarPantallaCompleta(content) {
             container.style.height = originalContainerStyles.height || "";
             container.style.zIndex = originalContainerStyles.zIndex || "";
             container.style.borderRadius = originalContainerStyles.borderRadius || "";
+            container.style.transform = originalContainerStyles.transform || "";
+            container.style.transformOrigin = originalContainerStyles.transformOrigin || "";
 
             // Restaurar estilos del iframe
             iframe.style.width = originalIframeStyles.width || "";
@@ -322,7 +390,9 @@ function iniciarPantallaCompleta(content) {
             width: container.style.width,
             height: container.style.height,
             zIndex: container.style.zIndex,
-            borderRadius: container.style.borderRadius
+            borderRadius: container.style.borderRadius,
+            transform: container.style.transform,
+            transformOrigin: container.style.transformOrigin
         };
         originalParent = container.parentElement;
         originalNextSibling = container.nextElementSibling;
@@ -341,12 +411,24 @@ function iniciarPantallaCompleta(content) {
         const container = iframe.parentElement;
         // Asegurarnos que el contenedor ocupa toda la pantalla
         container.style.position = "fixed";
-        container.style.top = "0";
-        container.style.left = "0";
-        container.style.width = "100vw";
-        container.style.height = "100vh";
         container.style.zIndex = "9999";
         container.style.borderRadius = "0";
+
+        if (shouldRotateLandscapeFallback()) {
+            container.style.top = "50%";
+            container.style.left = "50%";
+            container.style.width = "100vh";
+            container.style.height = "100vw";
+            container.style.transform = "translate(-50%, -50%) rotate(90deg)";
+            container.style.transformOrigin = "center center";
+        } else {
+            container.style.top = "0";
+            container.style.left = "0";
+            container.style.width = "100vw";
+            container.style.height = "100vh";
+            container.style.transform = "";
+            container.style.transformOrigin = "";
+        }
 
         iframe.style.width = "100%";
         iframe.style.height = "100%";
@@ -463,6 +545,7 @@ function iniciarPantallaCompleta(content) {
 
             if (enteredNativeFullscreen && (document.fullscreenElement || document.webkitFullscreenElement)) {
                 usingOverlayFallback = false;
+                await lockLandscapeOrientation();
                 applyFullscreenStyles();
                 createExitButton();
             } else {
@@ -477,16 +560,7 @@ function iniciarPantallaCompleta(content) {
                     document.body.appendChild(overlayEl);
 
                     // aplicar estilos para ocupar pantalla al contenedor SIN moverlo
-                    container.style.position = 'fixed';
-                    container.style.top = '0';
-                    container.style.left = '0';
-                    container.style.width = '100vw';
-                    container.style.height = '100vh';
-                    container.style.zIndex = '9999';
-                    container.style.borderRadius = '0';
-
-                    iframe.style.width = '100%';
-                    iframe.style.height = '100%';
+                    applyFullscreenStyles();
 
                     createExitButton();
                 } catch (err) {
@@ -558,4 +632,5 @@ window.initGameDetailPage = function initGameDetailPage(gameId) {
 
     syncThemeButton();
     renderGameDetailPage(gameId);
+    iniciarCoachDetalle("juegoDetalle", { gameId });
 };

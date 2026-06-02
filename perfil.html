@@ -111,10 +111,10 @@
 
         <!-- CONTENEDOR PRINCIPAL CON DOS COLUMNAS -->
         <div class="container mx-auto px-4 lg:px-6 py-8 lg:py-12">
-            <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
+            <div class="flex flex-col xl:flex-row gap-6 xl:gap-8">
 
                 <!-- === COLUMNA IZQUIERDA: PERFIL DEL USUARIO === -->
-                <aside class="w-full lg:w-96 flex flex-col gap-6">
+                <aside class="w-full xl:w-96 flex flex-col gap-6">
 
                     <!-- TARJETA PRINCIPAL DE PERFIL -->
                     <div
@@ -196,20 +196,29 @@
                         <!-- BOTONES DE ACCIÓN -->
                         <div class="px-6 py-6 space-y-2 border-t border-slate-100 dark:border-slate-700">
                             <button id="btn-editar"
-                                class="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold transition-colors">
+                                class="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold transition-colors"><img
+                                    src="assets/icon/editar.png" alt="Icono Editar"
+                                    class="w-5 h-5 inline-block mr-2 mb-1.5">
                                 Editar Perfil
                             </button>
                             <button id="btn-correo"
-                                class="w-full py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg font-bold transition-colors">
+                                class="w-full py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg font-bold transition-colors"><img
+                                    src="assets/icon/mail.png" alt="Icono Enviar Correo"
+                                    class="w-6 h-6 inline-block mr-1 mb-1">
                                 Enviar Métricas
                             </button>
                             <div class="flex gap-2">
                                 <button id="btn-reset-perfil"
-                                    class="flex-1 py-2 bg-red-200 dark:bg-red-900/30 hover:bg-red-300 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-lg font-bold   transition-colors">
+                                    class="flex-1 py-2 bg-red-200 dark:bg-red-900/30 hover:bg-red-300 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-lg font-bold  transition-colors">
+                                    <img src="assets/icon/reset.png" alt="Icono Reset"
+                                        class="w-5 h-5 inline-block mr-1 mb-1">
                                     Reiniciar
                                 </button>
                                 <button id="btn-toggle-coach"
-                                    class="flex-3 py-2 rounded-lg font-bold text-base transition-colors">Activar Coach
+                                    class="flex-1 py-2 bg-yellow-200 dark:bg-yellow-900/30 hover:bg-yellow-300 dark:hover:bg-yellow-900/50 text-yellow-600 dark:text-yellow-400 rounded-lg font-bold  transition-colors">
+                                    <img src="assets/icon/coach2.png" alt="Icono Coach"
+                                        class="w-5 h-5 inline-block mr-1 mb-1">
+                                    Desactivar Coach
                                 </button>
                             </div>
                         </div>
@@ -244,11 +253,11 @@
                             <div>
                                 <div class="flex justify-between text-sm mb-2">
                                     <span class="font-medium text-slate-900 dark:text-white">Atención</span>
-                                    <span id="stat-attention-text" class="font-bold text-indigo-500"></span>
+                                    <span id="stat-attention-text" class="font-bold text-purple-500"></span>
                                 </div>
                                 <div class="w-full bg-blue-100 dark:bg-blue-900/30 h-2.5 rounded-full overflow-hidden">
                                     <div id="stat-attention"
-                                        class="h-full bg-indigo-500 rounded-full w-0 transition-all duration-500"></div>
+                                        class="h-full bg-purple-500 rounded-full w-0 transition-all duration-500"></div>
                                 </div>
                             </div>
 
@@ -523,7 +532,7 @@
     <!-- MODAL DE EDICIÓN DE PERFIL -->
     <div id="modal-editar" class="fixed inset-0 bg-black/50 items-center justify-center hidden z-50">
         <div class="bg-white dark:bg-slate-800 p-8 rounded-xl w-full mr-20 ml-20 max-h-md overflow-y-auto">
-            <h2 class="text-2xl font-bold mb-6 text-slate-900 dark:text-white">Editar perfil</h2>
+            <h2 class="text-2xl font-bold mb-6 text-slate-900 dark:text-white ">Editar perfil</h2>
             <form id="perfil-form" class="space-y-4">
                 <div class="flex flex-col">
                     <label for="name" class="font-medium text-slate-900 dark:text-white mb-2">Nombre</label>
@@ -604,6 +613,35 @@
         </div>
     </div>
 
+    <!-- MODAL MEDALLA DESBLOQUEADA -->
+    <div id="modal-medalla" class="fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center z-50 hidden"
+        style="display:none; align-items:center !important; justify-content:center !important;">
+
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-2xl text-center max-w-sm mx-4">
+
+            <div id="modal-medalla-icono"
+                class="w-20 h-20 mx-auto mb-4 text-5xl flex items-center justify-center bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
+                🏆
+            </div>
+
+            <h2 class="text-xl font-bold text-amber-500 dark:text-amber-400 mb-2">
+                ¡Medalla desbloqueada!
+            </h2>
+
+            <p id="modal-medalla-nombre" class="text-2xl font-extrabold text-blue-600 dark:text-blue-400">
+            </p>
+
+            <p id="modal-medalla-descripcion" class="mt-2 text-slate-600 dark:text-slate-300">
+            </p>
+
+            <button id="cerrar-modal-medalla"
+                class="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-2 rounded-lg transition-colors">
+                Continuar
+            </button>
+
+        </div>
+    </div>
+
 
 
     <!-- SCRIPTS DE COACH E INICIALIZACIÓN -->
@@ -639,6 +677,7 @@
                     enviarMetricasPorCorreo(perfil);
                 });
             }
+
         });
     </script>
 
@@ -666,6 +705,11 @@
                     'aria-label',
                     isDark ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'
                 );
+
+                const imagenCorreo = document.querySelector('#btn-correo img');
+                if (imagenCorreo) {
+                    imagenCorreo.src = isDark ? 'assets/icon/mail_dark.png' : 'assets/icon/mail.png';
+                }
             };
 
             if (themeToggleBtn) {

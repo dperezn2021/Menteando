@@ -1,7 +1,9 @@
-function CoachController(perfil) {
+function CoachController(perfil, options = {}) {
     if (isCoachDisabled()) return;
     
     this.perfil = perfil;
+    this.contextoFijo = options.contexto || null;
+    this.datosContexto = options.datos || {};
     this.entity = null;
     this.timer = null;
     this.init();
@@ -70,15 +72,27 @@ CoachController.prototype.mostrarMensajeActual = function() {
     
     this.ajustarPosicion();
     
+    if (typeof getperfil === "function") {
+        this.perfil = getperfil();
+    }
+
     const path = window.location.pathname;
-    let contexto = "inicio";
-    if (path.includes("perfil.html")) contexto = "perfil";
-    else if (path.includes("games.html")) contexto = "juegos";
-    else if (path.includes("tests.html")) contexto = "tests";
-    else if (path.includes("about.html")) contexto = "about";
+    let contexto = this.contextoFijo || "inicio";
+    if (!this.contextoFijo) {
+        if (path.includes("perfil.html")) contexto = "perfil";
+        else if (path.includes("games.html")) contexto = "juegos";
+        else if (path.includes("tests.html")) contexto = "tests";
+        else if (path.includes("about.html")) contexto = "about";
+    }
     
-    const msg = getCoachMessage(this.perfil, contexto);
+    const msg = getCoachMessage(this.perfil, contexto, null, this.datosContexto);
     if (msg) this.entity.show(msg);
+};
+
+CoachController.prototype.setContextoFijo = function(contexto, datos = {}) {
+    this.contextoFijo = contexto;
+    this.datosContexto = datos;
+    this.mostrarMensajeActual();
 };
 
 CoachController.prototype.onResultados = function(skill, diferencia, nuevaMedalla) {

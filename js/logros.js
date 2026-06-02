@@ -4,7 +4,10 @@ const ICONOS = {
     memoria: "🧠",
     control: "🛡️",
     racha: "🔥",
-    sesiones: "🏆"
+    sesiones: "🏆",
+    email: "📧",
+    puntos: "📊",
+    puntos2: "💎",
 };
 
 // Definición de medallas
@@ -28,7 +31,7 @@ const MEDALLAS = [
         nombre: "Atención de élite",
         descripcion: "Alcanza un 80% en Atención",
         categoria: "atencion",
-        color: "blue",
+        color: "purple",
         icono: ICONOS.atencion,
         completa: false,
         condicion: (perfil) => {
@@ -70,7 +73,7 @@ const MEDALLAS = [
         nombre: "Racha imparable",
         descripcion: "Mantén una racha de 7 días jugando",
         categoria: "racha",
-        color: "purple",
+        color: "orange",
         icono: ICONOS.racha,
         completa: false,
         condicion: (perfil) => {
@@ -92,11 +95,104 @@ const MEDALLAS = [
             const objetivo = 20;
             return { actual, objetivo };
         }
+    },
+    {
+        id: "envio_metricas",
+        nombre: "Conexion establecida",
+        descripcion: "Usa el boton de enviar métricas al menos una vez",
+        categoria: "experiencia",
+        color: "emerald",
+        icono: ICONOS.email,
+        completa: false,
+        condicion: (perfil) => {
+            let actual = perfil.metricasEnviadas ? 1 : 0;
+            if(perfil.correo) actual = 0.9;
+            if(perfil.metricasEnviadas && perfil.correo) actual = 1;
+            const objetivo = 1;
+            return { actual, objetivo };
+        }
+    },
+    {
+        id: "puntos_5000",
+        nombre: "Puntos redondos",
+        descripcion: "Alcanza 5000 puntos en el juego",
+        categoria: "puntos",
+        color: "yellow",
+        icono: ICONOS.puntos,
+        completa: false,
+        condicion: (perfil) => {
+            const actual = perfil.puntos || 0;
+            const objetivo = 5000;
+            return { actual, objetivo };
+        }
+    },
+    {
+        id: "puntos_10000",
+        nombre: "Puntos legendarios",
+        descripcion: "Alcanza 10000 puntos en el juego",
+        categoria: "puntos",
+        color: "blue",
+        icono: ICONOS.puntos2,
+        completa: false,
+        condicion: (perfil) => {
+            const actual = perfil.puntos || 0;
+            const objetivo = 10000;
+            return { actual, objetivo };
+        }
     }
 ];
 
 // key para localStorage donde guardamos las medallas completadas
 const STORAGE_KEY_MEDALLAS = "medallas_completadas";
+const colaMedallas = [];
+let modalAbierto = false;
+
+function mostrarSiguienteMedalla() {
+
+    if (modalAbierto) return;
+
+    const medalla = colaMedallas.shift();
+
+    if (!medalla) return;
+
+    modalAbierto = true;
+
+    document.getElementById("modal-medalla-icono").textContent =
+        medalla.icono;
+
+    document.getElementById("modal-medalla-nombre").textContent =
+        medalla.nombre;
+
+    document.getElementById("modal-medalla-descripcion").textContent =
+        medalla.descripcion;
+
+    const modal = document.getElementById("modal-medalla");
+
+    modal.classList.remove("hidden");
+    modal.style.display = "flex";
+}
+
+function desbloquearMedalla(medalla) {
+
+    marcarMedallaComoCompleta(medalla.id);
+
+    colaMedallas.push(medalla);
+
+    mostrarSiguienteMedalla();
+}
+
+document.getElementById("cerrar-modal-medalla")?.addEventListener("click", () => {
+
+    const modal = document.getElementById("modal-medalla");
+
+    modal.classList.add("hidden");
+    modal.style.display = "none";
+
+    modalAbierto = false;
+
+    mostrarSiguienteMedalla();
+});
+
 
 // Leer medallas completadas desde localStorage (devuelve Set de ids)
 function obtenerMedallasCompletadasGuardadas() {
@@ -141,9 +237,9 @@ function obtenerEstadoMedallas(perfil) {
 
         // Si se cumple ahora y no estaba guardada, guardamos para persistirla
         if (cumpleAhora && !guardadas.has(medalla.id)) {
-            marcarMedallaComoCompleta(medalla.id);
+            desbloquearMedalla(medalla);
         }
-
+        
         const progreso = completada ? 100 : (objetivo ? (actual / objetivo) * 100 : 0);
 
         return {
@@ -167,6 +263,28 @@ function obtenerMisionActual(perfil) {
     return noCompletadas[0];
 }
 
+function mostrarModalMedalla(medalla) {
+    const modal = document.getElementById("modal-medalla");
+
+    document.getElementById("modal-medalla-icono").textContent =
+        medalla.icono;
+
+    document.getElementById("modal-medalla-nombre").textContent =
+        medalla.nombre;
+
+    document.getElementById("modal-medalla-descripcion").textContent =
+        medalla.descripcion;
+
+    modal.classList.remove("hidden");
+    modal.style.display = "flex";
+}
+
+document.getElementById("cerrar-modal-medalla")?.addEventListener("click", () => {
+    const modal = document.getElementById("modal-medalla");
+    modal.classList.add("hidden");
+    modal.style.display = "none";
+});
+
 
 
 // Renderizar la tarjeta de misión actual (en el elemento con id "mision-actual")
@@ -180,14 +298,31 @@ function renderizarMisionActual() {
 
     if (!mision) {
         contenedor.innerHTML = `
-            <div class="bg-gradient-to-r from-green-100 to-slate-50 my-8 dark:from-green-900/30 dark:to-slate-900 p-6 rounded-2xl outline outline-1 outline-green-500 dark:outline-green-700">
-                <h3 class="text-sm font-bold uppercase tracking-wide text-green-600 dark:text-green-400">¡Misiones completadas!</h3>
-                <p class="mt-3 text-base font-bold text-slate-900 dark:text-white">Eres un campeón</p>
-                <p class="text-xs text-green-600 dark:text-green-400 mt-1">Has superado todos los desafíos. ¡Sigue entrenando!</p>
-                <div class="w-full h-2 bg-green-200 dark:bg-green-800 rounded-full mt-4">
-                    <div class="w-full h-full bg-green-500 rounded-full"></div>
+            <div class="bg-gradient-to-r from-yellow-200 to-yellow-400 
+                        dark:from-yellow-700 dark:to-yellow-900
+                        my-8 p-6 rounded-2xl outline outline-1 
+                        outline-yellow-400 shadow-lg shadow-yellow-500/20">
+
+                <h3 class="text-sm font-bold uppercase tracking-wide 
+                           text-yellow-900 dark:text-yellow-100">
+                    ¡Maestría completa!
+                </h3>
+
+                <p class="mt-3 text-base font-bold text-yellow-900 dark:text-white">
+                    Has completado todas las misiones
+                </p>
+
+                <p class="text-xs text-yellow-800 dark:text-yellow-200 mt-1">
+                    Dominio total alcanzado. Sigue mejorando tus habilidades.
+                </p>
+
+                <div class="w-full h-2 bg-yellow-300 dark:bg-yellow-800 rounded-full mt-4">
+                    <div class="w-full h-full bg-yellow-500 rounded-full"></div>
                 </div>
-                <div class="text-right text-[10px] text-green-600 dark:text-green-400 mt-2">100%</div>
+
+                <div class="text-right text-[10px] text-yellow-800 dark:text-yellow-200 mt-2">
+                    100%
+                </div>
             </div>
         `;
         return;
@@ -216,37 +351,94 @@ function renderizarMedallas() {
 
     const perfil = getperfil();
     const medallas = obtenerEstadoMedallas(perfil);
+
     const completadas = medallas.filter(m => m.completada);
     const total = medallas.length;
+    const todoCompletado = completadas.length === total;
 
     const contadorSpan = document.getElementById("medallas-contador");
     if (contadorSpan) {
         contadorSpan.textContent = `${completadas.length}/${total}`;
     }
 
+    const colorMap = {
+        red: "border-red-500 bg-red-50 dark:bg-red-900/20",
+        blue: "border-blue-500 bg-blue-50 dark:bg-blue-900/20",
+        green: "border-green-500 bg-green-50 dark:bg-green-900/20",
+        amber: "border-amber-500 bg-amber-50 dark:bg-amber-900/20",
+        purple: "border-purple-500 bg-purple-50 dark:bg-purple-900/20",
+        cyan: "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20",
+        emerald: "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20",
+        yellow: "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20",
+        orange: "border-orange-500 bg-orange-50 dark:bg-orange-900/20",
+
+        // 🔥 GOLD MODE
+        gold: "border-yellow-300 bg-gradient-to-br from-yellow-200 to-yellow-400 dark:from-yellow-600 dark:to-yellow-800 shadow-yellow-500/30"
+    };
+
     contenedor.innerHTML = medallas.map(medalla => {
         const completada = medalla.completada;
-        const colorMap = {
-            red: "border-red-500 bg-red-50 dark:bg-red-900/20",
-            blue: "border-blue-500 bg-blue-50 dark:bg-blue-900/20",
-            green: "border-green-500 bg-green-50 dark:bg-green-900/20",
-            amber: "border-amber-500 bg-amber-50 dark:bg-amber-900/20",
-            purple: "border-purple-500 bg-purple-50 dark:bg-purple-900/20",
-            cyan: "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20"
-        };
-        const colorClase = completada ? colorMap[medalla.color] : "border-zinc-300 bg-stone-100 dark:border-zinc-600 dark:bg-stone-800";
+
+        // color base
+        let color = medalla.color;
+
+        // si todo completado → gold global
+        if (todoCompletado) {
+            color = "gold";
+        }
+
+        // si no está completada y no es modo gold → gris
+        const colorClase = (completada || todoCompletado)
+            ? colorMap[color]
+            : "border-zinc-300 bg-stone-100 dark:border-zinc-600 dark:bg-stone-800";
 
         return `
             <div class="flex flex-col items-center justify-center w-24 gap-2 text-center">
-                <div class="w-16 h-16 ${colorClase} rounded-full border-4 flex items-center justify-center transition-all duration-200 ${completada ? 'shadow-md' : 'opacity-50'}">
-                    <div class="text-3xl ${completada ? 'shadow-md' : 'opacity-0'}">${medalla.icono}</div>
+
+                <div class="w-16 h-16 ${colorClase} rounded-full border-4 
+                            flex items-center justify-center transition-all duration-200
+                            ${completada || todoCompletado ? 'shadow-md' : 'opacity-50'}">
+
+                    <div class="text-3xl ${completada || todoCompletado ? '' : 'opacity-0'}">
+                        ${medalla.icono}
+                    </div>
+
                 </div>
-                <p class="text-xs font-semibold uppercase text-center tracking-wide text-${medalla.color}-500 dark:text-${medalla.color}-600">${medalla.nombre}</p>
+
+                <p class="text-xs font-semibold uppercase text-center tracking-wide 
+                          text-${todoCompletado ? 'yellow' : medalla.color}-500 
+                          dark:text-${todoCompletado ? 'yellow' : medalla.color}-600">
+
+                    ${medalla.nombre}
+                </p>
+
             </div>
         `;
     }).join("");
-}
 
+    // ===============================
+    // BLOQUE "TODAS COMPLETADAS"
+    // ===============================
+    if (todoCompletado) {
+        contenedor.innerHTML += `
+            <div class="mt-6 border-2 border-yellow-400 p-4 rounded-xl 
+                        bg-gradient-to-r from-yellow-100 to-yellow-300 
+                        dark:from-yellow-900 dark:to-yellow-700 
+                        flex flex-col items-center justify-center w-full gap-4 text-center shadow-lg">
+
+                <p class="text-lg font-bold text-yellow-900 dark:text-yellow-100">
+                    🏆 ¡Maestro absoluto!
+                </p>
+
+                <p class="text-md text-yellow-800 dark:text-yellow-200">
+                    Has desbloqueado todas las medallas.
+                </p>
+
+            </div>
+        `;
+        return;
+    }
+}
 // Función para actualizar toda la UI de misiones y medallas
 function actualizarLogrosYMedallas() {
     renderizarMedallas();

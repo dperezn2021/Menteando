@@ -214,7 +214,7 @@ function generarTarjeta(test) {
 
     const coloresCategoria = {
         memoria: { fondo: "bg-emerald-400/20", icono: "text-emerald-500 dark:text-emerald-400" },
-        atencion: { fondo: "bg-indigo-400/20", icono: "text-indigo-500 dark:text-indigo-400" },
+        atencion: { fondo: "bg-purple-400/20", icono: "text-purple-500 dark:text-purple-400" },
         control: { fondo: "bg-amber-400/20", icono: "text-amber-500 dark:text-amber-400" },
         reflejos: { fondo: "bg-red-400/20", icono: "text-red-500 dark:text-red-400" }
     };

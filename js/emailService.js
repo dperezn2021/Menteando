@@ -98,6 +98,8 @@ function initEmailJS() {
 
 // ========== 1. ENVIAR MÉTRICAS DEL PERFIL ==========
 function enviarMetricasPorCorreo(perfil) {
+    
+
     if (!perfil.correo) {
         mostrarModal("No tienes un correo registrado. Edita tu perfil y añade un correo electrónico.", "info");
         return;
@@ -135,11 +137,16 @@ function enviarMetricasPorCorreo(perfil) {
     emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templates.metricas, data)
         .then(() => {
             mostrarModal("📊 Tus métricas han sido enviadas correctamente.", "success");
+            perfil.metricasEnviadas = true; // Marcar que se han enviado las métricas
+            saveperfil(perfil); // Guardar el perfil actualizado
         })
         .catch(err => {
             console.error("❌ Error métricas:", err);
             mostrarModal("No se pudieron enviar las métricas. Inténtalo de nuevo más tarde.", "error");
         });
+
+        
+
 }
 
 // ========== 2. ENVIAR FORMULARIO DE CONTACTO ==========

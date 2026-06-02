@@ -14,9 +14,11 @@ const perfilBase = {
     correo: "",
     sesiones: 0,
     nivel: 0,
+    metricasEnviadas: false,
     avatar: "../assets/icon/usuario.webp",
     ultimaSesion: null,
     ultimaSesionDia: null,
+    ultimoDiaJugado: null,
     sesionesDiarias: [0, 0, 0, 0, 0, 0, 0],
     juegos: {},
     juegoMasJugado: "Cargando...",
@@ -78,15 +80,17 @@ function resetperfil() {
     perfilLimpio.memoria = 0;
     perfilLimpio.control = 0;
     perfilLimpio.reflejos = 0;
+    perfilLimpio.metricasEnviadas = false;
     perfilLimpio.detalle = JSON.parse(JSON.stringify(perfilBase.detalle));
     perfilLimpio.sesionesDiarias = [0, 0, 0, 0, 0, 0, 0];
     perfilLimpio.ultimaSesionDia = null;
+    perfilLimpio.ultimoDiaJugado = null;
     perfilLimpio.rachaMaxima = 0;
     perfilLimpio.nuevaRachaMaxima = false;
 
     saveperfil(perfilLimpio);
     localStorage.removeItem("medallas_completadas");
-    localStorage.removeItem("ultimo_dia_jugado"); // ✅ Limpiar también esto
+    localStorage.removeItem("ultimo_dia_jugado");
     location.reload();
 }
 // === RECALCULAR PERFIL GLOBAL ===
@@ -167,34 +171,254 @@ function getTiempo(perfil) {
 }
 
 // ========== ACTUALIZAR RACHA POR SESIÓN COMPLETADA ==========
-function actualizarRachaPorSesionCompletada(perfil) {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+const MS_DIA = 86400000;
 
-    const ultimoDiaJugadoStr = localStorage.getItem("ultimo_dia_jugado");
+function getFechaLocalKey(fecha = new Date()) {
+    const year = fecha.getFullYear();
+    const month = String(fecha.getMonth() + 1).padStart(2, "0");
+    const day = String(fecha.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function getFechaDesdeLocalKey(fechaKey) {
+    if (!fechaKey || typeof fechaKey !== "string") return null;
+
+    const match = fechaKey.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) return null;
+
+    const [, year, month, day] = match.map(Number);
+    return new Date(year, month - 1, day);
+}
+
+function normalizarFechaLocalKey(valor) {
+    if (!valor || typeof valor !== "string") return null;
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+        return valor;
+    }
+
+    const fecha = new Date(valor);
+    if (Number.isNaN(fecha.getTime())) return null;
+
+    return getFechaLocalKey(fecha);
+}
+
+function getFechaDiaMesKey(valor) {
+    if (!valor || typeof valor !== "string") return null;
+
+    const partes = valor.split("/").map(Number);
+    if (partes.length < 2 || partes.some(Number.isNaN)) return null;
+
+    const hoy = new Date();
+    const fecha = new Date(hoy.getFullYear(), partes[1] - 1, partes[0]);
+    fecha.setHours(0, 0, 0, 0);
+
+    const manana = new Date(hoy);
+    manana.setHours(0, 0, 0, 0);
+    manana.setDate(manana.getDate() + 1);
+
+    if (fecha >= manana) {
+        fecha.setFullYear(fecha.getFullYear() - 1);
+    }
+
+    return getFechaLocalKey(fecha);
+}
+
+function calcularDiferenciaDias(fechaKeyNueva, fechaKeyAnterior) {
+    const fechaNueva = getFechaDesdeLocalKey(fechaKeyNueva);
+    const fechaAnterior = getFechaDesdeLocalKey(fechaKeyAnterior);
+
+    if (!fechaNueva || !fechaAnterior) return null;
+
+    return Math.floor((fechaNueva - fechaAnterior) / MS_DIA);
+}
+
+function asegurarSesionesDiarias(perfil) {
+    if (!Array.isArray(perfil.sesionesDiarias)) {
+        perfil.sesionesDiarias = [0, 0, 0, 0, 0, 0, 0];
+        return;
+    }
+
+    perfil.sesionesDiarias = perfil.sesionesDiarias
+        .slice(-7)
+        .map(valor => Math.max(0, Number(valor) || 0));
+
+    while (perfil.sesionesDiarias.length < 7) {
+        perfil.sesionesDiarias.unshift(0);
+    }
+}
+
+function contarSesionesDiariasDesdeHistorial(perfil, hoyKey = getFechaLocalKey()) {
+    const conteos = [0, 0, 0, 0, 0, 0, 0];
+    let total = 0;
+    const juegos = perfil.juegos || {};
+
+    Object.values(juegos).forEach(sesiones => {
+        if (!Array.isArray(sesiones)) return;
+
+        sesiones.forEach(sesion => {
+            const diaSesion = normalizarFechaLocalKey(sesion?.timestamp);
+            if (!diaSesion) return;
+
+            total += 1;
+            const diffDias = calcularDiferenciaDias(hoyKey, diaSesion);
+
+            if (diffDias !== null && diffDias >= 0 && diffDias < 7) {
+                conteos[6 - diffDias] += 1;
+            }
+        });
+    });
+
+    return { conteos, total };
+}
+
+function sumarDiasAFechaKey(fechaKey, dias) {
+    const fecha = getFechaDesdeLocalKey(fechaKey);
+    if (!fecha) return null;
+
+    fecha.setDate(fecha.getDate() + dias);
+    return getFechaLocalKey(fecha);
+}
+
+function getDiasJugadosDesdeHistorial(perfil) {
+    const dias = new Set();
+    let total = 0;
+    const juegos = perfil.juegos || {};
+
+    Object.values(juegos).forEach(sesiones => {
+        if (!Array.isArray(sesiones)) return;
+
+        sesiones.forEach(sesion => {
+            const diaSesion = normalizarFechaLocalKey(sesion?.timestamp);
+            if (!diaSesion) return;
+
+            total += 1;
+            dias.add(diaSesion);
+        });
+    });
+
+    return { dias, total };
+}
+
+function calcularRachaActualDesdeDias(dias, hoyKey = getFechaLocalKey()) {
+    let cursor = dias.has(hoyKey) ? hoyKey : sumarDiasAFechaKey(hoyKey, -1);
+    let racha = 0;
+
+    while (cursor && dias.has(cursor)) {
+        racha += 1;
+        cursor = sumarDiasAFechaKey(cursor, -1);
+    }
+
+    return racha;
+}
+
+function calcularRachaMaximaDesdeDias(dias) {
+    let rachaMaxima = 0;
+    let rachaActual = 0;
+    let diaAnterior = null;
+
+    [...dias].sort().forEach(dia => {
+        const diferencia = diaAnterior ? calcularDiferenciaDias(dia, diaAnterior) : null;
+        rachaActual = diferencia === 1 ? rachaActual + 1 : 1;
+        rachaMaxima = Math.max(rachaMaxima, rachaActual);
+        diaAnterior = dia;
+    });
+
+    return rachaMaxima;
+}
+
+function getUltimoDiaDesdeDias(dias) {
+    const ordenados = [...dias].sort();
+    return ordenados.length ? ordenados[ordenados.length - 1] : null;
+}
+
+function getUltimoDiaJugado(perfil) {
+    const desdePerfil = normalizarFechaLocalKey(perfil.ultimoDiaJugado);
+    if (desdePerfil) {
+        perfil.ultimoDiaJugado = desdePerfil;
+        localStorage.setItem("ultimo_dia_jugado", desdePerfil);
+        return desdePerfil;
+    }
+
+    const desdeStorage = normalizarFechaLocalKey(localStorage.getItem("ultimo_dia_jugado"));
+    if (desdeStorage) {
+        perfil.ultimoDiaJugado = desdeStorage;
+        localStorage.setItem("ultimo_dia_jugado", desdeStorage);
+        return desdeStorage;
+    }
+
+    const desdeUltimaSesion = normalizarFechaLocalKey(perfil.ultimaSesion);
+    if (desdeUltimaSesion) {
+        perfil.ultimoDiaJugado = desdeUltimaSesion;
+        localStorage.setItem("ultimo_dia_jugado", desdeUltimaSesion);
+        return desdeUltimaSesion;
+    }
+
+    return null;
+}
+
+function normalizarRachaActual(perfil) {
+    const ultimoDiaJugado = getUltimoDiaJugado(perfil);
+    if (!ultimoDiaJugado) {
+        perfil.racha = 0;
+        return perfil;
+    }
+
+    const diferenciaDias = calcularDiferenciaDias(getFechaLocalKey(), ultimoDiaJugado);
+
+    if (diferenciaDias !== null && diferenciaDias > 1) {
+        perfil.racha = 0;
+    }
+
+    return perfil;
+}
+
+function sincronizarRachasDesdeHistorial(perfil) {
+    const historial = getDiasJugadosDesdeHistorial(perfil);
+    const sesionesTotales = Number(perfil.sesiones) || 0;
+
+    if (!historial.total || historial.total < sesionesTotales) {
+        return normalizarRachaActual(perfil);
+    }
+
+    const rachaMaximaAnterior = Number(perfil.rachaMaxima) || 0;
+    const rachaMaximaHistorial = calcularRachaMaximaDesdeDias(historial.dias);
+    const ultimoDiaJugado = getUltimoDiaDesdeDias(historial.dias);
+
+    perfil.racha = calcularRachaActualDesdeDias(historial.dias);
+    perfil.rachaMaxima = rachaMaximaHistorial;
+
+    if (ultimoDiaJugado) {
+        perfil.ultimoDiaJugado = ultimoDiaJugado;
+        localStorage.setItem("ultimo_dia_jugado", ultimoDiaJugado);
+    }
+
+    if (rachaMaximaHistorial > rachaMaximaAnterior) {
+        perfil.nuevaRachaMaxima = true;
+    } else if (rachaMaximaHistorial < rachaMaximaAnterior && perfil.nuevaRachaMaxima) {
+        perfil.nuevaRachaMaxima = false;
+    }
+
+    return perfil;
+}
+
+function actualizarRachaPorSesionCompletada(perfil) {
+    const hoyKey = getFechaLocalKey();
+    const ultimoDiaJugado = getUltimoDiaJugado(perfil);
 
     let nuevaRacha = 1;
 
-    if (ultimoDiaJugadoStr) {
-        const ultimoDia = new Date(ultimoDiaJugadoStr);
-        ultimoDia.setHours(0, 0, 0, 0);
-
-        const diferenciaDias = Math.floor((hoy - ultimoDia) / 86400000);
-
-        console.log(`📅 Diferencia de días: ${diferenciaDias} | Último día: ${ultimoDia.toLocaleDateString()} | Hoy: ${hoy.toLocaleDateString()}`);
+    if (ultimoDiaJugado) {
+        const diferenciaDias = calcularDiferenciaDias(hoyKey, ultimoDiaJugado);
 
         if (diferenciaDias === 0) {
-            // Same day: keep existing racha (user may have multiple sessions today)
-            nuevaRacha = perfil.racha || 1;
+            nuevaRacha = Math.max(1, Number(perfil.racha) || 1);
         } else if (diferenciaDias === 1) {
-            // Played yesterday: increment racha
-            nuevaRacha = (perfil.racha || 0) + 1;
-        } else if (diferenciaDias > 1) {
-            // Missed yesterday (or more): reset racha to 0 as requested
-            nuevaRacha = 0;
-        } else {
-            // Fallback: start at 1
+            nuevaRacha = (Number(perfil.racha) || 0) + 1;
+        } else if (diferenciaDias !== null && diferenciaDias > 1) {
             nuevaRacha = 1;
+        } else {
+            nuevaRacha = Math.max(1, Number(perfil.racha) || 1);
         }
     }
 
@@ -207,10 +431,10 @@ function actualizarRachaPorSesionCompletada(perfil) {
 
 
 
-    // Guardar el día actual
-    localStorage.setItem("ultimo_dia_jugado", hoy.toISOString());
+    perfil.ultimoDiaJugado = hoyKey;
+    localStorage.setItem("ultimo_dia_jugado", hoyKey);
 
-    console.log(`🔥 Racha actualizada: ${nuevaRacha} días | Máxima: ${perfil.rachaMaxima}`);
+    console.log(`Racha actualizada: ${nuevaRacha} días | Máxima: ${perfil.rachaMaxima}`);
 
     return perfil;
 }
@@ -258,59 +482,40 @@ function getUltimasSesiones(perfil, limite = 3) {
 }
 // ========== SESIONES DIARIAS ==========
 function sincronizarSesionesDiarias(perfil) {
-    const hoy = new Date();
-    const hoyStr = hoy.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
+    asegurarSesionesDiarias(perfil);
 
-    // Inicializar si es la primera vez
-    if (!perfil.sesionesDiarias || !perfil.ultimaSesionDia) {
-        perfil.sesionesDiarias = [0, 0, 0, 0, 0, 0, 0];
-        perfil.sesionesDiarias[6] = 1; // Hoy = 1 sesión
-        perfil.ultimaSesionDia = hoyStr;
-        perfil.racha = 1;
-        if (!perfil.rachaMaxima) perfil.rachaMaxima = 1;
-        saveperfil(perfil);
-        return;
+    const hoyKey = getFechaLocalKey();
+    const historial = contarSesionesDiariasDesdeHistorial(perfil, hoyKey);
+
+    if (historial.total > 0 || Number(perfil.sesiones || 0) === 0) {
+        perfil.sesionesDiarias = historial.conteos;
+        perfil.ultimaSesionDia = hoyKey;
+        sincronizarRachasDesdeHistorial(perfil);
+        return perfil;
     }
 
-    // Si ya registró hoy, simplemente salir (ya se contó la sesión al inicio del día)
-    if (perfil.ultimaSesionDia === hoyStr) return;
+    const ultimaSesionDiaKey = normalizarFechaLocalKey(perfil.ultimaSesionDia) || getFechaDiaMesKey(perfil.ultimaSesionDia);
 
-    // Calcular días transcurridos desde la última sesión
-    const [d1, m1] = perfil.ultimaSesionDia.split('/').map(Number);
-    const fechaUltima = new Date(hoy.getFullYear(), m1 - 1, d1);
-    const diffDias = Math.floor((hoy - fechaUltima) / 86400000);
-
-    if (diffDias <= 0) return;
-
-    // Desplazar el array: eliminar días viejos, añadir ceros por días sin jugar
-    const diasDesplazar = Math.min(diffDias, 7);
-    for (let i = 0; i < diasDesplazar; i++) {
-        perfil.sesionesDiarias.shift();
-        perfil.sesionesDiarias.push(0);
+    if (!ultimaSesionDiaKey) {
+        perfil.ultimaSesionDia = hoyKey;
+        sincronizarRachasDesdeHistorial(perfil);
+        return perfil;
     }
 
-    // Registrar 1 sesión hoy (no acumular)
-    perfil.sesionesDiarias[6] = 1;
-    perfil.ultimaSesionDia = hoyStr;
+    const diffDias = calcularDiferenciaDias(hoyKey, ultimaSesionDiaKey);
 
-    // Calcular racha actual
-    let racha = 0;
-    for (let i = 6; i >= 0; i--) {
-        if (perfil.sesionesDiarias[i] > 0) {
-            racha++;
-        } else {
-            break;
+    if (diffDias !== null && diffDias > 0) {
+        const diasDesplazar = Math.min(diffDias, 7);
+        for (let i = 0; i < diasDesplazar; i++) {
+            perfil.sesionesDiarias.shift();
+            perfil.sesionesDiarias.push(0);
         }
     }
-    perfil.racha = racha;
 
-    // Máxima racha histórica
-    if (racha > (perfil.rachaMaxima || 0)) {
-        perfil.rachaMaxima = racha;
-        perfil.nuevaRachaMaxima = true;
-    }
+    perfil.ultimaSesionDia = hoyKey;
+    sincronizarRachasDesdeHistorial(perfil);
 
-    saveperfil(perfil);
+    return perfil;
 }
 
 
@@ -320,8 +525,19 @@ function getDiasJugadosSemana(perfil) {
 }
 
 function actualizarSesionesDiarias(perfil) {
-    sincronizarSesionesDiarias(perfil);
+    const hoyKey = getFechaLocalKey();
+    const historial = contarSesionesDiariasDesdeHistorial(perfil, hoyKey);
+
+    if (historial.total > 0 || Number(perfil.sesiones || 0) <= 1) {
+        perfil.sesionesDiarias = historial.conteos;
+        perfil.ultimaSesionDia = hoyKey;
+        normalizarRachaActual(perfil);
+    } else {
+        sincronizarSesionesDiarias(perfil);
+    }
+
     perfil.sesionesDiarias[6] += 1;
+    perfil.ultimaSesionDia = hoyKey;
     saveperfil(perfil);
     return perfil;
 }
@@ -442,11 +658,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnToggleCoach = document.getElementById("btn-toggle-coach");
     if (btnToggleCoach) {
         if (isCoachDisabled()) {
-            btnToggleCoach.textContent = "Activar Coach";
+            btnToggleCoach.innerHTML = '<img src="assets/icon/coach.png" alt="Icono Coach" class="w-5 h-5 inline-block mr-1 mb-1"> Activar Coach';
             btnToggleCoach.className = "flex-1 py-2 rounded-lg font-bold text-base transition-colors bg-green-200 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-300 dark:hover:bg-green-900/50";
         } else {
-            btnToggleCoach.textContent = "Desactivar Coach";
-            btnToggleCoach.className = "flex-1 py-2 rounded-lg font-bold text-base transition-colors bg-yellow-200 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-300 dark:hover:bg-yellow-900/50";
+            btnToggleCoach.innerHTML = '<img src="assets/icon/coach2.png" alt="Icono Coach" class="w-5 h-5 inline-block mr-1 mb-1">Desactivar Coach';
+            btnToggleCoach.className = "flex-1 py-2  rounded-lg font-bold text-base transition-colors bg-yellow-200 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-300 dark:hover:bg-yellow-900/50";
         }
 
         btnToggleCoach.addEventListener("click", () => {
