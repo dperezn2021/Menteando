@@ -278,24 +278,88 @@ function iniciarPantallaCompleta(content, juego = {}) {
     let originalIframeStyles = {};
     let originalBodyOverflow = "";
     let originalHtmlOverflow = "";
+    let originalBodyOverscroll = "";
+    let originalHtmlOverscroll = "";
+    let originalBodyTouchAction = "";
+    let originalHtmlTouchAction = "";
     let overlayEl = null;
     let originalParent = null;
     let originalNextSibling = null;
     let usingOverlayFallback = false;
     let orientationLockedByPage = false;
     const requiresLandscapeFullscreen = juego.fullscreenOrientation === "landscape";
+    const fullscreenQaParams = new URLSearchParams(window.location.search);
+    const localDevHost = ["localhost", "127.0.0.1", "::1", ""].includes(window.location.hostname);
+    const fullscreenQaMode = localDevHost && fullscreenQaParams.has("fullscreenQa");
+    const forceFullscreenFallback = fullscreenQaMode && fullscreenQaParams.get("forceFallback") !== "0";
 
     function isMobileLikeViewport() {
+        if (fullscreenQaMode) return true;
+
         return window.matchMedia("(hover: none) and (pointer: coarse)").matches
             || window.matchMedia("(max-width: 900px)").matches;
     }
 
     function isPortraitViewport() {
+        if (fullscreenQaMode && fullscreenQaParams.get("qaPortrait") !== "0") return true;
+
         return window.innerHeight > window.innerWidth;
     }
 
     function shouldRotateLandscapeFallback() {
         return requiresLandscapeFullscreen && isMobileLikeViewport() && isPortraitViewport();
+    }
+
+    function getVisibleViewportRect() {
+        if (fullscreenQaMode) {
+            const availableWidth = Math.max(280, window.innerWidth - 32);
+            const availableHeight = Math.max(360, window.innerHeight - 32);
+            const width = Math.min(390, availableWidth);
+            const height = Math.min(760, availableHeight);
+            const left = Math.max(16, Math.round((window.innerWidth - width) / 2));
+            const top = Math.max(16, Math.round((window.innerHeight - height) / 2));
+
+            return { width, height, left, top };
+        }
+
+        const viewport = window.visualViewport;
+        const width = Math.round(viewport?.width || window.innerWidth || document.documentElement.clientWidth);
+        const height = Math.round(viewport?.height || window.innerHeight || document.documentElement.clientHeight);
+        const left = Math.round(viewport?.offsetLeft || 0);
+        const top = Math.round(viewport?.offsetTop || 0);
+
+        return { width, height, left, top };
+    }
+
+    function applyOverlayStyles(rect = getVisibleViewportRect()) {
+        if (!overlayEl) return;
+
+        overlayEl.style.position = "fixed";
+        overlayEl.style.top = `${rect.top}px`;
+        overlayEl.style.left = `${rect.left}px`;
+        overlayEl.style.width = `${rect.width}px`;
+        overlayEl.style.height = `${rect.height}px`;
+        overlayEl.style.background = "#000";
+        overlayEl.style.zIndex = "9998";
+
+        if (fullscreenQaMode) {
+            overlayEl.style.boxShadow = "0 0 0 9999px rgba(15, 23, 42, 0.65)";
+            overlayEl.style.border = "1px solid rgba(255,255,255,0.35)";
+        } else {
+            overlayEl.style.boxShadow = "";
+            overlayEl.style.border = "";
+        }
+    }
+
+    function positionExitButton() {
+        if (!exitBtn) return;
+
+        const rect = getVisibleViewportRect();
+        const buttonWidth = exitBtn.offsetWidth || 96;
+        const left = Math.max(rect.left + 8, rect.left + rect.width - buttonWidth - 16);
+        exitBtn.style.top = `calc(env(safe-area-inset-top, 0px) + ${rect.top + 16}px)`;
+        exitBtn.style.left = `calc(env(safe-area-inset-left, 0px) + ${left}px)`;
+        exitBtn.style.right = "auto";
     }
 
     async function lockLandscapeOrientation() {
@@ -367,6 +431,10 @@ function iniciarPantallaCompleta(content, juego = {}) {
         // Restaurar scroll del body
         document.body.style.overflow = originalBodyOverflow;
         document.documentElement.style.overflow = originalHtmlOverflow;
+        document.body.style.overscrollBehavior = originalBodyOverscroll;
+        document.documentElement.style.overscrollBehavior = originalHtmlOverscroll;
+        document.body.style.touchAction = originalBodyTouchAction;
+        document.documentElement.style.touchAction = originalHtmlTouchAction;
 
         // Eliminar botón flotante si existe
         if (exitBtn) {
@@ -378,6 +446,8 @@ function iniciarPantallaCompleta(content, juego = {}) {
         document.removeEventListener('keydown', onKeyDown);
         window.removeEventListener('orientationchange', onOrientationChange);
         window.removeEventListener('resize', onOrientationChange);
+        window.visualViewport?.removeEventListener('resize', onOrientationChange);
+        window.visualViewport?.removeEventListener('scroll', onOrientationChange);
     }
 
     // Función para guardar estilos originales
@@ -404,28 +474,36 @@ function iniciarPantallaCompleta(content, juego = {}) {
 
         originalBodyOverflow = document.body.style.overflow;
         originalHtmlOverflow = document.documentElement.style.overflow;
+        originalBodyOverscroll = document.body.style.overscrollBehavior;
+        originalHtmlOverscroll = document.documentElement.style.overscrollBehavior;
+        originalBodyTouchAction = document.body.style.touchAction;
+        originalHtmlTouchAction = document.documentElement.style.touchAction;
     }
 
     // Función para aplicar estilos de pantalla completa
     function applyFullscreenStyles() {
         const container = iframe.parentElement;
+        const rect = getVisibleViewportRect();
+
+        applyOverlayStyles(rect);
+
         // Asegurarnos que el contenedor ocupa toda la pantalla
         container.style.position = "fixed";
         container.style.zIndex = "9999";
         container.style.borderRadius = "0";
 
         if (shouldRotateLandscapeFallback()) {
-            container.style.top = "50%";
-            container.style.left = "50%";
-            container.style.width = "100vh";
-            container.style.height = "100vw";
+            container.style.top = `${rect.top + rect.height / 2}px`;
+            container.style.left = `${rect.left + rect.width / 2}px`;
+            container.style.width = `${rect.height}px`;
+            container.style.height = `${rect.width}px`;
             container.style.transform = "translate(-50%, -50%) rotate(90deg)";
             container.style.transformOrigin = "center center";
         } else {
-            container.style.top = "0";
-            container.style.left = "0";
-            container.style.width = "100vw";
-            container.style.height = "100vh";
+            container.style.top = `${rect.top}px`;
+            container.style.left = `${rect.left}px`;
+            container.style.width = `${rect.width}px`;
+            container.style.height = `${rect.height}px`;
             container.style.transform = "";
             container.style.transformOrigin = "";
         }
@@ -436,6 +514,12 @@ function iniciarPantallaCompleta(content, juego = {}) {
         // Ocultar scroll
         document.body.style.overflow = "hidden";
         document.documentElement.style.overflow = "hidden";
+        document.body.style.overscrollBehavior = "none";
+        document.documentElement.style.overscrollBehavior = "none";
+        document.body.style.touchAction = "none";
+        document.documentElement.style.touchAction = "none";
+
+        positionExitButton();
     }
 
     // Función para crear botón flotante de salir
@@ -446,17 +530,21 @@ function iniciarPantallaCompleta(content, juego = {}) {
         // evitar comportamiento por defecto
         try { exitBtn.setAttribute('type', 'button'); } catch (e) { }
         exitBtn.id = "exit-fullscreen-btn";
-        exitBtn.textContent = "✕ Salir";
+        exitBtn.textContent = "Salir";
+        exitBtn.setAttribute("aria-label", "Salir de pantalla completa");
         exitBtn.style.cssText = `
             position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10000;
+            top: 16px;
+            left: auto;
+            right: 16px;
+            z-index: 2147483647;
             background-color: rgba(0,0,0,0.8);
             color: white;
             border: 2px solid rgba(255,255,255,0.3);
             border-radius: 40px;
-            padding: 12px 24px;
+            min-width: 88px;
+            min-height: 48px;
+            padding: 12px 20px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
@@ -464,7 +552,12 @@ function iniciarPantallaCompleta(content, juego = {}) {
             font-family: system-ui, sans-serif;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             transition: all 0.2s ease;
-            z-index: 10001;
+            pointer-events: auto;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-appearance: none;
+            appearance: none;
+            user-select: none;
         `;
 
         exitBtn.onmouseenter = () => {
@@ -494,7 +587,10 @@ function iniciarPantallaCompleta(content, juego = {}) {
             }
         });
 
-        document.body.appendChild(exitBtn);
+        const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement;
+        const buttonHost = fullscreenElement && !usingOverlayFallback ? fullscreenElement : document.body;
+        buttonHost.appendChild(exitBtn);
+        positionExitButton();
     }
 
     // Evento para cuando se activa el fullscreen nativo del navegador
@@ -524,20 +620,22 @@ function iniciarPantallaCompleta(content, juego = {}) {
 
             // Intentar fullscreen nativo
             let enteredNativeFullscreen = false;
-            try {
-                if (container.requestFullscreen) {
-                    await container.requestFullscreen();
-                    enteredNativeFullscreen = true;
-                } else if (container.webkitRequestFullscreen) {
-                    await container.webkitRequestFullscreen();
-                    enteredNativeFullscreen = true;
-                } else if (container.msRequestFullscreen) {
-                    await container.msRequestFullscreen();
-                    enteredNativeFullscreen = true;
+            if (!forceFullscreenFallback) {
+                try {
+                    if (container.requestFullscreen) {
+                        await container.requestFullscreen();
+                        enteredNativeFullscreen = true;
+                    } else if (container.webkitRequestFullscreen) {
+                        await container.webkitRequestFullscreen();
+                        enteredNativeFullscreen = true;
+                    } else if (container.msRequestFullscreen) {
+                        await container.msRequestFullscreen();
+                        enteredNativeFullscreen = true;
+                    }
+                } catch (err) {
+                    // fallo en requestFullscreen (posible en iframes o móviles)
+                    enteredNativeFullscreen = false;
                 }
-            } catch (err) {
-                // fallo en requestFullscreen (posible en iframes o móviles)
-                enteredNativeFullscreen = false;
             }
 
             document.addEventListener("fullscreenchange", onFullscreenChange);
@@ -553,7 +651,6 @@ function iniciarPantallaCompleta(content, juego = {}) {
                 usingOverlayFallback = true;
                 overlayEl = document.createElement('div');
                 overlayEl.className = 'unity-fullscreen-overlay';
-                overlayEl.style.cssText = 'position:fixed;inset:0;background:#000;z-index:9998;';
 
                 // Append backdrop (no mover el contenedor)
                 try {
@@ -572,6 +669,8 @@ function iniciarPantallaCompleta(content, juego = {}) {
             document.addEventListener('keydown', onKeyDown);
             window.addEventListener('orientationchange', onOrientationChange);
             window.addEventListener('resize', onOrientationChange);
+            window.visualViewport?.addEventListener('resize', onOrientationChange);
+            window.visualViewport?.addEventListener('scroll', onOrientationChange);
 
         } catch (error) {
             console.error("Error al entrar en pantalla completa:", error);
