@@ -3744,8 +3744,76 @@ function enterTestFullscreen() {
         left: container.style.left || '',
         width: container.style.width || '',
         height: container.style.height || '',
-        zIndex: container.style.zIndex || ''
+        zIndex: container.style.zIndex || '',
+        bodyOverflow: document.body.style.overflow || '',
+        htmlOverflow: document.documentElement.style.overflow || '',
+        bodyOverscroll: document.body.style.overscrollBehavior || '',
+        htmlOverscroll: document.documentElement.style.overscrollBehavior || '',
+        bodyTouchAction: document.body.style.touchAction || '',
+        htmlTouchAction: document.documentElement.style.touchAction || ''
     };
+
+    function getVisibleViewportRect() {
+        const viewport = window.visualViewport;
+        const width = Math.round(viewport?.width || window.innerWidth || document.documentElement.clientWidth);
+        const height = Math.round(viewport?.height || window.innerHeight || document.documentElement.clientHeight);
+        const left = Math.round(viewport?.offsetLeft || 0);
+        const top = Math.round(viewport?.offsetTop || 0);
+
+        return { width, height, left, top };
+    }
+
+    function positionExitButton(exit) {
+        if (!exit) return;
+
+        const rect = getVisibleViewportRect();
+        const buttonWidth = exit.offsetWidth || 88;
+        const left = Math.max(rect.left + 8, rect.left + rect.width - buttonWidth - 16);
+        exit.style.top = `calc(env(safe-area-inset-top, 0px) + ${rect.top + 16}px)`;
+        exit.style.left = `calc(env(safe-area-inset-left, 0px) + ${left}px)`;
+        exit.style.right = "auto";
+    }
+
+    function aplicarViewportFullscreen() {
+        const rect = getVisibleViewportRect();
+        const overlay = document.querySelector('.test-fullscreen-overlay');
+
+        if (overlay) {
+            overlay.style.position = 'fixed';
+            overlay.style.top = `${rect.top}px`;
+            overlay.style.left = `${rect.left}px`;
+            overlay.style.width = `${rect.width}px`;
+            overlay.style.height = `${rect.height}px`;
+            overlay.style.background = '#000';
+            overlay.style.zIndex = '9998';
+        }
+
+        container.style.position = 'fixed';
+        container.style.top = `${rect.top}px`;
+        container.style.left = `${rect.left}px`;
+        container.style.width = `${rect.width}px`;
+        container.style.height = `${rect.height}px`;
+        container.style.zIndex = '9999';
+
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overscrollBehavior = 'none';
+        document.documentElement.style.overscrollBehavior = 'none';
+        document.body.style.touchAction = 'none';
+        document.documentElement.style.touchAction = 'none';
+
+        positionExitButton(document.querySelector('.test-exit-fullscreen'));
+    }
+
+    function onViewportChange() {
+        setTimeout(aplicarViewportFullscreen, 200);
+    }
+
+    function onNativeFullscreenChange() {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            restaurar();
+        }
+    }
 
     function restaurar() {
         container.style.position = orig.position;
@@ -3754,33 +3822,51 @@ function enterTestFullscreen() {
         container.style.width = orig.width;
         container.style.height = orig.height;
         container.style.zIndex = orig.zIndex;
+        document.body.style.overflow = orig.bodyOverflow;
+        document.documentElement.style.overflow = orig.htmlOverflow;
+        document.body.style.overscrollBehavior = orig.bodyOverscroll;
+        document.documentElement.style.overscrollBehavior = orig.htmlOverscroll;
+        document.body.style.touchAction = orig.bodyTouchAction;
+        document.documentElement.style.touchAction = orig.htmlTouchAction;
         document.querySelector('.test-fullscreen-overlay')?.remove();
         document.querySelector('.test-exit-fullscreen')?.remove();
+        window.removeEventListener('orientationchange', onViewportChange);
+        window.removeEventListener('resize', onViewportChange);
+        window.visualViewport?.removeEventListener('resize', onViewportChange);
+        window.visualViewport?.removeEventListener('scroll', onViewportChange);
+        document.removeEventListener('fullscreenchange', onNativeFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', onNativeFullscreenChange);
+    }
+
+    function activarSeguimientoViewport() {
+        window.addEventListener('orientationchange', onViewportChange);
+        window.addEventListener('resize', onViewportChange);
+        window.visualViewport?.addEventListener('resize', onViewportChange);
+        window.visualViewport?.addEventListener('scroll', onViewportChange);
     }
 
     function aplicarOverlay() {
         const overlay = document.createElement('div');
         overlay.className = 'test-fullscreen-overlay';
-        overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:9998;';
         document.body.appendChild(overlay);
-        container.style.position = 'fixed';
-        container.style.top = '0';
-        container.style.left = '0';
-        container.style.width = '100vw';
-        container.style.height = '100vh';
-        container.style.zIndex = '9999';
+        aplicarViewportFullscreen();
+        activarSeguimientoViewport();
     }
 
     function crearBotonSalir() {
         const exit = document.createElement('button');
-        exit.textContent = '✕ Salir';
+        exit.type = 'button';
+        exit.textContent = 'Salir';
+        exit.setAttribute('aria-label', 'Salir de pantalla completa');
         exit.className = 'test-exit-fullscreen';
         exit.style.cssText = [
-            'position:fixed', 'top:16px', 'right:16px', 'z-index:10000',
-            'padding:10px 14px', 'border-radius:999px',
+            'position:fixed', 'top:16px', 'left:auto', 'right:16px', 'z-index:2147483647',
+            'min-width:88px', 'min-height:48px', 'padding:10px 16px', 'border-radius:999px',
             'background:rgba(0,0,0,0.75)', 'color:#fff', 'border:0',
             'font-weight:700', 'cursor:pointer', 'font-size:1rem',
-            'touch-action:manipulation'
+            'touch-action:manipulation', 'pointer-events:auto',
+            '-webkit-tap-highlight-color:transparent', '-webkit-appearance:none',
+            'appearance:none', 'user-select:none'
         ].join(';');
         exit.addEventListener('click', () => {
             if (document.fullscreenElement || document.webkitFullscreenElement) {
@@ -3788,25 +3874,30 @@ function enterTestFullscreen() {
             }
             restaurar();
         });
-        document.body.appendChild(exit);
+        const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement;
+        const buttonHost = fullscreenElement || document.body;
+        buttonHost.appendChild(exit);
+        positionExitButton(exit);
     }
 
     // Intentar fullscreen nativo
     try {
         if (container.requestFullscreen) {
             container.requestFullscreen()
-                .then(crearBotonSalir)
+                .then(() => {
+                    aplicarViewportFullscreen();
+                    activarSeguimientoViewport();
+                    crearBotonSalir();
+                })
                 .catch(() => { aplicarOverlay(); crearBotonSalir(); });
-            document.addEventListener('fullscreenchange', () => {
-                if (!document.fullscreenElement) restaurar();
-            }, { once: true });
+            document.addEventListener('fullscreenchange', onNativeFullscreenChange);
             return;
         } else if (container.webkitRequestFullscreen) {
             container.webkitRequestFullscreen();
+            aplicarViewportFullscreen();
+            activarSeguimientoViewport();
             crearBotonSalir();
-            document.addEventListener('webkitfullscreenchange', () => {
-                if (!document.webkitFullscreenElement) restaurar();
-            }, { once: true });
+            document.addEventListener('webkitfullscreenchange', onNativeFullscreenChange);
             return;
         }
     } catch (e) { /* ignorar */ }

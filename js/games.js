@@ -113,6 +113,87 @@ function createEmptyState() {
 }
 
 // ======================================================
+// HERRAMIENTA QA LOCAL DE FULLSCREEN
+// ======================================================
+function escapeHtml(value = "") {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function isLocalFullscreenQaHost() {
+    return ["localhost", "127.0.0.1", "::1", "[::1]", ""].includes(window.location.hostname);
+}
+
+function getFullscreenQaGames() {
+    const catalog = typeof window.getCatalogoJuegos === "function"
+        ? window.getCatalogoJuegos()
+        : getGamesCatalog();
+
+    return catalog
+        .filter((juego) => juego.fullscreenOrientation === "landscape" && juego.url)
+        .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+}
+
+function buildFullscreenQaUrl(gameUrl) {
+    const url = new URL(gameUrl, window.location.href);
+    url.searchParams.set("fullscreenQa", "1");
+    url.searchParams.set("forceFallback", "1");
+    url.searchParams.set("qaPortrait", "1");
+    return `${url.pathname}${url.search}${url.hash}`;
+}
+
+function renderFullscreenQaPanel() {
+    if (!isLocalFullscreenQaHost()) return;
+
+    const gamesGrid = document.getElementById("games-grid");
+    if (!gamesGrid) return;
+
+    const qaGames = getFullscreenQaGames();
+    if (!qaGames.length) return;
+
+    let panel = document.getElementById("fullscreen-qa-panel");
+    if (!panel) {
+        panel = document.createElement("section");
+        panel.id = "fullscreen-qa-panel";
+        gamesGrid.parentElement.insertBefore(panel, gamesGrid);
+    }
+
+    panel.innerHTML = `
+        <div class="mb-8 rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-blue-50 dark:bg-blue-950/30 p-4 sm:p-5">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                    <p class="text-xs font-black uppercase tracking-[0.18em] text-blue-600 dark:text-blue-300">QA local</p>
+                    <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Comprobacion de pantalla completa movil</h3>
+                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Solo aparece en local. Fuerza fallback, movil vertical y juego horizontal.</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                    <select id="fullscreen-qa-game" class="w-full sm:w-72 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-900 dark:text-white">
+                        ${qaGames.map((juego) => `<option value="${escapeHtml(juego.id)}">${escapeHtml(juego.nombre)}</option>`).join("")}
+                    </select>
+                    <button id="fullscreen-qa-open" type="button" class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-black text-white hover:bg-blue-700 transition">
+                        Probar fullscreen
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const select = document.getElementById("fullscreen-qa-game");
+    const openButton = document.getElementById("fullscreen-qa-open");
+
+    openButton?.addEventListener("click", () => {
+        const selectedGame = qaGames.find((juego) => juego.id === select?.value) || qaGames[0];
+        if (selectedGame) {
+            window.location.href = buildFullscreenQaUrl(selectedGame.url);
+        }
+    });
+}
+
+// ======================================================
 // FUNCIÓN PARA DETECTAR EL TIPO DE PANTALLA
 // ======================================================
 function getLayoutByScreenSize() {
@@ -406,6 +487,8 @@ window.initGamesPage = function initGamesPage() {
 
     let expanded = false;
     let resizeTimeout = null;
+
+    renderFullscreenQaPanel();
     
     const sync = () => {
         renderGamesPage({
