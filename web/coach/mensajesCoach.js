@@ -16,19 +16,20 @@ window.CoachMessages = {
             "Hoy es un buen día para mejorar tus habilidades cognitivas."
         ],
         inicioGuiado: [
-            "Consejo rápido: entra en tu perfil desde la foto de arriba. Ahí verás sesiones, racha actual, racha máxima, nivel, medallas y tus habilidades.",
+            "Consejo rápido: entra en tu perfil desde la foto de arriba. Ahí verás sesiones, racha actual y mucho más.",
             "La racha actual sube cuando terminas tu primera sesión del día. Si pasas un día sin jugar, vuelve a cero; la racha máxima guarda tu mejor marca.",
             "Si quieres dejar una opinión o leer a otros usuarios, ve a Acerca de y baja hasta Comentarios de la comunidad.",
-            "En la ficha de cada juego tienes el botón Escribir opinión. Te lleva directo a los comentarios con la categoría Juego seleccionada.",
+            "En la ficha de cada juego tienes el botón Escribir opinión. Te lleva directo a los comentarios de la comunidad",
             "¿No sabes por dónde empezar? Mira tu perfil: tu habilidad más baja te da una pista de qué juegos conviene entrenar."
         ],
         perfil: [
-            "El perfil es tu panel de control: ahí ves sesiones, racha actual, racha máxima, nivel, medallas y habilidades.",
+            "El perfil es tu panel de control: ahí ves sesiones, rachas, medallas y habilidades.",
             "La racha actual cuenta días seguidos jugando. La racha máxima es tu mejor marca histórica, aunque la actual se reinicie.",
             "Después de jugar, vuelve al perfil para ver qué habilidad ha cambiado y qué juego te está ayudando más.",
             "En el perfil verás tus estadísticas: rachas, niveles, medallas y capacidades cognitivas.",
             "Puedes editar tu nombre y avatar desde el perfil. Pulsa el botón con forma de lápiz sobre tu foto.",
             "El perfil guarda todo tu progreso automáticamente. No necesitas preocuparte por perder nada.",
+            "Si vas a cambiar de navegador o dispositivo, no te olvides de exportar tus métricas.",
             "Consulta tu perfil regularmente para ver cómo evolucionan tus habilidades.",
             "En el perfil también puedes ver tus medallas. Son logros que consigues al alcanzar ciertos hitos."
         ],
@@ -59,7 +60,7 @@ window.CoachMessages = {
         ],
         about: [
             "En Acerca de, debajo de la información del proyecto, tienes Comentarios de la comunidad para leer opiniones o dejar la tuya.",
-            "Los comentarios usan tu nombre y avatar del perfil, así que puedes personalizarlos antes de publicar.",
+            "Los comentarios usan tu apodo y avatar del perfil, así que puedes personalizarlos antes de publicar.",
             "En Acerca de puedes ver información del proyecto, su propósito y cómo funciona la privacidad.",
             "No guardamos tus datos en servidores. Todo tu progreso está solo en tu navegador.",
             "Menteando es un proyecto sin ánimo de lucro, diseñado para ayudar a personas mayores.",
@@ -76,7 +77,7 @@ window.CoachMessages = {
             "Estoy aquí para ayudarte. Si alguna vez te sientes perdido, activa al coach para recibir orientación."
         ],
         medallas: [
-            "Las medallas se consiguen al alcanzar ciertos logros. La primera es por 7 días seguidos jugando.",
+            "Las medallas se consiguen al alcanzar ciertos logros. Mira la misión actual y consigue la primera.",
             "Cada medalla representa un hito importante. ¿A qué esperas para conseguir tu primera?",
             "Hay medallas por racha, por sesiones totales y por superar ciertos porcentajes en habilidades.",
             "Las medallas aparecen automáticamente cuando cumples los requisitos."
@@ -87,7 +88,8 @@ window.CoachMessages = {
     explorador: {
         inicio: [
             "Revisa el perfil de vez en cuando: con tus sesiones ya empieza a mostrar qué habilidad destaca y cuál conviene entrenar.",
-            "Si un juego te gusta o ves algo raro, entra en su ficha y usa Escribir opinión para compartirlo con la comunidad.",
+            "Si un juego te gusta, usa Escribir opinión para compartirlo con la comunidad.",
+            "Si ves un error en un juego, rellena el formulario de Reportar problema o deja un comentario en Escribir opinión.",
             "Ya conoces lo básico. Ahora empieza lo divertido.",
             "Bienvenido de nuevo. Cada día avanzas un poco más.",
             "Tu esfuerzo empieza a notarse. Sigue así.",
@@ -99,11 +101,11 @@ window.CoachMessages = {
             "Ya tienes {sesiones} sesiones. Revisa tu perfil para ver tus primeras mejoras.",
             "Tu perfil empieza a mostrar tus puntos fuertes. Échale un vistazo.",
             "Con {sesiones} sesiones, tu perfil ya tiene datos interesantes. Míralo.",
-            "Las medallas empiezan a desbloquearse. La primera está al caer.",
+            "Las medallas empiezan a desbloquearse...",
             "¿Has visto tu nivel cognitivo? Empieza a subir más rápido cuanto más juegas."
         ],
         juegos: [
-            "Los comentarios de la comunidad están en Acerca de. Desde la ficha de cada juego puedes ir directo con categoría Juego.",
+            "Los comentarios de la comunidad están en Acerca de.",
             "Elige juegos por objetivo: atención, memoria, control o reflejos. Alternarlos hace el perfil más equilibrado.",
             "Cada juego entrena habilidades diferentes. Prueba todos para descubrir tu punto fuerte.",
             "Detector de Intrusos entrena atención. Operaciones Encadenadas entrena memoria. Misión Orbital entrena reflejos.",
@@ -113,11 +115,11 @@ window.CoachMessages = {
         tests: [
             "Haz el test de la habilidad que quieras medir. Te ayudará a conocer tu nivel real.",
             "Los tests son una foto de tus capacidades. Repítelos cada semana para ver evolución.",
-            "Si no sabes qué habilidad mejorar, haz un test. Te dirá cuál es tu punto débil.",
+            "Si no sabes qué habilidad mejorar, haz un test. Te dirá cuál es tu punto débil.",            
+            "Los tests no modifican tu perfil, solo lo evalúan. Son como un chequeo cognitivo.",
             "Los tests no muerden. Son rápidos y te dan información muy útil sobre tu rendimiento."
         ],
         medallas: [
-            "Sigue así. La medalla de 7 días está a la vuelta de la esquina.",
             "Cada medalla representa un hito. La primera será especial, no la pierdas.",
             "La medalla 'Racha imparable' se consigue con 7 días seguidos. ¿Crees que puedes?",
             "Las medallas son pruebas de tu constancia. Consigue todas las que puedas."

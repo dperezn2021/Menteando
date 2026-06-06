@@ -422,14 +422,7 @@
         });
     }
 
-    // Cerrar modal si se clica fuera
-    if (modal) {
-        modal.addEventListener("click", (e) => {
-            if (e.target === modal) {
-                modal.style.display = "none";
-            }
-        });
-    }
+    
 
     // === BOTÓN RESET PERFIL (modal de confirmación personalizado) ===
     const btnReset = document.getElementById("btn-reset-perfil");

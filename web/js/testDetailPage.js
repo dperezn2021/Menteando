@@ -55,7 +55,7 @@ function renderTestDetailPage(testId) {
         </li>
     `).join("");
 
-content.innerHTML = `
+    content.innerHTML = `
     <div class="max-w-7xl mx-auto px-4 py-8 lg:py-12">
         <!-- En móvil: info arriba, test abajo. En desktop: info derecha, test izquierda -->
         <div class="grid grid-cols-1 xl:grid-cols-[0.9fr_1.4fr] gap-8">
@@ -757,7 +757,7 @@ function initD2Logic(testId, callback) {
     let seleccionesEnLinea = new Set();
 
     // Comillas GRANDES
-        function formatearConComillas(letra, rayas) {
+    function formatearConComillas(letra, rayas) {
         const combinaciones = {
             1: [{ arriba: 0, abajo: 1 }],
             2: [{ arriba: 2, abajo: 0 }, { arriba: 0, abajo: 2 }, { arriba: 1, abajo: 1 }],
@@ -798,7 +798,7 @@ function initD2Logic(testId, callback) {
             <div class="w-full h-full flex flex-col p-4" style="max-height:100%;">
                 <div class="text-center mb-3">
                     <p class="text-lg font-bold text-blue-600 dark:text-blue-400">Línea ${lineaActual + 1}/${totalLineas}</p>
-                    <p class="text-base text-blue-500">Tiempo restante: <span id="d2-timer" class="font-bold text-xl">${tiempoPorLinea/1000}</span> segundos</p>
+                    <p class="text-base text-blue-500">Tiempo restante: <span id="d2-timer" class="font-bold text-xl">${tiempoPorLinea / 1000}</span> segundos</p>
                 </div>
                 <div class="flex-1 overflow-y-auto">
                     <div class="grid grid-cols-3 sm:grid-cols-5 gap-3 sm:gap-4 w-full justify-center">
@@ -838,18 +838,18 @@ function initD2Logic(testId, callback) {
             finalizarTest();
             return;
         }
-        
+
         puedeSeleccionar = true;
         lineaCompletada = false;
-        
+
         if (status) status.textContent = `Línea ${lineaActual + 1}/${totalLineas} · Haz clic en las 'd' con DOS comillas`;
-        
+
         const linea = generarLinea();
         renderLinea(linea);
-        
+
         let segundosRestantes = tiempoPorLinea / 1000;
         actualizarTimer(segundosRestantes);
-        
+
         const timerInterval = setInterval(() => {
             if (lineaCompletada) return;
             segundosRestantes--;
@@ -859,16 +859,16 @@ function initD2Logic(testId, callback) {
                 procesarLinea(linea);
             }
         }, 1000);
-        
+
         const clickHandler = (e) => {
             if (!puedeSeleccionar || lineaCompletada) return;
-            
+
             const div = e.target.closest('.estimulo');
             if (!div) return;
-            
+
             const idx = parseInt(div.dataset.idx);
             const yaMarcado = linea[idx].marcado;
-            
+
             if (yaMarcado) {
                 // Desmarcar
                 linea[idx].marcado = false;
@@ -883,9 +883,9 @@ function initD2Logic(testId, callback) {
                 div.classList.add('bg-blue-500', 'dark:bg-blue-600', 'ring-2', 'ring-blue-300', 'scale-95');
             }
         };
-        
+
         container.onclick = clickHandler;
-        
+
         timer = setTimeout(() => {
             if (!lineaCompletada) {
                 clearInterval(timerInterval);
@@ -893,19 +893,19 @@ function initD2Logic(testId, callback) {
             }
         }, tiempoPorLinea);
     }
-    
+
     function procesarLinea(linea) {
         if (lineaCompletada) return;
         lineaCompletada = true;
         puedeSeleccionar = false;
         if (timer) clearTimeout(timer);
-        
+
         let aciertosLinea = 0, comisionesLinea = 0, omisionesLinea = 0;
-        
+
         linea.forEach((stim, idx) => {
             const esObjetivo = (stim.letra === 'd' && stim.rayas === 2);
             const marcado = stim.marcado;
-            
+
             if (esObjetivo) {
                 if (marcado) aciertosLinea++;
                 else omisionesLinea++;
@@ -913,54 +913,54 @@ function initD2Logic(testId, callback) {
                 if (marcado) comisionesLinea++;
             }
         });
-        
+
         aciertosPorLinea.push(aciertosLinea);
         erroresComisionPorLinea.push(comisionesLinea);
         erroresOmisionPorLinea.push(omisionesLinea);
-        
+
         aciertos += aciertosLinea;
         erroresComision += comisionesLinea;
         erroresOmision += omisionesLinea;
-        
+
         lineaActual++;
         setTimeout(() => iniciarLinea(), 500);
     }
-    
+
     function finalizarTest() {
         const totalObjetivos = aciertos + erroresOmision;
         const precision = totalObjetivos > 0 ? aciertos / totalObjetivos : 0;
         const tasaOmisiones = totalObjetivos > 0 ? erroresOmision / totalObjetivos : 0;
-        
+
         const habilidades = [];
-        
+
         if (precision < 0.7) habilidades.push("atencion_selectiva");
         if (tasaOmisiones > 0.3) habilidades.push("atencion_sostenida");
         if (erroresComision > 8) habilidades.push("control_inhibitorio");
-        
+
         // Caída de rendimiento: diferencia entre primeras y últimas líneas
         const primerasLineas = aciertosPorLinea.slice(0, 2).reduce((a, b) => a + b, 0) / 2;
         const ultimasLineas = aciertosPorLinea.slice(-2).reduce((a, b) => a + b, 0) / 2;
         const caidaRendimiento = Math.max(0, primerasLineas - ultimasLineas);
-        
+
         if (caidaRendimiento > 2) habilidades.push("atencion_sostenida");
-        
+
         callback({
             testId, timestamp: Date.now(),
             metrics: {
                 aciertos: aciertos,
                 erroresComision: erroresComision,
                 erroresOmision: erroresOmision,
-                precision: Math.round(precision * 100),
+                precision: precision,
                 tasaOmisiones: Math.round(tasaOmisiones * 100) / 100,
                 caidaRendimiento: Math.round(caidaRendimiento * 10) / 10
             },
             habilidadesDebiles: habilidades
         });
-        
+
         startBtn.classList.remove("hidden");
         if (status) status.textContent = "";
     }
-    
+
     startBtn.onclick = () => {
         startBtn.classList.add("hidden");
         lineaActual = 0;
@@ -1071,6 +1071,7 @@ function initCPTLogic(testId, callback) {
 
     function finalizarTest() {
         const rtMedio = tiemposReaccion.length ? tiemposReaccion.reduce((a, b) => a + b, 0) / tiemposReaccion.length : 0;
+        const tiempoMedioFinal = rtMedio || 0;
 
         // CÁLCULO DE PRECISIÓN REAL (0.0 a 1.0) para que tu UI no explote
         // Si tu UI multiplica por 100, aquí mandamos el decimal.
@@ -1096,9 +1097,10 @@ function initCPTLogic(testId, callback) {
                 aciertos,
                 comisiones,
                 omisiones,
-                precision: precisionDecimal, // Enviamos decimal (0.9 para 90%)
-                tiempoMedioRespuestaMs: Math.round(rtMedio),
+                precision: precisionDecimal, // ✅ Ya está bien (decimal)
+                tiempoMedioRespuestaMs: Math.round(tiempoMedioFinal)
             },
+
             habilidadesDebiles
         });
         startBtn.classList.remove("hidden");
@@ -1745,6 +1747,14 @@ function initTowerOfLondonLogic(testId, callback) {
             precision = 0; // No puede ser 100% sin mover
         }
 
+        let precisionDecimal = 0;
+        if (movimientosTotales > 0 && totalOptimos > 0) {
+            precisionDecimal = Math.min(1, totalOptimos / movimientosTotales);
+        } else if (nivelesCompletados === 0) {
+            precisionDecimal = 0;
+        }
+
+
         const habilidades = [];
 
         // MEMORIA DE TRABAJO: si no completó al menos 2 niveles (solo si hizo movimientos)
@@ -1788,8 +1798,9 @@ function initTowerOfLondonLogic(testId, callback) {
                 nivelAlcanzado: nivelesCompletados,
                 movimientosTotales: movimientosTotales,
                 tiempoPromedioNivel: Math.round(tiempoPromedioNivel * 10) / 10,
-                precision: precision / 100, // Enviamos decimal (0.85 para 85%)
+                precision: precisionDecimal // ✅ Enviar decimal directamente
             },
+
             habilidadesDebiles: habilidades
         });
         startBtn.classList.remove("hidden");
@@ -1972,6 +1983,8 @@ function initTAVECLogic(testId, callback) {
             const falsos = seleccionadas.filter(p => !listaAprendizaje.includes(p)).length;
             const totalAprend = aciertosPorEnsayo.reduce((a, b) => a + b, 0);
             const olvido = recuerdoInmediato - recuerdoDemorado;
+            const maxPosible = 80; // 5 ensayos * 16 palabras
+            const precisionDecimal = Math.min(1, totalAprend / maxPosible);
 
             const habilidades = [];
             if (aciertosPorEnsayo[4] < 8) habilidades.push("memoria_trabajo");
@@ -1991,8 +2004,9 @@ function initTAVECLogic(testId, callback) {
                     olvido,
                     reconocimientoAciertos: aciertosRec,
                     reconocimientoFalsos: falsos,
-                    precision
+                    precision: precisionDecimal // ✅ Decimal entre 0 y 1
                 },
+
                 habilidadesDebiles: habilidades
             });
             startBtn.classList.remove("hidden");
@@ -2370,6 +2384,7 @@ function initMECLogic(testId, callback) {
         const precision = puntuacion / max;
         const tiempoMedio = tiemposRespuesta.reduce((a, b) => a + b, 0) / tiemposRespuesta.length;
         const habilidades = [];
+        const precisionDecimal = puntuacion / max; // Ya es decimal
 
         if (puntuacion < 23) habilidades.push("memoria_trabajo", "atencion_sostenida");
         else if (puntuacion < 26) habilidades.push("memoria_trabajo");
@@ -2384,10 +2399,10 @@ function initMECLogic(testId, callback) {
             metrics: {
                 puntuacionTotal: puntuacion,
                 maximoPosible: max,
-                porcentaje: precision,
-                precision,
+                precision: precisionDecimal, // ✅ Solo una vez, como decimal
                 tiempoMedioRespuestaMs: Math.round(tiempoMedio)
-            },
+            }
+            ,
             habilidadesDebiles: habilidades
         });
         startBtn.classList.remove("hidden");
@@ -3070,6 +3085,19 @@ function initTMTLogic(testId, callback) {
 
         // Eliminar duplicados
         const habilidadesUnicas = [...new Set(habilidades)];
+        // Valores de referencia (percentil 50 para adultos jóvenes)
+        const REFERENCIA_A = 29000; // 29 segundos
+        const REFERENCIA_B = 75000; // 75 segundos
+
+        // Calcular puntuación normalizada (0 a 1, donde 1 es excelente)
+        let tiempoANormalizado = Math.max(0, Math.min(1, 1 - (tiempoA / REFERENCIA_A / 2)));
+        let tiempoBNormalizado = Math.max(0, Math.min(1, 1 - (tiempoB / REFERENCIA_B / 2)));
+
+        // Precisión global como media ponderada (más peso a B por ser más complejo)
+        const precisionDecimal = (tiempoANormalizado * 0.4 + tiempoBNormalizado * 0.6);
+
+        // También puedes mantener una métrica de "errores" aparte
+        const tasaErrores = Math.min(1, totalErrores / 20); // 20 errores = 1.0
 
         console.log(`📊 TMT: TiempoA=${Math.round(tiempoA / 1000)}s, ErroresA=${erroresA}, ClicsFueraA=${clicsFueraA || 0}`);
         console.log(`📊 TMT: TiempoB=${Math.round(tiempoB / 1000)}s, ErroresB=${erroresB}, ClicsFueraB=${clicsFueraB || 0}`);
@@ -3086,8 +3114,10 @@ function initTMTLogic(testId, callback) {
                 totalErrores: totalErrores,
                 clicsFueraA: clicsFueraA || 0,
                 clicsFueraB: clicsFueraB || 0,
-                precision: Math.max(0, 1 - (totalErrores / 25) - (totalClicsFuera / 50))
-            },
+                precision: precisionDecimal, // ✅ Basada en tiempo, no en fórmula arbitraria
+                tasaErrores: tasaErrores      // ✅ Métrica adicional para errores
+            }
+            ,
             habilidadesDebiles: habilidadesUnicas
         });
 
@@ -3219,6 +3249,7 @@ function initSymbolSearchLogic(testId, callback) {
         const precision = aciertos / items.length;
         const tiempoMedio = tiempos.length ? tiempos.reduce((a, b) => a + b, 0) / tiempos.length : 0;
         const tiempoTotal = performance.now() - inicioTest;
+        const velocidad = items.length / (tiempoTotal / 1000); // estímulos/segundo
 
         // Calcular aciertos por nivel de dificultad
         let aciertosFaciles = 0;
@@ -3263,13 +3294,15 @@ function initSymbolSearchLogic(testId, callback) {
             metrics: {
                 aciertos,
                 total: items.length,
-                precision: Math.round(precision * 100) / 100,
+                precision: precision, // ✅ Decimal
                 aciertosFaciles,
                 aciertosMedios,
                 aciertosDificiles,
                 tiempoMedioRespuestaMs: Math.round(tiempoMedio),
-                tiempoTotalMs: Math.round(tiempoTotal)
-            },
+                tiempoTotalMs: Math.round(tiempoTotal),
+                velocidad: Math.round(velocidad * 10) / 10 // ✅ Nueva métrica
+            }
+            ,
             habilidadesDebiles: habilidadesUnicas
         });
 

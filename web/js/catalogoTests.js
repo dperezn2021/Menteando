@@ -113,7 +113,7 @@ const CATALOGO_TESTS = [
         "completado": false,
         "heroEyebrow": "Planificación ejecutiva",
         "bloques": [
-            " Memoriza la configuración objetivo durante 3 segundos.",
+            " Memoriza la configuración objetivo (la de abajo) durante 3 segundos.",
             " Tus bolas están al principio todas en la varilla izquierda.",
             " Solo puedes mover la bola que está ARRIBA de cada varilla.",
             " Tienes tiempo límite por nivel: 10s, 20s y 30s.",
