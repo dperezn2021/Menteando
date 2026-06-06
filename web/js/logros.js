@@ -372,7 +372,7 @@ function renderizarMedallas() {
         yellow: "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20",
         orange: "border-orange-500 bg-orange-50 dark:bg-orange-900/20",
 
-        // 🔥 GOLD MODE
+      
         gold: "border-yellow-300 bg-gradient-to-br from-yellow-200 to-yellow-400 dark:from-yellow-600 dark:to-yellow-800 shadow-yellow-500/30"
     };
 

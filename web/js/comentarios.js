@@ -103,7 +103,6 @@ async function responderComentario(id) {
     }
 }
 
-// MODIFICADO: Ahora valida activamente si el admin introdujo su contraseña
 function esAdmin() {
     const usuario = getUsuarioActual();
     const tieneToken = !!window.ADMIN_BEARER;
@@ -117,7 +116,7 @@ function esAdmin() {
     return usuario === "admin" && tieneToken;
 }
 
-// NUEVA FUNCIÓN: Maneja el login contra el endpoint /verify de tu Worker
+
 async function verificarContrasenaAdmin() {
     // Evitar bucles si ya se está pidiendo la contraseña
     if (window.VERIFICANDO_ADMIN) return;
@@ -145,7 +144,7 @@ async function verificarContrasenaAdmin() {
             // Guardamos la clave en la variable global que tus funciones fetch (DELETE, PUT) ya leen
             window.ADMIN_BEARER = password;
             mostrarModal('Autenticación de administrador correcta 👑', 'success');
-            cargarComentarios(); // Recargamos para que aparezcan los botones de borrar (🗑️)
+            cargarComentarios(); // Recargamos para que aparezcan los botones de borrar 
         } else {
             mostrarModal('Contraseña de administrador incorrecta', 'error');
         }
@@ -170,12 +169,10 @@ async function cargarComentarios() {
         const response = await fetch(url);
         let comentarios = await response.json();
 
-        // Fallback: if server doesn't support category filtering, apply client-side filter
         if (filtroActual !== "todos") {
             comentarios = comentarios.filter(c => c.categoria === filtroActual);
         }
 
-        // Apply client-side sorting: by fecha
         comentarios = (comentarios || []).slice();
         comentarios.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
         if (sortDesc) comentarios.reverse();

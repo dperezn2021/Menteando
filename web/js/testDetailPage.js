@@ -193,7 +193,8 @@ window.initTestDetailPage = function initTestDetailPage(testId) {
             if (test) {
                 const categoriaDisplay = { atencion: 'Atención', memoria: 'Memoria', control: 'Control', reflejos: 'Reflejos' };
                 const catLabel = categoriaDisplay[test.categoria] || (test.categoria.charAt(0).toUpperCase() + test.categoria.slice(1));
-                // Update nav header: title → test name, subtitle → category
+                
+                
                 const headerH1 = document.querySelector('header h1');
                 if (headerH1) headerH1.textContent = test.nombre;
                 if (headerH1.textContent === "TAVEC – Test de Aprendizaje Verbal España-Complutense") headerH1.textContent = "Test TAVEC";
@@ -1097,7 +1098,7 @@ function initCPTLogic(testId, callback) {
                 aciertos,
                 comisiones,
                 omisiones,
-                precision: precisionDecimal, // ✅ Ya está bien (decimal)
+                precision: precisionDecimal, 
                 tiempoMedioRespuestaMs: Math.round(tiempoMedioFinal)
             },
 
@@ -1798,7 +1799,7 @@ function initTowerOfLondonLogic(testId, callback) {
                 nivelAlcanzado: nivelesCompletados,
                 movimientosTotales: movimientosTotales,
                 tiempoPromedioNivel: Math.round(tiempoPromedioNivel * 10) / 10,
-                precision: precisionDecimal // ✅ Enviar decimal directamente
+                precision: precisionDecimal 
             },
 
             habilidadesDebiles: habilidades
@@ -2004,7 +2005,7 @@ function initTAVECLogic(testId, callback) {
                     olvido,
                     reconocimientoAciertos: aciertosRec,
                     reconocimientoFalsos: falsos,
-                    precision: precisionDecimal // ✅ Decimal entre 0 y 1
+                    precision: precisionDecimal 
                 },
 
                 habilidadesDebiles: habilidades
@@ -2399,7 +2400,7 @@ function initMECLogic(testId, callback) {
             metrics: {
                 puntuacionTotal: puntuacion,
                 maximoPosible: max,
-                precision: precisionDecimal, // ✅ Solo una vez, como decimal
+                precision: precisionDecimal,
                 tiempoMedioRespuestaMs: Math.round(tiempoMedio)
             }
             ,
@@ -2995,10 +2996,10 @@ function initTMTLogic(testId, callback) {
                     mostrarFeedbackAcierto(el);
                     siguienteIndex++;
 
-                    // Update progress counter live
+                 
+    
                     const progresoEl = document.getElementById('tmt-progreso');
                     if (progresoEl) progresoEl.textContent = `Progreso: ${siguienteIndex}/${ordenCorrectoTotal.length}`;
-                    // Redraw connecting lines after each correct click
                     setTimeout(() => dibujarLineas(), 10);
 
                     if (siguienteIndex >= ordenCorrectoTotal.length) {
@@ -3114,8 +3115,8 @@ function initTMTLogic(testId, callback) {
                 totalErrores: totalErrores,
                 clicsFueraA: clicsFueraA || 0,
                 clicsFueraB: clicsFueraB || 0,
-                precision: precisionDecimal, // ✅ Basada en tiempo, no en fórmula arbitraria
-                tasaErrores: tasaErrores      // ✅ Métrica adicional para errores
+                precision: precisionDecimal, 
+                tasaErrores: tasaErrores      
             }
             ,
             habilidadesDebiles: habilidadesUnicas
@@ -3294,13 +3295,13 @@ function initSymbolSearchLogic(testId, callback) {
             metrics: {
                 aciertos,
                 total: items.length,
-                precision: precision, // ✅ Decimal
+                precision: precision, 
                 aciertosFaciles,
                 aciertosMedios,
                 aciertosDificiles,
                 tiempoMedioRespuestaMs: Math.round(tiempoMedio),
                 tiempoTotalMs: Math.round(tiempoTotal),
-                velocidad: Math.round(velocidad * 10) / 10 // ✅ Nueva métrica
+                velocidad: Math.round(velocidad * 10) / 10 
             }
             ,
             habilidadesDebiles: habilidadesUnicas

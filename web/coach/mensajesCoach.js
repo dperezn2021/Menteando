@@ -2,13 +2,6 @@ window.CoachMessages = {
 
     // ========== NOVATO (0-10 sesiones) ==========
     novato: {
-        bienvenida: [
-            "Hola. Soy tu coach. Te guiaré durante tus primeros pasos en Menteando.",
-            "Bienvenido. Estoy aquí para ayudarte a entender cómo funciona todo.",
-            "Encantado de conocerte. Soy tu coach cognitivo y te acompañaré en tu entrenamiento.",
-            "¡Hola! Voy a enseñarte cómo sacarle el máximo partido a Menteando.",
-            "Comienza tu aventura cognitiva. Estaré aquí para guiarte."
-        ],
         inicio: [
             "Desde aquí puedes acceder a los juegos, tests o tu perfil personal.",
             "Explora las opciones del menú para empezar a entrenar tu mente.",
@@ -16,10 +9,11 @@ window.CoachMessages = {
             "Hoy es un buen día para mejorar tus habilidades cognitivas."
         ],
         inicioGuiado: [
+            "Hola. Soy tu coach cognitivo. Te guiaré durante tus primeros pasos en Menteando.",
             "Consejo rápido: entra en tu perfil desde la foto de arriba. Ahí verás sesiones, racha actual y mucho más.",
             "La racha actual sube cuando terminas tu primera sesión del día. Si pasas un día sin jugar, vuelve a cero; la racha máxima guarda tu mejor marca.",
             "Si quieres dejar una opinión o leer a otros usuarios, ve a Acerca de y baja hasta Comentarios de la comunidad.",
-            "En la ficha de cada juego tienes el botón Escribir opinión. Te lleva directo a los comentarios de la comunidad",
+            "En la ficha de cada juego tienes el botón Escribir opinión. Te lleva directo a los comentarios de la comunidad.",
             "¿No sabes por dónde empezar? Mira tu perfil: tu habilidad más baja te da una pista de qué juegos conviene entrenar."
         ],
         perfil: [
@@ -29,7 +23,7 @@ window.CoachMessages = {
             "En el perfil verás tus estadísticas: rachas, niveles, medallas y capacidades cognitivas.",
             "Puedes editar tu nombre y avatar desde el perfil. Pulsa el botón con forma de lápiz sobre tu foto.",
             "El perfil guarda todo tu progreso automáticamente. No necesitas preocuparte por perder nada.",
-            "Si vas a cambiar de navegador o dispositivo, no te olvides de exportar tus métricas.",
+            "Si vas a cambiar de navegador o dispositivo, no te olvides de exportar tus métricas desde el perfil.",
             "Consulta tu perfil regularmente para ver cómo evolucionan tus habilidades.",
             "En el perfil también puedes ver tus medallas. Son logros que consigues al alcanzar ciertos hitos."
         ],
@@ -51,36 +45,6 @@ window.CoachMessages = {
             "Haz un test cuando quieras saber tu nivel exacto en una habilidad concreta.",
             "Los tests son evaluaciones estandarizadas. Te ayudan a conocer tus puntos fuertes y débiles.",
             "No hay prisa con los tests. Tómate tu tiempo para responder con precisión."
-        ],
-        modoOscuro: [
-            "Arriba a la derecha puedes cambiar entre modo claro y oscuro. Elige el que más te guste.",
-            "¿Prefieres fondo oscuro? Pulsa el botón de la luna o el sol en la esquina superior derecha.",
-            "Si te cansan las pantallas brillantes, prueba el modo oscuro. Está en la parte superior.",
-            "El modo oscuro puede reducir la fatiga visual. Está disponible en todas las páginas."
-        ],
-        about: [
-            "En Acerca de, debajo de la información del proyecto, tienes Comentarios de la comunidad para leer opiniones o dejar la tuya.",
-            "Los comentarios usan tu apodo y avatar del perfil, así que puedes personalizarlos antes de publicar.",
-            "En Acerca de puedes ver información del proyecto, su propósito y cómo funciona la privacidad.",
-            "No guardamos tus datos en servidores. Todo tu progreso está solo en tu navegador.",
-            "Menteando es un proyecto sin ánimo de lucro, diseñado para ayudar a personas mayores.",
-            "Aquí puedes contactar con el desarrollador si tienes preguntas o sugerencias."
-        ],
-        editar: [
-            "Pulsa 'Editar Perfil' para cambiar tu nombre, apodo, edad o correo electrónico.",
-            "¿Quieres cambiar tu avatar? Pulsa el botón con forma de lápiz que aparece sobre tu foto.",
-            "Puedes personalizar tu perfil con tu nombre real o un apodo. Como prefieras."
-        ],
-        coach: [
-            "Soy tu coach cognitivo. Puedo darte consejos personalizados según tu rendimiento.",
-            "Si prefieres entrenar sin mí, puedes desactivarme con el botón 'Desactivar Coach' en tu perfil.",
-            "Estoy aquí para ayudarte. Si alguna vez te sientes perdido, activa al coach para recibir orientación."
-        ],
-        medallas: [
-            "Las medallas se consiguen al alcanzar ciertos logros. Mira la misión actual y consigue la primera.",
-            "Cada medalla representa un hito importante. ¿A qué esperas para conseguir tu primera?",
-            "Hay medallas por racha, por sesiones totales y por superar ciertos porcentajes en habilidades.",
-            "Las medallas aparecen automáticamente cuando cumples los requisitos."
         ]
     },
 
@@ -115,24 +79,9 @@ window.CoachMessages = {
         tests: [
             "Haz el test de la habilidad que quieras medir. Te ayudará a conocer tu nivel real.",
             "Los tests son una foto de tus capacidades. Repítelos cada semana para ver evolución.",
-            "Si no sabes qué habilidad mejorar, haz un test. Te dirá cuál es tu punto débil.",            
+            "Si no sabes qué habilidad mejorar, haz un test. Te dirá cuál es tu punto débil.",
             "Los tests no modifican tu perfil, solo lo evalúan. Son como un chequeo cognitivo.",
             "Los tests no muerden. Son rápidos y te dan información muy útil sobre tu rendimiento."
-        ],
-        medallas: [
-            "Cada medalla representa un hito. La primera será especial, no la pierdas.",
-            "La medalla 'Racha imparable' se consigue con 7 días seguidos. ¿Crees que puedes?",
-            "Las medallas son pruebas de tu constancia. Consigue todas las que puedas."
-        ],
-        editar: [
-            "Recuerda que puedes editar tu perfil y cambiar tu avatar cuando quieras.",
-            "Si aún no has puesto tu nombre real, puedes hacerlo desde editar perfil.",
-            "¿No te gusta tu avatar? Cámbialo cuando quieras. Hay varios para elegir."
-        ],
-        coach: [
-            "Sigo aquí para ayudarte. Puedes desactivarme si ya no me necesitas.",
-            "Recuerda que puedes activarme o desactivarme desde el perfil cuando quieras.",
-            "Si mis consejos te resultan repetitivos, desactívame. Pero siempre estaré aquí si me necesitas."
         ]
     },
 
@@ -155,7 +104,7 @@ window.CoachMessages = {
             "Récord personal. Llevas {racha} días consecutivos entrenando.",
             "Nueva racha máxima: {racha} días. La constancia da resultados.",
             "Has superado tu propia marca. {racha} días seguidos.",
-            "¡{racha} días! Nunca habías llegado tan lejos. Sigue así."
+            "{racha} días. Nunca habías llegado tan lejos. Sigue así."
         ],
         hito7Dias: [
             "7 días seguidos. Esa es la medalla 'Racha imparable'.",
@@ -180,17 +129,6 @@ window.CoachMessages = {
             "Compara tus resultados de tests con los de la semana pasada. La mejora será evidente.",
             "El test de {skill} te dirá exactamente en qué punto estás. Hazlo hoy.",
             "Un test a la semana es suficiente para monitorizar tu evolución sin estrés."
-        ],
-        medallas: [
-            "Estás cerca de la medalla de 14 días. Solo te quedan {diasPara14} días.",
-            "Próxima medalla: {siguienteMedalla}. Estás a {progreso} de conseguirla.",
-            "Con {racha} días de racha, la medalla de 14 días está al caer.",
-            "Tu próxima medalla es {siguienteMedalla}. Sigue así y la conseguirás."
-        ],
-        coach: [
-            "Sigo aquí por si necesitas orientación específica sobre alguna habilidad.",
-            "Si crees que ya controlas, puedes desactivarme. No me ofendo.",
-            "A estas alturas ya sabes lo que tienes que hacer. Pero aquí sigo por si acaso."
         ]
     },
 
@@ -209,14 +147,8 @@ window.CoachMessages = {
             "La diferencia entre tu mejor y peor habilidad es de {diferencia} puntos. Redúcela para equilibrar.",
             "Con {sesiones} sesiones, ya eres un usuario experimentado. Tu opinión puede ayudar a otros."
         ],
-        diferencia: [
-            "La diferencia entre tu mejor y peor habilidad es de {diferencia} puntos.",
-            "Concéntrate en {skillPeor}. Subirla equilibrará todo tu perfil.",
-            "Tu {skillPeor} tiene mucho margen de mejora. Es por donde vas a notar más progreso.",
-            "Equilibrar tus habilidades hará que tu nivel cognitivo suba más rápido."
-        ],
         juegos: [
-            "Para mejorar {skillPeor}, los juegos más efectivos son {juegoRecomendado} y similares.",
+            "Para mejorar {skillPeor}, prueba el juego recomendado: {juegoRecomendado}.",
             "Ya dominas {juegoFavorito}. Es hora de que pruebes {juegoAlternativo} para variar.",
             "Alterna entre juegos de distintas categorías. Si solo juegas a uno, solo mejorarás una habilidad.",
             "Tu juego favorito es {juegoFavorito} con {veces} partidas. Prueba también {juegoAlternativo}."
@@ -243,15 +175,9 @@ window.CoachMessages = {
             "Con {sesiones} sesiones, eres un caso de éxito. Tu constancia es ejemplar.",
             "Tu evolución es impresionante. ¿Recuerdas cómo empezaste? Nada que ver."
         ],
-        retos: [
-            "Tu próximo reto: alcanzar el {objetivo}% en {skillPeor}. Actualmente estás en {valorPeor}%.",
-            "¿Puedes conseguir la medalla de {siguienteMedalla}? Te faltan {progreso} puntos.",
-            "Un reto para tu nivel: mantén una racha de {retoRacha} días. Llevas {rachaActual}.",
-            "El verdadero reto ahora no es subir, es no bajar. Mantén tu nivel durante un mes."
-        ],
         optimizacion: [
             "Has jugado {veces} veces a {juegoFavorito}. Para evitar el estancamiento, prueba {juegoAlternativo}.",
-            "La variedad es clave en tu fase. Monotonía = estancamiento. Cambia de juegos a menudo.",
+            "La variedad es clave en tu fase. Monotonía es estancamiento. Cambia de juegos a menudo.",
             "Tu juego favorito es {juegoFavorito}. Está bien, pero no descuides los demás por completo.",
             "Un perfil 100% equilibrado es casi imposible. Acércate lo máximo que puedas."
         ],
@@ -260,12 +186,6 @@ window.CoachMessages = {
             "Repite el mismo test cada mes exactamente para ver tu evolución real sin variables extrañas.",
             "Si un test te da un resultado anómalo, repítelo. Puede ser un mal día.",
             "Los tests ya no te van a decir cosas que no sepas. Pero confirman tu progreso."
-        ],
-        comparativas: [
-            "Comparado con otros expertos, tu {skillMejor} está ligeramente por encima de la media.",
-            "Tu {skillPeor} es el único aspecto donde otros usuarios de tu nivel te superan.",
-            "Tu perfil es más equilibrado que la media de usuarios expertos. Buen trabajo.",
-            "La mayoría de expertos tienen una habilidad muy dominante. Tú eres más completo."
         ]
     },
 
@@ -282,24 +202,6 @@ window.CoachMessages = {
             "Tu {skillMejor} con un {valorMejor}% es de otro nivel. Tu {skillPeor} con un {valorPeor}% es tu única asignatura pendiente.",
             "Con una racha máxima de {rachaMaxima} días y actual de {rachaActual}, tu disciplina es tu superpoder.",
             "Tu perfil es el sueño de cualquier principiante. Ayúdalos a llegar donde estás."
-        ],
-        comparativas: [
-            "Tu mejor racha histórica es de {rachaMaxima} días. Tu racha actual es de {rachaActual}. ¿Puedes superarla?",
-            "La diferencia entre tu mejor y peor habilidad es solo de {diferencia} puntos. Eso es excelente.",
-            "Tu {skillMejor} está en el {percentilMejor}% de usuarios. Tu {skillPeor} en el {percentilPeor}%.",
-            "Comparado con usuarios de tu nivel, tu {skillMejor} es ligeramente superior a la media."
-        ],
-        retos: [
-            "¿Puedes superar tu propio récord? Tu máxima racha es de {rachaMaxima} días. El siguiente hito es {siguienteHito}.",
-            "El siguiente nivel es {siguienteNivel}. Estás a {diferenciaNivel} puntos. ¿Llegarás?",
-            "Un reto digno de un maestro: alcanza el {objetivo}% en tu habilidad más baja.",
-            "Los maestros no compiten contra otros, compiten contra sí mismos. Súperate cada día."
-        ],
-        optimizacion: [
-            "A tu nivel, la optimización es la única vía de mejora. Ajusta cada detalle.",
-            "Pequeños cambios en tu rutina pueden marcar la diferencia. Prueba horarios distintos.",
-            "Los maestros saben que la perfección no existe, pero la buscan igual.",
-            "Tu entrenamiento ya es casi óptimo. Solo queda pulir los bordes."
         ]
     },
 
@@ -313,8 +215,8 @@ window.CoachMessages = {
         "No recopilamos ningún dato personal. Todo tu progreso se guarda en tu navegador.",
         "Sin registro, sin servidores, sin compartir datos. Tu privacidad está completamente protegida.",
         "Puedes borrar todos tus datos en cualquier momento desde el perfil con el botón 'Reiniciar'.",
-        "Los datos se guardan localmente usando localStorage. Nadie más puede acceder a ellos.",
-        "Si cambias de navegador o dispositivo, tu progreso no se transferirá automáticamente.",
+        "Los datos se guardan localmente en tu navegador. Nadie más puede acceder a ellos.",
+        "Si cambias de navegador o dispositivo, tu progreso no se transferirá automáticamente. Recuerda exportar tus datos desde el perfil.",
         "¿Preguntas o sugerencias? Encuentra el contacto en esta misma página.",
         "El proyecto es completamente de código abierto. Puedes ver el repositorio en GitHub.",
         "Menteando es gratuito y sin publicidad. Creado para ayudar, no para lucrarse."
@@ -372,7 +274,7 @@ window.CoachMessages = {
             "Medalla conseguida. {skill} superó el {objetivo}%. Buen trabajo.",
             "Logro desbloqueado. Has mejorado tu {skill} notablemente. Medalla conseguida.",
             "La medalla de {skill} ya es tuya. Ese esfuerzo tenía recompensa.",
-            "¡{skill} ha alcanzado el {objetivo}%! Medalla desbloqueada."
+            "{skill} ha alcanzado el {objetivo}%. Medalla desbloqueada."
         ],
         mejoraGrande: [
             "{skill} subió un {diferencia}%. Ese juego te sienta fenomenal. Repite.",
