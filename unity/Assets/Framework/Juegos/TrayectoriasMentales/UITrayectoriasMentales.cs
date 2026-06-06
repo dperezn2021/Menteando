@@ -1,6 +1,9 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
+
 
 public class UITrayectoriasMentales : MonoBehaviour
 {
@@ -38,10 +41,18 @@ public class UITrayectoriasMentales : MonoBehaviour
     [Header("Fuente")]
     public TMP_FontAsset fontAsset;
 
+    [Header("Feedback Táctil")]
+    public Image chargeRing;
+    public float maxRingScale = 1.5f;
+
     private int extraLives = 0;
     private bool bouncePowerUpActive = false;
     private int currentStreak = 0;
 
+    [Header("Texto de ayuda")]
+    public TextMeshProUGUI helpText;
+    public string helpTextMessage = "🖱️ Pulsa y arrastra para calcular la trayectoria";
+    public float helpTextFadeTime = 0.5f;
     private void Awake()
     {
         if (bouncePowerUpIcon != null)
@@ -60,13 +71,50 @@ public class UITrayectoriasMentales : MonoBehaviour
         if (loadingScreen != null)
             loadingScreen.SetActive(false);
 
+        if (chargeRing != null)
+            chargeRing.gameObject.SetActive(false);
+
         UpdateExtraLivesDisplay();
         ApplyFontToChildren();
     }
 
     // ============================================================
-    // ACTUALIZACI�N DE TEXTOS
+    // ACTUALIZACIÓN DE TEXTOS
     // ============================================================
+
+    public void ShowHelpText()
+    {
+        if (helpText == null) return;
+        helpText.gameObject.SetActive(true);
+        helpText.text = helpTextMessage;
+        helpText.color = Color.yellow;
+
+        // Animación de parpadeo suave
+        StartCoroutine(PulseHelpText());
+    }
+
+    public void HideHelpText()
+    {
+        if (helpText == null) return;
+        helpText.gameObject.SetActive(false);
+        StopAllCoroutines();
+    }
+
+    private IEnumerator PulseHelpText()
+    {
+        if (helpText == null) yield break;
+
+        float time = 0;
+        Color originalColor = helpText.color;
+
+        while (helpText.gameObject.activeSelf)
+        {
+            time += Time.deltaTime * 2f;
+            float alpha = 0.5f + Mathf.Sin(time) * 0.5f;
+            helpText.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+            yield return null;
+        }
+    }
 
     public void UpdateBounceText(int required)
     {
@@ -85,7 +133,6 @@ public class UITrayectoriasMentales : MonoBehaviour
     public void UpdateRacha(int racha)
     {
         currentStreak = racha;
-        // La racha se muestra junto al nivel en UpdateLevel
     }
 
     public void UpdateAttempt(int current, int max)
@@ -97,7 +144,7 @@ public class UITrayectoriasMentales : MonoBehaviour
     public void UpdateLevel(int level)
     {
         if (levelText != null)
-            levelText.text = $"NIVEL {Mathf.Max(1, level)}  |  RACHA {currentStreak}";
+            levelText.text = $" NIVEL {Mathf.Max(1, level)}  |  RACHA {currentStreak}";
     }
 
     public void ShowFeedback(string message, bool isGood)
@@ -156,6 +203,31 @@ public class UITrayectoriasMentales : MonoBehaviour
             lifePowerUpIcon.color = extraLives > 0 ? powerUpActiveColor : powerUpInactiveColor;
         if (extraLivesCountText != null)
             extraLivesCountText.text = extraLives > 0 ? $"Vidas extra: {extraLives}" : "";
+    }
+
+    // ============================================================
+    // FEEDBACK TÁCTIL
+    // ============================================================
+
+    public void UpdateChargeFeedback(float normalizedTime)
+    {
+        if (chargeRing != null)
+        {
+            chargeRing.gameObject.SetActive(true);
+            chargeRing.fillAmount = normalizedTime;
+            float scale = 1f + (maxRingScale - 1f) * normalizedTime;
+            chargeRing.rectTransform.localScale = Vector3.one * scale;
+        }
+    }
+
+    public void HideChargeFeedback()
+    {
+        if (chargeRing != null)
+        {
+            chargeRing.gameObject.SetActive(false);
+            chargeRing.fillAmount = 0f;
+            chargeRing.rectTransform.localScale = Vector3.one;
+        }
     }
 
     // ============================================================

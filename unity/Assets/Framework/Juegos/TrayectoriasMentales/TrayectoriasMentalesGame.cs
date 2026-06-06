@@ -72,7 +72,7 @@ public class TrayectoriasMentalesGame : BaseGame
     public Sprite spriteTrampa;
     public Sprite spritePowerUpBounce;
     public Sprite spritePowerUpLife;
-    public Sprite spriteSalida; // Sprite para marcar la salida
+    public Sprite spriteSalida;
 
     public float pixelsPerUnit = 100f;
     public float escalaSpritePared = 8f;
@@ -102,12 +102,11 @@ public class TrayectoriasMentalesGame : BaseGame
     private RectTransform ratRect;
     private Graphic ratGraphic;
 
-    private GameObject exitMarker; // Añade esta variable al inicio de la clase
+    private GameObject exitMarker;
 
     private AudioManager audioManager => AudioManager.Instance;
     private bool simulationSilent = false;
     private int simulationTargetBounces;
-
 
     private readonly List<Trap> traps = new List<Trap>();
     private readonly List<PowerUp> powerUps = new List<PowerUp>();
@@ -140,6 +139,15 @@ public class TrayectoriasMentalesGame : BaseGame
     private Rect _cachedBounds;
     private bool _boundsCached;
 
+    // ========== INPUT UNIFICADO (PC + MÓVIL) ==========
+    private bool isPointerDown = false;
+    private float pointerDownTime = 0f;
+    private bool hasShownTrajectory = false;
+    private Vector2 lastAimDirection = Vector2.right;
+
+    // Para controlar el texto de ayuda
+    private bool helpTextHidden = false;
+
     // ============================================================
     // CICLO DE VIDA
     // ============================================================
@@ -153,8 +161,6 @@ public class TrayectoriasMentalesGame : BaseGame
             spriteHeight = (spritePared.rect.height / pixelsPerUnit) * escalaSpritePared;
         }
         else { spriteWidth = 2f * escalaSpritePared; spriteHeight = 0.7f * escalaSpritePared; }
-
-
     }
 
     public override void ResetGame()
@@ -180,10 +186,8 @@ public class TrayectoriasMentalesGame : BaseGame
         BuildGameObjects();
         GenerateRound();
 
-        // Ocultar pantalla de carga al iniciar
         if (ui != null && ui.loadingScreen != null)
             ui.loadingScreen.SetActive(false);
-
     }
 
     public override void OnGameStart() => ResetGame();
@@ -193,12 +197,149 @@ public class TrayectoriasMentalesGame : BaseGame
         DisableGenericTimer();
         if (gameActive && !gameFinished && !juegoPausado) AnimateRat();
         if (!gameActive || gameFinished || juegoPausado || phase != Phase.Planning) return;
-        UpdateAimFromPointer();
-        if (Input.GetMouseButtonDown(0) && PointerInsidePlayArea()) BeginExecution();
-        if (Input.GetKeyDown(KeyCode.D))
+
+        // ============================================
+        // INPUT UNIFICADO (PC + MÓVIL)
+        // ============================================
+
+        bool pointerJustDown = false;
+        bool pointerDown = false;
+        bool pointerJustUp = false;
+        Vector2 pointerPosition = Vector2.zero;
+        bool isTouchDevice = Input.touchCount > 0;
+
+        // Detectar input según dispositivo
+        if (isTouchDevice)
         {
-            mostrarSolucionDebug = !mostrarSolucionDebug;
-            DrawTrajectory();
+            Touch touch = Input.GetTouch(0);
+            pointerJustDown = (touch.phase == TouchPhase.Began);
+            pointerDown = (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Began);
+            pointerJustUp = (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled);
+            pointerPosition = touch.position;
+        }
+        else
+        {
+            // PC: el lanzamiento ocurre al SOLTAR el botón, no al hacer clic
+            pointerJustDown = Input.GetMouseButtonDown(0);
+            pointerDown = Input.GetMouseButton(0);
+            pointerJustUp = Input.GetMouseButtonUp(0);
+            pointerPosition = Input.mousePosition;
+        }
+
+        // Convertir posición a coordenadas locales del playArea
+        Canvas canvas = playArea.GetComponentInParent<Canvas>();
+        Camera cam = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay) ? canvas.worldCamera : null;
+        bool pointerInside = RectTransformUtility.ScreenPointToLocalPointInRectangle(playArea, pointerPosition, cam, out Vector2 localPointer);
+
+        // ===== INICIO DE PULSACIÓN (PRESS) =====
+        if (pointerJustDown && pointerInside)
+        {
+            // Ocultar texto de ayuda al primer toque
+            if (!helpTextHidden)
+            {
+                helpTextHidden = true;
+                ui?.HideHelpText();
+            }
+
+            isPointerDown = true;
+            pointerDownTime = Time.time;
+            hasShownTrajectory = false;
+
+            // Guardar dirección actual por si no hay movimiento
+            lastAimDirection = aimDirection;
+
+            // Actualizar dirección inmediatamente
+            Vector2 direction = localPointer - ratStart;
+            if (direction.sqrMagnitude > 12f)
+            {
+                aimDirection = direction.normalized;
+                currentMoveDirection = aimDirection;
+                lastAimDirection = aimDirection;
+                ApplyRatRotation();
+            }
+
+            // En PC, mostrar trayectoria inmediatamente al hacer clic (mejor UX)
+            if (!isTouchDevice)
+            {
+                DrawTrajectory();
+            }
+        }
+
+        // ===== PULSACIÓN MANTENIDA (DRAG) =====
+        if (isPointerDown && pointerDown && pointerInside)
+        {
+            // Actualizar dirección mientras se arrastra
+            Vector2 direction = localPointer - ratStart;
+            if (direction.sqrMagnitude > 12f)
+            {
+                aimDirection = direction.normalized;
+                currentMoveDirection = aimDirection;
+                lastAimDirection = aimDirection;
+                ApplyRatRotation();
+            }
+
+            float tiempoPresionado = Time.time - pointerDownTime;
+            float tiempoNormalizado = Mathf.Clamp01(tiempoPresionado / 0.2f);
+            ui?.UpdateChargeFeedback(tiempoNormalizado);
+
+            // Mostrar trayectoria después de 0.2 segundos (solo en móvil para evitar parpadeo)
+            if (!hasShownTrajectory && tiempoPresionado >= 0.2f)
+            {
+                hasShownTrajectory = true;
+                DrawTrajectory();
+            }
+            else if (hasShownTrajectory || !isTouchDevice)
+            {
+                // Actualizar trayectoria en tiempo real
+                DrawTrajectory();
+            }
+        }
+
+        // ===== FIN DE PULSACIÓN (RELEASE) - Aquí se lanza =====
+        if (pointerJustUp && isPointerDown)
+        {
+            ui?.HideChargeFeedback();
+
+            // En móvil: solo lanzar si se mantuvo el tiempo suficiente o si se movió
+            // En PC: siempre lanzar al soltar
+            bool fueLargo = (Time.time - pointerDownTime) >= 0.2f;
+            bool huboMovimiento = (aimDirection - lastAimDirection).sqrMagnitude > 0.01f;
+
+            if (!isTouchDevice)
+            {
+                // PC: siempre lanzar al soltar
+                BeginExecution();
+            }
+            else if (fueLargo || huboMovimiento)
+            {
+                // Móvil: lanzar si hubo movimiento o se mantuvo pulsado
+                BeginExecution();
+            }
+            else if (!fueLargo && pointerInside)
+            {
+                // Toque corto sin movimiento: mostrar trayectoria y lanzar con delay
+                DrawTrajectory();
+                StartCoroutine(LanzarConDelay(0.15f));
+            }
+
+            isPointerDown = false;
+            hasShownTrajectory = false;
+        }
+
+        // Si el pointer sale del área, cancelar
+        if (isPointerDown && !pointerInside && pointerJustUp)
+        {
+            ui?.HideChargeFeedback();
+            isPointerDown = false;
+            hasShownTrajectory = false;
+        }
+    }
+    private IEnumerator LanzarConDelay(float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+        if (phase == Phase.Planning && !gameFinished && isPointerDown == false)
+        {
+            BeginExecution();
         }
     }
 
@@ -248,6 +389,11 @@ public class TrayectoriasMentalesGame : BaseGame
     private void GenerateRound()
     {
         if (gameFinished || playArea == null) return;
+        
+        helpTextHidden = false;
+        ui?.ShowHelpText();
+
+
         int level = CurrentLevel();
         maxLevelReached = Mathf.Max(maxLevelReached, level);
         phase = Phase.Planning;
@@ -274,9 +420,7 @@ public class TrayectoriasMentalesGame : BaseGame
             List<Vector2> pathNormal = new List<Vector2>(solutionPath);
 
             List<Vector2> pathPU = null;
-            // 4. Colocar PowerUps
             int puCount = PowerUpCountForLevel(level);
-
 
             if (puCount >= 1 && pathNormal.Count > 3)
             {
@@ -298,14 +442,13 @@ public class TrayectoriasMentalesGame : BaseGame
                     {
                         PlacePowerUpOnPath(pathNormal, PowerUpType.ExtraLife);
                     }
-                    else // ExtraBounce
+                    else
                     {
                         if (requiredBounces < rebotesMaximos)
                         {
                             if (TryFindSolvableAim(out Vector2 puDir, requiredBounces + 1, 0))
                             {
                                 pathPU = new List<Vector2>(solutionPath);
-
                                 if (pathPU.Count > 3)
                                 {
                                     PlacePowerUpOnPath(pathPU, PowerUpType.ExtraBounce);
@@ -331,7 +474,6 @@ public class TrayectoriasMentalesGame : BaseGame
 
     private void CreateExitMarker()
     {
-        // Destruir marcador anterior si existe
         if (exitMarker != null)
         {
             Destroy(exitMarker);
@@ -385,12 +527,8 @@ public class TrayectoriasMentalesGame : BaseGame
 
     private void PlacePowerUpOnPath(List<Vector2> path, PowerUpType type)
     {
-        if (path.Count < 3)
-        {
-            return;
-        }
+        if (path.Count < 3) return;
 
-        // Intentar colocar en la ruta
         for (int attempt = 0; attempt < 30; attempt++)
         {
             int idx = Random.Range(path.Count / 4, path.Count * 3 / 4);
@@ -405,7 +543,6 @@ public class TrayectoriasMentalesGame : BaseGame
             return;
         }
 
-        // Fallback: punto medio
         Vector2 fallback = path[path.Count / 2];
         CreatePowerUpObject(fallback, new Vector2(50f, 50f), type);
     }
@@ -413,7 +550,6 @@ public class TrayectoriasMentalesGame : BaseGame
     private void CreatePowerUpObject(Vector2 pos, Vector2 size, PowerUpType type)
     {
         Sprite s = type == PowerUpType.ExtraBounce ? spritePowerUpBounce : spritePowerUpLife;
-        
 
         GameObject obj = new GameObject("PowerUp", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         obj.transform.SetParent(powerUpLayer, false);
@@ -443,7 +579,7 @@ public class TrayectoriasMentalesGame : BaseGame
         ChooseExitEdge(bounds);
         CreateOuterWalls(bounds);
         PositionRatStart(bounds);
-        CreateExitMarker(); // AÑADIR ESTA LÍNEA
+        CreateExitMarker();
     }
 
     private void ChooseExitEdge(Rect bounds)
@@ -810,6 +946,7 @@ public class TrayectoriasMentalesGame : BaseGame
         simulationSilent = false;
         return false;
     }
+
     private bool IsExitBounce(int wallIndex, Vector2 pos)
     {
         if (wallIndex >= 1 && wallIndex <= 4)
@@ -899,6 +1036,7 @@ public class TrayectoriasMentalesGame : BaseGame
         }
         pos = next;
     }
+
     private bool TryBounceInternal(Vector2 current, ref Vector2 next, ref Vector2 vel)
     {
         for (int i = 0; i < internalWalls.Count; i++)
@@ -943,6 +1081,11 @@ public class TrayectoriasMentalesGame : BaseGame
     private void BeginExecution()
     {
         if (phase != Phase.Planning || gameFinished) return;
+
+        // Asegurar que el texto desaparezca al lanzar
+        ui?.HideHelpText();
+        helpTextHidden = true;
+        
         if (executionRoutine != null) StopCoroutine(executionRoutine);
         executionRoutine = StartCoroutine(ExecuteRoutine());
     }
@@ -967,8 +1110,6 @@ public class TrayectoriasMentalesGame : BaseGame
             currentMoveDirection = vel.normalized;
             closest = Mathf.Min(closest, DistanceToExit(pos));
             CheckPowerUpCollection(pos);
-
-
 
             ratPosition = pos; ratRect.anchoredPosition = pos;
             ApplyRatRotation();
@@ -1016,8 +1157,7 @@ public class TrayectoriasMentalesGame : BaseGame
         phase = Phase.Feedback;
         if (success)
         {
-            audioManager?.Acierto(); // AÑADIR
-
+            audioManager?.Acierto();
             regenerateAfterFeedback = true; successes++; currentStreak++;
             bestStreak = Mathf.Max(bestStreak, currentStreak);
             successesInCurrentLevel++;
@@ -1026,7 +1166,7 @@ public class TrayectoriasMentalesGame : BaseGame
             {
                 currentLevel++; remainingAttempts = Mathf.Max(1, intentosMaximos); successesInCurrentLevel = 0;
                 SyncDifficultyLevel();
-                audioManager?.NivelUp(); // AÑADIR
+                audioManager?.NivelUp();
                 ui?.ShowFeedback($"Nivel {currentLevel}: ahora son {RequiredBouncesForLevel(currentLevel)} rebotes", true);
             }
             else ui?.ShowFeedback($"Salida correcta {successesInCurrentLevel}/{needed}", true);
@@ -1035,13 +1175,13 @@ public class TrayectoriasMentalesGame : BaseGame
         }
         else
         {
-            audioManager?.Error(); // AÑADIR
+            audioManager?.Error();
 
             if (!(ui != null && ui.ConsumeExtraLife())) remainingAttempts = Mathf.Max(0, remainingAttempts - 1);
             regenerateAfterFeedback = false; currentStreak = 0; successesInCurrentLevel = 0;
             string msg = failReason == ExecutionFailReason.Trap ? "Ratonera." :
-                         failReason == ExecutionFailReason.WrongBounceCount ? $"Rebotes incorrectos: {usedBounces}/{requiredBounces}." :
-                         "La rata no encontró la salida.";
+                         failReason == ExecutionFailReason.WrongBounceCount ? $"Rebotes incorrectos: {usedBounces}/{requiredBounces}" :
+                         "La rata no encontró la salida";
             msg += $" Intentos {remainingAttempts}/{intentosMaximos}";
             ui?.ShowFeedback(msg, false);
         }
@@ -1051,13 +1191,10 @@ public class TrayectoriasMentalesGame : BaseGame
 
     private IEnumerator NextRoundAfterDelay()
     {
-        // Esperar 3 segundos para que se lea el feedback
         yield return new WaitForSecondsRealtime(3f);
 
-        // Ocultar feedback
         ui?.HideFeedback();
 
-        // Mostrar pantalla de carga
         if (ui != null && ui.loadingScreen != null)
             ui.loadingScreen.SetActive(true);
 
@@ -1090,7 +1227,6 @@ public class TrayectoriasMentalesGame : BaseGame
             ui.loadingScreen.SetActive(false);
     }
 
-
     // ============================================================
     // RATA Y APUNTADO
     // ============================================================
@@ -1109,10 +1245,13 @@ public class TrayectoriasMentalesGame : BaseGame
         phase = Phase.Planning; ratPosition = ratStart;
         requiredBounces = originalRequiredBounces; bouncePowerUpCollected = false;
         ui?.SetBouncePowerUpActive(false);
-        PositionRat(); 
-        
+        PositionRat();
         UpdateAimFromPointer(true); UpdateHud(); DrawTrajectory();
 
+        if (!helpTextHidden)
+        {
+            ui?.ShowHelpText();
+        }
     }
 
     private void AnimateRat() { if (ratRect != null) ApplyRatRotation(); }
@@ -1147,8 +1286,8 @@ public class TrayectoriasMentalesGame : BaseGame
         if (phase == Phase.Planning)
         {
             simulationSilent = true;
-            int maxBouncesToShow = Mathf.Max(1, requiredBounces - 1); // N-1 rebotes mínimo
-            int postSteps = 40; // Muchos puntos después del último rebote
+            int maxBouncesToShow = Mathf.Max(1, requiredBounces - 1);
+            int postSteps = 40;
 
             Vector2 pos = ratStart, vel = aimDirection * velocidadRata;
             int bounces = 0, dotsAfterLastBounce = 0;
@@ -1273,9 +1412,9 @@ public class TrayectoriasMentalesGame : BaseGame
     private int InternalWallCountForLevel(int l) => l <= 1 ? 1 : Mathf.RoundToInt(Mathf.Lerp(1, paredesInternasNivel10, Mathf.Clamp01((l - 1f) / Mathf.Max(1f, nivelMaximo - 1f))));
     private int PowerUpCountForLevel(int l)
     {
-        if (l <= 3) return 1;   // Niveles 2-3: 1 PU
-        if (l <= 6) return 2;   // Niveles 4-6: 2 PUs (vida + rebote)
-        return 3;                // Niveles 7+: 2 PUs
+        if (l <= 3) return 1;
+        if (l <= 6) return 2;
+        return 3;
     }
     private Vector2 RandomOffset(float range) => new Vector2(Random.Range(-range, range), Random.Range(-range, range));
     private void SyncDifficultyLevel() { currentLevel = Mathf.Clamp(currentLevel, 1, nivelMaximo); maxLevelReached = Mathf.Max(maxLevelReached, currentLevel); if (DifficultyManager.Instance != null) DifficultyManager.Instance.nivelActual = currentLevel; }
@@ -1337,7 +1476,6 @@ public class TrayectoriasMentalesGame : BaseGame
         walls.Clear();
         internalWalls.Clear();
 
-        // Limpiar marcador de salida
         if (exitMarker != null)
         {
             Destroy(exitMarker);
@@ -1371,25 +1509,13 @@ public class TrayectoriasMentalesGame : BaseGame
         CognitiveMetrics m = new CognitiveMetrics();
         if (attempts <= 0) return m;
 
-        // Precisión base (más generosa)
         float prec = Mathf.Lerp(0.4f, 1f, (float)successes / Mathf.Max(1f, attempts));
-
-        // Evitar trampas (más generoso)
         float trap = Mathf.Lerp(0.5f, 1f, 1f - Mathf.Clamp01((float)trapHits / Mathf.Max(1f, attempts)));
-
-        // Precisión de rebotes (más generoso)
         float bounceAccuracy = Mathf.Lerp(0.3f, 1f, 1f - Mathf.Clamp01(Mathf.Abs(totalRequiredBounces - totalUsedBounces) / Mathf.Max(1f, totalRequiredBounces + attempts * 0.5f)));
-
-        // Distancia a la salida
         float dist = Mathf.Clamp01(totalExitDistanceScore / Mathf.Max(1f, attempts)) * 0.8f + 0.2f;
-
-        // Racha (más generosa)
         float streak = Mathf.Lerp(0.3f, 1f, Mathf.Clamp01(bestStreak / 3f));
-
-        // Factor de nivel
         float lvl = Mathf.Lerp(0.5f, 1f, Mathf.Clamp01(maxLevelReached / 8f));
 
-        // Métricas base (valores más altos)
         m.planificacion = (prec * 0.6f + bounceAccuracy * 0.4f) * lvl;
         m.memoriaTrabajo = (prec * 0.4f + bounceAccuracy * 0.35f + streak * 0.25f) * lvl;
         m.memoriaEspacial = (trap * 0.4f + dist * 0.6f) * prec * lvl;
