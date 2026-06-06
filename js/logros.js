@@ -300,7 +300,7 @@ function renderizarMisionActual() {
         contenedor.innerHTML = `
             <div class="bg-gradient-to-r from-yellow-200 to-yellow-400 
                         dark:from-yellow-700 dark:to-yellow-900
-                        my-8 p-6 rounded-2xl outline outline-1 
+                        rounded-2xl outline outline-1 
                         outline-yellow-400 shadow-lg shadow-yellow-500/20">
 
                 <h3 class="text-sm font-bold uppercase tracking-wide 
@@ -332,14 +332,14 @@ function renderizarMisionActual() {
     const anchoBarra = `${porcentaje}%`;
 
     contenedor.innerHTML = `
-        <div class="bg-gradient-to-r from-${actual.color}-50 to-${actual.color}-50 my-8 dark:from-slate-800 dark:to-${actual.color}-600 p-6 rounded-2xl outline outline-1 outline-${actual.color}-500 dark:outline-${actual.color}-900">
+        <div class="bg-gradient-to-r from-${actual.color}-50 to-${actual.color}-50 dark:from-slate-800 dark:to-${actual.color}-600 p-6 rounded-2xl outline outline-1 outline-${actual.color}-500 dark:outline-${actual.color}-900">
             <h3 class="text-sm font-bold uppercase tracking-wide text-${actual.color}-500 dark:text-${actual.color}-600">Misión actual</h3>
             <p class="text-xl mt-3 font-bold text-slate-900 dark:text-white">${mision.nombre}</p>
             <p class="text-lg text-${actual.color}-600 mt-1">${mision.descripcion}</p>
             <div class="relative w-full h-2 bg-indigo-950/50 rounded-full mt-4">
                 <div class="h-full bg-${actual.color}-500 rounded-full shadow-[0px_0px_8px_rgba(99,102,241,0.6)]" style="width: ${anchoBarra};"></div>
             </div>
-            <div class="text-right text-lg text-${actual.color}-600 dark:text-${actual.color}-200 mt-2">${mision.actual} / ${mision.objetivo}</div>
+            <div class="text-right text-lg text-${actual.color}-600 dark:text-${actual.color}-200 mt-2">${Math.ceil(mision.actual)} / ${mision.objetivo}</div>
         </div>
     `;
 }
@@ -372,7 +372,7 @@ function renderizarMedallas() {
         yellow: "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20",
         orange: "border-orange-500 bg-orange-50 dark:bg-orange-900/20",
 
-        // 🔥 GOLD MODE
+      
         gold: "border-yellow-300 bg-gradient-to-br from-yellow-200 to-yellow-400 dark:from-yellow-600 dark:to-yellow-800 shadow-yellow-500/30"
     };
 

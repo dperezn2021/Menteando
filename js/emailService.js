@@ -17,7 +17,7 @@ function mostrarModal(mensaje, tipo) {
     // Eliminar modal existente si lo hay
     const modalExistente = document.getElementById("menteando-modal");
     if (modalExistente) modalExistente.remove();
-    
+
     const modal = document.createElement("div");
     modal.id = "menteando-modal";
     modal.style.cssText = `
@@ -32,15 +32,15 @@ function mostrarModal(mensaje, tipo) {
         justify-content: center;
         z-index: 10000;
     `;
-    
+
     const colors = {
         success: { bg: "#dcfce7", border: "#22c55e", text: "#166534", icon: "✅" },
         error: { bg: "#fee2e2", border: "#ef4444", text: "#991b1b", icon: "❌" },
         info: { bg: "#dbeafe", border: "#3b82f6", text: "#1e40af", icon: "ℹ️" }
     };
-    
+
     const color = colors[tipo] || colors.info;
-    
+
     modal.innerHTML = `
         <div style="background: white; border-radius: 16px; max-width: 350px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); animation: fadeIn 0.2s ease-out;">
             <div style="background: ${color.bg}; padding: 20px; border-radius: 16px 16px 0 0; border-bottom: 2px solid ${color.border};">
@@ -71,9 +71,9 @@ function mostrarModal(mensaje, tipo) {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
-    
+
     // Animación fadeIn
     const style = document.createElement('style');
     style.textContent = `
@@ -83,9 +83,9 @@ function mostrarModal(mensaje, tipo) {
         }
     `;
     document.head.appendChild(style);
-    
+
     document.getElementById("modal-close-btn").onclick = () => modal.remove();
-    
+
     // Cerrar al hacer clic fuera
     modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
 }
@@ -98,7 +98,7 @@ function initEmailJS() {
 
 // ========== 1. ENVIAR MÉTRICAS DEL PERFIL ==========
 function enviarMetricasPorCorreo(perfil) {
-    
+
 
     if (!perfil.correo) {
         mostrarModal("No tienes un correo registrado. Edita tu perfil y añade un correo electrónico.", "info");
@@ -128,7 +128,16 @@ function enviarMetricasPorCorreo(perfil) {
         fecha_envio: new Date().toLocaleString("es-ES"),
         juego_favorito: perfil.juegoMasJugado || "Ninguno",
         total_sesiones: perfil.sesiones,
-        metrics_json: JSON.stringify(perfil.detalle, null, 2),
+        detalle_atencion_sostenida: Math.ceil(perfil.detalle.atencionSostenida) || "N/A",
+        detalle_atencion_selectiva: Math.ceil(perfil.detalle.atencionSelectiva) || "N/A",
+        detalle_atencion_dividida: Math.ceil(perfil.detalle.atencionDividida) || "N/A",
+        detalle_memoria_trabajo: Math.ceil(perfil.detalle.memoriaTrabajo) || "N/A",
+        detalle_memoria_espacial: Math.ceil(perfil.detalle.memoriaEspacial) || "N/A",
+        detalle_control_inhibitorio: Math.ceil(perfil.detalle.controlInhibitorio) || "N/A",
+        detalle_flexibilidad_cognitiva: Math.ceil(perfil.detalle.flexibilidadCognitiva) || "N/A",
+        detalle_planificacion: Math.ceil(perfil.detalle.planificacion) || "N/A",
+        detalle_velocidad_cognitiva: Math.ceil(perfil.detalle.velocidadCognitiva) || "N/A",
+        detalle_coordinacion_visomotora: Math.ceil(perfil.detalle.coordinacionVisomotora) || "N/A",
         name: perfil.nombre,
         email: "no-reply@menteando.com",
         time: new Date()
@@ -139,29 +148,31 @@ function enviarMetricasPorCorreo(perfil) {
             mostrarModal("📊 Tus métricas han sido enviadas correctamente.", "success");
             perfil.metricasEnviadas = true; // Marcar que se han enviado las métricas
             saveperfil(perfil); // Guardar el perfil actualizado
+            location.reload(); // Recargar la página para actualizar el estado del botón
+
         })
         .catch(err => {
             console.error("❌ Error métricas:", err);
             mostrarModal("No se pudieron enviar las métricas. Inténtalo de nuevo más tarde.", "error");
         });
 
-        
+
 
 }
 
 // ========== 2. ENVIAR FORMULARIO DE CONTACTO ==========
 function enviarContacto(event) {
     event.preventDefault();
-    
+
     const nombre = document.getElementById("contacto-nombre")?.value;
     const email = document.getElementById("contacto-email")?.value;
     const mensaje = document.getElementById("contacto-mensaje")?.value;
-    
+
     if (!nombre || !email || !mensaje) {
         mostrarModal("Por favor, completa todos los campos del formulario.", "info");
         return;
     }
-    
+
     const data = {
         from_name: nombre,
         from_email: email,
@@ -169,7 +180,7 @@ function enviarContacto(event) {
         to_email: "menteando.info@gmail.com",
         time: new Date().toLocaleString("es-ES")
     };
-    
+
     emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templates.contacto, data)
         .then(() => {
             mostrarModal("✅ Mensaje enviado correctamente. Te responderemos pronto.", "success");

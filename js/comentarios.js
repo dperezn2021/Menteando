@@ -103,7 +103,6 @@ async function responderComentario(id) {
     }
 }
 
-// MODIFICADO: Ahora valida activamente si el admin introdujo su contraseña
 function esAdmin() {
     const usuario = getUsuarioActual();
     const tieneToken = !!window.ADMIN_BEARER;
@@ -117,7 +116,7 @@ function esAdmin() {
     return usuario === "admin" && tieneToken;
 }
 
-// NUEVA FUNCIÓN: Maneja el login contra el endpoint /verify de tu Worker
+
 async function verificarContrasenaAdmin() {
     // Evitar bucles si ya se está pidiendo la contraseña
     if (window.VERIFICANDO_ADMIN) return;
@@ -145,7 +144,7 @@ async function verificarContrasenaAdmin() {
             // Guardamos la clave en la variable global que tus funciones fetch (DELETE, PUT) ya leen
             window.ADMIN_BEARER = password;
             mostrarModal('Autenticación de administrador correcta 👑', 'success');
-            cargarComentarios(); // Recargamos para que aparezcan los botones de borrar (🗑️)
+            cargarComentarios(); // Recargamos para que aparezcan los botones de borrar 
         } else {
             mostrarModal('Contraseña de administrador incorrecta', 'error');
         }
@@ -170,12 +169,10 @@ async function cargarComentarios() {
         const response = await fetch(url);
         let comentarios = await response.json();
 
-        // Fallback: if server doesn't support category filtering, apply client-side filter
         if (filtroActual !== "todos") {
             comentarios = comentarios.filter(c => c.categoria === filtroActual);
         }
 
-        // Apply client-side sorting: by fecha
         comentarios = (comentarios || []).slice();
         comentarios.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
         if (sortDesc) comentarios.reverse();
@@ -756,62 +753,211 @@ function escapeHtml(texto) {
 }
 
 // Modal confirm that returns a Promise<boolean>
+// Modal confirm que respeta modo oscuro
 function confirmModal(mensaje, title = '') {
     return new Promise((resolve) => {
         const modalExistente = document.getElementById("menteando-modal");
         if (modalExistente) modalExistente.remove();
+        
         const modal = document.createElement("div");
         modal.id = "menteando-modal";
-        modal.style.cssText = `position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:10000;`;
+        modal.style.cssText = `
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.7); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 10000;
+        `;
+        
+        // Detectar si estamos en modo oscuro
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        
         modal.innerHTML = `
-            <div style="background: white; border-radius: 12px; max-width:420px; width:90%; box-shadow: 0 10px 30px rgba(0,0,0,0.12);">
-                <div style="padding:18px 20px; border-bottom:1px solid #eee;">
-                    <h3 style="margin:0; font-size:16px; color:#0f172a">${title || 'Confirmar'}</h3>
+            <div style="
+                background: ${isDarkMode ? '#1e293b' : '#ffffff'}; 
+                border-radius: 16px; 
+                max-width: 420px; 
+                width: 90%; 
+                box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+                border: 1px solid ${isDarkMode ? '#334155' : '#e2e8f0'};
+            ">
+                <div style="
+                    padding: 18px 20px; 
+                    border-bottom: 1px solid ${isDarkMode ? '#334155' : '#e2e8f0'};
+                ">
+                    <h3 style="
+                        margin: 0; 
+                        font-size: 16px; 
+                        font-weight: 600;
+                        color: ${isDarkMode ? '#f1f5f9' : '#0f172a'};
+                    ">${title || 'Confirmar'}</h3>
                 </div>
-                <div style="padding:18px 20px;">
-                    <p style="margin:0 0 12px; color:#334155;">${mensaje}</p>
-                    <div style="display:flex; gap:8px; justify-content:flex-end;">
-                        <button id="modal-cancel-btn" style="background:#e5e7eb;border:none;padding:8px 12px;border-radius:8px;">Cancelar</button>
-                        <button id="modal-ok-btn" style="background:#3b82f6;color:#fff;border:none;padding:8px 12px;border-radius:8px;">Aceptar</button>
+                <div style="padding: 18px 20px;">
+                    <p style="
+                        margin: 0 0 12px; 
+                        color: ${isDarkMode ? '#cbd5e1' : '#334155'};
+                    ">${mensaje}</p>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button id="modal-cancel-btn" style="
+                            background: ${isDarkMode ? '#334155' : '#e5e7eb'}; 
+                            color: ${isDarkMode ? '#f1f5f9' : '#1f2937'};
+                            border: none; 
+                            padding: 8px 16px; 
+                            border-radius: 8px; 
+                            cursor: pointer;
+                            font-weight: 500;
+                            transition: all 0.2s;
+                        ">Cancelar</button>
+                        <button id="modal-ok-btn" style="
+                            background: #3b82f6; 
+                            color: #fff; 
+                            border: none; 
+                            padding: 8px 16px; 
+                            border-radius: 8px; 
+                            cursor: pointer;
+                            font-weight: 500;
+                            transition: all 0.2s;
+                        ">Aceptar</button>
                     </div>
                 </div>
             </div>
         `;
+        
         document.body.appendChild(modal);
-        modal.onclick = (e) => { if (e.target === modal) { modal.remove(); resolve(false); } };
-        document.getElementById('modal-cancel-btn').onclick = () => { modal.remove(); resolve(false); };
-        document.getElementById('modal-ok-btn').onclick = () => { modal.remove(); resolve(true); };
+        
+        modal.onclick = (e) => { 
+            if (e.target === modal) { 
+                modal.remove(); 
+                resolve(false); 
+            } 
+        };
+        
+        document.getElementById('modal-cancel-btn').onclick = () => { 
+            modal.remove(); 
+            resolve(false); 
+        };
+        
+        document.getElementById('modal-ok-btn').onclick = () => { 
+            modal.remove(); 
+            resolve(true); 
+        };
     });
 }
 
 // Modal input that returns a Promise<string|null>
+// Modal input que respeta modo oscuro
 function inputModal(mensaje, placeholder = '') {
     return new Promise((resolve) => {
         const modalExistente = document.getElementById("menteando-modal");
         if (modalExistente) modalExistente.remove();
+        
         const modal = document.createElement("div");
         modal.id = "menteando-modal";
-        modal.style.cssText = `position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:10000;`;
+        modal.style.cssText = `
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.7); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 10000;
+        `;
+        
+        // Detectar si estamos en modo oscuro
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        
         modal.innerHTML = `
-            <div style="background: white; border-radius: 12px; max-width:520px; width:92%; box-shadow: 0 10px 30px rgba(0,0,0,0.12);">
-                <div style="padding:18px 20px; border-bottom:1px solid #eee;">
-                    <h3 style="margin:0; font-size:16px; color:#0f172a">¿Por qué reportas?</h3>
+            <div style="
+                background: ${isDarkMode ? '#1e293b' : '#ffffff'}; 
+                border-radius: 16px; 
+                max-width: 520px; 
+                width: 92%; 
+                box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+                border: 1px solid ${isDarkMode ? '#334155' : '#e2e8f0'};
+            ">
+                <div style="
+                    padding: 18px 20px; 
+                    border-bottom: 1px solid ${isDarkMode ? '#334155' : '#e2e8f0'};
+                ">
+                    <h3 style="
+                        margin: 0; 
+                        font-size: 16px; 
+                        font-weight: 600;
+                        color: ${isDarkMode ? '#f1f5f9' : '#0f172a'};
+                    ">¿Por qué reportas?</h3>
                 </div>
-                <div style="padding:18px 20px;">
-                    <p style="margin:0 0 8px; color:#334155;">${mensaje}</p>
-                    <textarea id="modal-input" placeholder="${placeholder}" style="width:100%; min-height:80px; padding:8px; border-radius:8px; border:1px solid #e5e7eb; resize:vertical;"></textarea>
-                    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
-                        <button id="modal-cancel-btn" style="background:#e5e7eb;border:none;padding:8px 12px;border-radius:8px;">Cancelar</button>
-                        <button id="modal-ok-btn" style="background:#3b82f6;color:#fff;border:none;padding:8px 12px;border-radius:8px;">Enviar</button>
+                <div style="padding: 18px 20px;">
+                    <p style="
+                        margin: 0 0 8px; 
+                        color: ${isDarkMode ? '#cbd5e1' : '#334155'};
+                    ">${mensaje}</p>
+                    <textarea id="modal-input" 
+                        placeholder="${placeholder}" 
+                        style="
+                            width: 100%; 
+                            min-height: 80px; 
+                            padding: 10px 12px; 
+                            border-radius: 12px; 
+                            border: 1px solid ${isDarkMode ? '#475569' : '#e2e8f0'}; 
+                            background: ${isDarkMode ? '#0f172a' : '#ffffff'};
+                            color: ${isDarkMode ? '#f1f5f9' : '#1f2937'};
+                            resize: vertical;
+                            font-size: 14px;
+                        "></textarea>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
+                        <button id="modal-cancel-btn" style="
+                            background: ${isDarkMode ? '#334155' : '#e5e7eb'}; 
+                            color: ${isDarkMode ? '#f1f5f9' : '#1f2937'};
+                            border: none; 
+                            padding: 8px 16px; 
+                            border-radius: 8px; 
+                            cursor: pointer;
+                            font-weight: 500;
+                            transition: all 0.2s;
+                        ">Cancelar</button>
+                        <button id="modal-ok-btn" style="
+                            background: #3b82f6; 
+                            color: #fff; 
+                            border: none; 
+                            padding: 8px 16px; 
+                            border-radius: 8px; 
+                            cursor: pointer;
+                            font-weight: 500;
+                            transition: all 0.2s;
+                        ">Enviar</button>
                     </div>
                 </div>
             </div>
         `;
+        
         document.body.appendChild(modal);
-        modal.onclick = (e) => { if (e.target === modal) { modal.remove(); resolve(null); } };
-        document.getElementById('modal-cancel-btn').onclick = () => { modal.remove(); resolve(null); };
-        document.getElementById('modal-ok-btn').onclick = () => { const v = document.getElementById('modal-input').value.trim(); modal.remove(); resolve(v); };
-        // focus
+        
+        modal.onclick = (e) => { 
+            if (e.target === modal) { 
+                modal.remove(); 
+                resolve(null); 
+            } 
+        };
+        
+        document.getElementById('modal-cancel-btn').onclick = () => { 
+            modal.remove(); 
+            resolve(null); 
+        };
+        
+        document.getElementById('modal-ok-btn').onclick = () => { 
+            const v = document.getElementById('modal-input').value.trim(); 
+            modal.remove(); 
+            resolve(v); 
+        };
+        
         setTimeout(() => document.getElementById('modal-input').focus(), 50);
     });
 }

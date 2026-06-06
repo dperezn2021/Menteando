@@ -153,6 +153,7 @@ function getNivel(perfil) {
 
 // ========== FUNCIÓN DE FORMATO DE PUNTOS ==========
 function formatearPuntos(puntos) {
+    puntos = Math.ceil(Number(puntos) || 0);
     if (typeof puntos !== 'number' || isNaN(puntos)) puntos = 0;
     if (puntos < 1000) return Math.floor(puntos).toString();
     if (puntos < 1000000) return (puntos / 1000).toFixed(1) + "K";
@@ -609,6 +610,125 @@ function desactivarCoach() {
 
 function disableCoachForever() {
     localStorage.setItem("coach_disabled", "true");
+}
+
+
+
+
+// ========== EXPORTAR METRICAS ==========
+// ====================
+// EXPORTAR PERFIL
+// ====================
+
+function exportarPerfil() {
+
+    const perfil = getperfil();
+
+    const contenido = JSON.stringify({
+        version: "1.0",
+        fechaExportacion: new Date().toISOString(),
+        perfil
+    }, null, 2);
+
+    const blob = new Blob(
+        [contenido],
+        { type: "application/json" }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const enlace = document.createElement("a");
+
+    enlace.href = url;
+
+    enlace.download =
+        `menteando-${perfil.nombre || "perfil"}.json`;
+
+    document.body.appendChild(enlace);
+
+    enlace.click();
+
+    document.body.removeChild(enlace);
+
+    URL.revokeObjectURL(url);
+
+    mostrarModal(
+        "Perfil exportado correctamente.",
+        "success"
+    );
+}
+
+document
+    .getElementById("btn-exportar")
+    ?.addEventListener("click", exportarPerfil);
+
+
+// ====================
+// IMPORTAR PERFIL
+// ====================
+
+document
+    .getElementById("btn-importar")
+    ?.addEventListener("click", () => {
+
+        document
+            .getElementById("input-importar-perfil")
+            .click();
+
+    });
+
+document
+    .getElementById("input-importar-perfil")
+    ?.addEventListener("change", importarPerfil);
+
+function importarPerfil(event) {
+
+    const archivo = event.target.files[0];
+
+    if (!archivo) return;
+
+    const lector = new FileReader();
+
+    lector.onload = function(e) {
+
+        try {
+
+            const datos =
+                JSON.parse(e.target.result);
+
+            if (!datos.perfil) {
+
+                throw new Error(
+                    "Formato de archivo inválido"
+                );
+
+            }
+
+            saveperfil(datos.perfil);
+
+            mostrarModal(
+                "Perfil importado correctamente.",
+                "success"
+            );
+
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+
+        } catch (error) {
+
+            console.error(error);
+
+            mostrarModal(
+                "El archivo seleccionado no es válido.",
+                "error"
+            );
+
+        }
+
+    };
+
+    lector.readAsText(archivo);
 }
 
 // ========== EXPORTS GLOBALES ==========
