@@ -4,3 +4,10 @@
 /Unity_Menteando/.vs
 /Unity_Menteando/UserSettings
 /Unity_Menteando/Logs
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
