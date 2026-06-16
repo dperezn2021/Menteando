@@ -4,11 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Menteando">
-    <meta name="keywords" content="menteando, TMT">
-    <meta name="author" content="Daniel Perez Navarro">
-    <title>Menteando | TMT Test</title>
-    <link rel="icon" href="../assets/img/logo_1.png" type="image/png" sizes="32x32">
+    <title>Menteando | Trail Making Test A/B (TMT)</title>
+    <meta name="description"
+        content="Mide tu flexibilidad mental y coordinación visomotora con el Trail Making Test. Conecta números y letras de forma alterna lo más rápido posible.">
+    <meta name="keywords"
+        content="test TMT, trail making test, flexibilidad mental, coordinacion visomotora, atencion dividida">
+    <meta name="author" content="Daniel Pérez Navarro">
+    <link rel="canonical" href="https://menteando.com/tests/tmt-page">
+    <link rel="icon" href="/assets/img/logo_1.png" type="image/png" sizes="32x32">
 
     <script>
         (() => {
@@ -55,8 +58,10 @@
 
 <body
     class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased overflow-x-hidden">
-    <header class="header-auto-hide w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
+    <header
+        class="header-auto-hide w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3 flex-shrink-0">
                 <img id="game-logo" src="../assets/img/logo_1.png" alt="Logo del juego"
                     class="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover" />
@@ -68,7 +73,9 @@
             </div>
 
             <nav class="flex flex-row items-center justify-center gap-2 md:gap-3">
-                <a href="../tests.html" class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 hover:text-blue-500 transition-colors">Volver a tests</a>
+                <a href="../tests.html"
+                    class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 hover:text-blue-500 transition-colors">Volver
+                    a tests</a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -90,10 +97,10 @@
 
     <main id="test-detail-content"></main>
 
-       <!-- Script de inicialización de interfaz: se ejecuta cuando el DOM está listo -->
+    <!-- Script de inicialización de interfaz: se ejecuta cuando el DOM está listo -->
     <script data-purpose="init-interface">
         document.addEventListener('DOMContentLoaded', () => {
-        
+
             initTestDetailPage('tmt');
 
         });
