@@ -1,0 +1,170 @@
+/* =========================
+    PALETA Y VARIABLES
+========================= */
+
+:root {
+    --bg: #18181b;
+    --text: #f0f4f9;
+    --primary: #7ca8ff;
+    --secondary: #a8a0cd;
+    --success: #776edf;
+    --card-bg: #323057;
+    --radius: 16px;
+    --shadow: 0 4px 20px rgba(72, 72, 72, 0.169);
+    --shadow-hover: 0 6px 28px rgb(255, 255, 255);
+}
+
+/* =========================
+    GLOBAL
+========================= */
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", system-ui, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+    font-weight: 700;
+    margin: 0;
+}
+
+p {
+    line-height: 1.6;
+    margin: 0.5rem 0;
+    color: var(--text);
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    color-scheme: light;
+}
+
+html.dark {
+    color-scheme: dark;
+}
+
+/* =========================
+    HEADER - Solo auto-ocultación
+========================= */
+
+.header-auto-hide {
+    transition: transform 0.3s ease;
+}
+
+.header-hidden {
+    transform: translateY(-100%);
+}
+
+/* =========================
+    MENÚ HAMBURGUESA
+========================= */
+
+.menu-hamburguesa {
+    background: none !important;
+    border: none !important;
+    font-size: 1.8rem !important;
+    cursor: pointer;
+    color: currentColor;
+    padding: 0 8px;
+    display: none;
+}
+
+/* Overlay */
+.menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    z-index: 999;
+}
+
+.menu-overlay.visible {
+    display: block;
+}
+
+/* Menú lateral */
+.menu-container {
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 280px;
+    height: 100%;
+    background: var(--bg);
+    z-index: 1000;
+    transition: right 0.3s ease;
+    padding: 80px 20px 20px;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+}
+
+.menu-container.open {
+    right: 0;
+}
+
+.menu-container nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.menu-container nav a {
+    display: block;
+    padding: 0.4rem 0;
+    width: 100%;
+}
+
+/* Modo claro */
+html:not(.dark) .menu-container {
+    background: #ffffff;
+    color: #1e293b;
+}
+
+/* Modo oscuro */
+html.dark .menu-container {
+    background: var(--bg);
+}
+
+/* =========================
+    NOMBRE DE USUARIO - OCULTAR SOLO EN PANTALLAS PEQUEÑAS (cuando hay hamburguesa)
+========================= */
+
+/* Cuando el menú hamburguesa está visible (pantallas < 1024px), ocultar el nombre */
+@media (max-width: 1023px) {
+    #perfil-apodo-header {
+        display: none !important;
+    }
+}
+
+/* En desktop (≥1024px), mostrar el nombre normalmente */
+@media (min-width: 1024px) {
+    #perfil-apodo-header {
+        display: inline-block !important;
+    }
+}
+
+/* Ajuste para landscape en móvil: mantener nombre oculto igual */
+@media (max-width: 1023px) and (orientation: landscape) {
+    #perfil-apodo-header {
+        display: none !important;
+    }
+}
+
+/* Títulos responsive */
+.hero-title {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+}
+
+.section-title {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+}

@@ -1,0 +1,290 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="es">
+
+<head>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menteando | Tests Cognitivos y Evaluación Neuropsicológica</title>
+    <meta name="description" content="Mide tu rendimiento intelectual con tests cognitivos basados en evidencia (Stroop, d2, TMT). Evalúa tu atención sostenida, memoria de trabajo y flexibilidad cognitiva.">
+    <meta name="keywords" content="tests cognitivos, evaluación neuropsicológica, test Stroop, test d2, memoria de trabajo, atención sostenida, flexibilidad cognitiva, funciones ejecutivas, digital, test digitalizado">
+    <meta name="author" content="Daniel Pérez Navarro">
+    <link rel="canonical" href="https://menteando.com/tests">
+    <link rel="icon" href="/assets/img/logo_1.png" type="image/png" sizes="32x32">
+
+    
+    <script>
+        (() => {
+            const storedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const useDark = storedTheme ? storedTheme === 'dark' : prefersDark;
+            document.documentElement.classList.toggle('dark', useDark);
+            document.documentElement.classList.toggle('light', !useDark);
+        })();
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#3b82f6',
+                            secondary: '#6366f1',
+                            accent: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/coach/animacionesCoach.css">
+    <script defer src="js/header.js"></script>
+</head>
+
+<body class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased">
+
+    <!-- HEADER -->
+    <header
+        class="header-auto-hide w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <img src="../assets/img/logo_1.png" alt="Logo" class="w-10 h-10 md:w-12 md:h-12" />
+                <div class="flex flex-col leading-tight text-left">
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Menteando</h1>
+                    <p class="text-xs md:text-sm font-normal text-slate-500 dark:text-slate-300">Entrena tu mente, pero
+                        jugando</p>
+                </div>
+            </div>
+
+            <nav class="flex flex-direction-row md:flex-row items-center justify-center gap-1 md:gap-3">
+                <a href="index.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Inicio</a>
+                <a href="tests.html"
+                    class="text-lg md:text-2xl font-bold text-blue-500 hover:text-blue-700 transition-colors px-2">Tests</a>
+                <a href="games.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Juegos</a>
+                <a href="about.html"
+                    class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-500 transition-colors px-2">Acerca
+                    De</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <a href="perfil.html" class="flex items-center gap-2">
+                    <span id="perfil-apodo-header"
+                        class="text-md md:text-xl font-normal text-slate-500 dark:text-slate-300"></span>
+                    <div
+                        class="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-blue-500 bg-blue-500/10">
+                        <img id="perfil-avatar-header" src="/assets/icon/usuario.webp" alt="Avatar"
+                            class="w-full h-full object-cover" />
+                    </div>
+                </a>
+                <button id="theme-toggle-btn"
+                    class="text-lg md:text-2xl text-slate-900 dark:text-white hover:text-blue-500 transition-colors"></button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Coach -->
+        <div id="coach" class="coach">
+            <div id="coach-bubble" class="coach-bubble"></div>
+        </div>
+
+        <!-- Test recomendado -->
+        <section class="py-8 md:py-12 lg:py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div id="test-recomendado"></div>
+            </div>
+        </section>
+
+        <!-- Lista de tests -->
+        <section class="pb-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+                    <div>
+                        <h2 class="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-2">
+                            Explorar batería de tests</h2>
+                        <p class="text-slate-600 dark:text-slate-300 text-base md:text-lg max-w-7xl">Estos tests no
+                            modifican tu perfil: te ayudan a identificar en qué capacidad puedes estar flojeando.</p>
+                    </div>
+                    <div class="w-full lg:w-80">
+                        <input id="tests-barra-busqueda" type="text" placeholder="Buscar test..."
+                            class="w-full px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="flex flex-wrap gap-2 mb-8 items-center justify-center lg:justify-start">
+                    <button data-test-category="" onclick="setTestCategory('')"
+                        class="px-4 py-2 rounded-full text-sm font-semibold transition-all bg-blue-500 text-white hover:bg-blue-600">Todos</button>
+                    <button data-test-category="atencion" onclick="setTestCategory('atencion')"
+                        class="px-4 py-2 rounded-full text-sm font-semibold transition-all bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600">Atención</button>
+                    <button data-test-category="memoria" onclick="setTestCategory('memoria')"
+                        class="px-4 py-2 rounded-full text-sm font-semibold transition-all bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600">Memoria</button>
+                    <button data-test-category="control" onclick="setTestCategory('control')"
+                        class="px-4 py-2 rounded-full text-sm font-semibold transition-all bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600">Control</button>
+                    <button data-test-category="reflejos" onclick="setTestCategory('reflejos')"
+                        class="px-4 py-2 rounded-full text-sm font-semibold transition-all bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600">Reflejos</button>
+
+
+                </div>
+
+
+                <!-- Grid de tests - 1 columna móvil, 2 tablet, 3 desktop -->
+                <div id="tests-grid" class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6"></div>
+            </div>
+        </section>
+        <a id="feedback-btn" aria-label="Dejar opinión" title="Dejar opinión" href="https://forms.gle/whPgPDtptPN632Sh6"
+            target="_blank" rel="noopener noreferrer"
+            class="hidden fixed left-4 bottom-6 z-50 bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-3 shadow-lg items-center gap-2">
+            💭 Dejar opinión
+        </a>
+    </main>
+
+    <!------------------------------- FOOTER ------------------------>
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 md:py-16">
+
+            <!-- Grid principal: 3 columnas en desktop -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-10">
+
+                <!-- Columna 1: Logo y descripción (más ancha) -->
+                <div class="md:col-span-5 text-center md:text-left">
+                    <div class="flex items-center gap-3 justify-center md:justify-start mb-4">
+                        <img src="../assets/img/logo_1.png" alt="Logo" class="w-10 h-10 md:w-12 md:h-12" />
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Menteando</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Entrena tu mente, pero jugando</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-md mx-auto md:mx-0">
+                        Plataforma de estimulación cognitiva diseñada para mantener tu cerebro ágil, joven y saludable.
+                    </p>
+                </div>
+
+                <!-- Columna 2: Enlaces rápidos -->
+                <div class="md:col-span-3 text-center md:text-left">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-4 text-lg">Enlaces rápidos</h4>
+                    <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a href="index.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Inicio</a>
+                        </li>
+                        <li><a href="tests.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Tests
+                                cognitivos</a></li>
+                        <li><a href="games.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Juegos</a>
+                        </li>
+                        <li><a href="perfil.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Mi
+                                perfil</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 3: Información y contacto -->
+                <div class="md:col-span-4 text-center md:text-left">
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-4 text-lg">Información</h4>
+                    <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a href="about.html"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Acerca
+                                de Menteando</a></li>
+                        <li><a href="about.html#faq"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Preguntas
+                                frecuentes</a></li>
+                        <li><a href="about.html#contacto"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Contacto</a>
+                        </li>
+                        <li><a href="https://github.com/dperezn2021/Menteando" target="_blank"
+                                class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">GitHub
+                                del proyecto</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="pt-6 border-t border-slate-100 dark:border-slate-800 text-center text-xs text-slate-400">
+                © 2026 Menteando. Daniel Pérez Navarro.
+            </div>
+
+        </div>
+    </footer>
+
+
+    <!-- Scripts -->
+    <script src="/js/perfil.js"></script>
+    <script src="/js/datosPerfil.js"></script>
+    <script src="/js/catalogoTests.js"></script>
+    <script src="../js/catalogoJuegos.js"></script>
+
+    <script src="/js/tests.js"></script>
+    <script src="/coach/mensajesCoach.js"></script>
+    <script src="/coach/cerebroCoach.js"></script>
+    <script src="/coach/entidadCoach.js"></script>
+    <script src="/js/controladorCoach.js"></script>
+
+    <script>
+        const perfil = getperfil();
+        const coachController = new CoachController(perfil);
+        window.coachController = coachController;
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const headerAvatar = document.getElementById('perfil-avatar-header');
+            if (perfil.avatar && headerAvatar) headerAvatar.src = perfil.avatar;
+
+            const themeToggleBtn = document.getElementById('theme-toggle-btn');
+            const root = document.documentElement;
+            const syncThemeButton = () => {
+                const isDark = root.classList.contains('dark');
+                if (themeToggleBtn) themeToggleBtn.textContent = isDark ? '☀️' : '🌙';
+            };
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    const willUseDark = !root.classList.contains('dark');
+                    root.classList.toggle('dark', willUseDark);
+                    root.classList.toggle('light', !willUseDark);
+                    localStorage.setItem('theme', willUseDark ? 'dark' : 'light');
+                    syncThemeButton();
+                });
+                syncThemeButton();
+            }
+            renderFeaturedTest();
+            initTestsPage();
+        });
+    </script>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('feedback-btn');
+            if (!btn) return;
+
+            // Si NO ha sido descartado, mostramos el botón quitando 'hidden'
+            if (localStorage.getItem('feedbackDismissed') !== '1') {
+                btn.classList.remove('hidden');
+            } else {
+                return; // Si ya se descartó, no hacemos nada más
+            }
+
+            const dismiss = () => {
+                try { localStorage.setItem('feedbackDismissed', '1'); } catch (e) { }
+                btn.style.transition = 'opacity .25s ease, transform .25s ease';
+                btn.style.opacity = '0';
+                btn.style.transform = 'scale(.92)';
+                setTimeout(() => btn.remove(), 250);
+            };
+
+            btn.addEventListener('click', dismiss, { once: true });
+        })();
+    </script>
+</body>
+
+</html>

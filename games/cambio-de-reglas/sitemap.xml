@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Páginas Principales -->
+  <url><loc>https://menteando.com/</loc></url>
+  <url><loc>https://menteando.com/games</loc></url>
+  <url><loc>https://menteando.com/tests</loc></url>
+  <url><loc>https://menteando.com/perfil</loc></url>
+  <url><loc>https://menteando.com/about</loc></url>
+
+  <!-- Catálogo de Tests (Pretty URLs sin .html) -->
+  <url><loc>https://menteando.com/tests/mec-page</loc></url>
+  <url><loc>https://menteando.com/tests/tavec-page</loc></url>
+  <url><loc>https://menteando.com/tests/d2-page</loc></url>
+  <url><loc>https://menteando.com/tests/cpt-page</loc></url>
+  <url><loc>https://menteando.com/tests/corsi-page</loc></url>
+  <url><loc>https://menteando.com/tests/tower-of-london-page</loc></url>
+  <url><loc>https://menteando.com/tests/wcst-page</loc></url>
+  <url><loc>https://menteando.com/tests/stroop-page</loc></url>
+  <url><loc>https://menteando.com/tests/digit-span-page</loc></url>
+  <url><loc>https://menteando.com/tests/tmt-page</loc></url>
+  <url><loc>https://menteando.com/tests/symbol-search-page</loc></url>
+  <url><loc>https://menteando.com/tests/nback-page</loc></url>
+  <url><loc>https://menteando.com/tests/gng-page</loc></url>
+
+  <!-- Catálogo de Juegos (Pretty URLs sin .html) -->
+  <url><loc>https://menteando.com/games/detector-intrusos/detector-intrusos-page</loc></url>
+  <url><loc>https://menteando.com/games/doble-canal/doble-canal-page</loc></url>
+  <url><loc>https://menteando.com/games/silencio-mental/silencio-mental-page</loc></url>
+  <url><loc>https://menteando.com/games/operaciones-encadenadas/operaciones-encadenadas-page</loc></url>
+  <url><loc>https://menteando.com/games/eco-visual/eco-visual-page</loc></url>
+  <url><loc>https://menteando.com/games/color-match/color-match-page</loc></url>
+  <url><loc>https://menteando.com/games/cambio-de-reglas/cambio-de-reglas-page</loc></url>
+  <url><loc>https://menteando.com/games/trayectorias-mentales/trayectorias-mentales-page</loc></url>
+  <url><loc>https://menteando.com/games/mision-orbital/mision-orbital-page</loc></url>
+  <url><loc>https://menteando.com/games/reflejos-cruzados/reflejos-cruzados-page</loc></url>
+
+</urlset>
