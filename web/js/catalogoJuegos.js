@@ -225,8 +225,8 @@ const CATALOGO_JUEGOS = [
     "detalleDescripcion": "Color Match es una tarea tipo Stroop. Aparece una palabra de color pintada con otro color. Según la regla activa, debes responder al color de la tinta o al significado de la palabra. El reto es evitar la respuesta automática incorrecta.",
     "comoJugar": [
       "Lee la regla activa antes de responder.",
-      "Si la regla pide color real, pulsa el color con el que está pintado el texto.",
-      "Si la regla pide palabra, pulsa el color que la palabra dice.",
+      "Si la regla dice Color Pintado, pulsa el color con el que está pintado el texto.",
+      "Si la regla dice Color Escrito, pulsa el color que la palabra dice.",
       "Ignora la información que no corresponda a la regla.",
       "Responde con precisión y rapidez."
     ],
