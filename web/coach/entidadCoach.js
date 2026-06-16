@@ -5,7 +5,7 @@ function CoachEntity(element, bubble) {
 }
 
 CoachEntity.prototype.show = function(msg) {
-    this.bubble.innerText = msg;
+    this.bubble.innerHTML = msg;
     this.element.classList.add("visible");
     this.visible = true;
 };
@@ -14,6 +14,5 @@ CoachEntity.prototype.hide = function() {
     this.element.classList.remove("visible");
     this.visible = false;
 };
-
 
 window.CoachEntity = CoachEntity;

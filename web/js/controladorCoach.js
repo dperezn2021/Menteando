@@ -1,81 +1,104 @@
-function CoachController(perfil) {
-
-    // Si está desactivado → no crear nada
-    if (isCoachDisabled()) {
-        console.warn("Coach desactivado permanentemente.");
-        return;
-    }
-
+function CoachController(perfil, options = {}) {
+    if (isCoachDisabled()) return;
+    
     this.perfil = perfil;
-    this.entity = new CoachEntity(
-        document.getElementById("coach"),
-        document.getElementById("coach-bubble")
-    );
-
-    this.inactivityTimer = null;
-    this.setupUserInteractionListeners();
+    this.contextoFijo = options.contexto || null;
+    this.datosContexto = options.datos || {};
+    this.entity = null;
+    this.timer = null;
+    this.init();
 }
 
-
-CoachController.prototype.setupUserInteractionListeners = function () {
-    document.addEventListener("click", this.onUserInteraction.bind(this));
-    document.addEventListener("keydown", this.onUserInteraction.bind(this));
-    document.addEventListener("keydown", function (e) {
-        if (e.key.toLowerCase() === "h") {
-            desactivarCoach();
-
-            const coach = document.getElementById("coach");
-            if (coach) coach.remove();
-
-            console.warn("Coach desactivado permanentemente por el usuario.");
-        }
-    });
+CoachController.prototype.init = function() {
+    const self = this;
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            self.setupCoach();
+        });
+    } else {
+        this.setupCoach();
+    }
 };
 
-CoachController.prototype.onUserInteraction = function () {
-    this.entity.hide();
-    clearTimeout(this.inactivityTimer);
-
-    this.inactivityTimer = setTimeout(() => {
-        this.showContext("standby");
-    }, 5000);
+CoachController.prototype.setupCoach = function() {
+    const coachElement = document.getElementById("coach");
+    const bubbleElement = document.getElementById("coach-bubble");
+    if (!coachElement || !bubbleElement) return;
+    
+    this.entity = new CoachEntity(coachElement, bubbleElement);
+    this.setupListeners();
+    this.ajustarPosicion();
+    this.mostrarMensajeActual();
+    
+    window.addEventListener('resize', () => this.ajustarPosicion());
+    window.addEventListener('orientationchange', () => setTimeout(() => this.ajustarPosicion(), 100));
 };
 
-CoachController.prototype.showContext = function (contexto, ultimoJuego, tendencia) {
-    if (isCoachDisabled()) return;
-    const msg = getCoachMessage(this.perfil, contexto, ultimoJuego, tendencia);
+CoachController.prototype.ajustarPosicion = function() {
+    if (!this.entity || !this.entity.bubble || !this.entity.element) return;
+    
+    const coach = this.entity.element;
+    const bubble = this.entity.bubble;
+    
+    // Obtener dimensiones
+    const coachRect = coach.getBoundingClientRect();
+    const bubbleWidth = bubble.offsetWidth;
+    
+    // Si la burbuja no cabe a la izquierda, ponerla arriba
+    const cabeIzquierda = coachRect.left - bubbleWidth - 20 >= 0;
+    
+    if (cabeIzquierda) {
+        coach.classList.remove('bubble-top');
+    } else {
+        coach.classList.add('bubble-top');
+    }
+};
+
+CoachController.prototype.setupListeners = function() {
+    const self = this;
+    const hideAndSchedule = function() {
+        if (self.entity) self.entity.hide();
+        if (self.timer) clearTimeout(self.timer);
+        self.timer = setTimeout(function() {
+            if (self.entity) self.mostrarMensajeActual();
+        }, 5000);
+    };
+    document.addEventListener("click", hideAndSchedule);
+    document.addEventListener("keydown", hideAndSchedule);
+};
+
+CoachController.prototype.mostrarMensajeActual = function() {
+    if (!this.entity) return;
+    
+    this.ajustarPosicion();
+    
+    if (typeof getperfil === "function") {
+        this.perfil = getperfil();
+    }
+
+    const path = window.location.pathname;
+    let contexto = this.contextoFijo || "inicio";
+    if (!this.contextoFijo) {
+        if (path.includes("perfil.html")) contexto = "perfil";
+        else if (path.includes("games.html")) contexto = "juegos";
+        else if (path.includes("tests.html")) contexto = "tests";
+        else if (path.includes("about.html")) contexto = "about";
+    }
+    
+    const msg = getCoachMessage(this.perfil, contexto, null, this.datosContexto);
     if (msg) this.entity.show(msg);
 };
 
-// === EVENTOS ===
-CoachController.prototype.onPantallaPerfil = function () {
-    this.showContext("perfil");
+CoachController.prototype.setContextoFijo = function(contexto, datos = {}) {
+    this.contextoFijo = contexto;
+    this.datosContexto = datos;
+    this.mostrarMensajeActual();
 };
 
-CoachController.prototype.onMenuPrincipal = function () {
-    this.showContext("inicio");
+CoachController.prototype.onResultados = function(skill, diferencia, nuevaMedalla) {
+    if (!this.entity) return;
+    const msg = getCoachMessage(this.perfil, "resultados", null, { skill, diferencia, nuevaMedalla });
+    if (msg) this.entity.show(msg);
 };
-
-CoachController.prototype.onSeleccionJuego = function () {
-    this.showContext("juegos");
-};
-
-CoachController.prototype.onPantallaAbout = function () {
-    this.showContext("about");
-};
-
-CoachController.prototype.onPantallaTests = function () {
-    this.showContext("tests");
-};
-
-CoachController.prototype.onResultados = function (ultimoJuego, tendencia) {
-    this.showContext("resultados", ultimoJuego, tendencia);
-};
-
-CoachController.prototype.onResultados = function () {
-    this.showContext("standby");
-};
-
-
 
 window.CoachController = CoachController;

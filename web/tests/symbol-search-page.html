@@ -1,15 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="light" lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Menteando">
-    <meta name="keywords" content="menteando, test simbol search">
-    <meta name="author" content="Daniel Perez Navarro">
-    <title>Menteando | Test Symbol Search</title>
-    <link rel="icon" href="../assets/img/logo.png" type="image/png" sizes="32x32">
-
+    <title>Menteando | Symbol Search</title>
+    <meta name="description"
+        content="Evalúa tu velocidad de procesamiento visual y atención selectiva emparejando símbolos abstractos geométricos de dificultad incremental.">
+    <meta name="keywords"
+        content="symbol search test, busqueda de simbolos, procesamiento visual, atencion selectiva, discriminacion visual">
+    <meta name="author" content="Daniel Pérez Navarro">
+    <link rel="canonical" href="https://menteando.com/tests/symbol-search-page">
+    <link rel="icon" href="/assets/img/logo_1.png" type="image/png" sizes="32x32">
     <script>
         (() => {
             const storedTheme = localStorage.getItem('theme');
@@ -49,17 +51,22 @@
     </script>
 
 
+    <script defer src="../js/header.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body
     class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased overflow-x-hidden">
-    <header class="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
-        <div class="container mx-auto px-6 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
+    <header
+        class="header-auto-hide w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3 flex-shrink-0">
-                <img id="game-logo" src="../assets/img/logo2.png" alt="Logo del juego"
+                <img id="game-logo" src="../assets/img/logo_1.png" alt="Logo del juego"
                     class="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover" />
                 <div class="flex flex-col leading-tight text-left">
-                    <h1 id="game-title" class="text-3xl font-bold text-slate-900 dark:text-white">Test Symbol Search</h1>
+                    <h1 id="game-title" class="text-3xl font-bold text-slate-900 dark:text-white">Test Symbol Search
+                    </h1>
                     <p id="game-subtitle" class="text-xs md:text-sm font-normal text-slate-500 dark:text-slate-300">
                         Ejemplo de habilidad</p>
                 </div>
@@ -67,7 +74,8 @@
 
             <nav class="flex flex-row items-center justify-center gap-2 md:gap-3">
                 <a href="../tests.html"
-                    class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 hover:text-blue-500 transition-colors">Volver a tests</a>
+                    class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold hover:border-blue-500 hover:text-blue-500 transition-colors">Volver
+                    a tests</a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -89,10 +97,10 @@
 
     <main id="test-detail-content"></main>
 
-       <!-- Script de inicialización de interfaz: se ejecuta cuando el DOM está listo -->
+    <!-- Script de inicialización de interfaz: se ejecuta cuando el DOM está listo -->
     <script data-purpose="init-interface">
         document.addEventListener('DOMContentLoaded', () => {
-        
+
             initTestDetailPage('symbol-search');
 
         });
