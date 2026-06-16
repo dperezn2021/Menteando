@@ -333,7 +333,9 @@
                         <div
                             class="px-4 pb-4 text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-3">
                             Sí, los datos están vinculados al navegador y dispositivo. Si cambias de navegador o usas
-                            otro dispositivo, el progreso no se transferirá automáticamente. En caso de querer trasladar tu progreso, puedes exportar tus datos desde el perfil y luego importarlos en el nuevo navegador.
+                            otro dispositivo, el progreso no se transferirá automáticamente. En caso de querer trasladar
+                            tu progreso, puedes exportar tus datos desde el perfil y luego importarlos en el nuevo
+                            navegador.
                         </div>
                     </details>
 
@@ -348,7 +350,8 @@
                         <div
                             class="px-4 pb-4 text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-3">
                             Los juegos entrenan tus habilidades y mejoran tu perfil. Los tests miden tu nivel real sin
-                            modificarlo, son una evaluación que puedes ir haciendo para ver si mejoras con el entrenamiento.
+                            modificarlo, son una evaluación que puedes ir haciendo para ver si mejoras con el
+                            entrenamiento.
                         </div>
                     </details>
 
@@ -363,7 +366,8 @@
                         <div
                             class="px-4 pb-4 text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-3">
                             Sí, desde tu perfil puedes usar el botón "Reiniciar" para borrar todo tu progreso. También
-                            puedes borrar los datos manualmente desde la configuración de tu navegador o borrando la caché de este.
+                            puedes borrar los datos manualmente desde la configuración de tu navegador o borrando la
+                            caché de este.
                         </div>
                     </details>
 
@@ -377,11 +381,12 @@
                         </summary>
                         <div
                             class="px-4 pb-4 text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-3">
-                            Menteando está diseñado para todos los dispositivos y funciona correctamente en móviles, tablets y
+                            Menteando está diseñado para todos los dispositivos y funciona correctamente en móviles,
+                            tablets y
                             ordenadores.
                         </div>
                     </details>
-                    
+
                     <details
                         class="group rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
                         <summary
@@ -427,7 +432,7 @@
                         </div>
                     </details>
 
-                    
+
 
                     <details
                         class="group rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
@@ -450,7 +455,7 @@
                         </div>
                     </details>
 
-                    
+
                 </div>
             </div>
         </section>
@@ -515,6 +520,7 @@
                 </form>
             </div>
         </section>
+
 
         <!-- Sección de comentarios - Mismo ancho que el CTA -->
         <section class="py-20 bg-slate-50 dark:bg-slate-900/50" id="seccion-comentarios">
@@ -593,10 +599,18 @@
                 <div id="comentarios-container" class="space-y-3"></div>
             </div>
         </section>
+
+        <a id="feedback-btn" aria-label="Dejar opinión" title="Dejar opinión" href="https://forms.gle/whPgPDtptPN632Sh6"
+            target="_blank" rel="noopener noreferrer"
+            class="hidden fixed left-4 bottom-6 z-50 bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-3 shadow-lg items-center gap-2">
+            💭 Dejar opinión
+        </a>
+
+
     </main>
 
     <!-- FOOTER -->
-<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 md:py-16">
 
             <!-- Grid principal: 3 columnas en desktop -->
@@ -634,7 +648,6 @@
                                 perfil</a></li>
                     </ul>
                 </div>
-
                 <!-- Columna 3: Información y contacto -->
                 <div class="md:col-span-4 text-center md:text-left">
                     <h4 class="font-bold text-slate-900 dark:text-white mb-4 text-lg">Información</h4>
@@ -648,10 +661,10 @@
                         <li><a href="about.html#contacto"
                                 class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">Contacto</a>
                         </li>
-                        <li><a href="https://github.com/dperezn2021/Menteando" target="_blank"
+                        <li><a href="https://github.com/dperezn2021/Menteando" target="_blank" rel="noopener noreferrer"
                                 class="hover:text-blue-500 transition-colors flex items-center gap-2 justify-center md:justify-start">GitHub
                                 del proyecto</a></li>
-                    </ul>
+
                 </div>
             </div>
 
@@ -707,6 +720,31 @@
             }
         });
     </script>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('feedback-btn');
+            if (!btn) return;
+
+            // Si NO ha sido descartado, mostramos el botón quitando 'hidden'
+            if (localStorage.getItem('feedbackDismissed') !== '1') {
+                btn.classList.remove('hidden');
+            } else {
+                return; // Si ya se descartó, no hacemos nada más
+            }
+
+            const dismiss = () => {
+                try { localStorage.setItem('feedbackDismissed', '1'); } catch (e) { }
+                btn.style.transition = 'opacity .25s ease, transform .25s ease';
+                btn.style.opacity = '0';
+                btn.style.transform = 'scale(.92)';
+                setTimeout(() => btn.remove(), 250);
+            };
+
+            btn.addEventListener('click', dismiss, { once: true });
+        })();
+    </script>
+
 
 </body>
 

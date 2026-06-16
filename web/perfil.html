@@ -505,6 +505,11 @@
 
         </div>
 
+        <a id="feedback-btn" aria-label="Dejar opinión" title="Dejar opinión" href="https://forms.gle/whPgPDtptPN632Sh6"
+            target="_blank" rel="noopener noreferrer"
+            class="hidden fixed left-4 bottom-6 z-50 bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-3 shadow-lg items-center gap-2">
+            💭 Dejar opinión
+        </a>
     </main>
 
 
@@ -798,6 +803,29 @@
     </script>
 
 
+    <script>
+        (function () {
+            const btn = document.getElementById('feedback-btn');
+            if (!btn) return;
+
+            // Si NO ha sido descartado, mostramos el botón quitando 'hidden'
+            if (localStorage.getItem('feedbackDismissed') !== '1') {
+                btn.classList.remove('hidden');
+            } else {
+                return; // Si ya se descartó, no hacemos nada más
+            }
+
+            const dismiss = () => {
+                try { localStorage.setItem('feedbackDismissed', '1'); } catch (e) { }
+                btn.style.transition = 'opacity .25s ease, transform .25s ease';
+                btn.style.opacity = '0';
+                btn.style.transform = 'scale(.92)';
+                setTimeout(() => btn.remove(), 250);
+            };
+
+            btn.addEventListener('click', dismiss, { once: true });
+        })();
+    </script>
 </body>
 
 </html>
