@@ -602,12 +602,53 @@
             </div>
         </section>
 
+
         <a id="feedback-btn" aria-label="Dejar opinión" title="Dejar opinión" href="https://forms.gle/whPgPDtptPN632Sh6"
             target="_blank" rel="noopener noreferrer"
-            class="hidden fixed left-4 bottom-6 z-50 bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-3 shadow-lg items-center gap-2">
+            class="hidden lg:flex fixed bottom-4 left-4 z-40 items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold rounded-xl shadow-lg transition-all transform hover:scale-105">
             💭 Dejar opinión
         </a>
 
+
+        <!-- MODAL DE EDICIÓN DE PERFIL -->
+        <div id="modal-editar" class="fixed inset-0 bg-black/50 items-center justify-center hidden z-50">
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-xl w-full mr-20 ml-20 max-h-md overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-6 text-slate-900 dark:text-white ">Editar perfil</h2>
+                <form id="perfil-form" class="space-y-4">
+                    <div class="flex flex-col">
+                        <label for="name" class="font-medium text-slate-900 dark:text-white mb-2">Nombre</label>
+                        <input id="name" type="text"
+                            class="p-2 border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white" />
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="nickname" class="font-medium text-slate-900 dark:text-white mb-2">Apodo</label>
+                        <input id="nickname" type="text"
+                            class="p-2 border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white" />
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="age" class="font-medium text-slate-900 dark:text-white mb-2">Edad</label>
+                        <input id="age" type="number"
+                            class="p-2 border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white" />
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="email" class="font-medium text-slate-900 dark:text-white mb-2">Correo
+                            electrónico</label>
+                        <input id="email" type="email"
+                            class="p-2 border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white" />
+                    </div>
+                    <div class="flex gap-4 justify-end pt-4">
+                        <button type="submit"
+                            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold transition-colors">
+                            Guardar
+                        </button>
+                        <button type="button" id="btn-cerrar-modal"
+                            class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg font-bold transition-colors">
+                            Cerrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
     </main>
 
@@ -678,6 +719,8 @@
         </div>
     </footer>
 
+
+
     <script src="/js/perfil.js"></script>
     <script src="/js/emailService.js"></script>
     <script src="/js/catalogoJuegos.js"></script>
@@ -724,69 +767,76 @@
     </script>
 
     <script>
-        (function () {
-            const btn = document.getElementById('feedback-btn');
-            if (!btn) return;
-            if (localStorage.getItem('feedbackDismissed') !== '1') {
-                btn.classList.remove('hidden');
-            } else {
-                return;
-            }
-            const dismiss = () => {
-                try { localStorage.setItem('feedbackDismissed', '1'); } catch (e) { }
-                btn.style.transition = 'opacity .25s ease, transform .25s ease';
-                btn.style.opacity = '0';
-                btn.style.transform = 'scale(.92)';
-                setTimeout(() => btn.remove(), 250);
-            };
-            btn.addEventListener('click', dismiss, { once: true });
-        })();
 
+
+        // ========== FUNCIÓN SIMPLE PARA FORZAR CATEGORÍA ==========
         // ========== FUNCIÓN SIMPLE PARA FORZAR CATEGORÍA ==========
         function forzarCategoriaDesdeURL() {
             const urlParams = new URLSearchParams(window.location.search);
             const categoria = urlParams.get('categoria');
             const nombre = urlParams.get('nombre');
+            const tipoElemento = urlParams.get('tipoElemento'); // "juego" o "test"
 
             if (!categoria || !nombre) return;
 
             const catSelect = document.getElementById('comentario-categoria');
             const subSelect = document.getElementById('comentario-subtipo');
+            const txtArea = document.getElementById('comentario-texto'); // El textarea de tu formulario
 
-            if (!catSelect || !subSelect) return;
+            if (!catSelect) return;
 
-            // Forzar categoría
+            // 1. Forzamos la categoría principal ('error', 'juego' o 'test')
             catSelect.value = categoria;
             catSelect.dispatchEvent(new Event('change'));
 
             setTimeout(() => {
-                // Forzar subtipo
-                for (let opt of subSelect.options) {
-                    if (opt.value === nombre) {
-                        subSelect.value = nombre;
-                        break;
+                // 2. Si es un JUEGO o un TEST normal, forzamos el subtipo
+                if (categoria === 'juego' || categoria === 'test') {
+                    if (subSelect) {
+                        for (let opt of subSelect.options) {
+                            if (opt.value === nombre) {
+                                subSelect.value = nombre;
+                                break;
+                            }
+                        }
+                        subSelect.disabled = true;
                     }
                 }
-                // Bloquear
+                // 3. SI ES UN ERROR: Ignoramos el subtipo e inyectamos el texto que me pediste
+                else if (categoria === 'error') {
+                    if (txtArea) {
+                        const articulo = (tipoElemento === 'test') ? 'el test' : 'el juego';
+
+                        // Texto exacto que aparecerá en el cuadro
+                        txtArea.value = `He detectado que ${articulo} "${nombre}" tiene un error: `;
+
+                        // Ponemos el cursor al final para que el usuario continúe escribiendo
+                        txtArea.focus();
+                        const longitud = txtArea.value.length;
+                        txtArea.setSelectionRange(longitud, longitud);
+                    }
+                }
+
+                // Bloqueamos la categoría principal para que no la cambie
                 catSelect.disabled = true;
-                subSelect.disabled = true;
 
                 // SCROLL DIRECTO a la sección de comentarios
                 const seccion = document.getElementById('seccion-comentarios');
                 if (seccion) {
-                    // Scroll con offset fijo de 100px desde arriba
                     const offset = 100;
                     const top = seccion.getBoundingClientRect().top + window.pageYOffset - offset;
                     window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
                 }
 
-                // Mostrar mensaje
+                // Mostrar modal informativo
                 if (typeof mostrarModal === 'function') {
-                    mostrarModal(`Ahora estás opinando sobre "${nombre}"`, 'info');
+                    const msg = categoria === 'error'
+                        ? `Redactando reporte de error para "${nombre}"`
+                        : `Ahora estás opinando sobre "${nombre}"`;
+                    mostrarModal(msg, 'info');
                 }
             }, 300);
         }
-
         // ========== EJECUTAR UNA SOLA VEZ ==========
         let ejecutado = false;
 

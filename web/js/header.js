@@ -1,4 +1,4 @@
-// header.js - Versión corregida
+// header.js - Versión SIMPLE
 (function() {
     const header = document.querySelector('header');
     if (!header) return;
@@ -25,6 +25,37 @@
         if (navContainer) navContainer.classList.add('open');
         if (overlay) overlay.classList.add('visible');
         menuOpen = true;
+    }
+
+    // ============================================================
+    // FUNCIÓN PARA OCULTAR PERMANENTEMENTE (con localStorage)
+    // ============================================================
+    function ocultarBotonOpinionPermanente() {
+        try {
+            localStorage.setItem('feedbackDismissed', '1');
+        } catch (e) {}
+
+        // Ocultar el botón fixed del main
+        const mainBtn = document.getElementById('feedback-btn');
+        if (mainBtn) {
+            mainBtn.style.transition = 'all .3s ease';
+            mainBtn.style.opacity = '0';
+            mainBtn.style.transform = 'scale(.9)';
+            setTimeout(() => {
+                mainBtn.style.display = 'none';
+            }, 300);
+        }
+
+        // Ocultar el botón del menú
+        const menuBtn = document.querySelector('.menu-opinion-btn');
+        if (menuBtn) {
+            menuBtn.style.transition = 'all .3s ease';
+            menuBtn.style.opacity = '0';
+            menuBtn.style.transform = 'scale(.9)';
+            setTimeout(() => {
+                menuBtn.style.display = 'none';
+            }, 300);
+        }
     }
 
     function crearMenuHamburguesa() {
@@ -56,11 +87,44 @@
         navContainer = document.createElement('div');
         navContainer.className = 'menu-container';
         
+        // Clonar navegación
         const navClone = nav.cloneNode(true);
         navClone.querySelectorAll('a').forEach(a => {
             a.classList.add('menu-link');
         });
         navContainer.appendChild(navClone);
+
+        // ============================================================
+        // BOTÓN DE OPINIÓN EN EL MENÚ (SOLO MÓVIL)
+        // ============================================================
+        const mainBtn = document.getElementById('feedback-btn');
+        const opinionBtn = document.createElement('a');
+        opinionBtn.className = 'menu-opinion-btn';
+        opinionBtn.id = 'menu-feedback-btn';
+        
+        if (mainBtn) {
+            opinionBtn.innerHTML = mainBtn.innerHTML;
+            opinionBtn.href = mainBtn.href || 'https://forms.gle/whPgPDtptPN632Sh6';
+            opinionBtn.target = mainBtn.target || '_blank';
+            opinionBtn.rel = mainBtn.rel || 'noopener noreferrer';
+        } else {
+            opinionBtn.innerHTML = '💭 Dejar opinión';
+            opinionBtn.href = 'https://forms.gle/whPgPDtptPN632Sh6';
+            opinionBtn.target = '_blank';
+            opinionBtn.rel = 'noopener noreferrer';
+        }
+        
+        // Si ya se ocultó permanentemente, ocultar también
+        if (localStorage.getItem('feedbackDismissed') === '1') {
+            opinionBtn.style.display = 'none';
+        }
+        
+        // Evento para ocultar permanentemente
+        opinionBtn.addEventListener('click', function(e) {
+            ocultarBotonOpinionPermanente();
+        });
+        
+        navContainer.appendChild(opinionBtn);
 
         document.body.appendChild(overlay);
         document.body.appendChild(navContainer);
@@ -79,6 +143,12 @@
         }
 
         updateMenuVisibility();
+        
+        // Si ya está oculto permanentemente, ocultar el main
+        if (localStorage.getItem('feedbackDismissed') === '1') {
+            const btn = document.getElementById('feedback-btn');
+            if (btn) btn.style.display = 'none';
+        }
     }
 
     function updateMenuVisibility() {
@@ -91,7 +161,9 @@
         } else {
             hamburger.style.display = 'none';
             nav.style.display = 'flex';
-            closeMenu();
+            if (menuOpen) {
+                closeMenu();
+            }
         }
     }
 
@@ -135,7 +207,6 @@
         }
     }
 
-    // Event listeners
     window.addEventListener('scroll', () => {
         if (!ticking) {
             requestAnimationFrame(() => {
@@ -154,6 +225,14 @@
     function init() {
         crearMenuHamburguesa();
         updateMenuVisibility();
+        
+        // Evento para el botón del main
+        const btn = document.getElementById('feedback-btn');
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                ocultarBotonOpinionPermanente();
+            });
+        }
     }
 
     if (document.readyState === 'loading') {

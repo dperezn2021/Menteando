@@ -12,7 +12,6 @@ const EMAILJS_CONFIG = {
     }
 };
 
-// ========== MODAL DE NOTIFICACIÓN PERSONALIZADO ==========
 function mostrarModal(mensaje, tipo) {
     // Eliminar modal existente si lo hay
     const modalExistente = document.getElementById("menteando-modal");
@@ -31,6 +30,7 @@ function mostrarModal(mensaje, tipo) {
         align-items: center;
         justify-content: center;
         z-index: 10000;
+        backdrop-filter: blur(4px);
     `;
 
     const colors = {
@@ -41,19 +41,28 @@ function mostrarModal(mensaje, tipo) {
 
     const color = colors[tipo] || colors.info;
 
-    modal.innerHTML = `
-        <div style="background: white; border-radius: 16px; max-width: 350px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); animation: fadeIn 0.2s ease-out;">
-            <div style="background: ${color.bg}; padding: 20px; border-radius: 16px 16px 0 0; border-bottom: 2px solid ${color.border};">
-                <div style="font-size: 48px; text-align: center;">${color.icon}</div>
-                <h3 style="color: ${color.text}; text-align: center; margin: 10px 0 0; font-size: 18px;">
-                    ${tipo === "success" ? "¡Éxito!" : tipo === "error" ? "Error" : "Información"}
-                </h3>
-            </div>
-            <div style="padding: 24px;">
-                <p style="color: #334155; text-align: center; margin: 0; font-size: 14px; line-height: 1.5;">
-                    ${mensaje}
-                </p>
+    // Detectar si es el error de apodo duplicado
+    const esErrorApodo = mensaje && mensaje.includes("Ese apodo ya está siendo utilizado por otro usuario");
+
+    let buttonHTML = '';
+    if (esErrorApodo) {
+        buttonHTML = `
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button id="modal-close-btn" style="
+                    background: #94a3b8;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    flex: 1;
+                    transition: opacity 0.2s;
+                " onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                    Cerrar
+                </button>
+                <button id="modal-change-apodo-btn" style="
                     background: ${color.border};
                     color: white;
                     border: none;
@@ -62,12 +71,46 @@ function mostrarModal(mensaje, tipo) {
                     font-size: 14px;
                     font-weight: bold;
                     cursor: pointer;
-                    width: 100%;
-                    margin-top: 20px;
+                    flex: 1;
                     transition: opacity 0.2s;
                 " onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                    Entendido
+                    ✏️ Cambiar apodo
                 </button>
+            </div>
+        `;
+    } else {
+        buttonHTML = `
+            <button id="modal-close-btn" style="
+                background: ${color.border};
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: bold;
+                cursor: pointer;
+                width: 100%;
+                margin-top: 20px;
+                transition: opacity 0.2s;
+            " onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                Entendido
+            </button>
+        `;
+    }
+
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); animation: fadeIn 0.2s ease-out;">
+            <div style="background: ${color.bg}; padding: 20px; border-radius: 16px 16px 0 0; border-bottom: 2px solid ${color.border};">
+                <div style="font-size: 48px; text-align: center;">${color.icon}</div>
+                <h3 style="color: ${color.text}; text-align: center; margin: 10px 0 0; font-size: 18px; font-weight: bold;">
+                    ${tipo === "success" ? "¡Éxito!" : tipo === "error" ? "Error" : "Información"}
+                </h3>
+            </div>
+            <div style="padding: 24px;">
+                <p style="color: #334155; text-align: center; margin: 0; font-size: 14px; line-height: 1.6;">
+                    ${mensaje}
+                </p>
+                ${buttonHTML}
             </div>
         </div>
     `;
@@ -75,19 +118,58 @@ function mostrarModal(mensaje, tipo) {
     document.body.appendChild(modal);
 
     // Animación fadeIn
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-    `;
-    document.head.appendChild(style);
+    if (!document.getElementById("modal-fadein-style")) {
+        const style = document.createElement('style');
+        style.id = "modal-fadein-style";
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: scale(0.95); }
+                to { opacity: 1; transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
 
-    document.getElementById("modal-close-btn").onclick = () => modal.remove();
+    // Cerrar modal
+    document.getElementById("modal-close-btn")?.addEventListener("click", function() {
+        modal.remove();
+    });
+
+    // Botón "Cambiar apodo" → abre el modal de edición de perfil
+    document.getElementById("modal-change-apodo-btn")?.addEventListener("click", function() {
+        modal.remove(); // Cerrar el modal de error
+
+        // Abrir el modal de edición de perfil
+        abrirModalEdicion();
+    });
 
     // Cerrar al hacer clic fuera
     modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+}
+
+// ============================================================
+// FUNCIÓN PARA ABRIR EL MODAL DE EDICIÓN DE PERFIL
+// ============================================================
+function abrirModalEdicion() {
+    const modalEditar = document.getElementById("modal-editar");
+    if (!modalEditar) {
+        console.warn("Modal de edición no encontrado");
+        return;
+    }
+
+    const perfil = getperfil();
+
+    const nameInput = document.getElementById("name");
+    const nicknameInput = document.getElementById("nickname");
+    const ageInput = document.getElementById("age");
+    const emailInput = document.getElementById("email");
+
+    if (nameInput) nameInput.value = perfil.nombre || "";
+    if (nicknameInput) nicknameInput.value = perfil.apodo || "";
+    if (ageInput) ageInput.value = perfil.edad || "";
+    if (emailInput) emailInput.value = perfil.correo || "";
+
+    modalEditar.style.display = "flex";
 }
 
 // Inicializar EmailJS

@@ -1,4 +1,4 @@
-/*----------------------- COACH - SIEMPRE FIJO ABAJO DERECHA ----------------- */
+/*----------------------- COACH ----------------- */
 .coach {
   position: fixed;
   bottom: 20px;
@@ -15,45 +15,48 @@
   pointer-events: none;
 }
 
-/* En pantallas más grandes, el coach es más grande */
+/* Tamaños responsivos */
 @media screen and (min-width: 768px) {
-  .coach {
-    bottom: 30px;
-    right: 30px;
-    width: 90px;
-    height: 90px;
-  }
+  .coach { bottom: 30px; right: 30px; width: 90px; height: 90px; }
 }
-
 @media screen and (min-width: 1024px) {
-  .coach {
-    bottom: 40px;
-    right: 40px;
-    width: 120px;
-    height: 120px;
-  }
+  .coach { bottom: 40px; right: 40px; width: 120px; height: 120px; }
 }
-
 @media screen and (min-width: 1400px) {
-  .coach {
-    bottom: 50px;
-    right: 50px;
-    width: 140px;
-    height: 140px;
-  }
+  .coach { bottom: 50px; right: 50px; width: 140px; height: 140px; }
 }
 
 .coach.visible {
   opacity: 0.9;
   pointer-events: auto;
 }
-
 .coach.visible .coach-bubble {
   opacity: 1;
   transform: scale(1);
 }
 
-/*----------------------- BURBUJA (por defecto a la izquierda) ----------------- */
+/* ================================================================ */
+/* COACH A LA IZQUIERDA (juegos/tests)                             */
+/* ================================================================ */
+.coach.bubble-left {
+  right: auto !important;
+  left: 20px !important;
+}
+
+/* Tamaños responsivos para coach a la izquierda */
+@media screen and (min-width: 768px) {
+  .coach.bubble-left { left: 30px !important; }
+}
+@media screen and (min-width: 1024px) {
+  .coach.bubble-left { left: 40px !important; }
+}
+@media screen and (min-width: 1400px) {
+  .coach.bubble-left { left: 50px !important; }
+}
+
+/* ================================================================ */
+/* BURBUJA POR DEFECTO (a la derecha del coach)                    */
+/* ================================================================ */
 .coach-bubble {
   position: absolute;
   bottom: 50%;
@@ -75,7 +78,7 @@
   min-width: 150px;
 }
 
-/* Flecha hacia la derecha (posición izquierda) */
+/* Flecha hacia la derecha (apunta al coach) */
 .coach-bubble::after {
   content: '';
   position: absolute;
@@ -88,104 +91,28 @@
   border-bottom: 5px solid transparent;
 }
 
-/* Tamaños responsivos de la burbuja */
-@media screen and (min-width: 768px) {
-  .coach-bubble {
-    padding: 12px 16px;
-    font-size: 13px;
-    width: 240px;
-    max-width: 55vw;
-    min-width: 180px;
-    border-radius: 18px;
-  }
-  
-  .coach-bubble::after {
-    right: -8px;
-    bottom: 18px;
-    border-left-width: 8px;
-    border-top-width: 6px;
-    border-bottom-width: 6px;
-  }
-}
-
-@media screen and (min-width: 1024px) {
-  .coach-bubble {
-    padding: 14px 18px;
-    font-size: 14px;
-    width: 280px;
-    max-width: 50vw;
-    min-width: 200px;
-    border-radius: 20px;
-  }
-  
-  .coach-bubble::after {
-    right: -9px;
-    bottom: 20px;
-    border-left-width: 9px;
-  }
-}
-
-@media screen and (min-width: 1400px) {
-  .coach-bubble {
-    padding: 16px 20px;
-    font-size: 15px;
-    width: 320px;
-    max-width: 25vw;
-    min-width: 240px;
-    border-radius: 24px;
-  }
-  
-  .coach-bubble::after {
-    right: -10px;
-    bottom: 22px;
-    border-left-width: 10px;
-    border-top-width: 8px;
-    border-bottom-width: 8px;
-  }
-}
-
-/*----------------------- CUANDO NO CABE A LA IZQUIERDA: BURBUJA ARRIBA ----------------- */
-.coach.bubble-top .coach-bubble {
-  bottom: 100%;
-  right: 0;
-  top: auto;
-  left: auto;
-  transform: scale(0.9);
+/* ================================================================ */
+/* BURBUJA CUANDO EL COACH ESTÁ A LA IZQUIERDA                     */
+/* ================================================================ */
+.coach.bubble-left .coach-bubble {
+  right: auto;
+  left: 100%;
+  margin-left: 15px;
   margin-right: 0;
-  margin-bottom: 15px;
 }
 
-.coach.visible.bubble-top .coach-bubble {
-  transform: scale(1);
+.coach.bubble-left .coach-bubble::after {
+  right: auto;
+  left: -7px;
+  border-left: none;
+  border-right: 7px solid rgba(255, 255, 255, 0.98);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
 }
 
-/* Flecha hacia ABAJO (cuando la burbuja está arriba) - rotada 180 grados */
-.coach.bubble-top .coach-bubble::after {
-  right: 20px;
-  top: auto;
-  bottom: -7px;
-  left: auto;
-  transform: none;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 7px solid rgba(255, 255, 255, 0.98);
-  border-bottom: none;
-}
-
-@media screen and (min-width: 768px) {
-  .coach.bubble-top .coach-bubble {
-    margin-bottom: 18px;
-  }
-  
-  .coach.bubble-top .coach-bubble::after {
-    bottom: -8px;
-    border-top-width: 8px;
-    border-left-width: 6px;
-    border-right-width: 6px;
-  }
-}
-
-/* Modo oscuro */
+/* ================================================================ */
+/* MODO OSCURO                                                     */
+/* ================================================================ */
 html.dark .coach-bubble {
   background: rgba(30, 41, 59, 0.98);
   color: #f1f5f9;
@@ -195,12 +122,13 @@ html.dark .coach-bubble::after {
   border-left-color: rgba(30, 41, 59, 0.98);
 }
 
-html.dark .coach.bubble-top .coach-bubble::after {
-  border-top-color: rgba(30, 41, 59, 0.98);
-  border-left-color: transparent;
+html.dark .coach.bubble-left .coach-bubble::after {
+  border-right-color: rgba(30, 41, 59, 0.98);
 }
 
-/* Animación */
+/* ================================================================ */
+/* ANIMACIÓN                                                       */
+/* ================================================================ */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-8px); }

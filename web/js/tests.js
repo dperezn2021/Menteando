@@ -36,11 +36,11 @@ function createTestCard(test) {
     }[test.categoria] || "blue";
     
     return `
-        <article class="group bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-            <a href="${test.url}" class="block h-24 sm:h-40 overflow-hidden bg-slate-200 dark:bg-slate-700">
+        <article class="group bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
+            <a href="${test.url}" class="block h-24 sm:h-40 overflow-hidden bg-slate-200 dark:bg-slate-700 flex-shrink-0">
                 <img src="${test.imagen}" alt="${test.nombre}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
             </a>
-            <div class="p-3 sm:p-5 flex flex-col gap-2 sm:gap-3">
+            <div class="p-3 sm:p-5 flex flex-col gap-2 sm:gap-3 flex-1">
                 <!-- Badges: duración izquierda, categoría derecha -->
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-semibold ${duracionColor}">${test.duracion}</span>
@@ -62,9 +62,9 @@ function createTestCard(test) {
                     ${test.habilidades.length > 3 ? `<span class="px-2 py-0.5 rounded-full text-xs bg-slate-100 dark:bg-slate-700 text-slate-500">+${test.habilidades.length - 3}</span>` : ''}
                 </div>
 
-                <a href="${test.url}" class="mt-1 sm:mt-2 inline-flex items-center justify-center gap-1 sm:gap-2 w-full py-2 sm:py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm font-semibold transition-all">
+                <!-- Botón alineado abajo con mt-auto -->
+                <a href="${test.url}" class="mt-auto inline-flex items-center justify-center gap-1 sm:gap-2 w-full py-2 sm:py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm font-semibold transition-all">
                     Realizar test
-                    
                 </a>
             </div>
         </article>

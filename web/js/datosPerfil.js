@@ -317,7 +317,7 @@
                 const newName = nameInput.value.trim();
 
                 // Si intenta convertirse en 'admin' y no lo era antes, requiere contraseña
-                if (newName === 'admin' && perfil.nombre !== 'admin') {
+                if ((newName === 'admin' || newName === 'Admin' || newName === 'ADMIN' || newName === 'aDMIN' ) && perfil.nombre !== 'admin') {
 
                     const askAdminPassword = () => {
                         return new Promise((resolve) => {

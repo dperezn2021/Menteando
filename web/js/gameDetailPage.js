@@ -15,24 +15,75 @@ function getSkillToneClasses(skillSlug) {
     return badgeMap[accent] || badgeMap.blue;
 }
 
+
 function iniciarCoachDetalle(contexto, datos) {
+    console.log('========== INICIAR COACH DETALLE ==========');
+    console.log('Contexto:', contexto);
+
+    // Función para aplicar la clase
+    function aplicarClaseCoach() {
+        const coachElement = document.getElementById('coach');
+        console.log('Coach element encontrado:', coachElement);
+
+        if (coachElement) {
+            coachElement.classList.remove('bubble-left', 'bubble-top');
+            if (contexto === 'juegoDetalle' || contexto === 'testDetalle') {
+                coachElement.classList.add('bubble-left');
+                console.log('✅ AÑADIDA bubble-left');
+            }
+            console.log('Clases finales:', coachElement.className);
+            return true;
+        }
+        return false;
+    }
+
+    // Intentar aplicar la clase inmediatamente
+    if (aplicarClaseCoach()) {
+        console.log('✅ Coach encontrado y clase aplicada');
+    } else {
+        console.log('⏳ Coach no encontrado, esperando...');
+        // Esperar a que el coach aparezca en el DOM
+        const observer = new MutationObserver(function (mutations, obs) {
+            if (document.getElementById('coach')) {
+                console.log('✅ Coach detectado por MutationObserver');
+                aplicarClaseCoach();
+                obs.disconnect();
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // Timeout de seguridad
+        setTimeout(() => {
+            observer.disconnect();
+            if (!document.getElementById('coach')) {
+                console.warn('⚠️ Coach no encontrado después de 3 segundos');
+            }
+        }, 3000);
+    }
+
+    // Cargar detalleCoach.js si no está
+    if (typeof window.initDetalleCoach !== "function") {
+        const existing = document.querySelector('script[data-coach-detail-loader="true"]');
+        if (!existing) {
+            const script = document.createElement("script");
+            script.src = "/js/detalleCoach.js";
+            script.dataset.coachDetailLoader = "true";
+            script.onload = function () {
+                console.log('✅ detalleCoach.js cargado');
+                if (typeof window.initDetalleCoach === "function") {
+                    window.initDetalleCoach(contexto, datos);
+                }
+            };
+            document.head.appendChild(script);
+            return;
+        }
+    }
+
     if (typeof window.initDetalleCoach === "function") {
         window.initDetalleCoach(contexto, datos);
-        return;
     }
-
-    const existing = document.querySelector('script[data-coach-detail-loader="true"]');
-    if (existing) {
-        existing.addEventListener("load", () => window.initDetalleCoach?.(contexto, datos), { once: true });
-        return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "/js/detalleCoach.js";
-    script.dataset.coachDetailLoader = "true";
-    script.onload = () => window.initDetalleCoach?.(contexto, datos);
-    document.head.appendChild(script);
 }
+
 
 function renderGameDetailPage(gameId) {
     const juego = window.getJuegoById?.(gameId);
@@ -267,11 +318,21 @@ function renderGameDetailPage(gameId) {
     document.querySelectorAll('.btn-reportar').forEach(btn => {
         btn.addEventListener('click', function (e) {
             e.preventDefault();
-            window.location.href = "../../about.html?tipo=reporte#contacto";
-        });
-    });
 
-    // Iniciar pantalla completa
+            // Buscamos el botón de opinar que está al lado para sacar los datos dinámicamente
+            const btnOpinarHermano = this.parentElement.querySelector('.btn-opinar');
+
+            if (btnOpinarHermano) {
+                const tipoRaw = btnOpinarHermano.dataset.tipo; // "juego" o "test"
+                const nombreJuego = btnOpinarHermano.dataset.nombre; // Nombre del juego
+
+                // Redirigimos pasando la categoría 'error', el nombre del juego, y el tipo
+                window.location.href = `../../about.html?categoria=error&nombre=${encodeURIComponent(nombreJuego)}&tipoElemento=${encodeURIComponent(tipoRaw)}#seccion-comentarios`;
+            } else {
+                console.warn('No se encontró el botón de opinar para extraer los datos');
+            }
+        });
+    });    // Iniciar pantalla completa
     iniciarPantallaCompleta(content, juego);
 }
 
