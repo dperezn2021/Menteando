@@ -35,23 +35,8 @@ CoachController.prototype.setupCoach = function() {
 };
 
 CoachController.prototype.ajustarPosicion = function() {
-    if (!this.entity || !this.entity.bubble || !this.entity.element) return;
-    
-    const coach = this.entity.element;
-    const bubble = this.entity.bubble;
-    
-    // Obtener dimensiones
-    const coachRect = coach.getBoundingClientRect();
-    const bubbleWidth = bubble.offsetWidth;
-    
-    // Si la burbuja no cabe a la izquierda, ponerla arriba
-    const cabeIzquierda = coachRect.left - bubbleWidth - 20 >= 0;
-    
-    if (cabeIzquierda) {
-        coach.classList.remove('bubble-top');
-    } else {
-        coach.classList.add('bubble-top');
-    }
+    // El CSS se encarga de todo, no hacemos nada aquí
+    return;
 };
 
 CoachController.prototype.setupListeners = function() {
@@ -61,7 +46,8 @@ CoachController.prototype.setupListeners = function() {
         if (self.timer) clearTimeout(self.timer);
         self.timer = setTimeout(function() {
             if (self.entity) self.mostrarMensajeActual();
-        }, 5000);
+        }, 15000);
+        
     };
     document.addEventListener("click", hideAndSchedule);
     document.addEventListener("keydown", hideAndSchedule);

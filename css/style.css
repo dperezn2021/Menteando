@@ -27,7 +27,10 @@ body {
     overflow-x: hidden;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
     font-weight: 700;
     margin: 0;
 }
@@ -83,7 +86,7 @@ html.dark {
 .menu-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     display: none;
     z-index: 999;
 }
@@ -103,7 +106,7 @@ html.dark {
     z-index: 1000;
     transition: right 0.3s ease;
     padding: 80px 20px 20px;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .menu-container.open {
@@ -134,6 +137,190 @@ html:not(.dark) .menu-container {
 html.dark .menu-container {
     background: var(--bg);
 }
+
+/* =========================
+    BOTÓN OPINIÓN EN MENÚ HAMBURGUESA - PEGADO AL FONDO
+========================= */
+
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 280px;
+    height: 100%;
+    background: var(--bg, #18181b);
+    z-index: 1000;
+    transition: right 0.3s ease;
+    padding: 80px 20px 20px;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.menu-container.open {
+    right: 0;
+}
+
+/* El nav ocupa el espacio disponible, el botón se queda abajo */
+.menu-container nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.menu-container nav a {
+    display: block;
+    padding: 0.4rem 0;
+    width: 100%;
+}
+
+/* =========================
+    BOTÓN OPINIÓN EN MENÚ HAMBURGUESA - PEGADO AL FONDO
+========================= */
+
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 280px;
+    height: 100%;
+    background: var(--bg, #18181b);
+    z-index: 1000;
+    transition: right 0.3s ease;
+    padding: 80px 20px 20px;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+}
+
+.menu-container.open {
+    right: 0;
+}
+
+/* El nav ocupa el espacio disponible, el botón se queda abajo */
+.menu-container nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.menu-container nav a {
+    display: block;
+    padding: 0.4rem 0;
+    width: 100%;
+}
+
+/* =========================
+    BOTÓN DE OPINIÓN - FIXED BOTTOM-LEFT
+========================= */
+
+#feedback-btn {
+    z-index: 40;
+}
+
+/* =========================
+    MENÚ HAMBURGUESA
+========================= */
+
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 280px;
+    height: 100%;
+    background: var(--bg, #18181b);
+    z-index: 1000;
+    transition: right 0.3s ease;
+    padding: 80px 20px 20px;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+}
+
+.menu-container.open {
+    right: 0;
+}
+
+.menu-container nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.menu-container nav a {
+    display: block;
+    padding: 0.4rem 0;
+    width: 100%;
+}
+
+/* Botón de opinión en el menú - PEGADO AL FONDO */
+.menu-opinion-btn {
+    display: block;
+    width: 100%;
+    margin-top: auto;
+    padding: 0.75rem 1rem;
+    background: #3b82f6;
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+    text-align: center;
+    text-decoration: none;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.menu-opinion-btn:hover {
+    background: #2563eb;
+    transform: scale(1.02);
+}
+
+.menu-opinion-btn:active {
+    transform: scale(0.97);
+}
+
+html:not(.dark) .menu-container {
+    background: #ffffff;
+    color: #1e293b;
+}
+
+html.dark .menu-container {
+    background: var(--bg, #18181b);
+}
+
+html.dark .menu-opinion-btn {
+    background: #3b82f6;
+}
+
+html.dark .menu-opinion-btn:hover {
+    background: #2563eb;
+}
+
+/* En PC (>1024px) el botón del menú NO se ve */
+@media (min-width: 1024px) {
+    .menu-opinion-btn {
+        display: none !important;
+    }
+}
+
 
 /* =========================
     NOMBRE DE USUARIO - OCULTAR SOLO EN PANTALLAS PEQUEÑAS (cuando hay hamburguesa)

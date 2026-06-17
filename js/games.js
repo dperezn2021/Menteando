@@ -96,7 +96,7 @@ function createCompactCard(juego) {
                 </div>
                 <p class="hidden sm:block text-slate-600 dark:text-slate-300 text-base">${juego.descripcion}</p>
                 <a href="${juego.url}" class="mt-auto w-full py-2 sm:py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white text-xs sm:text-base font-bold text-center hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors">
-                    Entrenar
+                    Jugar
                 </a>
             </div>
         </article>

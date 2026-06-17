@@ -469,18 +469,28 @@ function getUltimasSesiones(perfil, limite = 3) {
 
     for (const gameId in perfil.juegos) {
         perfil.juegos[gameId].forEach(s => {
+
+            const fecha = new Date(s.timestamp);
+
+            if (Number.isNaN(fecha.getTime())) {
+                return;
+            }
+
             sesiones.push({
                 juego: gameId,
                 fecha: s.timestamp,
-                puntuacion: formatearPuntos(s.puntosSesion) ?? 0  // ← PRIORIZAR puntosSesion
+                puntuacion: formatearPuntos(s.puntosSesion) ?? 0
             });
         });
     }
 
-    sesiones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    sesiones.sort(
+        (a, b) => new Date(b.fecha) - new Date(a.fecha)
+    );
 
     return sesiones.slice(0, limite);
 }
+
 // ========== SESIONES DIARIAS ==========
 function sincronizarSesionesDiarias(perfil) {
     asegurarSesionesDiarias(perfil);
@@ -546,10 +556,10 @@ function actualizarSesionesDiarias(perfil) {
 function calcularDiasPasados(fechaStr1, fechaStr2) {
     const [d1, m1] = fechaStr1.split('/').map(Number);
     const [d2, m2] = fechaStr2.split('/').map(Number);
-    
+
     const fecha1 = new Date(new Date().getFullYear(), m1 - 1, d1);
     const fecha2 = new Date(new Date().getFullYear(), m2 - 1, d2);
-    
+
     const diff = Math.floor((fecha2 - fecha1) / 86400000);
     return Math.max(0, diff);
 }
@@ -614,121 +624,125 @@ function disableCoachForever() {
 
 
 
-
 // ========== EXPORTAR METRICAS ==========
 // ====================
-// EXPORTAR PERFIL
+// EXPORTAR PERFIL (COMPLETO)
 // ====================
 
 function exportarPerfil() {
-
     const perfil = getperfil();
+    
+    let ownedIds = [];
+    try {
+        const ownedData = localStorage.getItem('menteando_owned_ids');
+        if (ownedData) {
+            ownedIds = JSON.parse(ownedData);
+        }
+    } catch (e) {}
+
+    let clientId = localStorage.getItem('menteando_client_id') || null;
 
     const contenido = JSON.stringify({
-        version: "1.0",
+        version: "2.0",
         fechaExportacion: new Date().toISOString(),
-        perfil
+        perfil: perfil,
+        comentarios: {
+            ownedIds: ownedIds,
+            clientId: clientId
+        }
     }, null, 2);
 
-    const blob = new Blob(
-        [contenido],
-        { type: "application/json" }
-    );
-
+    const blob = new Blob([contenido], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-
     const enlace = document.createElement("a");
-
     enlace.href = url;
-
-    enlace.download =
-        `menteando-${perfil.nombre || "perfil"}.json`;
-
+    enlace.download = `menteando-${perfil.nombre || "perfil"}.json`;
     document.body.appendChild(enlace);
-
     enlace.click();
-
     document.body.removeChild(enlace);
-
     URL.revokeObjectURL(url);
 
-    mostrarModal(
-        "Perfil exportado correctamente.",
-        "success"
-    );
+    mostrarModal("Perfil exportado correctamente.", "success");
 }
 
-document
-    .getElementById("btn-exportar")
-    ?.addEventListener("click", exportarPerfil);
+document.getElementById("btn-exportar")?.addEventListener("click", exportarPerfil);
 
 
 // ====================
-// IMPORTAR PERFIL
+// IMPORTAR PERFIL (COMPLETO) - CORREGIDO
 // ====================
 
-document
-    .getElementById("btn-importar")
-    ?.addEventListener("click", () => {
+// ✅ 1. Listener del botón "Importar" -> abre el selector de archivos
+document.getElementById("btn-importar")?.addEventListener("click", function() {
+    const input = document.getElementById("input-importar-perfil");
+    if (input) {
+        input.click();
+    } else {
+        console.error("❌ No se encontró el input de importar");
+    }
+});
 
-        document
-            .getElementById("input-importar-perfil")
-            .click();
+// ✅ 2. Listener del input -> cuando se selecciona un archivo, llama a importarPerfil
+document.getElementById("input-importar-perfil")?.addEventListener("change", importarPerfil);
 
-    });
-
-document
-    .getElementById("input-importar-perfil")
-    ?.addEventListener("change", importarPerfil);
-
+// ✅ 3. Función importarPerfil
 function importarPerfil(event) {
-
     const archivo = event.target.files[0];
-
-    if (!archivo) return;
+    if (!archivo) {
+        console.warn("⚠️ No se seleccionó ningún archivo");
+        return;
+    }
 
     const lector = new FileReader();
-
     lector.onload = function(e) {
-
         try {
-
-            const datos =
-                JSON.parse(e.target.result);
+            const datos = JSON.parse(e.target.result);
 
             if (!datos.perfil) {
-
-                throw new Error(
-                    "Formato de archivo inválido"
-                );
-
+                throw new Error("Formato de archivo inválido: no contiene 'perfil'");
             }
 
+            // 1. Guardar el perfil
             saveperfil(datos.perfil);
+            console.log("✅ Perfil guardado");
 
-            mostrarModal(
-                "Perfil importado correctamente.",
-                "success"
-            );
+            // 2. Restaurar datos de comentarios
+            if (datos.comentarios) {
+                // Restaurar IDs de comentarios
+                if (datos.comentarios.ownedIds && datos.comentarios.ownedIds.length > 0) {
+                    localStorage.setItem('menteando_owned_ids', JSON.stringify(datos.comentarios.ownedIds));
+                    console.log(`✅ IDs de comentarios restaurados: ${datos.comentarios.ownedIds.length}`);
+                }
+
+                // Restaurar el Client ID
+                if (datos.comentarios.clientId) {
+                    localStorage.setItem('menteando_client_id', datos.comentarios.clientId);
+                    console.log(`✅ Client ID restaurado: ${datos.comentarios.clientId}`);
+                }
+            } else {
+                console.warn('⚠️ El archivo no contiene IDs de comentarios (versión antigua)');
+            }
+
+            mostrarModal("Perfil importado correctamente.", "success");
 
             setTimeout(() => {
                 location.reload();
             }, 1000);
 
         } catch (error) {
-
-            console.error(error);
-
-            mostrarModal(
-                "El archivo seleccionado no es válido.",
-                "error"
-            );
-
+            console.error("❌ Error al importar:", error);
+            mostrarModal("El archivo seleccionado no es válido.", "error");
         }
-
     };
-
+    
+    lector.onerror = function() {
+        mostrarModal("Error al leer el archivo.", "error");
+    };
+    
     lector.readAsText(archivo);
+    
+    // ✅ Limpiar el input para que se pueda seleccionar el mismo archivo dos veces
+    event.target.value = "";
 }
 
 // ========== EXPORTS GLOBALES ==========

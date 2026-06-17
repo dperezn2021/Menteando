@@ -1,5 +1,5 @@
 // ======================================================
-// COMENTARIOS GLOBALES - Menteando (VERSIÓN ESTABLE)
+// COMENTARIOS GLOBALES - Menteando (VERSIÓN CORREGIDA)
 // ======================================================
 
 const API_URL = "https://menteando-comentarios.d-perezn-2021.workers.dev/";
@@ -15,16 +15,10 @@ const CATEGORIAS = {
 };
 
 let filtroActual = "todos";
-// Toggle to fetch all comments from the Worker (server-side) instead of the default limited set
 let mostrarTodos = false;
-// Sort order: true = newest first (desc), false = oldest first (asc)
 let sortDesc = true;
 
 // ========== PROPIEDAD DE COMENTARIOS (localStorage) ==========
-// Los IDs de los comentarios publicados desde este navegador se guardan aquí.
-// Los botones de editar/borrar se muestran solo para estos IDs, no por nombre,
-// para evitar que alguien edite comentarios ajenos cambiándose el apodo.
-
 const OWNED_IDS_KEY = 'menteando_owned_ids';
 
 function getOwnedIds() {
@@ -38,13 +32,12 @@ function claimCommentId(id) {
     localStorage.setItem(OWNED_IDS_KEY, JSON.stringify([...set]));
 }
 
-// IDs alfanuméricos (formato nuevo, ej: 'mpwrvot6lo24uqj'): requieren localStorage.
-// IDs numéricos (formato antiguo, timestamps): fallback por nombre para migración.
 function isMyComment(com) {
     const id = String(com.id);
-    if (/[a-z]/i.test(id)) return getOwnedIds().has(id);
-    return com.usuario === getUsuarioActual();
+    // ✅ SOLO por ID en localStorage, NADA de fallback por nombre
+    return getOwnedIds().has(id);
 }
+
 
 // ========== FUNCIONES DE USUARIO ==========
 
@@ -58,16 +51,14 @@ function getUsuarioActual() {
 
 function getClientId() {
     let id = localStorage.getItem("menteando_client_id");
-
     if (!id) {
         id = crypto.randomUUID();
         localStorage.setItem("menteando_client_id", id);
     }
-
     return id;
 }
 
-// Admin replies: send PUT with reply payload { id, reply: { usuario, texto, fecha } }
+// Admin replies
 async function responderComentario(id) {
     const usuario = getUsuarioActual();
     if (!usuario) {
@@ -106,23 +97,16 @@ async function responderComentario(id) {
 function esAdmin() {
     const usuario = getUsuarioActual();
     const tieneToken = !!window.ADMIN_BEARER;
-
-    // Si el usuario se llama admin pero no se ha autenticado todavía
     if (usuario === "admin" && !tieneToken) {
-        // Ejecutamos la autenticación de forma asíncrona sin bloquear el renderizado
         verificarContrasenaAdmin();
     }
-
     return usuario === "admin" && tieneToken;
 }
 
-
 async function verificarContrasenaAdmin() {
-    // Evitar bucles si ya se está pidiendo la contraseña
     if (window.VERIFICANDO_ADMIN) return;
     window.VERIFICANDO_ADMIN = true;
 
-    // Usamos el inputModal que ya tienes programado en tus utilidades
     const password = await inputModal('Introduce la contraseña de administrador para activar los privilegios:', 'Contraseña');
 
     if (!password) {
@@ -131,7 +115,6 @@ async function verificarContrasenaAdmin() {
     }
 
     try {
-        // Hacemos la petición al endpoint /verify del Worker
         const response = await fetch(`${API_URL}verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -141,10 +124,9 @@ async function verificarContrasenaAdmin() {
         const data = await response.json();
 
         if (response.ok && data.ok) {
-            // Guardamos la clave en la variable global que tus funciones fetch (DELETE, PUT) ya leen
             window.ADMIN_BEARER = password;
             mostrarModal('Autenticación de administrador correcta 👑', 'success');
-            cargarComentarios(); // Recargamos para que aparezcan los botones de borrar 
+            cargarComentarios();
         } else {
             mostrarModal('Contraseña de administrador incorrecta', 'error');
         }
@@ -160,7 +142,6 @@ async function verificarContrasenaAdmin() {
 
 async function cargarComentarios() {
     try {
-        // Build query params: category and optionally all=true to request full list from Worker
         const params = [];
         if (filtroActual && filtroActual !== 'todos') params.push(`categoria=${encodeURIComponent(filtroActual)}`);
         if (mostrarTodos) params.push('all=true');
@@ -207,11 +188,9 @@ function mostrarComentarios(comentarios) {
     comentarios.forEach(com => {
         const card = document.createElement('div');
 
-        // --- LOGICA DE REPORTES (3 O MÁS REPORTES) ---
         const totalReportes = com.reportes || 0;
         const esComentarioReportado = totalReportes >= 3;
 
-        // Estilos base o estilos rojos si está reportado
         if (esComentarioReportado) {
             card.className = 'bg-red-50/90 dark:bg-red-950/20 rounded-2xl shadow-sm p-5 border border-red-400 dark:border-red-900/60 hover:shadow-md transition-all';
         } else {
@@ -246,7 +225,6 @@ function mostrarComentarios(comentarios) {
             card.className = 'bg-blue-50/90 dark:bg-blue-950/20 rounded-2xl shadow-sm p-5 border border-blue-400 dark:border-blue-900/60 hover:shadow-md transition-all';
             avatar.src = normalizeAvatarPath('/assets/img/logo_4.png');
             avatar.className = 'w-10 h-10 rounded-full object-cover';
-
         }
 
         const dateSpan = document.createElement('span');
@@ -258,12 +236,9 @@ function mostrarComentarios(comentarios) {
         catBadge.className = `px-2 py-0.5 rounded-full text-xs ${categoriaInfo.color}`;
         catBadge.textContent = com.subtipo ? `${categoriaInfo.nombre}: ${com.subtipo}` : categoriaInfo.nombre;
 
-
         left.appendChild(name);
         left.appendChild(dateSpan);
         left.appendChild(catBadge);
-
-
 
         if (com.editado) {
             const editLabel = document.createElement('span');
@@ -272,14 +247,12 @@ function mostrarComentarios(comentarios) {
             left.appendChild(editLabel);
         }
 
-        // Si está reportado, añadimos la etiqueta de alerta visible para todos (o con el contador si es admin)
         if (esComentarioReportado) {
             const rep = document.createElement('span');
             rep.className = 'text-xs font-semibold text-red-600 dark:text-red-400';
             rep.textContent = admin ? `⚠️ ${totalReportes} reportes` : '⚠️ Comentario Reportado';
             left.appendChild(rep);
         } else if (totalReportes > 0 && admin) {
-            // Si tiene menos de 3 reportes, solo el admin ve el aviso normal sin rojo
             const rep = document.createElement('span');
             rep.className = 'text-xs text-amber-500';
             rep.textContent = `⚠️ ${totalReportes} reportes`;
@@ -289,8 +262,6 @@ function mostrarComentarios(comentarios) {
         const right = document.createElement('div');
         right.className = 'flex gap-2 comentario-controls';
 
-        // esAutor (localStorage): controla editar/borrar
-        // esMiNombre (apodo): controla la 🚩 (no reportas los tuyos aunque hayas cambiado de nombre)
         const esAutor = isMyComment(com);
         const esMiNombre = usuarioActual && com.usuario === usuarioActual;
 
@@ -327,13 +298,11 @@ function mostrarComentarios(comentarios) {
 
         const textoP = document.createElement('p');
 
-        // Renderizado del texto según si está reportado y el rol del usuario
         if (esComentarioReportado) {
             textoP.className = 'comentario-texto text-red-600 dark:text-red-400 text-sm font-medium leading-relaxed';
             if (!admin) {
                 textoP.textContent = 'Comentario Reportado';
             } else {
-                // El admin ve el texto real pero coloreado en rojo
                 textoP.innerHTML = escapeHtml(com.texto || '').replace(/\r?\n/g, '<br>');
             }
         } else {
@@ -342,7 +311,6 @@ function mostrarComentarios(comentarios) {
         }
         textoDiv.appendChild(textoP);
 
-        // Guardamos el texto original y metadatos de la card
         card.dataset.raw = com.texto || '';
         card.dataset.categoria = com.categoria || 'general';
         card.dataset.subtipo = com.subtipo || '';
@@ -375,7 +343,6 @@ function mostrarComentarios(comentarios) {
             const list = document.createElement('div');
             list.className = 'pl-12 space-y-3';
             com.replies.forEach(r => {
-                // Ocultar respuestas a usuarios normales si el comentario principal está reportado
                 if (esComentarioReportado && !admin) return;
 
                 const rc = document.createElement('div');
@@ -393,7 +360,6 @@ function mostrarComentarios(comentarios) {
             repliesContainer.appendChild(list);
         }
 
-        // Caja de respuesta para el administrador
         if (esAdmin()) {
             const replyBox = document.createElement('div');
             replyBox.className = 'mt-2 pl-12';
@@ -419,14 +385,22 @@ function mostrarComentarios(comentarios) {
         container.appendChild(card);
     });
 }
-// ========== PUBLICAR COMENTARIO ==========
+
+// ========== PUBLICAR COMENTARIO (CORREGIDO) ==========
 
 async function publicarComentario() {
+    // DESBLOQUEAR para que el formulario lea el valor correctamente al hacer el fetch
+    if (document.getElementById("comentario-categoria")) {
+        document.getElementById("comentario-categoria").disabled = false;
+    }
+    if (document.getElementById("comentario-subtipo")) {
+        document.getElementById("comentario-subtipo").disabled = false;
+    }
+
     const usuario = getUsuarioActual();
     const texto = document.getElementById("comentario-texto")?.value.trim();
     const categoria = document.getElementById("comentario-categoria")?.value;
     const subtipo = document.getElementById("comentario-subtipo")?.value || "";
-
 
     if (!usuario) {
         mostrarModal("Debes configurar un apodo en tu perfil para comentar", "info");
@@ -437,10 +411,14 @@ async function publicarComentario() {
         mostrarModal("Debes seleccionar una categoría antes de publicar", "info");
         return;
     }
+    
+    // Esto se queda igual (solo frena si es test o juego, dejando pasar libremente a 'error')
     if ((categoria === "test" || categoria === "juego") && !subtipo) {
         mostrarModal(`Debes seleccionar ${categoria === "test" ? "el test" : "el juego"} al que se refiere tu comentario`, "info");
         return;
     }
+
+    
     if (!texto) {
         mostrarModal("Escribe un comentario", "info");
         return;
@@ -451,7 +429,6 @@ async function publicarComentario() {
         const perfil = getperfil();
         if (perfil?.avatar) avatar = perfil.avatar;
     }
-
 
     try {
         const body = {
@@ -464,27 +441,33 @@ async function publicarComentario() {
 
         if (subtipo) body.subtipo = subtipo;
         console.log('[publicarComentario] enviando:', body);
+
         const response = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body)
         });
 
+        // ✅ LEER UNA SOLA VEZ
         const data = await response.json().catch(() => ({}));
+        console.log('[publicarComentario] respuesta:', response.status, data);
 
         if (response.ok) {
-
-            const data = await response.json().catch(() => ({}));
-            console.log('[publicarComentario] respuesta:', data);
-            if (data?.id) claimCommentId(data.id);
+            // ✅ Guardar el ID si existe
+            if (data?.id) {
+                claimCommentId(data.id);
+                console.log(`✅ ID guardado: ${data.id}`);
+            } else {
+                console.warn('⚠️ No se recibió ID del comentario');
+            }
+            
             document.getElementById("comentario-texto").value = "";
             cargarComentarios();
             mostrarModal("Comentario publicado", "success");
         } else {
-            mostrarModal(
-                data?.error || "Error al publicar",
-                "error"
-            );
+            
+            mostrarModal(data?.error || "Error al publicar", "info");
+            
         }
     } catch (error) {
         console.error("Error:", error);
@@ -528,7 +511,6 @@ function editarComentario(id) {
     divTexto.innerHTML = '';
     const wrapper = document.createElement('div');
 
-    // Textarea
     const textarea = document.createElement('textarea');
     textarea.id = `edit-texto-${id}`;
     textarea.className = 'w-full p-2 rounded-lg border text-sm dark:bg-slate-700 dark:border-slate-600';
@@ -536,7 +518,6 @@ function editarComentario(id) {
     textarea.value = textoActual;
     wrapper.appendChild(textarea);
 
-    // Selector de categoría
     const selectEl = document.createElement('select');
     selectEl.id = `edit-categoria-${id}`;
     selectEl.className = 'mt-2 px-3 py-1 rounded-lg border text-sm w-full dark:bg-slate-700';
@@ -549,7 +530,6 @@ function editarComentario(id) {
     selectEl.value = categoriaActual;
     wrapper.appendChild(selectEl);
 
-    // Selector de subtipo (test / juego)
     const subWrapper = document.createElement('div');
     subWrapper.className = 'mt-2 hidden';
     const subSelect = document.createElement('select');
@@ -558,12 +538,10 @@ function editarComentario(id) {
     subWrapper.appendChild(subSelect);
     wrapper.appendChild(subWrapper);
 
-    // Si la categoría actual ya es test/juego, mostrar el selector pre-poblado
     if (categoriaActual === 'test' || categoriaActual === 'juego') {
         poblarSelectSubtipo(subSelect, subWrapper, categoriaActual, subtipoActual);
     }
 
-    // Al cambiar categoría, mostrar/ocultar subtipo
     selectEl.addEventListener('change', () => {
         const cat = selectEl.value;
         if (cat === 'test' || cat === 'juego') {
@@ -573,7 +551,6 @@ function editarComentario(id) {
         }
     });
 
-    // Fila de botones
     const btnRow = document.createElement('div');
     btnRow.className = 'flex gap-2 mt-2';
 
@@ -634,7 +611,6 @@ async function guardarEdicion(id) {
 
 function cancelarEdicion(id, textoOriginal) {
     const divTexto = document.getElementById(`texto-${id}`);
-    // Restore original raw text (preserves newlines)
     const card = document.getElementById(`comentario-${id}`);
     const raw = (card && card.dataset.raw) ? card.dataset.raw : textoOriginal;
     divTexto.innerHTML = `<p class="comentario-texto text-slate-700 dark:text-slate-300 text-sm leading-relaxed">${escapeHtml(raw).replace(/\r?\n/g, '<br>')}</p>`;
@@ -650,7 +626,7 @@ async function reportarComentario(id) {
     }
 
     const motivo = await inputModal('Opcional: añade un motivo para el reporte', 'Descripción (opcional)');
-    if (motivo === null) return; // cancel
+    if (motivo === null) return;
 
     try {
         const response = await fetch(API_URL, {
@@ -728,14 +704,6 @@ function filtrarComentarios(categoria) {
 
 // ========== UTILIDADES ==========
 
-function mostrarMensajeTemporal(mensaje, tipo) {
-    const msgDiv = document.createElement('div');
-    msgDiv.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg text-white text-sm z-50 ${tipo === 'success' ? 'bg-green-500' : 'bg-red-500'} animate-fade-in`;
-    msgDiv.textContent = mensaje;
-    document.body.appendChild(msgDiv);
-    setTimeout(() => msgDiv.remove(), 3000);
-}
-
 function formatearFecha(fechaISO) {
     const fecha = new Date(fechaISO);
     const ahora = new Date();
@@ -752,8 +720,6 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Modal confirm that returns a Promise<boolean>
-// Modal confirm que respeta modo oscuro
 function confirmModal(mensaje, title = '') {
     return new Promise((resolve) => {
         const modalExistente = document.getElementById("menteando-modal");
@@ -774,7 +740,6 @@ function confirmModal(mensaje, title = '') {
             z-index: 10000;
         `;
         
-        // Detectar si estamos en modo oscuro
         const isDarkMode = document.documentElement.classList.contains('dark');
         
         modal.innerHTML = `
@@ -849,8 +814,6 @@ function confirmModal(mensaje, title = '') {
     });
 }
 
-// Modal input that returns a Promise<string|null>
-// Modal input que respeta modo oscuro
 function inputModal(mensaje, placeholder = '') {
     return new Promise((resolve) => {
         const modalExistente = document.getElementById("menteando-modal");
@@ -871,7 +834,6 @@ function inputModal(mensaje, placeholder = '') {
             z-index: 10000;
         `;
         
-        // Detectar si estamos en modo oscuro
         const isDarkMode = document.documentElement.classList.contains('dark');
         
         modal.innerHTML = `
@@ -962,18 +924,15 @@ function inputModal(mensaje, placeholder = '') {
     });
 }
 
-// Normalize avatar path: return absolute path or full URL; fall back to default
 function normalizeAvatarPath(path) {
     const fallback = '/assets/icon/usuario.webp';
     if (!path) return fallback;
     path = String(path).trim();
     if (!path) return fallback;
-    if (/^https?:\/\//i.test(path)) return path; // full URL
-    if (path.startsWith('/')) return path; // already absolute
-    // Attempt to find assets/ in path and produce /assets/... otherwise fallback
+    if (/^https?:\/\//i.test(path)) return path;
+    if (path.startsWith('/')) return path;
     const m = path.match(/(assets[\\/].*)$/i);
     if (m && m[1]) return '/' + m[1].replace(/\\/g, '/');
-    // If path contains 'img' or 'icon', try to append to /assets
     if (/icon|img|avatar/i.test(path)) {
         const cleaned = path.replace(/^[\.\/]+/, '');
         return '/' + cleaned.replace(/\\/g, '/');
@@ -1000,9 +959,8 @@ function actualizarAvatar() {
     }
 }
 
-// ========== SELECTOR DE SUBTIPO (test / juego) ==========
+// ========== SELECTOR DE SUBTIPO ==========
 
-// Devuelve array de nombres legibles para test o juego, usando catálogos o fallback
 function getOpcionesSubtipo(categoria) {
     const fallbackJuegos = [
         "Detector de Intrusos", "Doble Canal", "Silencio Mental", "Operaciones Encadenadas",
@@ -1026,7 +984,6 @@ function getOpcionesSubtipo(categoria) {
     return [];
 }
 
-// Puebla un <select> con las opciones de subtipo para la categoría dada
 function poblarSelectSubtipo(selectEl, wrapperEl, categoria, valorActual) {
     const opciones = getOpcionesSubtipo(categoria);
     if (!opciones.length) { wrapperEl.classList.add('hidden'); return; }
@@ -1064,6 +1021,29 @@ function initSubtipoSelector() {
     });
 }
 
+// ========== FUNCIÓN PARA ABRIR MODAL DE EDICIÓN ==========
+
+function abrirModalEdicion() {
+    const modalEditar = document.getElementById("modal-editar");
+    if (!modalEditar) {
+        console.warn("Modal de edición no encontrado");
+        return;
+    }
+
+    const perfil = getperfil();
+    const nameInput = document.getElementById("name");
+    const nicknameInput = document.getElementById("nickname");
+    const ageInput = document.getElementById("age");
+    const emailInput = document.getElementById("email");
+
+    if (nameInput) nameInput.value = perfil.nombre || "";
+    if (nicknameInput) nicknameInput.value = perfil.apodo || "";
+    if (ageInput) ageInput.value = perfil.edad || "";
+    if (emailInput) emailInput.value = perfil.correo || "";
+
+    modalEditar.style.display = "flex";
+}
+
 // ========== INICIALIZACIÓN ==========
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1085,7 +1065,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Insert 'Mostrar todos los comentarios' toggle button above the comments container
     const comentariosContainer = document.getElementById('comentarios-container');
     if (comentariosContainer) {
         const wrapper = document.createElement('div');
@@ -1125,3 +1104,5 @@ window.borrarComentarioPrompt = borrarComentarioPrompt;
 window.filtrarComentarios = filtrarComentarios;
 window.guardarEdicion = guardarEdicion;
 window.cancelarEdicion = cancelarEdicion;
+window.abrirModalEdicion = abrirModalEdicion;
+

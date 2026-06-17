@@ -52,26 +52,29 @@ function generarTarjeta(juego) {
     const skillLabel = juego.categoria;
 
     return `
-        <article class="bg-white dark:bg-slate-800 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden group">
-            <a href="${juego.url}" class="block h-48 overflow-hidden bg-slate-200 dark:bg-slate-700">
+        <article class="bg-white dark:bg-slate-800 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden group flex flex-col h-full">
+            
+            <a href="${juego.url}" class="block h-48 overflow-hidden bg-slate-200 dark:bg-slate-700 shrink-0">
                 <img src="${juego.imagen}" alt="${juego.nombre}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
             </a>
 
-            <div class="p-6 flex flex-col gap-3">
+            <div class="p-6 flex flex-col gap-3 flex-1">
                 <span class="px-3 py-1 text-sm font-bold uppercase rounded-full w-fit ${getBadgeClasses(skillSlug)}">
                     ${skillLabel}
                 </span>
 
-                 <div class="flex flex-row gap-2 grow">
-                    ${juego.logo ? `<img src="${juego.logo}" alt="${juego.nombre}" class="w-10 h-10 object-cover">` : ""}
-                <h3 class="text-2xl font-bold text-slate-900 dark:text-white">${juego.nombre}</h3>
-                   </div>
-                <p class="text-slate-600 dark:text-slate-300 text-base">${juego.descripcion}</p>
+                <div class="flex flex-row gap-2 items-center">
+                    ${juego.logo ? `<img src="${juego.logo}" alt="${juego.nombre}" class="w-10 h-10 object-cover rounded-lg">` : ""}
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white">${juego.nombre}</h3>
+                </div>
+                
+                <p class="text-slate-600 dark:text-slate-300 text-base leading-relaxed">${juego.descripcion}</p>
 
-                <a href="${juego.url}" class="mt-auto w-full py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white font-bold text-center hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors">
-                    Entrenar
+                <a href="${juego.url}" class="mt-auto w-full py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-white font-bold text-center block hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors">
+                    Jugar
                 </a>
             </div>
+
         </article>
     `;
 }
@@ -90,7 +93,6 @@ function generarJuegoDelDia(juego) {
     return `
         <div class="w-full flex flex-col lg:flex-row items-center gap-6 lg:gap-10 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 sm:p-10 lg:p-14 shadow-lg">
 
-            <!-- Contenido -->
             <div class="w-full lg:flex-1 flex flex-col gap-4">
 
                 <div class="flex items-center gap-2">
@@ -120,15 +122,16 @@ function generarJuegoDelDia(juego) {
                     <a href="${juego.url}" class="flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all">
                         Jugar ahora
                     </a>
-                    <a href="about.html#seccion-comentarios" class="flex items-center justify-center px-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                    
+                    <button class="btn-opinar flex items-center justify-center px-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                            data-tipo="juego"
+                            data-nombre="${juego.nombre}">
                         Opina sobre el juego
-                    </a>
+                    </button>
                 </div>
 
             </div>
 
-            
-            <!-- Imagen -->
             <a href="${juego.url}" class="relative block w-full h-56 sm:h-64 lg:h-auto lg:flex-1 lg:min-h-[240px] rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-700">
                 <img src="${juego.imagen}" alt="${juego.nombre}" class="block w-full h-full object-cover">
                 <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
@@ -137,6 +140,25 @@ function generarJuegoDelDia(juego) {
         </div>
     `;
 }
+
+// ========== BOTONES DE OPINIÓN (FUERA DE LA FUNCIÓN) ==========
+// Pon este bloque al final del archivo o dentro de tu función de inicialización / DOMContentLoaded
+document.addEventListener('click', function (e) {
+    // Usamos delegación de eventos para capturar el clic incluso si el botón se genera dinámicamente después
+    const boton = e.target.closest('.btn-opinar');
+    
+    if (boton) {
+        e.preventDefault();
+        const tipo = boton.dataset.tipo;
+        const nombre = boton.dataset.nombre;
+        
+        if (tipo && nombre) {
+            window.location.href = `../../about.html?categoria=${tipo}&nombre=${encodeURIComponent(nombre)}#seccion-comentarios`;
+        } else {
+            console.warn('Faltan datos en el botón de opinión');
+        }
+    }
+});
 
 
 function juegoRecomendadoPersonalizado() {
