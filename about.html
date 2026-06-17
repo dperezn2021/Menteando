@@ -2,48 +2,51 @@
 <html class="light" lang="es">
 
 <head>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menteando | Proyecto de Investigación, Misión y Visión Académica</title>
-    <meta name="description" content="Conoce el contexto académico de Menteando. Un Trabajo de Fin de Grado (TFG) de Diseño y Desarrollo de Videojuegos en la Universidad Rey Juan Carlos (URJC).">
-    <meta name="keywords" content="URJC, Universidad Rey Juan Carlos, TFG, Trabajo Fin de Grado, Daniel Pérez Navarro, desarrollo de videojuegos, neurociencia aplicada, investigación científica, misión y visión, salud mental">
-    <meta name="author" content="Daniel Pérez Navarro">
-    <link rel="canonical" href="https://menteando.com/about">
-    <link rel="icon" href="/assets/img/logo_1.png" type="image/png" sizes="32x32">
 
-    <script>
-        (() => {
-            const storedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const useDark = storedTheme ? storedTheme === 'dark' : prefersDark;
-            document.documentElement.classList.toggle('dark', useDark);
-            document.documentElement.classList.toggle('light', !useDark);
-        })();
-    </script>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Menteando | Proyecto de Investigación, Misión y Visión Académica</title>
+        <meta name="description"
+            content="Conoce el contexto académico de Menteando. Un Trabajo de Fin de Grado (TFG) de Diseño y Desarrollo de Videojuegos en la Universidad Rey Juan Carlos (URJC).">
+        <meta name="keywords"
+            content="URJC, Universidad Rey Juan Carlos, TFG, Trabajo Fin de Grado, Daniel Pérez Navarro, desarrollo de videojuegos, neurociencia aplicada, investigación científica, misión y visión, salud mental">
+        <meta name="author" content="Daniel Pérez Navarro">
+        <link rel="canonical" href="https://menteando.com/about">
+        <link rel="icon" href="/assets/img/logo_1.png" type="image/png" sizes="32x32">
 
-    <!-- EmailJS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+        <script>
+            (() => {
+                const storedTheme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const useDark = storedTheme ? storedTheme === 'dark' : prefersDark;
+                document.documentElement.classList.toggle('dark', useDark);
+                document.documentElement.classList.toggle('light', !useDark);
+            })();
+        </script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: { primary: '#3b82f6', secondary: '#6366f1', accent: '#f59e0b' }
+        <!-- EmailJS SDK -->
+        <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <script>
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            brand: { primary: '#3b82f6', secondary: '#6366f1', accent: '#f59e0b' }
+                        }
                     }
                 }
             }
-        }
-    </script>
+        </script>
 
-    <link rel="stylesheet" href="/coach/animacionesCoach.css">
-    <link rel="stylesheet" href="css/style.css">
-    <script defer src="js/header.js"></script>
-</head>
+        <link rel="stylesheet" href="/coach/animacionesCoach.css">
+        <link rel="stylesheet" href="css/style.css">
+        <script defer src="js/header.js"></script>
+    </head>
 
 <body class="bg-neutral-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans antialiased">
 
@@ -724,14 +727,11 @@
         (function () {
             const btn = document.getElementById('feedback-btn');
             if (!btn) return;
-
-            // Si NO ha sido descartado, mostramos el botón quitando 'hidden'
             if (localStorage.getItem('feedbackDismissed') !== '1') {
                 btn.classList.remove('hidden');
             } else {
-                return; // Si ya se descartó, no hacemos nada más
+                return;
             }
-
             const dismiss = () => {
                 try { localStorage.setItem('feedbackDismissed', '1'); } catch (e) { }
                 btn.style.transition = 'opacity .25s ease, transform .25s ease';
@@ -739,9 +739,84 @@
                 btn.style.transform = 'scale(.92)';
                 setTimeout(() => btn.remove(), 250);
             };
-
             btn.addEventListener('click', dismiss, { once: true });
         })();
+
+        // ========== FUNCIÓN SIMPLE PARA FORZAR CATEGORÍA ==========
+        function forzarCategoriaDesdeURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoria = urlParams.get('categoria');
+            const nombre = urlParams.get('nombre');
+
+            if (!categoria || !nombre) return;
+
+            const catSelect = document.getElementById('comentario-categoria');
+            const subSelect = document.getElementById('comentario-subtipo');
+
+            if (!catSelect || !subSelect) return;
+
+            // Forzar categoría
+            catSelect.value = categoria;
+            catSelect.dispatchEvent(new Event('change'));
+
+            setTimeout(() => {
+                // Forzar subtipo
+                for (let opt of subSelect.options) {
+                    if (opt.value === nombre) {
+                        subSelect.value = nombre;
+                        break;
+                    }
+                }
+                // Bloquear
+                catSelect.disabled = true;
+                subSelect.disabled = true;
+
+                // SCROLL DIRECTO a la sección de comentarios
+                const seccion = document.getElementById('seccion-comentarios');
+                if (seccion) {
+                    // Scroll con offset fijo de 100px desde arriba
+                    const offset = 100;
+                    const top = seccion.getBoundingClientRect().top + window.pageYOffset - offset;
+                    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+                }
+
+                // Mostrar mensaje
+                if (typeof mostrarModal === 'function') {
+                    mostrarModal(`Ahora estás opinando sobre "${nombre}"`, 'info');
+                }
+            }, 300);
+        }
+
+        // ========== EJECUTAR UNA SOLA VEZ ==========
+        let ejecutado = false;
+
+        function ejecutarSiHayParametros() {
+            if (ejecutado) return;
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('categoria') && urlParams.get('nombre')) {
+                ejecutado = true;
+                // Esperar a que el DOM esté listo
+                if (document.readyState === 'complete') {
+                    setTimeout(forzarCategoriaDesdeURL, 500);
+                } else {
+                    document.addEventListener('DOMContentLoaded', function () {
+                        setTimeout(forzarCategoriaDesdeURL, 500);
+                    });
+                }
+            }
+        }
+
+        // Ejecutar
+        ejecutarSiHayParametros();
+
+        // También en load por si los comentarios tardan
+        window.addEventListener('load', function () {
+            if (!ejecutado) {
+                ejecutarSiHayParametros();
+            }
+        });
+
+        console.log('✅ about.html cargado correctamente');
     </script>
 
 
