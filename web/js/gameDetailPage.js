@@ -214,10 +214,19 @@ function renderGameDetailPage(gameId) {
                     <p class="text-sm font-medium text-indigo-400">¿Qué te ha parecido este juego?</p>
                 </div>
                 <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Tu opinión nos ayuda a mejorar. Comparte tu experiencia o reporta algún problema.</p>
+
+
                 <div class="flex gap-3 mt-4">
-                    <button id="btn-opinar-juego" class="flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white py-2 text-sm font-bold transition">Escribir opinión</button>
-                    <button id="btn-reportar-juego" class="flex-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">Reportar problema</button>
+                    <button class="btn-opinar flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white py-2 text-sm font-bold transition"
+                            data-tipo="juego"
+                            data-nombre='${juego.nombre}'>
+                        Escribir opinión
+                    </button>
+                    <button class="btn-reportar flex-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                        Reportar problema
+                    </button>
                 </div>
+
             </div>
         </div>
     </section>
@@ -239,25 +248,28 @@ function renderGameDetailPage(gameId) {
         });
     }
 
-
-
-    // Botón Escribir opinión
-    const btnOpinar = document.getElementById("btn-opinar-juego");
-    if (btnOpinar) {
-        btnOpinar.addEventListener("click", () => {
-            // Redirigir a about.html con categoría "juego" pre-seleccionada
-            window.location.href = "../../about.html?categoria=juego#seccion-comentarios";
+    // ========== BOTONES DE OPINIÓN ==========
+    // Usar querySelectorAll para buscar por clase
+    document.querySelectorAll('.btn-opinar').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const tipo = this.dataset.tipo;
+            const nombre = this.dataset.nombre;
+            if (tipo && nombre) {
+                window.location.href = `../../about.html?categoria=${tipo}&nombre=${encodeURIComponent(nombre)}#seccion-comentarios`;
+            } else {
+                console.warn('Faltan datos en el botón de opinión');
+            }
         });
-    }
+    });
 
-    // Botón Reportar problema
-    const btnReportar = document.getElementById("btn-reportar-juego");
-    if (btnReportar) {
-        btnReportar.addEventListener("click", () => {
-            // Redirigir al formulario de contacto
+    // ========== BOTONES DE REPORTE ==========
+    document.querySelectorAll('.btn-reportar').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
             window.location.href = "../../about.html?tipo=reporte#contacto";
         });
-    }
+    });
 
     // Iniciar pantalla completa
     iniciarPantallaCompleta(content, juego);
