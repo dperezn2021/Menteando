@@ -46,7 +46,8 @@ CoachController.prototype.setupListeners = function() {
         if (self.timer) clearTimeout(self.timer);
         self.timer = setTimeout(function() {
             if (self.entity) self.mostrarMensajeActual();
-        }, 5000);
+        }, 15000);
+        
     };
     document.addEventListener("click", hideAndSchedule);
     document.addEventListener("keydown", hideAndSchedule);
