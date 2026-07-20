@@ -1,42 +1,104 @@
-# Desarrollo de una plataforma web interactiva para fomentar la estimulación mental en adultos
+# 🧠 Menteando
 
-## 📝 Descripción del Proyecto
-Este repositorio contiene el **Trabajo de Fin de Grado (TFG)** enfocado en el desarrollo de una plataforma web interactiva diseñada específicamente para el mantenimiento y desarrollo cognitivo en adultos y personas mayores. 
+> Trabajo de Fin de Grado – Universidad Rey Juan Carlos
 
-A través de una serie de minijuegos accesibles integrados en la web y desarrollados con el motor **Unity**, el proyecto explora el potencial de los videojuegos como herramientas pedagógicas y de salud mental. El objetivo principal es estimular capacidades cognitivas críticas como:
-* 🧠 **Memoria** (retención y recuerdo a corto/largo plazo).
-* ⚡ **Reflejos** (tiempo de reacción y coordinación visomotora).
-* 🧩 **Flexibilidad mental** (adaptación a nuevas reglas y resolución de problemas).
-* 🎯 **Concentración** (atención sostenida y focalizada).
+## 📖 Descripción
 
-La plataforma prioriza una experiencia de usuario (UX) accesible, intuitiva y atractiva visualmente, eliminando las barreras tecnológicas habituales para este grupo demográfico.
+**Menteando** es una plataforma web interactiva desarrollada como Trabajo de Fin de Grado del **Grado en Diseño y Desarrollo de Videojuegos** de la Universidad Rey Juan Carlos.
 
----
+Su objetivo es ofrecer una herramienta accesible para el entrenamiento y la estimulación cognitiva en adultos mediante una combinación de **tests de evaluación**, **minijuegos**, **seguimiento del progreso** y **gamificación**, todo ello directamente desde el navegador y sin necesidad de instalación.
 
-## 👤 Detalles del Autor y Centro
-* **Autor:** Daniel Pérez Navarro
-* **Tutor:** Eduardo García Pardo
-* **Centro:** Universidad Rey Juan Carlos (URJC)
-* **Grado:** Grado en Diseño y Desarrollo de Videojuegos
-* **Fecha de Presentación:** Enero / 2026
+La plataforma integra una batería de tests inspirados en pruebas neuropsicológicas y un catálogo de minijuegos desarrollados en **Unity WebGL**, permitiendo trabajar distintas habilidades cognitivas de forma entretenida y realizar un seguimiento de su evolución.
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
-* **Motor de Videojuegos:** Unity (Exportación WebGL)
-* **Desarrollo Web:** HTML5, CSS3, JavaScript
-* **Control de Versiones:** Git y GitHub
+## ✨ Características principales
+
+- 🧠 Batería de tests cognitivos inspirados en pruebas neuropsicológicas.
+- 🎮 Diez minijuegos desarrollados en Unity.
+- 📊 Perfil cognitivo con estadísticas y evolución.
+- 🏆 Sistema de gamificación mediante puntos, rachas y medallas.
+- 🤖 Coach cognitivo con recomendaciones personalizadas.
+- 📱 Diseño adaptable para ordenador, tablet y móvil.
+- 🔒 Almacenamiento local mediante **LocalStorage**, sin necesidad de crear una cuenta.
+- 🌐 Plataforma completamente accesible desde cualquier navegador moderno.
 
 ---
 
-## 📚 Referencias y Bibliografía
-El marco teórico, los estudios sobre gamificación cognitiva y el desarrollo técnico del proyecto se encuentran debidamente documentados. Las citas bibliográficas siguen el formato estándar y pueden consultarse directamente en el archivo de configuración de este repositorio:
+## 🛠️ Tecnologías utilizadas
 
-> 📄 Las referencias detalladas se encuentran en el archivo [references.bib](references.bib) en formato **BibTeX**.
+### Desarrollo web
+
+- HTML5
+- CSS3
+- Tailwind CSS
+- JavaScript (ES6)
+
+### Desarrollo de videojuegos
+
+- Unity
+- C#
+- WebGL
+
+### Servicios utilizados
+
+- Cloudflare Pages
+- Cloudflare Workers
+- EmailJS
+- Google Forms
+
+### Herramientas de desarrollo
+
+- Git
+- GitHub
+- Visual Studio 2022
+- Visual Studio Code
+- Figma
+- Photoshop/Photopea
 
 ---
 
-## 📬 Contacto
-Si tienes alguna duda, sugerencia o estás interesado en el desarrollo del proyecto, puedes ponerte en contacto a través de:
+## 🎓 Información académica
 
-* **Correo electrónico:** [d.perezn.2021@gmail.com](mailto:d.perezn.2021@gmail.com)
+**Autor**
+
+Daniel Pérez Navarro
+
+**Tutor**
+
+Eduardo García Pardo
+
+**Universidad**
+
+Universidad Rey Juan Carlos
+
+**Escuela**
+
+E.T.S. de Ingeniería Informática
+
+**Grado**
+
+Grado en Diseño y Desarrollo de Videojuegos
+
+**Curso académico**
+
+2025–2026
+
+---
+
+
+## 📧 Contacto
+
+Si tienes cualquier duda o sugerencia sobre el proyecto:
+
+**Daniel Pérez Navarro**
+
+📩 d.perezn.2021@gmail.com
+
+---
+
+## 📄 Licencia
+
+Este repositorio contiene el Trabajo de Fin de Grado del autor.
+
+El contenido de la memoria y el código se distribuyen únicamente con fines académicos y de consulta, salvo que se indique lo contrario.
