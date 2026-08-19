@@ -86,6 +86,20 @@ public class RawDetectorData
     public float tiempoPorEnsayo;
 }
 
+[System.Serializable]
+public class RawDoubleCanalData
+{
+    public int aciertosObjetivo;
+    public int omisionesObjetivo;
+    public int aciertosNoGo;
+    public int erroresImpulsivos;
+    public int obstaculosEsquivados;
+    public int colisiones;
+    public int mejorRacha;
+    public System.Collections.Generic.List<float> tiemposReaccion;
+    public int nivelAlcanzado;
+}
+
 
 //////////////////////////////////////////////////////////////
 // CONTEXTO GLOBAL DEL TFG - UNITY + WEB (JS/HTML)

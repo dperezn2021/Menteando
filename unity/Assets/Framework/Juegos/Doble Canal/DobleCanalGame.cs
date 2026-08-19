@@ -1155,8 +1155,18 @@ public class DobleCanalGame : BaseGame
         ui?.OcultarFeedback();
         LimpiarObstaculos();
 
-        CognitiveMetrics metricas = CalcularCognicion();
-        WebExporter.EnviarSesion(nombre, AplicarPesos(metricas));
+        int nivel = ObtenerNivelActual();
+        WebExporter.EnviarSesionCruda(nombre, new RawDoubleCanalData {
+            aciertosObjetivo = aciertosObjetivo,
+            omisionesObjetivo = omisionesObjetivo,
+            aciertosNoGo = aciertosNoGo,
+            erroresImpulsivos = erroresImpulsivos,
+            obstaculosEsquivados = obstaculosEsquivados,
+            colisiones = colisiones,
+            mejorRacha = mejorRacha,
+            tiemposReaccion = new System.Collections.Generic.List<float>(tiemposReaccion),
+            nivelAlcanzado = nivel
+        });
 
         ui?.MostrarResultados(aciertosObjetivo, omisionesObjetivo, aciertosNoGo, erroresImpulsivos,
             obstaculosEsquivados, colisiones, Mathf.FloorToInt(distanciaRecorrida));
