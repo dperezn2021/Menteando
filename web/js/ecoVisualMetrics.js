@@ -128,4 +128,9 @@ const EcoVisualMetrics = {
 // Exportar globalmente
 if (typeof window !== 'undefined') {
   window.EcoVisualMetrics = EcoVisualMetrics;
+
+  // Registrar con el procesador genérico cuando esté disponible
+  if (typeof window.RawGameMetricsProcessor !== 'undefined') {
+    window.RawGameMetricsProcessor.register('eco visual', EcoVisualMetrics);
+  }
 }

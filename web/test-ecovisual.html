@@ -26,8 +26,20 @@
     <hr>
     <div id="output"></div>
 
+    <script src="js/RawGameMetricsProcessor.js"></script>
     <script src="js/ecoVisualMetrics.js"></script>
     <script src="js/test-ecoVisualMetrics.js"></script>
+    <script>
+        // Test generic processor
+        if (typeof RawGameMetricsProcessor !== 'undefined') {
+            console.log("\n🔍 Testing RawGameMetricsProcessor...");
+            const registered = RawGameMetricsProcessor.listarProcesadores();
+            console.log("  Registered games:", registered);
+            if (registered.includes('eco visual')) {
+                console.log("  ✅ Eco Visual processor registered");
+            }
+        }
+    </script>
     <script>
         // Capturar console.log para mostrar en HTML
         const output = document.getElementById('output');

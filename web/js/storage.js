@@ -42,11 +42,11 @@
         // Detectar si hay datos crudos (nueva arquitectura) o métricas (antigua)
         let metricas;
         if (data.rawGameData) {
-            // Nueva arquitectura: calcular métricas en JS desde datos crudos
-            if (typeof window.EcoVisualMetrics !== 'undefined') {
-                metricas = window.EcoVisualMetrics.procesarDatos(data.rawGameData);
+            // Nueva arquitectura: procesar datos crudos con el procesador registrado
+            if (typeof window.RawGameMetricsProcessor !== 'undefined') {
+                metricas = window.RawGameMetricsProcessor.procesarDatos(data.gameId, data.rawGameData);
             } else {
-                console.warn("⚠️ EcoVisualMetrics no está cargado, usando métricas crudas");
+                console.warn("⚠️ RawGameMetricsProcessor no está cargado");
                 metricas = {};
             }
         } else {
