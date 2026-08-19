@@ -100,6 +100,17 @@ public class RawDoubleCanalData
     public int nivelAlcanzado;
 }
 
+[System.Serializable]
+public class RawSilencioMentalData
+{
+    public int aciertosObjetivo;
+    public int rechazosCorrectos;
+    public int objetivosMostrados;
+    public int distractoresMostrados;
+    public int mejorRacha;
+    public int nivelAlcanzado;
+}
+
 
 //////////////////////////////////////////////////////////////
 // CONTEXTO GLOBAL DEL TFG - UNITY + WEB (JS/HTML)

@@ -485,7 +485,16 @@ public class SilencioMentalGame : BaseGame
         esperandoRespuesta = false;
         feedbackVisible = false;
         if (rutinaActual != null) StopCoroutine(rutinaActual);
-        WebExporter.EnviarSesion(nombre, AplicarPesos(CalcularCognicion()));
+
+        int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
+        WebExporter.EnviarSesionCruda(nombre, new RawSilencioMentalData {
+            aciertosObjetivo = aciertosObjetivo,
+            rechazosCorrectos = rechazosCorrectos,
+            objetivosMostrados = objetivosMostrados,
+            distractoresMostrados = distractoresMostrados,
+            mejorRacha = mejorRacha,
+            nivelAlcanzado = nivel
+        });
     }
 
     public override CognitiveMetrics CalcularCognicion()
