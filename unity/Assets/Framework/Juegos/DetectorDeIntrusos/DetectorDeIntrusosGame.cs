@@ -371,12 +371,20 @@ public class DetectorDeIntrusosGame : BaseGame
             celdas = null;
         }
 
-        CognitiveMetrics m = CalcularCognicion();
-        CognitiveMetrics p = AplicarPesos(m);
+        int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
+        float puntosCalculados = ((float)aciertos / Mathf.Max(1, aciertos + errores + omisiones)) * 100f;
 
-        Debug.Log($"📤 Enviando resultados - Selectiva: {p.atencionSelectiva:F2}, Velocidad: {p.velocidadCognitiva:F2}");
-
-        WebExporter.EnviarSesion(nombre, p);
+        WebExporter.EnviarSesionCruda(nombre, new RawDetectorData {
+            aciertos = aciertos,
+            errores = errores,
+            omisiones = omisiones,
+            totalIntentos = totalIntentos,
+            nivelAlcanzado = nivel,
+            filas = filas,
+            columnas = columnas,
+            sumaRT = sumaRT,
+            tiempoPorEnsayo = tiempoPorEnsayo
+        });
     }
 
     private void OnDestroy()

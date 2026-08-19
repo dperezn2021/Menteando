@@ -72,6 +72,20 @@ public class RawGameSessionData
     public float puntos;
 }
 
+[System.Serializable]
+public class RawDetectorData
+{
+    public int aciertos;
+    public int errores;
+    public int omisiones;
+    public int totalIntentos;
+    public int nivelAlcanzado;
+    public int filas;
+    public int columnas;
+    public float sumaRT;
+    public float tiempoPorEnsayo;
+}
+
 
 //////////////////////////////////////////////////////////////
 // CONTEXTO GLOBAL DEL TFG - UNITY + WEB (JS/HTML)
