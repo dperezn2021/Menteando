@@ -661,7 +661,20 @@ public class EcoVisualGame : BaseGame, IBeginDragHandler, IDragHandler, IEndDrag
         StopAllCoroutines();
         MostrarBarra(false);
         OnMemorizacionActualizada?.Invoke(0f, 1f);
-        WebExporter.EnviarSesion(nombre, AplicarPesos(CalcularCognicion()));
+        WebExporter.EnviarSesionCruda(nombre, new RawEcoVisualData
+        {
+            rondasSuperadas = rondasSuperadas,
+            rondaActual = rondaActual,
+            puntuacionTotal = puntuacionTotal,
+            puntuacionMaximaTotal = puntuacionMaximaTotal,
+            rendimientosRonda = new System.Collections.Generic.List<float>(rendimientosRonda),
+            mejorRacha = mejorRacha,
+            nivelActual = nivelActual,
+            nivelMaximo = nivelMaximo,
+            nivelInicial = nivelInicial,
+            pesoProgresoNivelCognicion = pesoProgresoNivelCognicion,
+            multiplicadorMinimoProgresoCognicion = multiplicadorMinimoProgresoCognicion
+        });
     }
 
     public override CognitiveMetrics CalcularCognicion()

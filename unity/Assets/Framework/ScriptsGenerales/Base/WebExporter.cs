@@ -9,12 +9,12 @@ public static class WebExporter
 #else
     private static void SaveGameData(string json)
     {
-        Debug.Log("Simulación SaveGameData: " + json);  
+        Debug.Log("Simulaciï¿½n SaveGameData: " + json);  
     }
 #endif
 
     public static void EnviarSesion(string nombreJuego, CognitiveMetrics metricas)
-    {       
+    {
         float scoreTotal =
             metricas.atencionSelectiva +
             metricas.atencionSostenida +
@@ -41,6 +41,29 @@ public static class WebExporter
 
         string json = JsonUtility.ToJson(data);
         SaveGameData(json);
+    }
+
+    public static void EnviarSesionCruda(string nombreJuego, RawEcoVisualData rawData)
+    {
+        float puntos = CalcularPuntosDesdeRendimiento(rawData);
+
+        RawGameSessionData data = new RawGameSessionData
+        {
+            gameId = nombreJuego,
+            timestamp = System.DateTime.UtcNow.ToString("o"),
+            rawGameData = rawData,
+            puntos = puntos
+        };
+
+        string json = JsonUtility.ToJson(data);
+        SaveGameData(json);
+    }
+
+    private static float CalcularPuntosDesdeRendimiento(RawEcoVisualData rawData)
+    {
+        if (rawData.puntuacionMaximaTotal <= 0) return 0f;
+        float rendimiento = (float)rawData.puntuacionTotal / rawData.puntuacionMaximaTotal;
+        return rendimiento * 100f;
     }
 
 }

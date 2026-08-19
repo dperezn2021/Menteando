@@ -15,10 +15,10 @@
             control: perfil.control || 0,
             reflejos: perfil.reflejos || 0
         };
-        
+
         perfil.sesiones++;
         perfil.ultimaSesion = data.timestamp;
-        
+
         // ACTUALIZAR RACHA - pasar el perfil como parámetro
         if (typeof actualizarRachaPorSesionCompletada === 'function') {
             actualizarRachaPorSesionCompletada(perfil);
@@ -26,9 +26,9 @@
 
         let puntosAAñadir = Number(data.puntos);
         if (isNaN(puntosAAñadir)) puntosAAñadir = 0;
-        
+
         perfil.puntos = Number(perfil.puntos || 0) + puntosAAñadir;
-        
+
         // ACTUALIZAR SESIONES DIARIAS
         if (typeof actualizarSesionesDiarias === 'function') {
             actualizarSesionesDiarias(perfil);
@@ -38,13 +38,28 @@
         if (!perfil.juegos[data.gameId]) {
             perfil.juegos[data.gameId] = [];
         }
-        
+
+        // Detectar si hay datos crudos (nueva arquitectura) o métricas (antigua)
+        let metricas;
+        if (data.rawGameData) {
+            // Nueva arquitectura: calcular métricas en JS desde datos crudos
+            if (typeof window.EcoVisualMetrics !== 'undefined') {
+                metricas = window.EcoVisualMetrics.procesarDatos(data.rawGameData);
+            } else {
+                console.warn("⚠️ EcoVisualMetrics no está cargado, usando métricas crudas");
+                metricas = {};
+            }
+        } else {
+            // Antigua arquitectura: usar métricas precalculadas
+            metricas = data.metrics || {};
+        }
+
         const sessionData = {
-            ...data.metrics,
+            ...metricas,
             timestamp: data.timestamp,
             puntosSesion: puntosAAñadir
         };
-        
+
         perfil.juegos[data.gameId].push(sessionData);
         
         // RECALCULAR HABILIDADES

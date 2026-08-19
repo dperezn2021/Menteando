@@ -47,6 +47,31 @@ public class GameSessionData
     public float puntos;
 }
 
+[System.Serializable]
+public class RawEcoVisualData
+{
+    public int rondasSuperadas;
+    public int rondaActual;
+    public int puntuacionTotal;
+    public int puntuacionMaximaTotal;
+    public System.Collections.Generic.List<float> rendimientosRonda;
+    public int mejorRacha;
+    public int nivelActual;
+    public int nivelMaximo;
+    public int nivelInicial;
+    public float pesoProgresoNivelCognicion;
+    public float multiplicadorMinimoProgresoCognicion;
+}
+
+[System.Serializable]
+public class RawGameSessionData
+{
+    public string gameId;
+    public string timestamp;
+    public RawEcoVisualData rawGameData;
+    public float puntos;
+}
+
 
 //////////////////////////////////////////////////////////////
 // CONTEXTO GLOBAL DEL TFG - UNITY + WEB (JS/HTML)
