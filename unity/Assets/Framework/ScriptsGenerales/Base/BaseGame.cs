@@ -111,6 +111,69 @@ public class RawSilencioMentalData
     public int nivelAlcanzado;
 }
 
+[System.Serializable]
+public class RawOperacionesEncadenadasData
+{
+    public int operacionesCorrectas;
+    public int totalOperaciones;
+    public System.Collections.Generic.List<float> tiemposRespuesta;
+    public System.Collections.Generic.List<bool> aciertos;
+    public System.Collections.Generic.List<bool> fueEspecial;
+    public System.Collections.Generic.List<int> nivelesPorOperacion;
+    public int nivelAlcanzado;
+}
+
+[System.Serializable]
+public class RawColorMatchData
+{
+    public int aciertos;
+    public int errores;
+    public int totalIntentos;
+    public System.Collections.Generic.List<float> tiemposRespuesta;
+    public int nivelAlcanzado;
+}
+
+[System.Serializable]
+public class RawCambioDeReglasData
+{
+    public int aciertos;
+    public int errores;
+    public int totalIntentos;
+    public System.Collections.Generic.List<float> tiemposRespuesta;
+    public int reglasAprendidas;
+    public int nivelAlcanzado;
+}
+
+[System.Serializable]
+public class RawTrayectoriasData
+{
+    public int nivelSuperado;
+    public int nivelMaximoAlcanzado;
+    public int errores;
+    public System.Collections.Generic.List<float> tiemposNiveles;
+    public float tiempoTotal;
+}
+
+[System.Serializable]
+public class RawMisionOrbitalData
+{
+    public int aciertos;
+    public int errores;
+    public int totalIntentos;
+    public System.Collections.Generic.List<float> tiemposRespuesta;
+    public int nivelAlcanzado;
+}
+
+[System.Serializable]
+public class RawReflejosData
+{
+    public int aciertos;
+    public int errores;
+    public int totalIntentos;
+    public System.Collections.Generic.List<float> tiemposRespuesta;
+    public int nivelAlcanzado;
+}
+
 
 //////////////////////////////////////////////////////////////
 // CONTEXTO GLOBAL DEL TFG - UNITY + WEB (JS/HTML)

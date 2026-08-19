@@ -392,7 +392,17 @@ public class OperacionesEncadenadasGame : BaseGame
         activo = false;
         enMemorizacion = false;
         if (rutinaMemorizacion != null) StopCoroutine(rutinaMemorizacion);
-        WebExporter.EnviarSesion(nombre, AplicarPesos(CalcularCognicion()));
+
+        int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
+        WebExporter.EnviarSesionCruda(nombre, new RawOperacionesEncadenadasData {
+            operacionesCorrectas = operacionesCorrectas,
+            totalOperaciones = totalOperaciones,
+            tiemposRespuesta = new System.Collections.Generic.List<float>(tiemposRespuesta),
+            aciertos = new System.Collections.Generic.List<bool>(aciertos),
+            fueEspecial = new System.Collections.Generic.List<bool>(fueEspecial),
+            nivelesPorOperacion = new System.Collections.Generic.List<int>(nivelesPorOperacion),
+            nivelAlcanzado = nivel
+        });
     }
 
     public override void PausarJuego(bool pausar)
