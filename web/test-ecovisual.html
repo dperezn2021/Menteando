@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test EcoVisual Metrics</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1a1a1a;
+            color: #0f0;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { color: #0ff; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .info { color: #0ff; }
+        pre { background: #000; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test EcoVisual Metrics</h1>
+    <p>Validando que los cálculos en JavaScript son equivalentes a C#...</p>
+    <hr>
+    <div id="output"></div>
+
+    <script src="js/ecoVisualMetrics.js"></script>
+    <script src="js/test-ecoVisualMetrics.js"></script>
+    <script>
+        // Capturar console.log para mostrar en HTML
+        const output = document.getElementById('output');
+        const originalLog = console.log;
+        const originalAssert = console.assert;
+
+        console.log = function(...args) {
+            originalLog(...args);
+            const msg = args.map(a =>
+                typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)
+            ).join(' ');
+            const pre = document.createElement('pre');
+            pre.textContent = msg;
+            if (msg.includes('✅')) pre.className = 'success';
+            if (msg.includes('❌')) pre.className = 'error';
+            if (msg.includes('TEST')) pre.className = 'info';
+            output.appendChild(pre);
+        };
+
+        console.assert = function(condition, message) {
+            originalAssert(condition, message);
+            if (!condition) {
+                const pre = document.createElement('pre');
+                pre.className = 'error';
+                pre.textContent = '❌ ASSERTION FAILED: ' + message;
+                output.appendChild(pre);
+            }
+        };
+    </script>
+</body>
+</html>
