@@ -2,19 +2,21 @@ const CambioDeReglasMetrics = {
   calcularCognicion(rawData) {
     const { aciertosReales = 0, fallos = 0, cambiosRegla = 0, mejorRacha = 0, nivelActual = 1 } = rawData;
     const total = aciertosReales + fallos;
-    if (total <= 0) return {};
+    if (total <= 0) {
+      return { flexibilidadCognitiva: 0, controlInhibitorio: 0, atencionSostenida: 0, planificacion: 0, memoriaEspacial: 0 };
+    }
     const precision = aciertosReales / total;
     const precisionExigente = Math.max(0, Math.min(1, (precision - 0.50) / (0.95 - 0.50)));
-    const volumen = Math.min(1, total / 45);
-    const nivelFactor = Math.min(1, (nivelActual - 1) / 9);
-    const flexibilidad = Math.min(1, cambiosRegla / 30);
-    const rachaNormalizada = Math.min(1, Math.min(mejorRacha, aciertosReales) / 18);
+    const volumen = Math.max(0, Math.min(1, total / 45));
+    const nivelFactor = Math.max(0, Math.min(1, (nivelActual - 1) / 9));
+    const flexibilidad = Math.max(0, Math.min(1, cambiosRegla / 30));
+    const rachaNormalizada = Math.max(0, Math.min(1, Math.min(mejorRacha, aciertosReales) / 18));
     return {
-      flexibilidadCognitiva: Math.min(1, (precisionExigente * 0.45 + flexibilidad * 0.35 + nivelFactor * 0.20) * volumen),
-      controlInhibitorio: Math.min(1, (precisionExigente * 0.80 + nivelFactor * 0.20) * volumen),
-      atencionSostenida: Math.min(1, (aciertosReales / 60) * precisionExigente),
-      planificacion: Math.min(1, (precisionExigente * 0.40 + rachaNormalizada * 0.40 + nivelFactor * 0.20) * volumen),
-      memoriaEspacial: Math.min(1, (precisionExigente * 0.70 + nivelFactor * 0.30) * volumen)
+      flexibilidadCognitiva: Math.max(0, Math.min(1, (precisionExigente * 0.45 + flexibilidad * 0.35 + nivelFactor * 0.20) * volumen)),
+      controlInhibitorio: Math.max(0, Math.min(1, (precisionExigente * 0.80 + nivelFactor * 0.20) * volumen)),
+      atencionSostenida: Math.max(0, Math.min(1, (aciertosReales / 60) * precisionExigente)),
+      planificacion: Math.max(0, Math.min(1, (precisionExigente * 0.40 + rachaNormalizada * 0.40 + nivelFactor * 0.20) * volumen)),
+      memoriaEspacial: Math.max(0, Math.min(1, (precisionExigente * 0.70 + nivelFactor * 0.30) * volumen))
     };
   },
   aplicarPesos(metrics) {

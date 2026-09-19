@@ -1,0 +1,14 @@
+console.log("\n🧪 TESTS: Cambio de Reglas");
+const t1 = { aciertosReales: 0, fallos: 0, cambiosRegla: 0, mejorRacha: 0, nivelActual: 1 };
+const r1 = CambioDeReglasMetrics.procesarDatos(t1);
+console.assert(r1.flexibilidadCognitiva === 0, "Vacío = 0");
+const t2 = { aciertosReales: 45, fallos: 0, cambiosRegla: 30, mejorRacha: 18, nivelActual: 10 };
+const r2 = CambioDeReglasMetrics.calcularCognicion(t2);
+console.assert(Object.values(r2).every(v => v >= 0 && v <= 1), "Perfecto: todos [0-1]");
+const t3 = { aciertosReales: 20, fallos: 10, cambiosRegla: 10, mejorRacha: 5, nivelActual: 5 };
+const r3 = CambioDeReglasMetrics.procesarDatos(t3);
+console.assert(Object.values(r3).every(v => v >= 0 && v <= 1), "Típico: todos [0-1]");
+const t4 = { aciertosReales: 5, fallos: 35, cambiosRegla: 2, mejorRacha: 1, nivelActual: 2 };
+const r4 = CambioDeReglasMetrics.procesarDatos(t4);
+console.assert(r4.flexibilidadCognitiva < 0.3, "Bajo: flexibilidad < 0.3");
+console.log("✅ Cambio de Reglas OK\n");

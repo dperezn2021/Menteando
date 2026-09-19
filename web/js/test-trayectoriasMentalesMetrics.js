@@ -1,0 +1,14 @@
+console.log("\n🧪 TESTS: Trayectorias Mentales");
+const t1 = { attempts: 0, successes: 0, trapHits: 0, totalRequiredBounces: 0, totalUsedBounces: 0, bestStreak: 0, maxLevelReached: 1, totalExitDistanceScore: 0 };
+const r1 = TrayectoriasMentalesMetrics.procesarDatos(t1);
+console.assert(Object.values(r1).slice(0, 4).every(v => v === 0), "Vacío: todos 0");
+const t2 = { attempts: 20, successes: 20, trapHits: 0, totalRequiredBounces: 100, totalUsedBounces: 100, bestStreak: 3, maxLevelReached: 8, totalExitDistanceScore: 20 };
+const r2 = TrayectoriasMentalesMetrics.calcularCognicion(t2);
+console.assert(Object.values(r2).every(v => v >= 0 && v <= 1), "Perfecto: todos [0-1]");
+const t3 = { attempts: 15, successes: 10, trapHits: 2, totalRequiredBounces: 75, totalUsedBounces: 80, bestStreak: 2, maxLevelReached: 5, totalExitDistanceScore: 10 };
+const r3 = TrayectoriasMentalesMetrics.procesarDatos(t3);
+console.assert(Object.values(r3).every(v => v >= 0 && v <= 1), "Típico: todos [0-1]");
+const t4 = { attempts: 10, successes: 2, trapHits: 6, totalRequiredBounces: 50, totalUsedBounces: 30, bestStreak: 0, maxLevelReached: 2, totalExitDistanceScore: 1 };
+const r4 = TrayectoriasMentalesMetrics.procesarDatos(t4);
+console.assert(r4.memoriaEspacial < 0.5, "Bajo: memoria espacial < 0.5");
+console.log("✅ Trayectorias Mentales OK\n");

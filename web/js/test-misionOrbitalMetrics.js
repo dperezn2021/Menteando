@@ -1,0 +1,14 @@
+console.log("\n🧪 TESTS: Misión Orbital");
+const t1 = { totalIntentos: 0, aciertos: 0, sumaRT: 0, sumaRT2: 0, maxLevelReached: 1, mejorRacha: 0, cambiosDireccion: 0 };
+const r1 = MisionOrbitalMetrics.procesarDatos(t1);
+console.assert(Object.values(r1).slice(0, 4).every(v => v === 0), "Vacío: todos 0");
+const t2 = { totalIntentos: 20, aciertos: 20, sumaRT: 10, sumaRT2: 5.5, maxLevelReached: 12, mejorRacha: 8, cambiosDireccion: 0 };
+const r2 = MisionOrbitalMetrics.calcularCognicion(t2);
+console.assert(Object.values(r2).every(v => v >= 0.1 && v <= 0.95), "Perfecto: en rango");
+const t3 = { totalIntentos: 15, aciertos: 10, sumaRT: 15, sumaRT2: 15, maxLevelReached: 6, mejorRacha: 3, cambiosDireccion: 2 };
+const r3 = MisionOrbitalMetrics.procesarDatos(t3);
+console.assert(Object.values(r3).every(v => v >= 0 && v <= 1), "Típico: todos [0-1]");
+const t4 = { totalIntentos: 10, aciertos: 2, sumaRT: 18, sumaRT2: 32, maxLevelReached: 2, mejorRacha: 1, cambiosDireccion: 5 };
+const r4 = MisionOrbitalMetrics.procesarDatos(t4);
+console.assert(r4.velocidadCognitiva < 0.5, "Bajo: velocidad < 0.5");
+console.log("✅ Misión Orbital OK\n");

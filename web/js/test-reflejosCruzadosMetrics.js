@@ -1,0 +1,14 @@
+console.log("\n🧪 TESTS: Reflejos Cruzados");
+const t1 = { totalEvents: 0, touchedCorrect: 0, touchedIncorrect: 0, avoidedCorrect: 0, missedTargets: 0, bestStreak: 0, maxLevelReached: 1, ruleSwitchCount: 0 };
+const r1 = ReflejosCruzadosMetrics.procesarDatos(t1);
+console.assert(Object.values(r1).slice(0, 4).every(v => v === 0), "Vacío: todos 0");
+const t2 = { totalEvents: 30, touchedCorrect: 25, touchedIncorrect: 0, avoidedCorrect: 5, missedTargets: 0, bestStreak: 8, maxLevelReached: 10, ruleSwitchCount: 3 };
+const r2 = ReflejosCruzadosMetrics.calcularCognicion(t2);
+console.assert(Object.values(r2).every(v => v >= 0 && v <= 1), "Perfecto: todos [0-1]");
+const t3 = { totalEvents: 25, touchedCorrect: 15, touchedIncorrect: 3, avoidedCorrect: 5, missedTargets: 2, bestStreak: 4, maxLevelReached: 5, ruleSwitchCount: 1 };
+const r3 = ReflejosCruzadosMetrics.procesarDatos(t3);
+console.assert(Object.values(r3).every(v => v >= 0 && v <= 1), "Típico: todos [0-1]");
+const t4 = { totalEvents: 20, touchedCorrect: 5, touchedIncorrect: 10, avoidedCorrect: 2, missedTargets: 3, bestStreak: 1, maxLevelReached: 2, ruleSwitchCount: 0 };
+const r4 = ReflejosCruzadosMetrics.procesarDatos(t4);
+console.assert(r4.coordinacionVisomotora < 0.3, "Bajo: coordinación < 0.3");
+console.log("✅ Reflejos Cruzados OK\n");
