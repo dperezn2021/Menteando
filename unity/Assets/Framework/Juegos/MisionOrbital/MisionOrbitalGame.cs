@@ -438,9 +438,13 @@ public class MisionOrbitalGame : BaseGame
 
     public void EnviarResultados()
     {
-        CognitiveMetrics m = CalcularCognicion();
-        CognitiveMetrics p = AplicarPesos(m);
-
-        WebExporter.EnviarSesion(nombre, p);
+        int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
+        WebExporter.EnviarSesionCruda(nombre, new RawMisionOrbitalData {
+            aciertos = aciertos,
+            errores = errores,
+            totalIntentos = totalIntentos,
+            tiemposRespuesta = new System.Collections.Generic.List<float>(tiemposReaccion),
+            nivelAlcanzado = nivel
+        });
     }
 }

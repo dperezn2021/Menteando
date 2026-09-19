@@ -1127,8 +1127,14 @@ public class CambioDeReglasGame : BaseGame
         LimpiarAlimentos();
         LimpiarPowerUps();
 
-        CognitiveMetrics metrics = AplicarPesos(CalcularCognicion());
-        WebExporter.EnviarSesion(nombre, metrics);
+        int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
+        WebExporter.EnviarSesionCruda(nombre, new RawCambioDeReglasData {
+            aciertosReales = aciertosReales,
+            fallos = fallos,
+            cambiosRegla = cambiosRegla,
+            mejorRacha = mejorRacha,
+            nivelAlcanzado = nivel
+        });
     }
 
     public override CognitiveMetrics CalcularCognicion()

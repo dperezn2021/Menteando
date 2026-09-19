@@ -1501,7 +1501,13 @@ public class TrayectoriasMentalesGame : BaseGame
         if (gameFinished) return;
         gameFinished = true; gameActive = false;
         if (executionRoutine != null) StopCoroutine(executionRoutine);
-        WebExporter.EnviarSesion(nombre, AplicarPesos(CalcularCognicion()));
+        WebExporter.EnviarSesionCruda(nombre, new RawTrayectoriasData {
+            nivelSuperado = levelsCrossedTotal,
+            nivelMaximoAlcanzado = maxLevelReached,
+            errores = trapHits,
+            tiemposNiveles = new System.Collections.Generic.List<float>(),
+            tiempoTotal = Time.realtimeSinceStartup
+        });
     }
 
     public override CognitiveMetrics CalcularCognicion()

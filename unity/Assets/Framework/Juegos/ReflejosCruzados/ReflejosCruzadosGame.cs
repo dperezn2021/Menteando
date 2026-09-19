@@ -463,7 +463,14 @@ public class ReflejosCruzadosGame : BaseGame
         gameFinished = true;
         gameActive = false;
         ClearItems();
-        WebExporter.EnviarSesion(nombre, AplicarPesos(CalcularCognicion()));
+        int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
+        WebExporter.EnviarSesionCruda(nombre, new RawReflejosData {
+            aciertos = successfulTouches,
+            errores = incorrectTouches,
+            totalIntentos = totalEvents,
+            tiemposRespuesta = new System.Collections.Generic.List<float>(reactionTimes),
+            nivelAlcanzado = nivel
+        });
     }
 
     public override CognitiveMetrics CalcularCognicion()
