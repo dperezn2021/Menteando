@@ -295,7 +295,14 @@ public class ColorMatchGame : BaseGame
         LimpiarRutinas(); // 🔥 CAMBIO
         colorWheel?.SetPausado(true); // 🔥 CAMBIO
 
-        WebExporter.EnviarSesion(nombre, AplicarPesos(CalcularCognicion()));
+        int nivel = DifficultyManager.Instance?.nivelActual ?? 1;
+        WebExporter.EnviarSesionCruda(nombre, new RawColorMatchData {
+            aciertos = aciertos,
+            errores = errores,
+            totalIntentos = totalIntentos,
+            tiemposRespuesta = new System.Collections.Generic.List<float>(tiemposReaccion),
+            nivelAlcanzado = nivelMaximoAlcanzado
+        });
     }
 
     public override CognitiveMetrics CalcularCognicion()

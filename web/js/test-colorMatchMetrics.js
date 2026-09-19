@@ -1,0 +1,12 @@
+console.log("\n🧪 TESTS: Color Match");
+const t1 = { aciertos: 0, errores: 0, totalIntentos: 0, tiemposRespuesta: [], nivelAlcanzado: 1, mejorRacha: 0 };
+const r1 = ColorMatchMetrics.procesarDatos(t1);
+console.assert(r1.controlInhibitorio === 0, "Vacío = 0");
+const t2 = { aciertos: 8, errores: 0, totalIntentos: 8, tiemposRespuesta: [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5], nivelAlcanzado: 8, mejorRacha: 10 };
+const r2 = ColorMatchMetrics.calcularCognicion(t2);
+console.assert(r2.controlInhibitorio > 0.9, "Perfecto > 0.9");
+const t3 = { aciertos: 5, errores: 3, totalIntentos: 8, tiemposRespuesta: [0.7,0.8,0.6,1.0,0.5,0.9,0.75,0.8], nivelAlcanzado: 4, mejorRacha: 5 };
+const r3 = ColorMatchMetrics.procesarDatos(t3);
+let v = Object.values(r3).slice(0,4).every(x => x >= 0 && x <= 1);
+console.assert(v, "Rango [0-1]");
+console.log("✅ Color Match OK\n");
